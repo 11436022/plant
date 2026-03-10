@@ -29,6 +29,6 @@ database.py: 資料庫連線配置中心，使用 dotenv 讀取環境變數。
 models.py: 定義資料庫表格結構 (ORM)。
 api_fetch.py : 從農業 API 抓取資料並回傳 JSON把資料抓下來存成檔案
 crud.py: 負責資料庫操作
-
+test_gemini.py:傳入照片 設定prompt經由gemini傳到資料庫
 1. 請先執行 python api_fetch.py 獲取最新農業資料。
 2. 再執行 python crud.py 將抓取到的資料同步至資料庫。
