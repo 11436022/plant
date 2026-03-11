@@ -41,6 +41,7 @@ class PlantDiary(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("user.user_id")) 
     crop_id = Column(Integer, ForeignKey("crop.crop_id"))
+    status_name = Column(String(100),nullable=True)
     image_url = Column(String(2048))
     disease_id = Column(Integer, ForeignKey("disease.disease_id"), nullable=True)
     pest_id = Column(Integer, ForeignKey("pests.pest_id"), nullable=True)

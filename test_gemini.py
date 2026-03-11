@@ -1,4 +1,4 @@
-import google.generativeai as genai
+from google import genai
 import os
 from PIL import Image
 from dotenv import load_dotenv
@@ -7,9 +7,8 @@ import json
 import google.api_core.exceptions
 load_dotenv()
 
-genai.configure(api_key=os.getenv("Gemini_API_KEY"))
+client = genai.Client(api_key=os.getenv("Gemini_API_KEY"))
 
-model = genai.GenerativeModel("gemini-3-flash-preview")
 
 def diagnostic_plant(image_path):
     img = Image.open(image_path)
@@ -19,17 +18,22 @@ def diagnostic_plant(image_path):
     1.植物名稱
     2.健康狀態(Healthy/Disease/Pest)
     3.簡易建議
-    請用JSON格式回傳,例如{"name":"韭菜", "status":"Disease","suggestion":"疑似疑似鏽病，建議剪除病葉"}
+    請用JSON格式回傳,例如{"name":"韭菜", "status":"白化病","suggestion":"疑似疑似鏽病，建議剪除病葉"}
     """
-    response = model.generate_content([prompt, img])
-    return response.text
+    try:
+        response = client.models.generate_content(model="gemini-2.5-flash",contents=[prompt,img])
+        clean_text=response.text.replace('```json', '').replace('```', '').strip()
+        return json.loads(clean_text)
+    except Exception as e:
+        print(f"AI 辨識出錯: {e}")
+        return None
 
 
 
 
-def save_to_db(plant_data, image_path):
+def save_to_db(data, image_path):
 
-    connection = pymysql.connect(
+    conn = pymysql.connect(
         host="localhost",
         user="plant",
         password="1234",
@@ -38,26 +42,24 @@ def save_to_db(plant_data, image_path):
     )
 
     try:
-        with connection.cursor() as cursor:
-            clean_json = plant_data.replace('```json', '').replace('```', '').strip()
-            data = json.loads(clean_json)
-
+        with conn.cursor() as cursor:
+            
             sql = """
-            INSERT INTO plant_diary (user_id,crop_id,image_url,user_note,created_at)
-            VALUES (%s, %s, %s, %s, NOW())
+            INSERT INTO plant_diary (user_id,crop_id,image_url,status_name,user_note,created_at)
+            VALUES (%s, %s,%s,%s, %s, NOW())
             """
-            cursor.execute(sql,(1,2,image_path,data["suggestion"]))
-        connection.commit()
+            cursor.execute(sql,(1,2,image_path,data["status"],data["suggestion"]))
+        conn.commit()
         print("資料已成功存入資料庫!")
     except google.api_core.exceptions.ResourceExhausted:
         return "ERROR: API 配額已達上限（請稍後再試）"
     except Exception as e:
         return f"ERROR: 發生未知錯誤: {str(e)}"
     finally:
-        connection.close()
+        conn.close()
 
 
 
 if __name__ == "__main__":
-    result = diagnostic_plant("")
-    save_to_db(result, r"")
+    result = diagnostic_plant(r"C:\Users\User\OneDrive\Desktop\MyProject\dataset\lettuce_fushan\disease\IMG_13.jpg")
+    save_to_db(result, r"C:\Users\User\OneDrive\Desktop\MyProject\dataset\lettuce_fushan\disease\IMG_13.jpg")
