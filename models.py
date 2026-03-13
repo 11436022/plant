@@ -15,8 +15,9 @@ class Disease(Base):
     __tablename__ = "disease"
     disease_id = Column(Integer, primary_key=True, index=True)
     crop_id = Column(Integer, ForeignKey("crop.crop_id"))
-    disease_name = Column(String(100), nullable=False)
+    disease_name = Column(String(100))
     description = Column(Text)
+    treatment = Column(String(100))
     crop = relationship("Crop", back_populates="diseases")
     
 class Pest(Base):
@@ -25,6 +26,7 @@ class Pest(Base):
     crop_id = Column(Integer, ForeignKey("crop.crop_id"))
     pest_name = Column(String(100), nullable=False)
     description = Column(Text)
+    treatment = Column(String(100))
     crop = relationship("Crop", back_populates="pests")    
 class User(Base):
     __tablename__ = "user"

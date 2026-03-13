@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 import pymysql
 import json
 import google.api_core.exceptions
+from db_utils import get_or_create_id
+
 load_dotenv()
 
 client = genai.Client(api_key=os.getenv("Gemini_API_KEY"))
@@ -14,11 +16,17 @@ def diagnostic_plant(image_path):
     img = Image.open(image_path)
 
     prompt = """
-    你是一位植物專家.請分析這張照片並回答:
-    1.植物名稱
-    2.健康狀態(Healthy/Disease/Pest)
-    3.簡易建議
-    請用JSON格式回傳,例如{"name":"韭菜", "status":"白化病","suggestion":"疑似疑似鏽病，建議剪除病葉"}
+    請分析這張植物照片，並嚴格按照以下 JSON 格式回傳（不要包含額外文字）：
+    {
+    "crop_name:"植物名稱",
+    "category": "Healthy/Disease/Pest",
+    "status_name": "病名或蟲害簡稱(若健康則填Healthy)",
+    "confidence": 準確率(0~1),
+    "suggestion": "發生了甚麼",
+    "treatment" : "和建議如何改善"
+    }
+    注意:status_name 請精簡只要疾病或害蟲名稱，不要括號。
+    注意:suggestion 請精簡在20字左右。
     """
     try:
         response = client.models.generate_content(model="gemini-2.5-flash",contents=[prompt,img])
@@ -32,12 +40,25 @@ def diagnostic_plant(image_path):
 
 
 def save_to_db(data, image_path):
+    print("--- 開始執行儲存流程 ---") # 加入這行
+    category = data.get('category')
+    print(f"辨識到的類別是: {category}")
+    status_name = data.get("status_name")
+    disease_id = None
+    pest_id = None
+    # 在這裡「呼叫」擴充邏輯
+    if category == "Disease":
+        disease_id = get_or_create_id("disease",status_name,data.get("suggestion"),data.get("treatment"))
+    elif category == 'Pest':
+        pest_id = get_or_create_id('pests', status_name, data.get('suggestion'), data.get('treatment'))
+
+    # 執行最終的 plant_diary 儲存
 
     conn = pymysql.connect(
-        host="localhost",
-        user="plant",
-        password="1234",
-        database="plant_db",
+        user = os.getenv("DB_USER"),
+        password = os.getenv("DB_PASSWORD"),
+        host = os.getenv("DB_HOST"),
+        database = os.getenv("DB_NAME"),
         cursorclass=pymysql.cursors.DictCursor
     )
 
@@ -45,11 +66,13 @@ def save_to_db(data, image_path):
         with conn.cursor() as cursor:
             
             sql = """
-            INSERT INTO plant_diary (user_id,crop_id,image_url,status_name,user_note,created_at)
-            VALUES (%s, %s,%s,%s, %s, NOW())
+            INSERT INTO plant_diary (user_id,crop_id,status_name,image_url,disease_id, pest_id,confidence,user_note,created_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
             """
-            cursor.execute(sql,(1,2,image_path,data["status"],data["suggestion"]))
+            cursor.execute(sql,(
+                1,2,data["status_name"],image_path,disease_id, pest_id,data["confidence"],data["suggestion"]))
         conn.commit()
+        print(f"✅ 成功！已關聯 {category} ID: {disease_id or pest_id}")
         print("資料已成功存入資料庫!")
     except google.api_core.exceptions.ResourceExhausted:
         return "ERROR: API 配額已達上限（請稍後再試）"
@@ -61,5 +84,6 @@ def save_to_db(data, image_path):
 
 
 if __name__ == "__main__":
-    result = diagnostic_plant(r"C:\Users\User\OneDrive\Desktop\MyProject\dataset\lettuce_fushan\disease\IMG_13.jpg")
-    save_to_db(result, r"C:\Users\User\OneDrive\Desktop\MyProject\dataset\lettuce_fushan\disease\IMG_13.jpg")
+    result = diagnostic_plant(r"")
+    print(result)
+    save_to_db(result, r"")
