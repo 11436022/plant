@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import pymysql
 import json
 import google.api_core.exceptions
-from db_utils import get_or_create_id
+from db_utils import get_or_create_id, get_crop_id_by_name
 
 load_dotenv()
 
@@ -18,7 +18,7 @@ def diagnostic_plant(image_path):
     prompt = """
     請分析這張植物照片，並嚴格按照以下 JSON 格式回傳（不要包含額外文字）：
     {
-    "crop_name:"植物名稱",
+    "crop_name":"植物名稱",
     "category": "Healthy/Disease/Pest",
     "status_name": "病名或蟲害簡稱(若健康則填Healthy)",
     "confidence": 準確率(0~1),
@@ -41,6 +41,12 @@ def diagnostic_plant(image_path):
 
 def save_to_db(data, image_path):
     print("--- 開始執行儲存流程 ---") # 加入這行
+
+    crop_name = data.get("crop_name")
+    target_crop_id = get_crop_id_by_name(crop_name)
+    if target_crop_id is None:
+        print("無法關聯植物，儲存失敗。")
+        return
     category = data.get('category')
     print(f"辨識到的類別是: {category}")
     status_name = data.get("status_name")
@@ -48,9 +54,9 @@ def save_to_db(data, image_path):
     pest_id = None
     # 在這裡「呼叫」擴充邏輯
     if category == "Disease":
-        disease_id = get_or_create_id("disease",status_name,data.get("suggestion"),data.get("treatment"))
+        disease_id = get_or_create_id("disease",status_name,target_crop_id,data.get("suggestion"),data.get("treatment"))
     elif category == 'Pest':
-        pest_id = get_or_create_id('pests', status_name, data.get('suggestion'), data.get('treatment'))
+        pest_id = get_or_create_id('pests', status_name, target_crop_id,data.get('suggestion'), data.get('treatment'))
 
     # 執行最終的 plant_diary 儲存
 
@@ -66,11 +72,11 @@ def save_to_db(data, image_path):
         with conn.cursor() as cursor:
             
             sql = """
-            INSERT INTO plant_diary (user_id,crop_id,status_name,image_url,disease_id, pest_id,confidence,user_note,created_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
+            INSERT INTO plant_diary (user_id,crop_id,status_name,image_url,disease_id, pest_id,confidence,suggestion,user_note,created_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%s, NOW())
             """
             cursor.execute(sql,(
-                1,2,data["status_name"],image_path,disease_id, pest_id,data["confidence"],data["suggestion"]))
+                1,target_crop_id,status_name,image_path,disease_id, pest_id,data["confidence"],data["suggestion"],"hi"))
         conn.commit()
         print(f"✅ 成功！已關聯 {category} ID: {disease_id or pest_id}")
         print("資料已成功存入資料庫!")

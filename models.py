@@ -48,6 +48,7 @@ class PlantDiary(Base):
     disease_id = Column(Integer, ForeignKey("disease.disease_id"), nullable=True)
     pest_id = Column(Integer, ForeignKey("pests.pest_id"), nullable=True)
     confidence = Column(Float)
+    suggestion = Column(Text)
     user_note = Column(Text)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     user = relationship("User", back_populates="plant_diary")
