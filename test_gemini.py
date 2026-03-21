@@ -18,7 +18,7 @@ def diagnostic_plant(image_path):
     prompt = """
     請分析這張植物照片，並嚴格按照以下 JSON 格式回傳（不要包含額外文字）：
     {
-    "crop_name":"植物名稱",
+    "crop_name":"植物名稱"(中文名),
     "category": "Healthy/Disease/Pest",
     "status_name": "病名或蟲害簡稱(若健康則填Healthy)",
     "confidence": 準確率(0~1),
@@ -39,7 +39,7 @@ def diagnostic_plant(image_path):
 
 
 
-def save_to_db(data, image_path):
+def save_to_db(data, image_path,user_note=""):
     print("--- 開始執行儲存流程 ---") # 加入這行
 
     crop_name = data.get("crop_name")
@@ -67,7 +67,6 @@ def save_to_db(data, image_path):
         database = os.getenv("DB_NAME"),
         cursorclass=pymysql.cursors.DictCursor
     )
-
     try:
         with conn.cursor() as cursor:
             
@@ -76,10 +75,11 @@ def save_to_db(data, image_path):
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%s, NOW())
             """
             cursor.execute(sql,(
-                1,target_crop_id,status_name,image_path,disease_id, pest_id,data["confidence"],data["suggestion"],"hi"))
+                1,target_crop_id,status_name,image_path,disease_id, pest_id,data["confidence"],data["suggestion"],user_note))
         conn.commit()
         print(f"✅ 成功！已關聯 {category} ID: {disease_id or pest_id}")
         print("資料已成功存入資料庫!")
+        return target_crop_id
     except google.api_core.exceptions.ResourceExhausted:
         return "ERROR: API 配額已達上限（請稍後再試）"
     except Exception as e:
@@ -87,9 +87,7 @@ def save_to_db(data, image_path):
     finally:
         conn.close()
 
-
-
-if __name__ == "__main__":
-    result = diagnostic_plant(r"")
-    print(result)
-    save_to_db(result, r"")
+#if __name__ == "__main__":
+ #   result = diagnostic_plant(r"")
+  #  print(result)
+   # save_to_db(result, r"")
