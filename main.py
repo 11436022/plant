@@ -6,7 +6,7 @@ from test_gemini import save_to_db, diagnostic_plant
 from fastapi.staticfiles import StaticFiles
 from fastapi import HTTPException
 from db_utils import get_db_connection
-
+import uvicorn
 
 app = FastAPI(title = "植物病害診斷系統 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -86,3 +86,8 @@ async def get_all_history():
         raise HTTPException(status_code=500,detail="資料庫查詢失敗")
     finally:
         conn.close()
+
+
+if __name__ == "__main__":
+    
+    uvicorn.run(app, host="0.0.0.0", port=8000)

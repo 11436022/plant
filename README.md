@@ -34,3 +34,12 @@ CREATE DATABASE plant_db;
 * main.py:專案啟動入口，整合 FastAPI 路由並串接上傳照片查詢歷史紀錄
 1. 請先執行 python api_fetch.py 獲取最新農業資料。
 2. 再執行 python crud.py 將抓取到的資料同步至資料庫。
+
+### docker
+# 1. 先建立映像檔 (只需要做一次)
+docker build -t plant-app-final .
+
+# 2. 啟動容器 (每次要跑程式時執行這行)
+docker run --gpus all -it -p 8000:8000 -v ${PWD}:/app plant-app-final bash -c "cd /app && python3 main.py"
+
+# 如果網頁跑不出來網址改成  http://localhost:8000/docs
