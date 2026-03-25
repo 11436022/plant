@@ -18,6 +18,9 @@ RUN pip install --no-cache-dir \
     python-dotenv \
     Pillow \
     google-genai \
+    google-api-core \
+    google-auth \
+    python-multipart \
     cryptography
 
 # 5. 告訴容器啟動時要跑什麼
