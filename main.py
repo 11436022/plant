@@ -87,7 +87,29 @@ async def get_all_history():
     finally:
         conn.close()
 
+@app.delete("/diaries/{diariy_id}")
+async def delete_diary(diary_id:int):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT image_url From plant_diary Where id=%s",(diary_id,))
+            record = cursor.fetchone()
+            if not record:
+                raise HTTPException(status_code=404, detail="找不到該筆紀錄")
+            sql = "DELETE From plant_diary Where id = %s"
+            cursor.execute(sql,(diary_id,))
+            conn.commit()
 
+            image_path = record.get("image_url")
+            if image_path and os.path.exists(image_path):
+                os.remove(image_path)
+                print(f"--- 已成功刪除實體檔案: {image_path} ---")
+            return {"status":"success","message":f"ID{diary_id}已成功刪除"}
+    except Exception as e:
+        print(f"刪除失敗:{e}")
+        raise HTTPException(status_code=500,detail=str(e))
+    finally:
+        conn.close()
 if __name__ == "__main__":
     
     uvicorn.run(app, host="0.0.0.0", port=8000)

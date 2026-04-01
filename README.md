@@ -17,12 +17,13 @@ pip install -r requirements.txt
 # .env 內容範例
 DB_USER=你的MySQL帳號 (例如 root)
 DB_PASSWORD=你的MySQL密碼
-DB_HOST=localhost
+DB_HOST=host.docker.internal
+DB_HOST=127.0.0.1 
 DB_NAME=plant_db
 
 ### 3. 建立本地資料庫
 請開啟 MySQL，手動執行以下指令建立資料庫：
-CREATE DATABASE plant_db;
+init_db.sql可以直接複製到mysql去建立
 
 ### 📂 檔案結構說明
 * database.py: 資料庫連線配置中心，使用 dotenv 讀取環境變數。
@@ -34,8 +35,12 @@ CREATE DATABASE plant_db;
 * main.py:專案啟動入口，整合 FastAPI 路由並串接上傳照片查詢歷史紀錄
 1. 請先執行 python api_fetch.py 獲取最新農業資料。
 2. 再執行 python crud.py 將抓取到的資料同步至資料庫。
+* init_db.sql: 資料庫
+* dockerfile:可以用docker環境來跑
 
 ### docker
+# 一樣要先建好 資料庫 還有下載docker desktop
+# 要改成 DB_HOST=host.docker.internal
 # 1. 先建立映像檔 (只需要做一次)
 docker build -t plant-app-final .
 
