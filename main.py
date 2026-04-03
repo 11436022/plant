@@ -7,6 +7,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi import HTTPException
 from db_utils import get_db_connection
 import uvicorn
+from pydantic import BaseModel, EmailStr
+from passlib.context import CryptContext
+import pymysql
+
 
 app = FastAPI(title = "植物病害診斷系統 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -20,6 +24,7 @@ def read_root():
 @app.post("/diaries/upload")
 async def create_diary(
     user_note: str = Form(""),
+    user_id: int = Form(...),
     file: UploadFile = File(...)
 ):
     # 1. 產生唯一檔名並儲存圖片
@@ -35,12 +40,13 @@ async def create_diary(
         
         # 組合出前端可以直接用的網址
         full_url = f"http://127.0.0.1:8000/{file_path.replace(os.sep, '/')}"
-        my_id = save_to_db(result, file_path, user_note)
+        my_id = save_to_db(result, file_path,user_id, user_note)
         return {
             "status":"success",
             "message": "紀錄已存入資料庫",
             "data": {
                 "crop_id": my_id,
+                "user": user_id,
                 "category": result.get("category"),
                 "status_name": result.get("status_name"),
                 "confidence":result.get("confidence"),
@@ -52,7 +58,7 @@ async def create_diary(
     return {"status":"error","message":"AI 辨識失敗"}
 
 @app.get("/diaries")
-async def get_all_history():
+async def get_all_history(user_id:int):
     """取得所有診斷歷史紀錄"""
     conn = get_db_connection()
     try:
@@ -70,9 +76,10 @@ async def get_all_history():
                 d.created_at
             From plant_diary d
             LEFT JOIN crop c ON d.crop_id = c.crop_id
+            Where d.user_id = %s
             ORDER BY d.created_at desc
             """
-            cursor.execute(sql)
+            cursor.execute(sql,(user_id,))
             rows = cursor.fetchall()
             # 修正圖片路徑：讓它變成瀏覽器可以直接點開的網址
             for row in rows:
@@ -110,6 +117,45 @@ async def delete_diary(diary_id:int):
         raise HTTPException(status_code=500,detail=str(e))
     finally:
         conn.close()
+
+# 1. 設定密碼加密工具 (使用 bcrypt 演算法)
+pwd_context = CryptContext(schemes=["bcrypt"], bcrypt__ident="2b")
+
+# 2. 定義註冊用的資料格式 (Schema)
+class UserRegister(BaseModel):
+    username: str
+    password: str
+    email: EmailStr
+    full_name: str = None
+
+@app.post("/users/register")
+async def register_user(user: UserRegister):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            # A. 檢查帳號或 Email 是否已存在
+            check_sql = "SELECT user_id From user Where username = %s OR email = %s"
+            cursor.execute(check_sql,(user.username,user.email))
+            if cursor.fetchone():
+                raise HTTPException(status_code=400, detail="帳號或 Email 已被註冊過囉！")
+            # B. 密碼加密 (雜湊化)
+            hashed_password = pwd_context.hash(user.password)
+
+            insert_sql = """
+            INSERT into user (username, password_hash, email, full_name)
+            VALUES(%s, %s, %s, %s)
+            """
+            cursor.execute(insert_sql,(user.username, hashed_password, user.email, user.full_name))
+            conn.commit()
+            return {"status":"success", "message":f"歡迎 {user.username}！註冊成功。"}
+    except Exception as e:
+        print(f"註冊出錯:{e}")
+        raise HTTPException(status_code=500, detail="伺服器註冊失敗")
+    finally:
+        conn.close()
+
+
+
 if __name__ == "__main__":
     
     uvicorn.run(app, host="0.0.0.0", port=8000)

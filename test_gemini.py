@@ -39,7 +39,7 @@ def diagnostic_plant(image_path):
 
 
 
-def save_to_db(data, image_path,user_note=""):
+def save_to_db(data, image_path,user_id,user_note=""):
     print("--- 開始執行儲存流程 ---") # 加入這行
 
     crop_name = data.get("crop_name")
@@ -75,7 +75,7 @@ def save_to_db(data, image_path,user_note=""):
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%s, NOW())
             """
             cursor.execute(sql,(
-                1,target_crop_id,status_name,image_path,disease_id, pest_id,data["confidence"],data["suggestion"],user_note))
+                user_id,target_crop_id,status_name,image_path,disease_id, pest_id,data["confidence"],data["suggestion"],user_note))
         conn.commit()
         print(f"✅ 成功！已關聯 {category} ID: {disease_id or pest_id}")
         print("資料已成功存入資料庫!")
