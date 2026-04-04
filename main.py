@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form,Body
 import shutil
 import os
 import uuid
@@ -9,8 +9,8 @@ from db_utils import get_db_connection
 import uvicorn
 from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
-import pymysql
-
+import jwt
+import datetime
 
 app = FastAPI(title = "植物病害診斷系統 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -155,7 +155,49 @@ async def register_user(user: UserRegister):
         conn.close()
 
 
+# --- 安全設定 ---
+secret_key = "your_super_secret_key_here"
+algorithm = "HS256"
+access_token_expire_minutes = 60 * 24
 
+# 1. 建立登入用的資料格式
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+@app.post("/user/login")
+async def login_user(user:UserLogin):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            # A. 找尋使用者
+            sql = "SELECT user_id, username, password_hash FROM user WHERE username = %s"
+            cursor.execute(sql,(user.username,))
+            db_user = cursor.fetchone()
+
+            if not db_user:
+                raise HTTPException(status_code=400, detail="帳號或密碼錯誤 (找不到帳號)")
+            # B. 比對密碼 (使用之前的 pwd_context)
+            if not pwd_context.verify(user.password, db_user["password_hash"]):
+                raise HTTPException(status_code=400, detail="帳號或密碼錯誤 (密碼不對)")
+            # C. 密碼正確，產生 JWT Token
+            payload = {
+                "user_id": db_user["user_id"],
+                "username": db_user["username"],
+                "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=access_token_expire_minutes)
+            }
+            token = jwt.encode(payload, secret_key, algorithm=algorithm)
+
+            return {
+                "status": "success",
+                "message": "登入成功!",
+                "access_token": token,
+                "token_type": "bearer"
+            }
+    finally:
+        conn.close()
+
+            
 if __name__ == "__main__":
     
     uvicorn.run(app, host="0.0.0.0", port=8000)

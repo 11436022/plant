@@ -24,7 +24,8 @@ RUN pip install --no-cache-dir \
     cryptography \
     bcrypt==4.0.1 \
     pydantic[email] \
-    passlib[bcrypt]
+    passlib[bcrypt] \
+    PyJWT
 
 # 5. 告訴容器啟動時要跑什麼
 CMD ["python3", "main.py"]
