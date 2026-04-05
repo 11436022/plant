@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Form,Body
+from fastapi import FastAPI, UploadFile, File, Form, Body,Header, Depends
 import shutil
 import os
 import uuid
@@ -11,6 +11,9 @@ from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 import jwt
 import datetime
+from auth import get_current_user
+
+
 
 app = FastAPI(title = "植物病害診斷系統 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -24,13 +27,11 @@ def read_root():
 @app.post("/diaries/upload")
 async def create_diary(
     user_note: str = Form(""),
-    user_id: int = Form(...),
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    current_user_id: int = Depends(get_current_user)
 ):
-    # 1. 產生唯一檔名並儲存圖片
-    file_extension = os.path.splitext(file.filename)[1]
-    unique_filename = f"{uuid.uuid4()}{file_extension}"
-    file_path = os.path.join(upload_dir, unique_filename)
+    
+    file_path = f"static/uploads/{file.filename}"
 
     with open(file_path,"wb") as buffer:
         shutil.copyfileobj(file.file,buffer)
@@ -40,13 +41,13 @@ async def create_diary(
         
         # 組合出前端可以直接用的網址
         full_url = f"http://127.0.0.1:8000/{file_path.replace(os.sep, '/')}"
-        my_id = save_to_db(result, file_path,user_id, user_note)
+        my_id = save_to_db(result, file_path,current_user_id, user_note)
         return {
             "status":"success",
             "message": "紀錄已存入資料庫",
             "data": {
                 "crop_id": my_id,
-                "user": user_id,
+                "user": current_user_id,
                 "category": result.get("category"),
                 "status_name": result.get("status_name"),
                 "confidence":result.get("confidence"),
@@ -196,6 +197,12 @@ async def login_user(user:UserLogin):
             }
     finally:
         conn.close()
+
+
+
+
+
+
 
             
 if __name__ == "__main__":

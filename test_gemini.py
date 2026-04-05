@@ -46,7 +46,7 @@ def save_to_db(data, image_path,user_id,user_note=""):
     target_crop_id = get_crop_id_by_name(crop_name)
     if target_crop_id is None:
         print("無法關聯植物，儲存失敗。")
-        return
+        
     category = data.get('category')
     print(f"辨識到的類別是: {category}")
     status_name = data.get("status_name")
