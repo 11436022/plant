@@ -1,7 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, Form, Body,Header, Depends
 import shutil
 import os
-import uuid
 from test_gemini import save_to_db, diagnostic_plant
 from fastapi.staticfiles import StaticFiles
 from fastapi import HTTPException
@@ -59,7 +58,7 @@ async def create_diary(
     return {"status":"error","message":"AI 辨識失敗"}
 
 @app.get("/diaries")
-async def get_all_history(user_id:int):
+async def get_all_history(current_user_id:int = Depends(get_current_user)):
     """取得所有診斷歷史紀錄"""
     conn = get_db_connection()
     try:
@@ -70,17 +69,14 @@ async def get_all_history(user_id:int):
                 d.id,
                 c.crop_name as crop_name,
                 d.status_name,
-                d.confidence,
                 d.image_url,
-                d.suggestion,
-                d.user_note,
                 d.created_at
             From plant_diary d
             LEFT JOIN crop c ON d.crop_id = c.crop_id
             Where d.user_id = %s
             ORDER BY d.created_at desc
             """
-            cursor.execute(sql,(user_id,))
+            cursor.execute(sql,(current_user_id,))
             rows = cursor.fetchall()
             # 修正圖片路徑：讓它變成瀏覽器可以直接點開的網址
             for row in rows:
@@ -94,6 +90,32 @@ async def get_all_history(user_id:int):
         raise HTTPException(status_code=500,detail="資料庫查詢失敗")
     finally:
         conn.close()
+
+@app.get("/diaries/{diary_id}")
+async def get_diary_detail(diary_id: int, current_user_id: int = Depends(get_current_user)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            sql = """
+            SELECT d.*, c.crop_name as crop_name
+            FROM plant_diary d
+            LEFT JOIN crop c ON d.crop_id = c.crop_id
+            WHERE d.id = %s AND d.user_id = %s
+            """
+            cursor.execute(sql,(diary_id,current_user_id))
+            detail = cursor.fetchone()
+            if not detail:
+                raise HTTPException(status_code=404, detail = "找不到此紀錄或您無權查看")
+            
+            if detail.get("image_url"):
+                detail["image_url"] = detail["image_url"].replace("\\","/")
+                # 如果是本機測試，這裡可以補上網址前綴
+                if not detail['image_url'].startswith("http"):
+                    detail['image_url'] = f"http://127.0.0.1:8000/{detail['image_url']}"
+                return {"status": "success", "data": detail}
+    finally:
+        conn.close()
+
 
 @app.delete("/diaries/{diariy_id}")
 async def delete_diary(diary_id:int):
@@ -198,7 +220,21 @@ async def login_user(user:UserLogin):
     finally:
         conn.close()
 
+#呼叫這個 API 後，前端就能在側邊欄顯示 使用者的名字
+@app.get("/user/me")
+async def get_user_profile(current_user_id: int = Depends(get_current_user)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            sql = "SELECT username, email, full_name, created_at FROM user WHERE user_id = %s"
+            cursor.execute(sql,(current_user_id,))
+            user_info = cursor.fetchone()
 
+            if not user_info:
+                raise HTTPException(status_code=404, detail="找不到使用者")
+            return {"status":"success", "data": user_info}
+    finally:
+        conn.close()
 
 
 

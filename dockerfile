@@ -27,5 +27,6 @@ RUN pip install --no-cache-dir \
     passlib[bcrypt] \
     PyJWT
 
+COPY . .
 # 5. 告訴容器啟動時要跑什麼
 CMD ["python3", "main.py"]

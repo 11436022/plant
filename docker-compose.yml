@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    image: plant-backend
+    container_name: plant_app_container
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      # --- 關鍵：持久化掛載 ---
+      # [主機路徑]:[容器內路徑]
+      # . 代表當前資料夾，這會把電腦的 static/uploads 同步到容器裡
+      - ./static/uploads:/app/static/uploads
+    restart: always
