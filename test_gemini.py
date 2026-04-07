@@ -48,18 +48,13 @@ def save_to_db(data, image_path,user_id,user_note=""):
         print("無法關聯植物，儲存失敗。")
         
     category = data.get('category')
-    print(f"辨識到的類別是: {category}")
     status_name = data.get("status_name")
     disease_id = None
     pest_id = None
-    # 在這裡「呼叫」擴充邏輯
-    if category == "Disease":
-        disease_id = get_or_create_id("disease",status_name,target_crop_id,data.get("suggestion"),data.get("treatment"))
-    elif category == 'Pest':
-        pest_id = get_or_create_id('pests', status_name, target_crop_id,data.get('suggestion'), data.get('treatment'))
-
-    # 執行最終的 plant_diary 儲存
-
+    final_suggestion = data.get("suggestion") # 預設用 AI 給的
+    final_treatment = data.get("treatment")   # 預設用 AI 給的
+    
+    
     conn = pymysql.connect(
         user = os.getenv("DB_USER"),
         password = os.getenv("DB_PASSWORD"),
@@ -69,6 +64,35 @@ def save_to_db(data, image_path,user_id,user_note=""):
     )
     try:
         with conn.cursor() as cursor:
+            if category == "Disease":
+                check_sql = "SELECT disease_id, description, treatment FROM disease WHERE disease_name = %s"
+                cursor.execute(check_sql, (status_name,))
+                db_disease = cursor.fetchone()
+
+                if db_disease:
+                    # 找到了！使用知識庫裡的專業內容
+                    disease_id = db_disease['disease_id']
+                    final_suggestion = db_disease['description']
+                    final_treatment = db_disease['treatment']
+                    print(f"🎯 精確匹配到知識庫條目: {status_name}")
+                else:
+                    # 沒找到，才呼叫你原本的 get_or_create_id (建立新條目)
+                    disease_id = get_or_create_id("disease", status_name, target_crop_id, final_suggestion, final_treatment)
+            
+            # --- 第二步：如果是 Pest ---
+            elif category == 'Pest':
+                # ### 關鍵：新增 Pest 的精確匹配 ###
+                check_pest_sql = "SELECT pest_id, description, treatment FROM pests WHERE pest_name = %s"
+                cursor.execute(check_pest_sql, (status_name,))
+                db_pest = cursor.fetchone()
+
+                if db_pest:
+                    pest_id = db_pest['pest_id']
+                    final_suggestion = db_pest['description']
+                    final_treatment = db_pest['treatment']
+                    print(f"🎯 匹配到 Pest 知識庫: {status_name}")
+                else:
+                    pest_id = get_or_create_id('pests', status_name, target_crop_id, final_suggestion, final_treatment)
             
             sql = """
             INSERT INTO plant_diary (user_id,crop_id,status_name,image_url,disease_id, pest_id,confidence,suggestion,user_note,created_at)
