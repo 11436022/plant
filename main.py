@@ -11,17 +11,19 @@ from passlib.context import CryptContext
 import jwt
 import datetime
 from auth import get_current_user
-
+from pathlib import Path
 
 
 app = FastAPI(title = "植物病害診斷系統 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
-upload_dir = "static/uploads"
-os.makedirs(upload_dir,exist_ok=True)
+
 
 @app.get("/")
 def read_root():
     return {"message": "後端伺服器運作中！請訪問 /docs 查看 API 文件"}
+
+UPLOAD_DIR = Path("static/uploads")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 @app.post("/diaries/upload")
 async def create_diary(
@@ -30,12 +32,12 @@ async def create_diary(
     current_user_id: int = Depends(get_current_user)
 ):
     
-    file_path = f"static/uploads/{file.filename}"
+    file_path = UPLOAD_DIR / file.filename
 
     with open(file_path,"wb") as buffer:
         shutil.copyfileobj(file.file,buffer)
-
-    result = diagnostic_plant(file_path)
+    db_path = file_path.as_posix()
+    result = diagnostic_plant(db_path)
     if result:
         
         # 組合出前端可以直接用的網址
@@ -117,12 +119,12 @@ async def get_diary_detail(diary_id: int, current_user_id: int = Depends(get_cur
         conn.close()
 
 
-@app.delete("/diaries/{diariy_id}")
-async def delete_diary(diary_id:int):
+@app.delete("/diaries/{diary_id}")
+async def delete_diary(diary_id:int,current_user_id: int = Depends(get_current_user)):
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT image_url From plant_diary Where id=%s",(diary_id,))
+            cursor.execute("SELECT image_url From plant_diary Where id=%s AND user_id = %s",(diary_id,current_user_id))
             record = cursor.fetchone()
             if not record:
                 raise HTTPException(status_code=404, detail="找不到該筆紀錄")

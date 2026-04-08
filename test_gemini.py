@@ -5,27 +5,48 @@ from dotenv import load_dotenv
 import pymysql
 import json
 import google.api_core.exceptions
-from db_utils import get_or_create_id, get_crop_id_by_name
+from db_utils import get_or_create_id, get_crop_id_by_name,get_db_connection
 
 load_dotenv()
 
 client = genai.Client(api_key=os.getenv("Gemini_API_KEY"))
 
+def get_standard_names():
+    conn = get_db_connection()
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT disease_name FROM disease")
+            diseases = [row["disease_name"] for row in cursor.fetchall()]
+            cursor.execute("SELECT pest_name FROM pests")
+            pests = [row["pest_name"] for row in cursor.fetchall()]
+            return diseases, pests
+    finally:
+        conn.close()
+
+
 
 def diagnostic_plant(image_path):
+    diseases, pests = get_standard_names()
+    disease_list_str = ", ".join(diseases)
+    pest_list_str = ", ".join(pests)
     img = Image.open(image_path)
 
-    prompt = """
-    請分析這張植物照片，並嚴格按照以下 JSON 格式回傳（不要包含額外文字）：
-    {
-    "crop_name":"植物名稱"(中文名),
+    prompt = f"""
+    請分析這張植物照片，你的 "status_name" 欄位必須優先匹配以下清單。
+    
+    已知疾病清單：{disease_list_str}
+    已知蟲害清單：{pest_list_str}
+    
+    如果完全不符合，請自行生成精確名稱，並嚴格按照以下 JSON 格式回傳（不要包含額外文字）：
+    {{
+    "crop_name":"植物名稱(中文名)",
     "category": "Healthy/Disease/Pest",
     "status_name": "病名或蟲害簡稱(若健康則填Healthy)",
-    "confidence": 準確率(0~1),
+    "confidence": "準確率(0~1)",
     "suggestion": "發生了甚麼",
     "treatment" : "和建議如何改善"
-    }
-    注意:status_name 請精簡只要疾病或害蟲名稱，不要括號。
+    }}
     注意:suggestion 請精簡在20字左右。
     """
     try:
@@ -65,8 +86,8 @@ def save_to_db(data, image_path,user_id,user_note=""):
     try:
         with conn.cursor() as cursor:
             if category == "Disease":
-                check_sql = "SELECT disease_id, description, treatment FROM disease WHERE disease_name = %s"
-                cursor.execute(check_sql, (status_name,))
+                check_sql = "SELECT disease_id, description, treatment FROM disease WHERE disease_name = %s OR disease_name LIKE %s"
+                cursor.execute(check_sql, (status_name,f"%{status_name}%"))
                 db_disease = cursor.fetchone()
 
                 if db_disease:
@@ -82,8 +103,8 @@ def save_to_db(data, image_path,user_id,user_note=""):
             # --- 第二步：如果是 Pest ---
             elif category == 'Pest':
                 # ### 關鍵：新增 Pest 的精確匹配 ###
-                check_pest_sql = "SELECT pest_id, description, treatment FROM pests WHERE pest_name = %s"
-                cursor.execute(check_pest_sql, (status_name,))
+                check_pest_sql = "SELECT pest_id, description, treatment FROM pests WHERE pest_name = %s OR pest_name LIKE %s"
+                cursor.execute(check_pest_sql, (status_name,f"%{status_name}%"))
                 db_pest = cursor.fetchone()
 
                 if db_pest:
