@@ -10,7 +10,7 @@ from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 import jwt
 import datetime
-from auth import get_current_user
+from auth import get_current_user, verify_admin
 from pathlib import Path
 
 
@@ -24,14 +24,14 @@ def read_root():
 
 UPLOAD_DIR = Path("static/uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-
+#上傳照片
 @app.post("/diaries/upload")
 async def create_diary(
     user_note: str = Form(""),
     file: UploadFile = File(...),
-    current_user_id: int = Depends(get_current_user)
+    current_user_id: dict = Depends(get_current_user)
 ):
-    
+    user_id = current_user_id["user_id"]
     file_path = UPLOAD_DIR / file.filename
 
     with open(file_path,"wb") as buffer:
@@ -48,7 +48,7 @@ async def create_diary(
             "message": "紀錄已存入資料庫",
             "data": {
                 "crop_id": my_id,
-                "user": current_user_id,
+                "user": user_id,
                 "category": result.get("category"),
                 "status_name": result.get("status_name"),
                 "confidence":result.get("confidence"),
@@ -93,6 +93,20 @@ async def get_all_history(current_user_id:int = Depends(get_current_user)):
     finally:
         conn.close()
 
+@app.get("/admin/all-diaries")
+async def admin_get_all_diaries(admin: dict = Depends(verify_admin)):
+    """管理員可以看到所有使用者的辨識紀錄"""
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            sql = "SELECT * FROM plant_diary ORDER BY created_at DESC"
+            cursor.execute(sql)
+            rows = cursor.fetchall()
+            return {"status": "success", "total_records": len(rows), "data": rows}
+    finally:
+        conn.close()
+
+#取得diary中特定的日誌
 @app.get("/diaries/{diary_id}")
 async def get_diary_detail(diary_id: int, current_user_id: int = Depends(get_current_user)):
     conn = get_db_connection()
@@ -118,7 +132,7 @@ async def get_diary_detail(diary_id: int, current_user_id: int = Depends(get_cur
     finally:
         conn.close()
 
-
+#刪除日誌
 @app.delete("/diaries/{diary_id}")
 async def delete_diary(diary_id:int,current_user_id: int = Depends(get_current_user)):
     conn = get_db_connection()
@@ -153,6 +167,7 @@ class UserRegister(BaseModel):
     email: EmailStr
     full_name: str = None
 
+#建立帳戶
 @app.post("/users/register")
 async def register_user(user: UserRegister):
     conn = get_db_connection()
@@ -190,13 +205,14 @@ class UserLogin(BaseModel):
     username: str
     password: str
 
+#帳戶登入
 @app.post("/user/login")
 async def login_user(user:UserLogin):
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
             # A. 找尋使用者
-            sql = "SELECT user_id, username, password_hash FROM user WHERE username = %s"
+            sql = "SELECT user_id, username, password_hash, role FROM user WHERE username = %s"
             cursor.execute(sql,(user.username,))
             db_user = cursor.fetchone()
 
@@ -209,6 +225,7 @@ async def login_user(user:UserLogin):
             payload = {
                 "user_id": db_user["user_id"],
                 "username": db_user["username"],
+                "role": db_user["role"],
                 "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=access_token_expire_minutes)
             }
             token = jwt.encode(payload, secret_key, algorithm=algorithm)
@@ -222,7 +239,7 @@ async def login_user(user:UserLogin):
     finally:
         conn.close()
 
-#呼叫這個 API 後，前端就能在側邊欄顯示 使用者的名字
+#呼叫這個 API 後，前端就能在側邊欄顯示 使用者的名字及資訊
 @app.get("/user/me")
 async def get_user_profile(current_user_id: int = Depends(get_current_user)):
     conn = get_db_connection()

@@ -54,7 +54,7 @@ CREATE TABLE `disease` (
   PRIMARY KEY (`disease_id`),
   KEY `disease_ibfk_1` (`crop_id`),
   CONSTRAINT `disease_ibfk_1` FOREIGN KEY (`crop_id`) REFERENCES `crop` (`crop_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -62,7 +62,7 @@ CREATE TABLE `disease` (
 --
 
 /*!40000 ALTER TABLE `disease` DISABLE KEYS */;
-INSERT INTO `disease` VALUES (1,NULL,'土壤呈強酸性','根生長不良、生長延遲。','施用石灰或草木灰中和酸性，增加土壤 pH 值。'),(2,NULL,'土壤通氣不良','根部腐爛。','中耕鬆土，或在介質中加入珍珠石、增加孔隙。'),(3,NULL,'土壤排水不良','常因底層有硬土層造成生長延遲。','改善排水系統，打破深層硬土，或更換疏水性好的介質。'),(4,NULL,'土壤過份乾燥','葉尖捲曲褐化，出現斑點或斑塊，全株黃化、落葉、萎凋或大量落葉。','建立規律澆水制度，可覆蓋稻草減少水分蒸發。'),(5,NULL,'土壤酸鹼值不平衡','嫩葉退綠造成葉片呈黃綠狀。','檢測土壤 pH 值，根據結果調整（酸則加鹼，鹼則加酸）。'),(6,NULL,'土壤鹽基(EC)過高','葉尖捲曲褐化，落葉、萎凋或大量落葉。','以大量清水淋洗土壤排除鹽分，並暫停施肥。'),(7,NULL,'土壤條件環境劇變','根系發育不良、植株衰弱。','設置遮陽網或溫室控溫，避免環境因子短時間內大幅震盪。'),(8,NULL,'微量元素不平衡','嫩葉退綠造成葉片呈黃綠狀。','噴施綜合微量元素葉面肥，快速補充缺失養分。'),(9,NULL,'肥料中之鹽分累積','土壤表層有結晶體、堅硬。','移除表土結晶，充分灌水洗鹽，減少化學肥料使用。'),(10,NULL,'氮肥過多','頂端葉片繁茂但開花少。','減少氮肥，增施磷鉀肥，促進花芽分化。'),(11,NULL,'肥料傷害(肥料過多)','葉尖褐化或出現塊斑、葉片黃化，嚴重者葉片乾縮、落葉，甚至全株萎凋。','立即大量澆水稀釋肥料濃度，嚴重時需更換部分土壤。'),(12,NULL,'肥料不足','葉片黃化、生長延遲、葉片減少及植株短小。','定期定量施用平衡型肥料 (N-P-K 比例均衡)。'),(13,NULL,'肥料不足且氮肥嚴重不足','植株矮化、新葉變小、老葉黃化。','追施速效性氮肥（如尿素），並注意土壤有機質補充。'),(14,NULL,'缺鉀','葉片由老葉葉緣向內黃化。','施用硫酸鉀或硝酸鉀肥料，增強植株抗性。'),(15,NULL,'缺鎂','老葉葉脈間黃化，新葉黃化但葉脈仍為綠色。','施用苦土石灰（含有碳酸鎂）或噴灑硫酸鎂溶液。'),(16,NULL,'水分不足','葉片黃化、頂端葉片褐化、植株萎凋。','立即補水，並確保水分滲透至根系所在深度。'),(17,NULL,'水分過多','老葉黃化，葉間捲曲褐化，葉尖褐化或由葉尖開始出現黃色、褐色斑點，葉片減少，嚴重者落葉；生長不良、生長延遲、植株褪色，嚴重者莖部腐爛、植株萎凋。','停止澆水，加強通風，若已腐爛需剪除爛根並換盆消毒。'),(18,NULL,'濕度太低','頂端葉片褐化、葉片乾縮。','在植株周圍噴霧增加空氣濕度，或使用加濕器。'),(19,NULL,'乾旱','葉片黃化，葉片出現黃色、褐色斑點。','穩定灌溉，並考慮在土表鋪設覆蓋物保持濕潤。'),(20,NULL,'冬季光照不足','生長延遲。','移動植株至向陽處，或使用人工植物燈補光。');
+INSERT INTO `disease` VALUES (1,NULL,'土壤呈強酸性','根生長不良、生長延遲。','施用石灰或草木灰中和酸性，增加土壤 pH 值。'),(2,NULL,'土壤通氣不良','根部腐爛。','中耕鬆土，或在介質中加入珍珠石、增加孔隙。'),(3,NULL,'土壤排水不良','常因底層有硬土層造成生長延遲。','改善排水系統，打破深層硬土，或更換疏水性好的介質。'),(4,NULL,'土壤過份乾燥','葉尖捲曲褐化，出現斑點或斑塊，全株黃化、落葉、萎凋或大量落葉。','建立規律澆水制度，可覆蓋稻草減少水分蒸發。'),(5,NULL,'土壤酸鹼值不平衡','嫩葉退綠造成葉片呈黃綠狀。','檢測土壤 pH 值，根據結果調整（酸則加鹼，鹼則加酸）。'),(6,NULL,'土壤鹽基(EC)過高','葉尖捲曲褐化，落葉、萎凋或大量落葉。','以大量清水淋洗土壤排除鹽分，並暫停施肥。'),(7,NULL,'土壤條件環境劇變','根系發育不良、植株衰弱。','設置遮陽網或溫室控溫，避免環境因子短時間內大幅震盪。'),(8,NULL,'微量元素不平衡','嫩葉退綠造成葉片呈黃綠狀。','噴施綜合微量元素葉面肥，快速補充缺失養分。'),(9,NULL,'肥料中之鹽分累積','土壤表層有結晶體、堅硬。','移除表土結晶，充分灌水洗鹽，減少化學肥料使用。'),(10,NULL,'氮肥過多','頂端葉片繁茂但開花少。','減少氮肥，增施磷鉀肥，促進花芽分化。'),(11,NULL,'肥料傷害(肥料過多)','葉尖褐化或出現塊斑、葉片黃化，嚴重者葉片乾縮、落葉，甚至全株萎凋。','立即大量澆水稀釋肥料濃度，嚴重時需更換部分土壤。'),(12,NULL,'肥料不足','葉片黃化、生長延遲、葉片減少及植株短小。','定期定量施用平衡型肥料 (N-P-K 比例均衡)。'),(13,NULL,'肥料不足且氮肥嚴重不足','植株矮化、新葉變小、老葉黃化。','追施速效性氮肥（如尿素），並注意土壤有機質補充。'),(14,NULL,'缺鉀','葉片由老葉葉緣向內黃化。','施用硫酸鉀或硝酸鉀肥料，增強植株抗性。'),(15,NULL,'缺鎂','老葉葉脈間黃化，新葉黃化但葉脈仍為綠色。','施用苦土石灰（含有碳酸鎂）或噴灑硫酸鎂溶液。'),(16,NULL,'水分不足','葉片黃化、頂端葉片褐化、植株萎凋。','立即補水，並確保水分滲透至根系所在深度。'),(17,NULL,'水分過多','老葉黃化，葉間捲曲褐化，葉尖褐化或由葉尖開始出現黃色、褐色斑點，葉片減少，嚴重者落葉；生長不良、生長延遲、植株褪色，嚴重者莖部腐爛、植株萎凋。','停止澆水，加強通風，若已腐爛需剪除爛根並換盆消毒。'),(18,NULL,'濕度太低','頂端葉片褐化、葉片乾縮。','在植株周圍噴霧增加空氣濕度，或使用加濕器。'),(19,NULL,'乾旱','葉片黃化，葉片出現黃色、褐色斑點。','穩定灌溉，並考慮在土表鋪設覆蓋物保持濕潤。'),(20,NULL,'冬季光照不足','生長延遲。','移動植株至向陽處，或使用人工植物燈補光。'),(21,NULL,'白粉病','葉面出現白色粉狀斑點，為白粉病感染。','改善通風、移除病葉，可噴灑硫磺或苦楝油防治。');
 /*!40000 ALTER TABLE `disease` ENABLE KEYS */;
 
 --
@@ -112,7 +112,7 @@ CREATE TABLE `plant_diary` (
   `user_note` text,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -120,7 +120,7 @@ CREATE TABLE `plant_diary` (
 --
 
 /*!40000 ALTER TABLE `plant_diary` DISABLE KEYS */;
-INSERT INTO `plant_diary` VALUES (1,1,2,'蚜蟲','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\lettuce_pointed\\disease\\IMG_14_aug.albumentations1_aug.albumentations2.jpg',NULL,NULL,0.8,'葉片上出現小型深色害蟲，可能是蚜蟲，吸食汁液。','hi','2026-03-14 15:56:26'),(2,1,409,'白粉病','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\chives_disease\\IMG_1420_404 (2).jpg',1,NULL,0.88,'葉片出現白色粉狀黴斑。','hi','2026-03-14 15:57:20'),(3,1,432,'Healthy','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\chives_healthy\\IMG_1423_273.jpg',NULL,NULL,0.9,'此植物外觀健康，無明顯病蟲害跡象。','hi','2026-03-14 16:04:11'),(4,1,2,'Healthy','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\lettuce_fushan\\disease\\IMG_15_aug.bright.jpg',NULL,NULL,0.95,'植株生長良好，葉片翠綠。','hi','2026-03-14 16:05:24'),(5,1,2,'Anthracnose','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\lettuce_fushan\\disease\\IMG_1330_aug.flip.jpg',4,NULL,0.85,'葉片出現深褐色凹陷壞死斑，中央穿孔。','hi','2026-03-14 16:08:25'),(6,1,2,'炭疽病','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\lettuce_fushan\\disease\\IMG_1330_aug.flip.jpg',NULL,NULL,0.92,'葉片出現深色不規則斑點，中心組織壞死腐爛。','hi','2026-03-14 16:11:21'),(7,1,2,'炭疽病','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\lettuce_fushan\\disease\\IMG_1330_aug.flip.jpg',5,NULL,0.88,'葉片出現褐色不規則病斑，中心可能破裂，顯示受炭疽病感染。','hi','2026-03-14 16:16:23'),(8,1,2,'蟲害','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\lettuce_fushan\\disease\\IMG_1288_aug.bright_aug.albumentations1.jpg',NULL,1,0.85,'葉片出現明顯孔洞與邊緣褐化，疑遭蟲害。','hi','2026-03-16 15:35:25'),(9,1,2,'Healthy','static/uploads\\2a4d9f4f-62ce-48db-b545-5138cf45567a.jpg',NULL,NULL,0.95,'植株生長良好，葉片呈現健康翠綠。','這個蔬菜好可愛','2026-03-17 16:17:31'),(10,1,648,'白粉病','static/uploads\\8dce3f18-0422-4a93-99db-c2a22c1aebf5.jpg',6,NULL,0.95,'葉片上出現白色粉狀物，這是由真菌引起的白粉病。','你好嗎','2026-03-18 16:14:40'),(11,1,648,'白粉病','static/uploads\\8dce3f18-0422-4a93-99db-c2a22c1aebf5.jpg',6,NULL,0.95,'葉片上出現白色粉狀物，這是由真菌引起的白粉病。','你好嗎','2026-03-18 16:14:40'),(12,1,2,'薊馬','static/uploads\\24e15811-cd5c-4184-b180-fcd48b618200.jpg',NULL,2,0.75,'葉面有微小白斑點，可能為初期刺吸式害蟲。','西巴如馬','2026-03-18 16:19:15'),(13,1,2,'薊馬','static/uploads\\24e15811-cd5c-4184-b180-fcd48b618200.jpg',NULL,2,0.75,'葉面有微小白斑點，可能為初期刺吸式害蟲。','西巴如馬','2026-03-18 16:19:15'),(14,1,2,'葉斑病','static/uploads\\f3ecc7c7-fe72-4fed-a1e8-0899befafba5.jpg',7,NULL,0.85,'葉面出現散佈的黑斑點，疑似葉斑病初步感染。','西巴','2026-03-18 16:32:07'),(15,1,2,'Healthy','static/uploads/7b7ad086-a6d9-48a9-964b-e20d48c80c68.jpg',NULL,NULL,0.9,'葉片翠綠，結構完整，無明顯病蟲害，生長狀況良好。','132','2026-03-23 17:37:16'),(18,2,2,'Healthy','static/uploads/IMG_1291_aug.albumentations_aug.albumentations2.jpg',NULL,NULL,0.99,'植物目前看起來很健康，狀況良好。','258','2026-04-06 17:23:33');
+INSERT INTO `plant_diary` VALUES (1,1,2,'蚜蟲','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\lettuce_pointed\\disease\\IMG_14_aug.albumentations1_aug.albumentations2.jpg',NULL,NULL,0.8,'葉片上出現小型深色害蟲，可能是蚜蟲，吸食汁液。','hi','2026-03-14 15:56:26'),(2,1,409,'白粉病','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\chives_disease\\IMG_1420_404 (2).jpg',1,NULL,0.88,'葉片出現白色粉狀黴斑。','hi','2026-03-14 15:57:20'),(3,1,432,'Healthy','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\chives_healthy\\IMG_1423_273.jpg',NULL,NULL,0.9,'此植物外觀健康，無明顯病蟲害跡象。','hi','2026-03-14 16:04:11'),(4,1,2,'Healthy','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\lettuce_fushan\\disease\\IMG_15_aug.bright.jpg',NULL,NULL,0.95,'植株生長良好，葉片翠綠。','hi','2026-03-14 16:05:24'),(5,1,2,'Anthracnose','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\lettuce_fushan\\disease\\IMG_1330_aug.flip.jpg',4,NULL,0.85,'葉片出現深褐色凹陷壞死斑，中央穿孔。','hi','2026-03-14 16:08:25'),(6,1,2,'炭疽病','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\lettuce_fushan\\disease\\IMG_1330_aug.flip.jpg',NULL,NULL,0.92,'葉片出現深色不規則斑點，中心組織壞死腐爛。','hi','2026-03-14 16:11:21'),(7,1,2,'炭疽病','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\lettuce_fushan\\disease\\IMG_1330_aug.flip.jpg',5,NULL,0.88,'葉片出現褐色不規則病斑，中心可能破裂，顯示受炭疽病感染。','hi','2026-03-14 16:16:23'),(8,1,2,'蟲害','C:\\Users\\User\\OneDrive\\Desktop\\MyProject\\dataset\\lettuce_fushan\\disease\\IMG_1288_aug.bright_aug.albumentations1.jpg',NULL,1,0.85,'葉片出現明顯孔洞與邊緣褐化，疑遭蟲害。','hi','2026-03-16 15:35:25'),(9,1,2,'Healthy','static/uploads\\2a4d9f4f-62ce-48db-b545-5138cf45567a.jpg',NULL,NULL,0.95,'植株生長良好，葉片呈現健康翠綠。','這個蔬菜好可愛','2026-03-17 16:17:31'),(10,1,648,'白粉病','static/uploads\\8dce3f18-0422-4a93-99db-c2a22c1aebf5.jpg',6,NULL,0.95,'葉片上出現白色粉狀物，這是由真菌引起的白粉病。','你好嗎','2026-03-18 16:14:40'),(11,1,648,'白粉病','static/uploads\\8dce3f18-0422-4a93-99db-c2a22c1aebf5.jpg',6,NULL,0.95,'葉片上出現白色粉狀物，這是由真菌引起的白粉病。','你好嗎','2026-03-18 16:14:40'),(12,1,2,'薊馬','static/uploads\\24e15811-cd5c-4184-b180-fcd48b618200.jpg',NULL,2,0.75,'葉面有微小白斑點，可能為初期刺吸式害蟲。','西巴如馬','2026-03-18 16:19:15'),(13,1,2,'薊馬','static/uploads\\24e15811-cd5c-4184-b180-fcd48b618200.jpg',NULL,2,0.75,'葉面有微小白斑點，可能為初期刺吸式害蟲。','西巴如馬','2026-03-18 16:19:15'),(14,1,2,'葉斑病','static/uploads\\f3ecc7c7-fe72-4fed-a1e8-0899befafba5.jpg',7,NULL,0.85,'葉面出現散佈的黑斑點，疑似葉斑病初步感染。','西巴','2026-03-18 16:32:07'),(15,1,2,'Healthy','static/uploads/7b7ad086-a6d9-48a9-964b-e20d48c80c68.jpg',NULL,NULL,0.9,'葉片翠綠，結構完整，無明顯病蟲害，生長狀況良好。','132','2026-03-23 17:37:16'),(18,2,2,'Healthy','static/uploads/IMG_1291_aug.albumentations_aug.albumentations2.jpg',NULL,NULL,0.99,'植物目前看起來很健康，狀況良好。','258','2026-04-06 17:23:33'),(19,2,2,'缺鎂','static/uploads/IMG_1274.jpg',15,NULL,0.85,'葉片葉脈間黃化，葉緣褐化，可能是缺鎂。','123654','2026-04-08 07:24:05');
 /*!40000 ALTER TABLE `plant_diary` ENABLE KEYS */;
 
 --
@@ -137,10 +137,11 @@ CREATE TABLE `user` (
   `email` varchar(100) DEFAULT NULL,
   `full_name` varchar(50) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `role` varchar(20) DEFAULT 'user',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -148,7 +149,7 @@ CREATE TABLE `user` (
 --
 
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'thomas','$2b$12$YJwymCA.a4T5iGp9ALEF1OPoHILzL1MTyt9/aZ9WLzUWUZpb4yw.O','123456@gmail.com','thomas','2026-04-03 15:50:49'),(2,'123','$2b$12$54LMrXH8DXUTRxeyWV.x4.mF6SeIE8EJcud4cOKb/p8zc5qhUYY96','123@example.com','123','2026-04-06 15:35:25');
+INSERT INTO `user` VALUES (1,'admin','$2b$12$528HuluM6KgL6S/fjnew8eDvb9.1JfADvx0fdQelMvV3TtVkvx/N.','admin@example.com','admin','2026-04-09 15:19:47','admin'),(2,'123','$2b$12$54LMrXH8DXUTRxeyWV.x4.mF6SeIE8EJcud4cOKb/p8zc5qhUYY96','123@example.com','123','2026-04-06 15:35:25','user'),(3,'thomas','$2b$12$YJwymCA.a4T5iGp9ALEF1OPoHILzL1MTyt9/aZ9WLzUWUZpb4yw.O','123456@gmail.com','thomas','2026-04-03 15:50:49','user');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 
 --
@@ -164,4 +165,4 @@ INSERT INTO `user` VALUES (1,'thomas','$2b$12$YJwymCA.a4T5iGp9ALEF1OPoHILzL1MTyt
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-08  0:53:31
+-- Dump completed on 2026-04-09 23:55:56
