@@ -41,8 +41,9 @@ async def create_diary(
     if result:
         
         # 組合出前端可以直接用的網址
-        full_url = f"http://127.0.0.1:8000/{file_path.replace(os.sep, '/')}"
-        my_id = save_to_db(result, file_path,current_user_id, user_note)
+        # 修改後
+        full_url = f"http://127.0.0.1:8000/{file_path.as_posix()}"
+        my_id = save_to_db(result, file_path,user_id, user_note)
         return {
             "status":"success",
             "message": "紀錄已存入資料庫",

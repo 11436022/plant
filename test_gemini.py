@@ -116,11 +116,11 @@ def save_to_db(data, image_path,user_id,user_note=""):
                     pest_id = get_or_create_id('pests', status_name, target_crop_id, final_suggestion, final_treatment)
             
             sql = """
-            INSERT INTO plant_diary (user_id,crop_id,status_name,image_url,disease_id, pest_id,confidence,suggestion,user_note,created_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%s, NOW())
+            INSERT INTO plant_diary (user_id,crop_id,status_name,image_url,disease_id, pest_id,confidence,suggestion,treatment,user_note,created_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s,%s, %s,%s, NOW())
             """
             cursor.execute(sql,(
-                user_id,target_crop_id,status_name,image_path,disease_id, pest_id,data["confidence"],data["suggestion"],user_note))
+                user_id,target_crop_id,status_name,image_path,disease_id, pest_id,data["confidence"],final_suggestion,final_treatment,user_note))
         conn.commit()
         print(f"✅ 成功！已關聯 {category} ID: {disease_id or pest_id}")
         print("資料已成功存入資料庫!")
