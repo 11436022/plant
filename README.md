@@ -33,10 +33,14 @@ init_db.sql可以直接複製到mysql去建立
 * test_gemini.py:傳入照片 設定prompt經由gemini傳到資料庫
 * db_utils.py:傳入照片如果disease和pest表沒有則會新增
 * main.py:專案啟動入口，整合 FastAPI 路由並串接上傳照片查詢歷史紀錄
+* alembic:為了讓大家資料庫同步
 1. 請先執行 python api_fetch.py 獲取最新農業資料。
 2. 再執行 python crud.py 將抓取到的資料同步至資料庫。
 * init_db.sql: 資料庫
 * dockerfile:可以用docker環境來跑
+
+# 如果有更改資料庫要去alembic,才能同步
+
 
 ### docker
 # 一樣要先建好 資料庫 還有下載docker desktop
