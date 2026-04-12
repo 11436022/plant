@@ -12,7 +12,17 @@ import jwt
 import datetime
 from auth import get_current_user, verify_admin
 from pathlib import Path
+from sqlalchemy.orm import Session
+import models
+from database import SessionLocal, engine
 
+# 定義連線產生器
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 app = FastAPI(title = "植物病害診斷系統 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -29,7 +39,8 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 async def create_diary(
     user_note: str = Form(""),
     file: UploadFile = File(...),
-    current_user_id: dict = Depends(get_current_user)
+    current_user_id: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     user_id = current_user_id["user_id"]
     file_path = UPLOAD_DIR / file.filename
@@ -37,13 +48,16 @@ async def create_diary(
     with open(file_path,"wb") as buffer:
         shutil.copyfileobj(file.file,buffer)
     db_path = file_path.as_posix()
-    result = diagnostic_plant(db_path)
+    crops = [c.crop_name for c in db.query(models.Crop).all()]
+    diseases = [d.disease_name for d in db.query(models.Disease).all()]
+    pests = [p.pest_name for p in db.query(models.Pest).all()]
+    result = diagnostic_plant(db_path,crops,diseases,pests)
     if result:
         
         # 組合出前端可以直接用的網址
         # 修改後
         full_url = f"http://127.0.0.1:8000/{file_path.as_posix()}"
-        my_id = save_to_db(result, file_path,user_id, user_note)
+        my_id = save_to_db(result, file_path,user_id, user_note,db)
         return {
             "status":"success",
             "message": "紀錄已存入資料庫",
@@ -63,6 +77,7 @@ async def create_diary(
 @app.get("/diaries")
 async def get_all_history(current_user_id:int = Depends(get_current_user)):
     """取得所有診斷歷史紀錄"""
+    user_id = current_user_id["user_id"]
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
@@ -79,7 +94,7 @@ async def get_all_history(current_user_id:int = Depends(get_current_user)):
             Where d.user_id = %s
             ORDER BY d.created_at desc
             """
-            cursor.execute(sql,(current_user_id,))
+            cursor.execute(sql,(user_id,))
             rows = cursor.fetchall()
             # 修正圖片路徑：讓它變成瀏覽器可以直接點開的網址
             for row in rows:
@@ -110,6 +125,7 @@ async def admin_get_all_diaries(admin: dict = Depends(verify_admin)):
 #取得diary中特定的日誌
 @app.get("/diaries/{diary_id}")
 async def get_diary_detail(diary_id: int, current_user_id: int = Depends(get_current_user)):
+    user_id = current_user_id["user_id"]
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
@@ -119,7 +135,7 @@ async def get_diary_detail(diary_id: int, current_user_id: int = Depends(get_cur
             LEFT JOIN crop c ON d.crop_id = c.crop_id
             WHERE d.id = %s AND d.user_id = %s
             """
-            cursor.execute(sql,(diary_id,current_user_id))
+            cursor.execute(sql,(diary_id,user_id))
             detail = cursor.fetchone()
             if not detail:
                 raise HTTPException(status_code=404, detail = "找不到此紀錄或您無權查看")

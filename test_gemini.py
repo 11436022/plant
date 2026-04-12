@@ -4,37 +4,47 @@ from PIL import Image
 from dotenv import load_dotenv
 import pymysql
 import json
-import google.api_core.exceptions
-from db_utils import get_or_create_id, get_crop_id_by_name,get_db_connection
+from db_utils import get_or_create_id
+from sqlalchemy.orm import Session
+import models
+from datetime import datetime
+from database import SessionLocal
 
 load_dotenv()
 
 client = genai.Client(api_key=os.getenv("Gemini_API_KEY"))
 
 def get_standard_names():
-    conn = get_db_connection()
-
+    db = SessionLocal() # 開啟一個臨時連線
     try:
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT disease_name FROM disease")
-            diseases = [row["disease_name"] for row in cursor.fetchall()]
-            cursor.execute("SELECT pest_name FROM pests")
-            pests = [row["pest_name"] for row in cursor.fetchall()]
-            return diseases, pests
+        # 1. 抓取所有植物名稱
+        crops = [c.crop_name for c in db.query(models.Crop).all()]
+        
+        # 2. 抓取所有疾病名稱
+        diseases = [d.disease_name for d in db.query(models.Disease).all()]
+        
+        # 3. 抓取所有蟲害名稱
+        pests = [p.pest_name for p in db.query(models.Pest).all()]
+        
+        return crops, diseases, pests # 確保回傳 3 個值
     finally:
-        conn.close()
+        db.close()
 
 
 
-def diagnostic_plant(image_path):
-    diseases, pests = get_standard_names()
+def diagnostic_plant(image_path, crops, diseases, pests):
+    crops,diseases, pests = get_standard_names()
+    crop_list_str = ", ".join(crops)
     disease_list_str = ", ".join(diseases)
     pest_list_str = ", ".join(pests)
     img = Image.open(image_path)
 
     prompt = f"""
+    你的 "crop_name" 必須優先從以下清單中選擇：
+    [{crop_list_str}]
+    如果圖片中的植物明顯不屬於上述清單，請回傳 "未知"。
+
     請分析這張植物照片，你的 "status_name" 欄位必須優先匹配以下清單。
-    
     已知疾病清單：{disease_list_str}
     已知蟲害清單：{pest_list_str}
     
@@ -60,11 +70,13 @@ def diagnostic_plant(image_path):
 
 
 
-def save_to_db(data, image_path,user_id,user_note=""):
+def save_to_db(data, image_path,user_id,user_note, db: Session):
     print("--- 開始執行儲存流程 ---") # 加入這行
 
     crop_name = data.get("crop_name")
-    target_crop_id = get_crop_id_by_name(crop_name)
+    crop = db.query(models.Crop).filter(models.Crop.crop_name == crop_name).first()
+
+    target_crop_id = crop.crop_id if crop else None
     if target_crop_id is None:
         print("無法關聯植物，儲存失敗。")
         
@@ -84,53 +96,63 @@ def save_to_db(data, image_path,user_id,user_note=""):
         cursorclass=pymysql.cursors.DictCursor
     )
     try:
-        with conn.cursor() as cursor:
-            if category == "Disease":
-                check_sql = "SELECT disease_id, description, treatment FROM disease WHERE disease_name = %s OR disease_name LIKE %s"
-                cursor.execute(check_sql, (status_name,f"%{status_name}%"))
-                db_disease = cursor.fetchone()
+        # --- 第一步：如果是 Disease ---
+        if category == "Disease":
+            db_disease = db.query(models.Disease).filter(
+                (models.Disease.disease_name == status_name) | 
+                (models.Disease.disease_name.like(f"%{status_name}%"))
+            ).first()
 
-                if db_disease:
-                    # 找到了！使用知識庫裡的專業內容
-                    disease_id = db_disease['disease_id']
-                    final_suggestion = db_disease['description']
-                    final_treatment = db_disease['treatment']
-                    print(f"🎯 精確匹配到知識庫條目: {status_name}")
-                else:
-                    # 沒找到，才呼叫你原本的 get_or_create_id (建立新條目)
-                    disease_id = get_or_create_id("disease", status_name, target_crop_id, final_suggestion, final_treatment)
-            
-            # --- 第二步：如果是 Pest ---
-            elif category == 'Pest':
-                # ### 關鍵：新增 Pest 的精確匹配 ###
-                check_pest_sql = "SELECT pest_id, description, treatment FROM pests WHERE pest_name = %s OR pest_name LIKE %s"
-                cursor.execute(check_pest_sql, (status_name,f"%{status_name}%"))
-                db_pest = cursor.fetchone()
+            if db_disease:
+                disease_id = db_disease.disease_id
+                final_suggestion = db_disease.description
+                final_treatment = db_disease.treatment
+                print(f"🎯 精確匹配到 Disease 知識庫: {status_name}")
+            else:
+                # 這裡建議把 get_or_create_id 也改成用 db (Session) 版本，或是維持原樣
+                disease_id = get_or_create_id("disease", status_name, target_crop_id, final_suggestion, final_treatment)
+        
+        # --- 第二步：如果是 Pest ---
+        elif category == 'Pest':
+            db_pest = db.query(models.Pest).filter(
+                (models.Pest.pest_name == status_name) | 
+                (models.Pest.pest_name.like(f"%{status_name}%"))
+            ).first()
 
-                if db_pest:
-                    pest_id = db_pest['pest_id']
-                    final_suggestion = db_pest['description']
-                    final_treatment = db_pest['treatment']
-                    print(f"🎯 匹配到 Pest 知識庫: {status_name}")
-                else:
-                    pest_id = get_or_create_id('pests', status_name, target_crop_id, final_suggestion, final_treatment)
-            
-            sql = """
-            INSERT INTO plant_diary (user_id,crop_id,status_name,image_url,disease_id, pest_id,confidence,suggestion,treatment,user_note,created_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s,%s, %s,%s, NOW())
-            """
-            cursor.execute(sql,(
-                user_id,target_crop_id,status_name,image_path,disease_id, pest_id,data["confidence"],final_suggestion,final_treatment,user_note))
-        conn.commit()
-        print(f"✅ 成功！已關聯 {category} ID: {disease_id or pest_id}")
-        print("資料已成功存入資料庫!")
+            if db_pest:
+                pest_id = db_pest.pest_id
+                final_suggestion = db_pest.description
+                final_treatment = db_pest.treatment
+                print(f"🎯 匹配到 Pest 知識庫: {status_name}")
+            else:
+                pest_id = get_or_create_id('pests', status_name, target_crop_id, final_suggestion, final_treatment)
+
+        # --- 第三步：新增紀錄到 PlantDiary ---
+        new_diary = models.PlantDiary(
+            user_id=user_id,
+            crop_id=target_crop_id,
+            status_name=status_name,
+            image_url=str(image_path),
+            disease_id=disease_id,
+            pest_id=pest_id,
+            confidence=data.get("confidence"),
+            suggestion=final_suggestion,
+            treatment=final_treatment,
+            user_note=user_note,
+            created_at=datetime.now()
+        )
+
+        db.add(new_diary)
+        db.commit() # 提交儲存
+        db.refresh(new_diary) # 重新整理以取得自動生成的 ID
+
+        print(f"✅ 成功！已存入 PlantDiary ID: {new_diary.id}")
         return target_crop_id
-    except google.api_core.exceptions.ResourceExhausted:
-        return "ERROR: API 配額已達上限（請稍後再試）"
+
     except Exception as e:
-        return f"ERROR: 發生未知錯誤: {str(e)}"
-    finally:
-        conn.close()
+        db.rollback() # 出錯時回滾，確保資料庫一致性
+        print(f"❌ ERROR: 發生未知錯誤: {str(e)}")
+        return f"ERROR: {str(e)}"
 
 #if __name__ == "__main__":
  #   result = diagnostic_plant(r"")
