@@ -52,3 +52,13 @@ docker build -t plant-app-final .
 docker run --gpus all -it -p 8000:8000 -v ${PWD}:/app plant-app-final bash -c "cd /app && python3 main.py"
 
 # 如果網頁跑不出來網址改成  http://localhost:8000/docs
+
+### Alembic (資料庫同步)
+# Alembic 用法
+pip install alembic pymysql python-dotenv
+python -m alembic current
+python -m alembic upgrade head
+
+# Alembic 抓法
+git pull origin main
+python -m alembic upgrade head
