@@ -4,7 +4,7 @@ from PIL import Image
 from dotenv import load_dotenv
 import pymysql
 import json
-from db_utils import get_or_create_id
+from db_utils import get_or_complete_knowledge
 from sqlalchemy.orm import Session
 import models
 from datetime import datetime
@@ -70,62 +70,41 @@ def diagnostic_plant(image_path, crops, diseases, pests):
 
 
 
-def save_to_db(data, image_path,user_id,user_note, db: Session):
+async def save_to_db(data, image_path,user_id,user_note, db: Session):
     print("--- 開始執行儲存流程 ---") # 加入這行
 
     crop_name = data.get("crop_name")
-    crop = db.query(models.Crop).filter(models.Crop.crop_name == crop_name).first()
+    crop_info = await get_or_complete_knowledge("crop", crop_name, db)
+    target_crop_id = crop_info["id"] if crop_info else None
 
-    target_crop_id = crop.crop_id if crop else None
     if target_crop_id is None:
         print("無法關聯植物，儲存失敗。")
         
-    category = data.get('category')
+    category = data.get('category', '').lower()
     status_name = data.get("status_name")
     disease_id = None
     pest_id = None
     final_suggestion = data.get("suggestion") # 預設用 AI 給的
     final_treatment = data.get("treatment")   # 預設用 AI 給的
     
-    
-    conn = pymysql.connect(
-        user = os.getenv("DB_USER"),
-        password = os.getenv("DB_PASSWORD"),
-        host = os.getenv("DB_HOST"),
-        database = os.getenv("DB_NAME"),
-        cursorclass=pymysql.cursors.DictCursor
-    )
     try:
         # --- 第一步：如果是 Disease ---
-        if category == "Disease":
-            db_disease = db.query(models.Disease).filter(
-                (models.Disease.disease_name == status_name) | 
-                (models.Disease.disease_name.like(f"%{status_name}%"))
-            ).first()
+        if category == "disease":
+            # 呼叫智慧函式：先查知識庫，沒有就叫 Gemini 生成
+            knowledge = await get_or_complete_knowledge("disease", status_name, db)
+            disease_id = knowledge["id"]
+            final_suggestion = knowledge["suggestion"]
+            final_treatment = knowledge["treatment"]
+            print(f"🎯 已連動 Disease 知識庫: {status_name}")
 
-            if db_disease:
-                disease_id = db_disease.disease_id
-                final_suggestion = db_disease.description
-                final_treatment = db_disease.treatment
-                print(f"🎯 精確匹配到 Disease 知識庫: {status_name}")
-            else:
-                # 這裡建議把 get_or_create_id 也改成用 db (Session) 版本，或是維持原樣
-                disease_id = get_or_create_id("disease", status_name, target_crop_id, final_suggestion, final_treatment)
-        
+         
         # --- 第二步：如果是 Pest ---
-        elif category == 'Pest':
-            db_pest = db.query(models.Pest).filter(
-                (models.Pest.pest_name == status_name) | 
-                (models.Pest.pest_name.like(f"%{status_name}%"))
-            ).first()
-
-            if db_pest:
-                pest_id = db_pest.pest_id
-                final_suggestion = db_pest.description
-                final_treatment = db_pest.treatment
-                print(f"🎯 匹配到 Pest 知識庫: {status_name}")
-            else:
-                pest_id = get_or_create_id('pests', status_name, target_crop_id, final_suggestion, final_treatment)
+        elif category == 'pest':
+            knowledge = await get_or_complete_knowledge("pest", status_name, db)
+            pest_id = knowledge["id"]
+            final_suggestion = knowledge["suggestion"]
+            final_treatment = knowledge["treatment"]
+            print(f"🎯 已連動 Pest 知識庫: {status_name}")
 
         # --- 第三步：新增紀錄到 PlantDiary ---
         new_diary = models.PlantDiary(

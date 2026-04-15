@@ -1,10 +1,10 @@
-from fastapi import FastAPI, UploadFile, File, Form, Body,Header, Depends
+from fastapi import FastAPI, UploadFile, File, Form, Body, Depends
 import shutil
 import os
-from test_gemini import save_to_db, diagnostic_plant
+from test_gemini import save_to_db, diagnostic_plant,client
 from fastapi.staticfiles import StaticFiles
 from fastapi import HTTPException
-from db_utils import get_db_connection
+from db_utils import get_db_connection,get_or_complete_knowledge
 import uvicorn
 from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
@@ -14,7 +14,8 @@ from auth import get_current_user, verify_admin
 from pathlib import Path
 from sqlalchemy.orm import Session
 import models
-from database import SessionLocal, engine
+from database import SessionLocal
+
 
 # 定義連線產生器
 def get_db():
@@ -39,10 +40,10 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 async def create_diary(
     user_note: str = Form(""),
     file: UploadFile = File(...),
-    current_user_id: dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    user_id = current_user_id["user_id"]
+    user_id = current_user["user_id"]
     file_path = UPLOAD_DIR / file.filename
 
     with open(file_path,"wb") as buffer:
@@ -52,27 +53,30 @@ async def create_diary(
     diseases = [d.disease_name for d in db.query(models.Disease).all()]
     pests = [p.pest_name for p in db.query(models.Pest).all()]
     result = diagnostic_plant(db_path,crops,diseases,pests)
-    if result:
-        
-        # 組合出前端可以直接用的網址
-        # 修改後
-        full_url = f"http://127.0.0.1:8000/{file_path.as_posix()}"
-        my_id = save_to_db(result, file_path,user_id, user_note,db)
-        return {
-            "status":"success",
-            "message": "紀錄已存入資料庫",
-            "data": {
-                "crop_id": my_id,
-                "user": user_id,
-                "category": result.get("category"),
-                "status_name": result.get("status_name"),
-                "confidence":result.get("confidence"),
-                "image_url": full_url, # 回傳完整網址給前端
-                "suggestion": result.get("suggestion"),
-                "treatment" : result.get("treatment")
-            }
+    if not result:
+        if os.path.exists(file_path): os.remove(file_path)
+        raise HTTPException(status_code=500, detail="AI 辨識失敗，請稍後再試。")
+    confidence = float(result.get("confidence", 0))
+    if confidence < 0.6:  # 稍微放寬一點點測試看看
+        if os.path.exists(file_path): os.remove(file_path)
+        raise HTTPException(status_code=422, detail="照片信心度不足，建議換個角度重新拍攝。")
+    full_url = f"http://127.0.0.1:8000/{file_path.as_posix()}"
+    my_id = await save_to_db(result, file_path,user_id, user_note,db)
+    return {
+        "status":"success",
+        "message": "紀錄已存入資料庫",
+        "data": {
+            "crop_id": my_id,
+            "user": user_id,
+            "category": result.get("category"),
+            "status_name": result.get("status_name"),
+            "confidence":result.get("confidence"),
+            "image_url": full_url, # 回傳完整網址給前端
+            "suggestion": result.get("suggestion"),
+            "treatment" : result.get("treatment")
         }
-    return {"status":"error","message":"AI 辨識失敗"}
+    }
+    
 
 @app.get("/diaries")
 async def get_all_history(current_user_id:int = Depends(get_current_user)):
@@ -121,6 +125,7 @@ async def admin_get_all_diaries(admin: dict = Depends(verify_admin)):
             return {"status": "success", "total_records": len(rows), "data": rows}
     finally:
         conn.close()
+
 
 #取得diary中特定的日誌
 @app.get("/diaries/{diary_id}")
@@ -173,6 +178,67 @@ async def delete_diary(diary_id:int,current_user_id: int = Depends(get_current_u
         raise HTTPException(status_code=500,detail=str(e))
     finally:
         conn.close()
+
+async def classify_agriculture_term(name: str):
+    """
+    請 Gemini 判斷該名稱屬於哪一類。
+    回傳值：'disease', 'pest' 或 'invalid'
+    """
+    prompt = f"請判斷『{name}』屬於哪一類：『植物疾病』、『農業害蟲』。如果是疾病請回傳 disease，如果是害蟲請回傳 pest，如果都不是或不相關請回傳 invalid。只需回傳標籤文字。"
+    try:
+        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        result = response.text.strip().lower()
+        if result in ['disease', 'pest']:
+            return result
+        return "invalid"
+    except:
+        return "invalid"
+
+@app.patch("/diaries/{diary_id}")
+async def patch_diary(
+    diary_id: int,
+    update_data: dict = Body(...),
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    user_id = current_user["user_id"]
+    is_admin = current_user.get("role") == "admin"
+
+    db_entry = db.query(models.PlantDiary).filter(models.PlantDiary.id == diary_id).first()
+    if not db_entry or (not is_admin and db_entry.user_id != user_id):
+        raise HTTPException(status_code=404, detail="紀錄不存在或無權限修改")
+
+    new_crop_name = update_data.get("crop_name")
+    new_status = update_data.get("status_name")
+    
+
+    if new_crop_name:
+        crop_info = await get_or_complete_knowledge("crop", new_crop_name, db)
+        db_entry.crop_id = crop_info["id"]
+
+    if new_status:
+        # A. 自動分類與驗證
+        category = await classify_agriculture_term(new_status)
+        if category == "invalid":
+            raise HTTPException(status_code=400, detail="請輸入有效的農作物病蟲害名稱")
+        # B. 取得/補全知識庫內容 (自動連動百科建議)
+        knowledge = await get_or_complete_knowledge(category, new_status, db)
+        # C. 同步更新日記欄位
+        db_entry.status_name = new_status
+        db_entry.suggestion = knowledge["suggestion"]
+        db_entry.treatment = knowledge["treatment"]
+    # 處理其他手動欄位 (如果有傳入則以手動為主，給予最高靈活性)
+    if "user_note" in update_data:
+        db_entry.user_note = update_data["user_note"]
+    if "suggestion" in update_data: 
+        db_entry.suggestion = update_data["suggestion"]
+    if "treatment" in update_data:
+        db_entry.treatment = update_data["treatment"]
+
+    db.commit()
+    return {"status": "success", "message": "修正成功，資料庫已自動同步分類。"}
+
+
 
 # 1. 設定密碼加密工具 (使用 bcrypt 演算法)
 pwd_context = CryptContext(schemes=["bcrypt"], bcrypt__ident="2b")
