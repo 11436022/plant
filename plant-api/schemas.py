@@ -1,12 +1,3 @@
-from pydantic import BaseModel
-from typing import Dict, Any
+"""舊 schema 相容層，轉接到 app.schemas.prediction。"""
 
-class PlantData(BaseModel):
-    plant_name: str
-    confidence: float
-    is_healthy: bool
-
-class PredictionResponse(BaseModel):
-    status: str
-    data: PlantData
-    metadata: Dict[str, Any]
+from app.schemas.prediction import PlantData, PredictionResponse  # noqa: F401
