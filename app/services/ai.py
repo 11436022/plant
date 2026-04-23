@@ -49,7 +49,7 @@ def diagnostic_plant(image_path, crops=None, diseases=None, pests=None):
 
     prompt = f"""
 Identify the crop and health status from this image.
-
+只有suggestion/treatment中文回答
 Known crops: {crop_list_str}
 Known diseases: {disease_list_str}
 Known pests: {pest_list_str}
@@ -58,7 +58,7 @@ Return valid JSON only:
 {{
   "crop_name": "string",
   "category": "Healthy|Disease|Pest",
-  "status_name": "string",
+  "status_name": "string",(若健康則填Healthy)
   "confidence": 0.0,
   "suggestion": "string",
   "treatment": "string"
