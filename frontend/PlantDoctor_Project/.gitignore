@@ -1,0 +1,20 @@
+# --- Backend (Python) ---
+**/__pycache__/
+*.pyc
+.env
+venv/
+backend/static/uploads/*
+.vscode/
+
+# --- Frontend (Android) ---
+**/build/
+**/.gradle/
+**/local.properties
+**/.idea/
+*.iml
+*.apk
+*.jks
+
+# --- System Files ---
+.DS_Store
+Thumbs.db
