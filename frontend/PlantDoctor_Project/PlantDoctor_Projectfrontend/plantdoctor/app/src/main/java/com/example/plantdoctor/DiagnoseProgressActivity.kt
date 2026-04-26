@@ -9,6 +9,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -53,32 +54,46 @@ class DiagnoseProgressActivity : AppCompatActivity() {
             return
         }
 
-        // 2. 準備圖片檔案 (改用正確的 Part 名稱 "file" 對應後端)
+        // 2. 準備圖片檔案
         val file = uriToFile(uri)
         val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-        // 注意：這裡的 "file" 必須跟 main.py 裡的 create_diary(file: UploadFile) 名稱一致
         val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
         // 3. 發動網路請求
         val apiService = PlantApiService.create()
 
-        // 重要修正：token 變數裡面已經包含 "Bearer " 了（登入時存入的）
-        // 所以直接傳入 token 即可，不要寫成 "Bearer $token"
+        // 這裡維持使用 ResponseBody 接收，但我們在成功後手動解析它
         apiService.uploadImage(token, body).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     progressBar.progress = 100
                     tvPercent.text = "100%"
 
-                    Toast.makeText(this@DiagnoseProgressActivity, "辨識成功！", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this@DiagnoseProgressActivity, ResultActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    // --- 核心修正：解析並傳遞真實資料 ---
+                    val responseString = response.body()?.string()
+
+                    try {
+                        // 使用 Gson 解析 JSON (這裡對應夥伴寫的 HistoryResponse 格式)
+                        // 因為診斷回傳的單筆格式跟歷史紀錄的 data 列表解析邏輯相似
+                        // 為了保險，我們直接傳送原始 JSON 字串給下一頁處理
+
+                        Toast.makeText(this@DiagnoseProgressActivity, "辨識成功！", Toast.LENGTH_SHORT).show()
+
+                        val intent = Intent(this@DiagnoseProgressActivity, ResultActivity::class.java)
+                        intent.putExtra("DIAGNOSIS_RESULT", responseString) // 把整串結果丟給 ResultActivity
+                        startActivity(intent)
+                        finish()
+
+                    } catch (e: Exception) {
+                        Log.e("ParseError", "解析失敗: ${e.message}")
+                        Toast.makeText(this@DiagnoseProgressActivity, "解析結果出錯", Toast.LENGTH_SHORT).show()
+                        finish()
+                    }
+                    // ---------------------------------
                 } else {
                     val errorJson = response.errorBody()?.string()
                     Log.e("ServerResponse", "Code: ${response.code()}, Error: $errorJson")
 
-                    // 如果 401，通常是 Token 格式問題
                     if (response.code() == 401) {
                         Toast.makeText(this@DiagnoseProgressActivity, "驗證失敗，請重新登入", Toast.LENGTH_LONG).show()
                     } else {
@@ -98,7 +113,7 @@ class DiagnoseProgressActivity : AppCompatActivity() {
 
     private fun uriToFile(uri: Uri): File {
         val inputStream = contentResolver.openInputStream(uri)
-        val file = File(cacheDir, "${System.currentTimeMillis()}.jpg") // 使用時間戳避免衝突
+        val file = File(cacheDir, "${System.currentTimeMillis()}.jpg")
         val outputStream = FileOutputStream(file)
         inputStream?.copyTo(outputStream)
         outputStream.close()

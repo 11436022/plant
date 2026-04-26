@@ -1,1 +1,0 @@
-"""Plant API application package."""
