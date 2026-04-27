@@ -3,13 +3,18 @@ import os
 import pymysql
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
+from dotenv import load_dotenv
 from app.db.base import Base
+
+load_dotenv()
 
 user = os.getenv("DB_USER")
 password = os.getenv("DB_PASSWORD")
 host = os.getenv("DB_HOST")
 db_name = os.getenv("DB_NAME")
+
+if not all([user, host, db_name]):
+    raise ValueError("無法從 .env 讀取資料庫設定，請檢查檔案是否存在且格式正確。")
 
 DATABASE_URL = f"mysql+pymysql://{user}:{password}@{host}/{db_name}"
 
