@@ -20,19 +20,16 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-
-
 data class HistoryItem(
-    val id: Int,              
-    val crop_name: String,    
-    val created_at: String,         
-    val status_name: String,      
-    val image_url: String,     
+    val id: Int,
+    val crop_name: String,
+    val created_at: String,
+    val status_name: String,
+    val image_url: String,
     var suggestion: String? = null, // 一開始是空的，點擊後才抓
     var treatment: String? = null,  // 一開始是空的
     var isExpanded: Boolean = false
 )
-
 
 class HistoryListActivity : AppCompatActivity() {
     private lateinit var adapter: HistoryAdapter
@@ -42,6 +39,12 @@ class HistoryListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history_list)
 
+        // --- 新增：處理返回按鈕邏輯 ---
+        val btnBackHome = findViewById<ImageButton>(R.id.btn_back_home)
+        btnBackHome.setOnClickListener {
+            finish() // 結束當前頁面，回到上一層
+        }
+
         val rvHistory = findViewById<RecyclerView>(R.id.rv_history_list)
         rvHistory.layoutManager = LinearLayoutManager(this)
 
@@ -49,6 +52,7 @@ class HistoryListActivity : AppCompatActivity() {
         rvHistory.adapter = adapter
         fetchHistoryFromServer()
     }
+
     private fun fetchHistoryFromServer(){
         // 1. 取得存好的 Token
         val sharedPreferences = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
@@ -82,7 +86,7 @@ class HistoryListActivity : AppCompatActivity() {
                                 finish()
                             }
                             404 -> {
-                            Toast.makeText(this@HistoryListActivity, "找不到紀錄", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@HistoryListActivity, "找不到紀錄", Toast.LENGTH_SHORT).show()
                             }
                             else -> {
                                 Toast.makeText(this@HistoryListActivity, "伺服器錯誤: ${response.code()}", Toast.LENGTH_SHORT).show()
@@ -128,7 +132,7 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) :
         val detailText = if (item.suggestion != null) {
             "【建議】\n${item.suggestion}\n\n【處理】\n${item.treatment}"
         } else {
-            "載入中，請稍候..." 
+            "載入中，請稍候..."
         }
         holder.tvAdvice.text = detailText
 
@@ -144,7 +148,7 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) :
                 if (item.suggestion == null) {
                     val sharedPref = holder.itemView.context.getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
                     val token = sharedPref.getString("token", "") ?: ""
-                    
+
                     PlantApiService.create().getDiaryDetail(item.id, token).enqueue(object : Callback<DetailDetailResponse> {
                         override fun onResponse(call: Call<DetailDetailResponse>, response: Response<DetailDetailResponse>) {
                             if (response.isSuccessful) {
@@ -152,7 +156,7 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) :
                                 // 把抓到的詳情補回這個 item
                                 item.suggestion = detail?.suggestion
                                 item.treatment = detail?.treatment
-                                
+
                                 // 展開並更新
                                 item.isExpanded = true
                                 val currentPos = holder.adapterPosition
@@ -171,7 +175,7 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) :
                     notifyItemChanged(position)
                 }
             }
-             else {
+            else {
                 // 縮起來
                 item.isExpanded = false
                 notifyItemChanged(position)
