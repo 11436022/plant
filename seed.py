@@ -1,7 +1,7 @@
 import json
 from sqlalchemy.orm import Session
-from database import SessionLocal, engine
-import models
+from app.db.session import SessionLocal, engine
+from app.db import models
 from app.db.models import Base
 
 def seed_data():

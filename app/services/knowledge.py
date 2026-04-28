@@ -1,10 +1,10 @@
 from app.db import models
-
+from fastapi import HTTPException
 
 async def get_or_complete_knowledge(table_name, name_val, db):
     """查詢知識表，若不存在則補齊資料。"""
 
-    from app.services.ai import client
+    from app.services.ai import client,check_if_real_crop
 
     if table_name == "crop":
         model = models.Crop
@@ -30,6 +30,13 @@ async def get_or_complete_knowledge(table_name, name_val, db):
         return result
 
     if table_name == "crop":
+        is_valid = await check_if_real_crop(name_val)
+        if not is_valid:
+            # 如果不是植物，直接報錯，中斷流程
+            raise HTTPException(
+                status_code=400, 
+                detail=f"'{name_val}' 不像是一個有效的植物名稱，請重新輸入。"
+            )
         new_crop = models.Crop(crop_name=name_val)
         db.add(new_crop)
         db.commit()
@@ -44,7 +51,7 @@ async def get_or_complete_knowledge(table_name, name_val, db):
     )
 
     try:
-        response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
         ai_text = response.text or ""
     except Exception:
         ai_text = ""
