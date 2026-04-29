@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 import secrets
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
 from fastapi import HTTPException
@@ -64,7 +65,7 @@ def ensure_auth_schema() -> None:
         conn.close()
 
 
-def issue_email_verification(user_id: int, username: str, email: str) -> datetime.datetime:
+def issue_email_verification(user_id: int, username: str, email: str) -> datetime:
     """建立信箱驗證 token 並寄出驗證信。"""
 
     token, expires_at = _issue_token(
@@ -91,7 +92,7 @@ def issue_email_verification(user_id: int, username: str, email: str) -> datetim
     return expires_at
 
 
-def send_password_reset_email(user_id: int, username: str, email: str) -> datetime.datetime:
+def send_password_reset_email(user_id: int, username: str, email: str) -> datetime:
     """建立一次性重設密碼 token，並寄出重設連結。"""
 
     token, expires_at = _issue_token(
@@ -172,13 +173,22 @@ def update_password(user_id: int, password_hash: str) -> None:
         conn.close()
 
 
-def _issue_token(user_id: int, purpose: str, expires_in_minutes: int) -> tuple[str, datetime.datetime]:
+def _issue_token(user_id: int, purpose: str, expires_in_minutes: int) -> tuple[str, datetime]:
     """建立一次性 token，並讓同用途舊 token 失效。"""
 
     ensure_auth_schema()
     raw_token = secrets.token_urlsafe(32)
+    print(f"Generated Raw Token: {raw_token}")
     token_hash = _hash_token(raw_token)
-    expires_at = datetime.datetime.utcnow() + datetime.timedelta(minutes=expires_in_minutes)
+    print(f"DEBUG: Token Hash to DB (雜湊): {token_hash}")
+    tw_tz = timezone(timedelta(hours=8))
+    now_tw = datetime.now(tw_tz).replace(tzinfo=None) # 取得台灣時間並轉為 naive
+    expires_at = now_tw + timedelta(minutes=expires_in_minutes)
+    
+
+    
+    # 存入前可以考慮將其轉換成無時區但數值為 UTC 的格式：
+    expires_at_naive = expires_at.replace(tzinfo=None)
 
     conn = get_db_connection()
     try:
@@ -186,23 +196,23 @@ def _issue_token(user_id: int, purpose: str, expires_in_minutes: int) -> tuple[s
             cursor.execute(
                 """
                 UPDATE user_one_time_tokens
-                SET used_at = COALESCE(used_at, UTC_TIMESTAMP())
+                SET used_at = COALESCE(used_at, %s)
                 WHERE user_id = %s AND purpose = %s AND used_at IS NULL
                 """,
-                (user_id, purpose),
+                (now_tw, user_id, purpose),
             )
             cursor.execute(
                 """
-                INSERT INTO user_one_time_tokens (user_id, purpose, token_hash, expires_at)
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO user_one_time_tokens (user_id, purpose, token_hash, expires_at,created_at)
+                VALUES (%s, %s, %s, %s, %s)
                 """,
-                (user_id, purpose, token_hash, expires_at),
+                (user_id, purpose, token_hash, expires_at_naive, now_tw),
             )
         conn.commit()
     finally:
         conn.close()
 
-    return raw_token, expires_at
+    return raw_token, expires_at_naive
 
 
 def _consume_token(token: str, purpose: str) -> dict:
@@ -210,7 +220,7 @@ def _consume_token(token: str, purpose: str) -> dict:
 
     ensure_auth_schema()
     token_hash = _hash_token(token)
-
+    print(f"DEBUG: Input token hash: {token_hash}")
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
@@ -227,16 +237,18 @@ def _consume_token(token: str, purpose: str) -> dict:
                 raise HTTPException(status_code=400, detail="Invalid token.")
             if record["used_at"] is not None:
                 raise HTTPException(status_code=400, detail="Token has already been used.")
-            if record["expires_at"] <= datetime.datetime.utcnow():
+            tw_tz = timezone(timedelta(hours=8))
+            now_tw = datetime.now(tw_tz).replace(tzinfo=None)
+            if record["expires_at"] <= now_tw:
                 raise HTTPException(status_code=400, detail="Token has expired.")
 
             cursor.execute(
                 """
                 UPDATE user_one_time_tokens
-                SET used_at = UTC_TIMESTAMP()
+                SET used_at = %s
                 WHERE id = %s AND used_at IS NULL
                 """,
-                (record["id"],),
+                (now_tw, record["id"]),
             )
             if cursor.rowcount != 1:
                 raise HTTPException(status_code=400, detail="Token is no longer valid.")
