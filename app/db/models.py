@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -6,7 +6,7 @@ from app.db.base import Base
 
 
 class Crop(Base):
-    """作物主檔。"""
+    """作物資料表。"""
 
     __tablename__ = "crop"
 
@@ -19,7 +19,7 @@ class Crop(Base):
 
 
 class Disease(Base):
-    """病害主檔。"""
+    """病害資料表。"""
 
     __tablename__ = "disease"
 
@@ -33,7 +33,7 @@ class Disease(Base):
 
 
 class Pest(Base):
-    """蟲害主檔。"""
+    """蟲害資料表。"""
 
     __tablename__ = "pests"
 
@@ -47,7 +47,7 @@ class Pest(Base):
 
 
 class User(Base):
-    """使用者資料。"""
+    """使用者資料表。"""
 
     __tablename__ = "user"
 
@@ -57,13 +57,16 @@ class User(Base):
     email = Column(String(100), unique=True, nullable=True)
     full_name = Column(String(50))
     role = Column(String(20), nullable=False, default="user")
+    # 新註冊帳號需要先驗證信箱；既有資料庫則由 migration 與啟動修補補齊欄位。
+    is_email_verified = Column(Boolean, nullable=False, default=True)
+    email_verified_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     plant_diary = relationship("PlantDiary", back_populates="user")
 
 
 class PlantDiary(Base):
-    """植物診斷日誌。"""
+    """植物診斷日誌資料表。"""
 
     __tablename__ = "plant_diary"
 
