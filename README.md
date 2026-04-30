@@ -24,6 +24,10 @@ DB_NAME=plant_db
 ### 3. 建立本地資料庫
 請開啟 MySQL，手動執行以下指令建立資料庫：
 init_db.sql可以直接複製到mysql去建立
+### (2026/4/28更新)現在請直接跑以下步驟(打開terminal)：
+git pull origin main
+python -m alembic upgrade head
+python seed.py
 
 ### 📂 檔案結構說明
 * database.py: 資料庫連線配置中心，使用 dotenv 讀取環境變數。
