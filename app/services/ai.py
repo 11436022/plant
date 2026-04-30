@@ -88,6 +88,29 @@ async def classify_agriculture_term(name: str) -> str:
         pass
     return "invalid"
 
+async def check_if_real_crop(name_val: str) -> bool:
+    """利用 AI 判斷輸入的字串是否為真實存在的農作物、植物或蔬果。"""
+    from app.services.ai import client
+
+    prompt = (
+        f"妳是一位專業的農業專家。請問 '{name_val}' 是否為存在的農作物、蔬果或植物名稱？"
+        "請只回答 'True','False' "
+        
+    )
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash", 
+            contents=prompt
+        )
+        # 取得回傳內容並清理空白與大小寫
+        ans = response.text.strip().lower()
+        return "true" in ans
+    except Exception as e:
+        # 如果 AI 服務出錯，保險起見我們預設為 True (或者 False，看你的嚴謹度)
+        print(f"AI Check Error: {e}")
+        return False
+
 
 async def save_to_db(data, image_path, user_id, user_note, db: Session):
     """將診斷結果寫入 plant_diary。"""

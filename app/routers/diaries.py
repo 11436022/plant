@@ -10,6 +10,7 @@ from app.services.ai import classify_agriculture_term, diagnostic_plant, get_ref
 from app.services.auth import get_current_user
 from app.services.files import build_public_image_url, create_safe_upload_path, ensure_image_upload
 from app.services.knowledge import get_or_complete_knowledge
+from app.schemas.patch import DiaryUpdate
 
 router = APIRouter(prefix="/diaries", tags=["diaries"])
 
@@ -118,7 +119,7 @@ async def get_diary_detail(diary_id: int, current_user: dict = Depends(get_curre
 @router.patch("/{diary_id}")
 async def patch_diary(
     diary_id: int,
-    update_data: dict = Body(...),
+    update_data: DiaryUpdate,
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -131,14 +132,14 @@ async def patch_diary(
     if not db_entry or (not is_admin and db_entry.user_id != user_id):
         raise HTTPException(status_code=404, detail="Diary not found.")
 
-    new_crop_name = update_data.get("crop_name")
-    new_status = update_data.get("status_name")
+    new_crop_name = update_data.crop_name
+    new_status = update_data.status_name
 
     if new_crop_name:
         crop_info = await get_or_complete_knowledge("crop", new_crop_name, db)
         db_entry.crop_id = crop_info["id"]
 
-    if new_status:
+    if new_status and new_status not in ["string", ""] and new_status != db_entry.status_name:
         category = await classify_agriculture_term(new_status)
         if category == "invalid":
             raise HTTPException(status_code=400, detail="Status must be a disease or pest.")
@@ -146,13 +147,12 @@ async def patch_diary(
         db_entry.status_name = new_status
         db_entry.suggestion = knowledge["suggestion"]
         db_entry.treatment = knowledge["treatment"]
-
-    if "user_note" in update_data:
-        db_entry.user_note = update_data["user_note"]
-    if "suggestion" in update_data:
-        db_entry.suggestion = update_data["suggestion"]
-    if "treatment" in update_data:
-        db_entry.treatment = update_data["treatment"]
+    optional_fields = ["user_note"]
+    for field in optional_fields:
+        value = getattr(update_data, field)
+        if value is not None:
+            setattr(db_entry, field, value)
+    
 
     db.commit()
     return {"status": "success", "message": "Diary updated successfully."}
