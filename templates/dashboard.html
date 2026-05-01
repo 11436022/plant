@@ -7,27 +7,68 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
         .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h1 { color: #2E7D32; border-bottom: 2px solid #2E7D32; padding-bottom: 10px; }
+        
+        /* 操作區塊樣式 */
+        .admin-actions { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; gap: 20px; }
+        .action-box { background: #e8f5e9; padding: 15px; border-radius: 8px; flex: 1; }
+        
+        input[type="text"] { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 200px; }
+        button { padding: 8px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; transition: 0.3s; }
+        
+        .btn-add { background-color: #2E7D32; color: white; }
+        .btn-search { background-color: #1976D2; color: white; }
+        .btn-save { background-color: #FFA000; color: white; font-size: 12px; }
+        .btn-delete { background-color: #d32f2f; color: white; }
+        button:hover { opacity: 0.8; }
+
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background-color: #f8f9fa; color: #333; }
         tr:hover { background-color: #f1f8e9; }
+        
         .plant-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; background: #ffebee; color: #c62828; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        
+        .edit-group { display: flex; gap: 5px; align-items: center; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌿 植物神醫 - 管理者診斷紀錄</h1>
-        <p>目前資料庫總計：<strong>{{ diaries|length }}</strong> 筆紀錄</p>
+        <h1>🌿 植物神醫 - 管理者後台</h1>
+        
+        <div class="admin-actions">
+            <!-- 新增功能 -->
+            <div class="action-box">
+                <form action="/admin/add" method="post">
+                    <strong>➕ 手動新增紀錄：</strong>
+                    <input type="text" name="status_name" placeholder="輸入病害名稱..." required>
+                    <button type="submit" class="btn-add">執行新增</button>
+                </form>
+            </div>
+
+            <!-- 搜尋功能 -->
+            <div class="action-box" style="background: #e3f2fd;">
+                <form action="/admin/" method="get">
+                    <strong>🔍 搜尋紀錄：</strong>
+                    <input type="text" name="search" placeholder="搜尋病害..." value="{{ search_query }}">
+                    <button type="submit" class="btn-search">搜尋</button>
+                    {% if search_query %}
+                        <a href="/admin/" style="font-size: 12px; color: #1976D2; margin-left: 10px;">清除搜尋</a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+
+        <p>目前資料顯示：<strong>{{ diaries|length }}</strong> 筆紀錄</p>
         
         <table>
             <thead>
                 <tr>
                     <th>圖片</th>
                     <th>ID</th>
-                    <th>病害名稱</th>
+                    <th>診斷結果 (修改)</th>
                     <th>診斷時間</th>
-                    <th>操作</th>
+                    <th>管理操作</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,13 +78,24 @@
                         {% if diary.image_url %}
                         <img src="{{ diary.image_url }}" class="plant-img" alt="植物照片">
                         {% else %}
-                        無圖片
+                        <span style="color: #999;">無圖片</span>
                         {% endif %}
                     </td>
                     <td>{{ diary.id }}</td>
-                    <td><span class="status-badge">{{ diary.status_name }}</span></td>
+                    <td>
+                        <!-- 修改功能：直接在表格內編輯 -->
+                        <form action="/admin/update/{{ diary.id }}" method="post" class="edit-group">
+                            <input type="text" name="status_name" value="{{ diary.status_name }}" class="status-badge" style="width: 150px; background: white;">
+                            <button type="submit" class="btn-save">💾 儲存</button>
+                        </form>
+                    </td>
                     <td>{{ diary.created_at }}</td>
-                    <td><button>查看詳情</button></td>
+                    <td>
+                        <!-- 刪除功能 -->
+                        <form action="/admin/delete/{{ diary.id }}" method="post" onsubmit="return confirm('警告：確定要永久刪除這筆紀錄嗎？');">
+                            <button type="submit" class="btn-delete">🗑️ 刪除</button>
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
