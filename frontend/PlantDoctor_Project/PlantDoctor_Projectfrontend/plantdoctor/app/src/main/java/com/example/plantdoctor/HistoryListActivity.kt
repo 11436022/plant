@@ -1,8 +1,9 @@
 package com.example.plantdoctor
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,8 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.content.Context
-import android.util.Log
+import com.bumptech.glide.Glide
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,8 +26,8 @@ data class HistoryItem(
     val created_at: String,
     val status_name: String,
     val image_url: String,
-    var suggestion: String? = null, // 一開始是空的，點擊後才抓
-    var treatment: String? = null,  // 一開始是空的
+    var suggestion: String? = null,
+    var treatment: String? = null,
     var isExpanded: Boolean = false
 )
 
@@ -39,10 +39,10 @@ class HistoryListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history_list)
 
-        // --- 新增：處理返回按鈕邏輯 ---
+        // 處理返回按鈕邏輯
         val btnBackHome = findViewById<ImageButton>(R.id.btn_back_home)
         btnBackHome.setOnClickListener {
-            finish() // 結束當前頁面，回到上一層
+            finish()
         }
 
         val rvHistory = findViewById<RecyclerView>(R.id.rv_history_list)
@@ -54,7 +54,6 @@ class HistoryListActivity : AppCompatActivity() {
     }
 
     private fun fetchHistoryFromServer(){
-        // 1. 取得存好的 Token
         val sharedPreferences = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
         val token = sharedPreferences.getString("token", null)
 
@@ -64,10 +63,9 @@ class HistoryListActivity : AppCompatActivity() {
             finish()
             return
         }
-        // 2. 建立 API 連線
+
         val apiService = PlantApiService.create()
 
-        // 3. 呼叫 getAllHistory
         apiService.getAllHistory(token).enqueue(object: Callback<HistoryResponse>{
             override fun onResponse(call: Call<HistoryResponse>, response: Response<HistoryResponse>){
                 if(response.isSuccessful){
@@ -96,7 +94,6 @@ class HistoryListActivity : AppCompatActivity() {
                 }
             }
             override fun onFailure(call: Call<HistoryResponse>, t: Throwable){
-                // --- 處理網路連線失敗  ---
                 Log.e("API_ERROR", "網路連線失敗: ${t.message}")
                 Toast.makeText(this@HistoryListActivity, "網路連線異常，請檢查網路設定", Toast.LENGTH_LONG).show()
             }
@@ -114,6 +111,8 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) :
         val tvAdvice: TextView = view.findViewById(R.id.tv_history_advice)
         val layoutDetail: LinearLayout = view.findViewById(R.id.layout_detail)
         val imgArrow: ImageView = view.findViewById(R.id.img_arrow)
+
+        val imgHistory: ImageView = view.findViewById(R.id.img_history_plant)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
@@ -127,8 +126,26 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) :
         holder.tvDate.text = item.created_at
         holder.tvStatus.text = item.status_name
 
-        // 2. 詳情資料賦值 (處理 null 的情況)
-        // 將建議與處理方法組合在一起顯示
+        // --- 修正版：處理本機測試網址與 C 槽路徑錯誤 ---
+        var finalImageUrl = item.image_url
+            .replace("127.0.0.1", "10.0.2.2")
+            .replace("localhost", "10.0.2.2")
+
+        // 魔法切除：把後端傳錯的 C 槽絕對路徑砍掉
+        if (finalImageUrl.contains("C:/Users/LL/Documents/MyProjects/plant/")) {
+            finalImageUrl = finalImageUrl.replace("C:/Users/LL/Documents/MyProjects/plant/", "")
+        }
+
+        // 驗證我們有沒有切對
+        Log.d("Glide_Check", "最終修復圖片網址: $finalImageUrl")
+
+        Glide.with(holder.itemView.context)
+            .load(finalImageUrl)
+            .placeholder(android.R.drawable.ic_menu_gallery)
+            .error(android.R.drawable.ic_dialog_alert)
+            .into(holder.imgHistory)
+        // ----------------------------------------
+
         val detailText = if (item.suggestion != null) {
             "【建議】\n${item.suggestion}\n\n【處理】\n${item.treatment}"
         } else {
@@ -136,15 +153,14 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) :
         }
         holder.tvAdvice.text = detailText
 
-        // 根據狀態顯示或隱藏細節區域
         holder.layoutDetail.visibility = if (item.isExpanded) View.VISIBLE else View.GONE
-
-        // 旋轉箭頭圖示 (展開時向上，縮起時向下)
         holder.imgArrow.rotation = if (item.isExpanded) 180f else 0f
 
         holder.itemView.setOnClickListener {
+            val currentPos = holder.adapterPosition
+            if (currentPos == RecyclerView.NO_POSITION) return@setOnClickListener
+
             if (!item.isExpanded) {
-                // 如果還沒抓過詳情 (判斷 suggestion 是否為空)
                 if (item.suggestion == null) {
                     val sharedPref = holder.itemView.context.getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
                     val token = sharedPref.getString("token", "") ?: ""
@@ -153,16 +169,10 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) :
                         override fun onResponse(call: Call<DetailDetailResponse>, response: Response<DetailDetailResponse>) {
                             if (response.isSuccessful) {
                                 val detail = response.body()?.data
-                                // 把抓到的詳情補回這個 item
                                 item.suggestion = detail?.suggestion
                                 item.treatment = detail?.treatment
-
-                                // 展開並更新
                                 item.isExpanded = true
-                                val currentPos = holder.adapterPosition
-                                if (currentPos != RecyclerView.NO_POSITION) {
-                                    notifyItemChanged(currentPos)
-                                }
+                                notifyItemChanged(currentPos)
                             }
                         }
                         override fun onFailure(call: Call<DetailDetailResponse>, t: Throwable) {
@@ -170,15 +180,12 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) :
                         }
                     })
                 } else {
-                    // 已經有資料了，直接展開
                     item.isExpanded = true
-                    notifyItemChanged(position)
+                    notifyItemChanged(currentPos)
                 }
-            }
-            else {
-                // 縮起來
+            } else {
                 item.isExpanded = false
-                notifyItemChanged(position)
+                notifyItemChanged(currentPos)
             }
         }
     }

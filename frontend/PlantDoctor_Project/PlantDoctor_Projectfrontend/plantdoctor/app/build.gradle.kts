@@ -1,16 +1,15 @@
 plugins {
     alias(libs.plugins.android.application)
-    // 這裡原本報錯，我幫你移除了多餘的宣告
 }
 
 android {
     namespace = "com.example.plantdoctor"
-    compileSdk = 36
+    compileSdk = 36 // 如果之後編譯報錯，可以將這裡改為 34 或 35
 
     defaultConfig {
         applicationId = "com.example.plantdoctor"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 36 // 如果 compileSdk 改了，這裡也要跟著改
         versionCode = 1
         versionName = "1.0"
 
@@ -31,8 +30,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-
-    // 我把這裡也刪掉了，因為現代版本會自動抓取編譯環境，減少出錯機會
 }
 
 dependencies {
@@ -46,6 +43,9 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+    // --- 新增：圖片載入套件 (Glide) ---
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
