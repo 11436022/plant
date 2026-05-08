@@ -126,18 +126,26 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) :
         holder.tvDate.text = item.created_at
         holder.tvStatus.text = item.status_name
 
-        // --- 修正版：處理本機測試網址與 C 槽路徑錯誤 ---
+        // --- 萬用修正版：自動偵測並切除本機路徑 ---
         var finalImageUrl = item.image_url
             .replace("127.0.0.1", "10.0.2.2")
             .replace("localhost", "10.0.2.2")
 
-        // 魔法切除：把後端傳錯的 C 槽絕對路徑砍掉
-        if (finalImageUrl.contains("C:/Users/LL/Documents/MyProjects/plant/")) {
-            finalImageUrl = finalImageUrl.replace("C:/Users/LL/Documents/MyProjects/plant/", "")
+        // 核心邏輯：不論 C 槽還是 D 槽，只要找到 static/ 就把前面的東西全部砍掉
+        val keyword = "static/"
+        if (finalImageUrl.contains(keyword)) {
+            val startIndex = finalImageUrl.indexOf(keyword)
+            // 取得基礎網址 (例如 http://10.0.2.2:8000/)
+            val firstSlash = finalImageUrl.indexOf("/", 8)
+            if (firstSlash != -1) {
+                val baseUrl = finalImageUrl.substring(0, firstSlash + 1)
+                // 重新拼接：基礎網址 + static/...
+                finalImageUrl = baseUrl + finalImageUrl.substring(startIndex)
+            }
         }
 
-        // 驗證我們有沒有切對
-        Log.d("Glide_Check", "最終修復圖片網址: $finalImageUrl")
+        // 驗證修復結果
+        Log.d("Glide_Check", "萬用修復網址: $finalImageUrl")
 
         Glide.with(holder.itemView.context)
             .load(finalImageUrl)
