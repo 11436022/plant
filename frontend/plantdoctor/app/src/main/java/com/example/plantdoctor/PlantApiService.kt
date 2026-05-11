@@ -63,7 +63,7 @@ interface PlantApiService {
     // 【診斷日誌相關】 (注意：這些會自動由 Interceptor 加上 Token)
 
     @Multipart
-    @POST("diaries/fake-upload")
+    @POST("diaries/upload")
     fun uploadImage(
         @Part("user_note") userNote: RequestBody,
         @Part image: MultipartBody.Part
