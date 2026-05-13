@@ -6,14 +6,7 @@ from urllib.parse import urlencode
 
 from fastapi import HTTPException
 
-from app.core.config import (
-    EMAIL_VERIFICATION_EXPIRE_MINUTES,
-    EMAIL_VERIFY_PATH,
-    FRONTEND_BASE_URL,
-    PASSWORD_RESET_EXPIRE_MINUTES,
-    PASSWORD_RESET_PATH,
-    PUBLIC_BASE_URL,
-)
+from app.core.config import settings
 from app.db.session import get_db_connection
 from app.services.email import send_email
 
@@ -71,9 +64,9 @@ def issue_email_verification(user_id: int, username: str, email: str) -> datetim
     token, expires_at = _issue_token(
         user_id=user_id,
         purpose=EMAIL_VERIFICATION_PURPOSE,
-        expires_in_minutes=EMAIL_VERIFICATION_EXPIRE_MINUTES,
+        expires_in_minutes=settings.EMAIL_VERIFICATION_EXPIRE_MINUTES,
     )
-    verify_url = _build_url(PUBLIC_BASE_URL, EMAIL_VERIFY_PATH, token)
+    verify_url = _build_url(settings.PUBLIC_BASE_URL, settings.EMAIL_VERIFY_PATH, token)
     send_email(
         to_email=email,
         subject="Plant 帳號驗證信",
@@ -98,9 +91,9 @@ def send_password_reset_email(user_id: int, username: str, email: str) -> dateti
     token, expires_at = _issue_token(
         user_id=user_id,
         purpose=PASSWORD_RESET_PURPOSE,
-        expires_in_minutes=PASSWORD_RESET_EXPIRE_MINUTES,
+        expires_in_minutes=settings.PASSWORD_RESET_EXPIRE_MINUTES,
     )
-    reset_url = _build_url(FRONTEND_BASE_URL, PASSWORD_RESET_PATH, token)
+    reset_url = _build_url(settings.FRONTEND_BASE_URL, settings.PASSWORD_RESET_PATH, token)
     send_email(
         to_email=email,
         subject="Plant 重設密碼通知",

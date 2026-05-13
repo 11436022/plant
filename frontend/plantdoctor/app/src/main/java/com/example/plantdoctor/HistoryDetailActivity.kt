@@ -3,6 +3,7 @@ package com.example.plantdoctor
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -56,7 +57,8 @@ class HistoryDetailActivity : AppCompatActivity() {
         btnAction.backgroundTintList = getColorStateList(android.R.color.holo_red_light)
 
         btnAction.setOnClickListener {
-            showDeleteConfirmDialog()
+            // 放棄使用 AlertDialog，直接執行刪除
+            executeDelete()
         }
 
         btnBack.setOnClickListener {
@@ -88,21 +90,26 @@ class HistoryDetailActivity : AppCompatActivity() {
                         .load(finalUrl)
                         .placeholder(android.R.drawable.ic_menu_gallery)
                         .into(imgPlant)
+
+                    // 【新增】處理使用者筆記的顯示
+                    val etUserNote = findViewById<TextView>(R.id.et_user_note)
+                    if (!data.user_note.isNullOrEmpty()) {
+                        etUserNote.visibility = android.view.View.VISIBLE
+                        etUserNote.text = data.user_note
+                        // 移除輸入框樣式，讓它看起來像普通文字
+                        etUserNote.background = null
+                        etUserNote.isFocusable = false
+                        etUserNote.isClickable = false
+                    } else {
+                        // 如果沒有筆記，就隱藏這個元件
+                        etUserNote.visibility = android.view.View.GONE
+                    }
                 }
             }
             override fun onFailure(call: Call<DetailDetailResponse>, t: Throwable) {
                 Toast.makeText(this@HistoryDetailActivity, "載入失敗", Toast.LENGTH_SHORT).show()
             }
         })
-    }
-
-    private fun showDeleteConfirmDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("刪除病例")
-            .setMessage("確定要永久刪除這筆診斷紀錄嗎？")
-            .setPositiveButton("確定") { _, _ -> executeDelete() }
-            .setNegativeButton("取消", null)
-            .show()
     }
 
     private fun executeDelete() {
@@ -113,11 +120,15 @@ class HistoryDetailActivity : AppCompatActivity() {
             override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
                 if (response.isSuccessful) {
                     Toast.makeText(this@HistoryDetailActivity, "刪除成功", Toast.LENGTH_SHORT).show()
-                    finish() // 關閉此頁
+                    setResult(RESULT_OK)
+                    finish()
+                } else {
+                    Toast.makeText(this@HistoryDetailActivity, "刪除失敗: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
             }
+
             override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
-                Toast.makeText(this@HistoryDetailActivity, "刪除失敗", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@HistoryDetailActivity, "刪除失敗: 網路連線問題", Toast.LENGTH_SHORT).show()
             }
         })
     }

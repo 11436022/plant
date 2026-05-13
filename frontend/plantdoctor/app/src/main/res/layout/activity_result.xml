@@ -60,7 +60,7 @@
         app:cardElevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cv_image_container"
-        android:layout_marginBottom="-30dp">
+        android:layout_marginBottom="0dp">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
@@ -122,11 +122,25 @@
                     android:textColor="#444444"
                     android:textSize="16sp" />
 
+                <EditText
+                    android:id="@+id/et_user_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:background="@drawable/edittext_background"
+                    android:hint="新增您的觀察筆記..."
+                    android:inputType="textMultiLine"
+                    android:minLines="3"
+                    android:padding="12dp"
+                    android:gravity="top"
+                    android:textSize="16sp"
+                    android:textColor="#333333"/>
+
                 <Button
                     android:id="@+id/btn_save_report"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginTop="16dp"
                     android:backgroundTint="#2E7D32"
                     android:text="儲存至歷史病例"
                     android:textSize="20sp"

@@ -32,7 +32,23 @@ data class RegisterRequest(
 data class ForgotPasswordRequest(val email: String)
 
 // 診斷紀錄相關 (共用 HistoryItem)
-data class UploadResponse(val status: String, val data: HistoryItem)
+// data class UploadResponse(val status: String, val data: HistoryItem) // <--- 舊的上傳回傳，將被取代
+
+// 【新流程】兩階段提交的資料模型
+data class PredictionResponse(
+    val prediction_id: String,
+    val analysis_result: AnalysisResult
+)
+data class AnalysisResult(
+    val crop_name: String?,
+    val category: String?,
+    val status_name: String?,
+    val confidence: Double?,
+    val suggestion: String?,
+    val treatment: String?
+)
+data class ConfirmRequest(val user_note: String)
+
 
 data class HistoryResponse(
     val status: String,
@@ -51,23 +67,44 @@ data class GenericResponse(val status: String, val message: String)
 interface PlantApiService {
 
     // 【帳戶相關】
-    @POST("users/register")
+    @POST("auth/users/register")
     fun register(@Body request: RegisterRequest): Call<GenericResponse>
 
-    @POST("user/login")
-    fun login(@Body request: LoginRequest): Call<LoginResponse>
+    @FormUrlEncoded
+    @POST("auth/login")
+    fun login(
+        @Field("username") username: String,
+        @Field("password") password: String
+    ): Call<LoginResponse>
 
-    @POST("user/forgot-password")
+    @POST("auth/user/forgot-password")
     fun forgotPassword(@Body request: ForgotPasswordRequest): Call<GenericResponse>
 
     // 【診斷日誌相關】 (注意：這些會自動由 Interceptor 加上 Token)
 
+    // @Multipart
+    // @POST("diaries/upload")
+    // fun uploadImage(
+    //     @Part("user_note") userNote: RequestBody,
+    //     @Part image: MultipartBody.Part
+    // ): Call<UploadResponse>
+
+    // --- 新的兩階段提交流程 ---
+
+    // 1. 預測 API
     @Multipart
-    @POST("diaries/upload")
-    fun uploadImage(
-        @Part("user_note") userNote: RequestBody,
+    @POST("predict/") // 注意路徑變為 /api/v1/predict/
+    fun predictImage(
         @Part image: MultipartBody.Part
-    ): Call<UploadResponse>
+    ): Call<PredictionResponse>
+
+    // 2. 確認儲存 API
+    @POST("diaries/confirm/{prediction_id}")
+    fun confirmDiary(
+        @Path("prediction_id") predictionId: String,
+        @Body request: ConfirmRequest
+    ): Call<GenericResponse> // 假設成功只回傳通用訊息
+
 
     @GET("diaries")
     fun getAllHistory(): Call<HistoryResponse>
@@ -81,8 +118,8 @@ interface PlantApiService {
 
     // --- 3. Retrofit 實例產生器 ---
     companion object {
-        // 模擬器連線本機電腦後端的專用 IP
-        private const val BASE_URL = "http://10.0.2.2:8000/"
+        // 模擬器連線本機電腦後端的專用 IP，並包含 API 版本
+        private const val BASE_URL = "http://10.0.2.2:8000/api/v1/"
 
         fun create(token: String? = null): PlantApiService {
 

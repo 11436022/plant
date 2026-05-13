@@ -49,9 +49,8 @@ class LoginActivity : AppCompatActivity() {
             }
 
             val apiService = PlantApiService.create(null)
-            val loginData = LoginRequest(username, password)
 
-            apiService.login(loginData).enqueue(object : Callback<LoginResponse> {
+            apiService.login(username, password).enqueue(object : Callback<LoginResponse> {
                 override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                     if (response.isSuccessful) {
                         val body = response.body()

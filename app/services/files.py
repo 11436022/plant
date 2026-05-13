@@ -3,14 +3,20 @@ from pathlib import Path
 
 from fastapi import HTTPException, UploadFile
 
-from app.core.config import PUBLIC_BASE_URL, UPLOAD_DIR
+from app.core.config import settings
 
 
 def build_public_image_url(image_path: str) -> str:
-    """將相對圖片路徑轉為公開網址。"""
+    """將檔案路徑(無論絕對或相對)轉為公開網址。"""
 
-    clean_path = image_path.replace("\\", "/")
-    return f"{PUBLIC_BASE_URL}/{clean_path.lstrip('/')}"
+    # 1. 從完整的路徑中，只取出檔名部分
+    filename = Path(image_path).name
+
+    # 2. 確保基底 URL 結尾沒有斜線，避免產生雙斜線 (e.g. "http://...//uploads")
+    base_url = settings.PUBLIC_BASE_URL.rstrip('/')
+
+    # 3. 拼接成一個標準的、可公開存取的 URL
+    return f"{base_url}/uploads/{filename}"
 
 
 def create_safe_upload_path(original_name: str) -> Path:
@@ -19,8 +25,8 @@ def create_safe_upload_path(original_name: str) -> Path:
     filename = Path(original_name or "upload.bin").name
     suffix = Path(filename).suffix.lower()
     safe_name = f"{uuid.uuid4().hex}{suffix}"
-    file_path = (UPLOAD_DIR / safe_name).resolve()
-    upload_root = UPLOAD_DIR.resolve()
+    file_path = (settings.UPLOAD_DIR / safe_name).resolve()
+    upload_root = settings.UPLOAD_DIR.resolve()
     if upload_root not in file_path.parents:
         raise HTTPException(status_code=400, detail="Invalid upload path.")
     return file_path

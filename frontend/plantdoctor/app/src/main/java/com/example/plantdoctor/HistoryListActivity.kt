@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,11 +16,13 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
@@ -27,13 +30,14 @@ import retrofit2.Response
 
 // 歷史紀錄資料模型
 data class HistoryItem(
-    val id: Int,
-    val crop_name: String,
-    val created_at: String,
-    val status_name: String,
-    val image_url: String,
-    var suggestion: String? = null,
-    var treatment: String? = null,
+    @SerializedName("id") val id: Int,
+    @SerializedName("crop_name") val crop_name: String,
+    @SerializedName("created_at") val created_at: String,
+    @SerializedName("status_name") val status_name: String,
+    @SerializedName("image_url") val image_url: String,
+    @SerializedName("suggestion") var suggestion: String? = null,
+    @SerializedName("treatment") var treatment: String? = null,
+    @SerializedName("user_note") val user_note: String?,
     var isExpanded: Boolean = false
 )
 
@@ -42,6 +46,15 @@ class HistoryListActivity : AppCompatActivity() {
     private val displayList = mutableListOf<HistoryItem>()
     private val fullHistoryList = mutableListOf<HistoryItem>()
     private var lastQuery: String = "" // 儲存最後一次搜尋關鍵字
+
+    // 【關鍵修復】註冊一個 ActivityResultLauncher 來處理從詳情頁返回的結果
+    private val detailActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        // 如果結果是 OK (表示在詳情頁有執行刪除成功等操作)
+        if (result.resultCode == RESULT_OK) {
+            // 就重新從伺服器抓取最新資料
+            fetchHistoryFromServer()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +77,7 @@ class HistoryListActivity : AppCompatActivity() {
         // 3. 初始化 RecyclerView
         val rvHistory = findViewById<RecyclerView>(R.id.rv_history_list)
         rvHistory.layoutManager = LinearLayoutManager(this)
-        adapter = HistoryAdapter(displayList)
+        adapter = HistoryAdapter(displayList, detailActivityLauncher)
         rvHistory.adapter = adapter
     }
 
@@ -116,8 +129,10 @@ class HistoryListActivity : AppCompatActivity() {
 
 // --- Adapter 實作 ---
 
-class HistoryAdapter(private val historyList: List<HistoryItem>) :
-    RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
+class HistoryAdapter(
+    private val historyList: List<HistoryItem>,
+    private val launcher: androidx.activity.result.ActivityResultLauncher<Intent>
+) : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
 
     class HistoryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvName: TextView = view.findViewById(R.id.tv_history_name)
@@ -150,52 +165,21 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) :
             .error(android.R.drawable.ic_dialog_alert)
             .into(holder.imgHistory)
 
-        holder.tvAdvice.text = if (item.suggestion != null) {
-            "【建議】\n${item.suggestion}\n\n【處理】\n${item.treatment}"
-        } else {
-            "點擊展開詳情..."
-        }
+        holder.tvAdvice.text = "點擊查看完整報告" // 簡化提示文字
 
-        holder.layoutDetail.visibility = if (item.isExpanded) View.VISIBLE else View.GONE
-        holder.imgArrow.rotation = if (item.isExpanded) 180f else 0f
+        // 隱藏不再需要的展開式佈局和箭頭
+        holder.layoutDetail.visibility = View.GONE
+        holder.imgArrow.visibility = View.GONE
+        holder.btnGoDetail.visibility = View.GONE
 
-        // 展開與 API 延遲加載詳情
+        // 【新邏輯】點擊整個項目，直接跳轉到詳情頁
         holder.itemView.setOnClickListener {
-            val currentPos = holder.adapterPosition
-            if (currentPos == RecyclerView.NO_POSITION) return@setOnClickListener
-
-            if (!item.isExpanded) {
-                if (item.suggestion == null) {
-                    val sharedPref = holder.itemView.context.getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
-                    val token = sharedPref.getString("token", "") ?: ""
-
-                    PlantApiService.create(token).getDiaryDetail(item.id).enqueue(object : Callback<DetailDetailResponse> {
-                        override fun onResponse(call: Call<DetailDetailResponse>, response: Response<DetailDetailResponse>) {
-                            if (response.isSuccessful) {
-                                val detail = response.body()?.data
-                                item.suggestion = detail?.suggestion
-                                item.treatment = detail?.treatment
-                                item.isExpanded = true
-                                notifyItemChanged(currentPos)
-                            }
-                        }
-                        override fun onFailure(call: Call<DetailDetailResponse>, t: Throwable) {}
-                    })
-                } else {
-                    item.isExpanded = true
-                    notifyItemChanged(currentPos)
-                }
-            } else {
-                item.isExpanded = false
-                notifyItemChanged(currentPos)
+            val intent = Intent(holder.itemView.context, HistoryDetailActivity::class.java).apply {
+                // 將被點擊項目的 ID 傳遞給詳情頁
+                putExtra("DIARY_ID", item.id)
             }
-        }
-
-        // 跳轉至詳情頁面
-        holder.btnGoDetail.setOnClickListener {
-            val intent = Intent(holder.itemView.context, HistoryDetailActivity::class.java)
-            intent.putExtra("DIARY_ID", item.id)
-            holder.itemView.context.startActivity(intent)
+            // 使用您已經建立好的 launcher 來啟動 Activity
+            launcher.launch(intent)
         }
     }
 

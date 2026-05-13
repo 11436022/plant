@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.security import OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 
 from app.db.session import get_db_connection
+from app.db.models import User
 from app.schemas.auth import (
     EmailVerificationRequest,
     ForgotPasswordRequest,
@@ -73,8 +75,8 @@ async def register_user(user: UserRegister):
     }
 
 
-@router.post("/user/login")
-async def login_user(user: UserLogin):
+@router.post("/login")
+async def login_user(form_data: OAuth2PasswordRequestForm = Depends()):
     """登入帳號，未驗證信箱者不可取得 JWT。"""
 
     ensure_auth_schema()
@@ -87,12 +89,12 @@ async def login_user(user: UserLogin):
                 FROM user
                 WHERE username = %s
                 """,
-                (user.username,),
+                (form_data.username,),
             )
             db_user = cursor.fetchone()
             if not db_user:
                 raise HTTPException(status_code=400, detail="Invalid username or password.")
-            if not pwd_context.verify(user.password, db_user["password_hash"]):
+            if not pwd_context.verify(form_data.password, db_user["password_hash"]):
                 raise HTTPException(status_code=400, detail="Invalid username or password.")
             if not db_user.get("is_email_verified"):
                 raise HTTPException(
@@ -102,8 +104,8 @@ async def login_user(user: UserLogin):
 
             token = create_access_token(
                 {
+                    "sub": db_user["username"],
                     "user_id": db_user["user_id"],
-                    "username": db_user["username"],
                     "role": db_user["role"],
                 }
             )
@@ -118,27 +120,22 @@ async def login_user(user: UserLogin):
 
 
 @router.get("/user/me")
-async def get_user_profile(current_user: dict = Depends(get_current_user)):
+async def get_user_profile(current_user: User = Depends(get_current_user)):
     """取得目前登入者的基本資料。"""
 
-    ensure_auth_schema()
-    conn = get_db_connection()
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT username, email, full_name, created_at, is_email_verified, email_verified_at
-                FROM user
-                WHERE user_id = %s
-                """,
-                (current_user["user_id"],),
-            )
-            user_info = cursor.fetchone()
-            if not user_info:
-                raise HTTPException(status_code=404, detail="User not found.")
-            return {"status": "success", "data": user_info}
-    finally:
-        conn.close()
+    # get_current_user 已經從資料庫中獲取了完整的 User 物件，
+    # 我們可以直接使用它，無需再次查詢資料庫。
+    return {
+        "status": "success",
+        "data": {
+            "username": current_user.username,
+            "email": current_user.email,
+            "full_name": current_user.full_name,
+            "created_at": current_user.created_at,
+            "is_email_verified": current_user.is_email_verified,
+            "email_verified_at": current_user.email_verified_at,
+        },
+    }
 
 
 @router.post("/user/verify-email/request")

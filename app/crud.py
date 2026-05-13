@@ -1,6 +1,13 @@
-from database import SessionLocal
-from models import Crop
-from api_fetch import fetch_crop_data
+from sqlalchemy.orm import Session
+
+from app.db.session import SessionLocal
+from app.db.models import Crop, User
+from app.api_fetch import fetch_crop_data
+
+
+def get_user_by_username(db: Session, username: str) -> User | None:
+    """根據使用者名稱查詢使用者。"""
+    return db.query(User).filter(User.username == username).first()
 
 
 def save_main_crops():

@@ -1,5 +1,6 @@
 import shutil
 import time
+import uuid
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
@@ -8,45 +9,72 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.schemas.prediction import PredictionResponse
 from app.services.ai import diagnostic_plant, get_reference_lists
-from app.services.files import create_safe_upload_path, ensure_image_upload
 
-router = APIRouter(tags=["prediction"])
+# 暫存區：使用一個簡單的 Python 字典來模擬 Redis
+# 格式: { "prediction_id": { "result": ai_json_result, "temp_path": "path/to/temp/image.jpg" } }
+prediction_cache = {}
+
+router = APIRouter(
+    prefix="/predict",
+    tags=["prediction"]
+)
+
+# 建立一個臨時資料夾來存放待確認的圖片
+TEMP_DIR = Path("static/tmp")
+TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
-@router.post("/v1/predict", response_model=PredictionResponse)
-async def predict_plant(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    """執行純預測，不寫入日誌。"""
+@router.post("/", status_code=200)
+async def predict_plant_status(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """
+    接收圖片，執行 AI 分析，並將結果暫存。
 
-    ensure_image_upload(file)
-    temp_path = create_safe_upload_path(file.filename)
+    這個端點會：
+    1. 儲存上傳的圖片到一個臨時資料夾。
+    2. 呼叫 AI 模型進行分析。
+    3. 產生一個唯一的 prediction_id。
+    4. 將分析結果和圖片路徑暫存起來。
+    5. 回傳 prediction_id 和分析結果給客戶端。
+    """
     start_time = time.time()
-
     try:
-        with open(temp_path, "wb") as buffer:
+        # 1. 將圖片儲存到臨時位置
+        # temp_file_path = save_upload_file(file, TEMP_DIR) # <-- 移除舊的、不存在的函式呼叫
+        temp_file_path = TEMP_DIR / (file.filename or f"{uuid.uuid4()}.jpg")
+        with open(temp_file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
+        # 2. 呼叫 AI 進行診斷
         crops, diseases, pests = get_reference_lists(db)
-        result = diagnostic_plant(temp_path.as_posix(), crops, diseases, pests)
-        if not result:
-            raise HTTPException(status_code=502, detail="Prediction service failed.")
+        ai_result = diagnostic_plant(str(temp_file_path), crops, diseases, pests)
 
-        category = str(result.get("category", "")).lower()
-        plant_name = result.get("crop_name") or "unknown"
-        confidence = float(result.get("confidence", 0.0) or 0.0)
-        return {
-            "status": "success",
-            "data": {
-                "plant_name": plant_name,
-                "confidence": confidence,
-                "is_healthy": category == "healthy",
-            },
-            "metadata": {
-                "filename": Path(file.filename or temp_path.name).name,
-                "process_time": f"{time.time() - start_time:.4f}s",
-                "status_name": result.get("status_name"),
-                "category": result.get("category"),
-            },
+        if not ai_result:
+            raise HTTPException(status_code=502, detail="AI analysis service failed.")
+
+        # 3. 產生唯一的 ID
+        prediction_id = str(uuid.uuid4())
+
+        # 4. 將完整的 AI 結果和臨時路徑存入暫存區
+        prediction_cache[prediction_id] = {
+            "result": ai_result,
+            "temp_path": str(temp_file_path)
         }
+        
+        # 5. 組合回傳給 App 的資料
+        response_data = {
+            "prediction_id": prediction_id,
+            "analysis_result": ai_result,
+            "metadata": {
+                "filename": Path(file.filename or temp_file_path.name).name,
+                "process_time": f"{time.time() - start_time:.4f}s",
+            }
+        }
+
+        return response_data
+
+    except Exception as e:
+        # 捕捉所有可能的錯誤
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
     finally:
-        if temp_path.exists():
-            temp_path.unlink()
+        # 暫存的圖片不由 predict API 刪除，而是由 confirm API 或過期機制處理
+        pass

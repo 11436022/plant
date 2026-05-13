@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -17,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.bumptech.glide.Glide
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -38,6 +40,7 @@ class UploadActivity : AppCompatActivity() {
 
     // --- 2. 相簿選擇處理 ---
     private val selectImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        Log.d("UPLOAD_DEBUG", "selectImageLauncher callback triggered. Result code: ${result.resultCode}")
         if (result.resultCode == Activity.RESULT_OK) {
             val uri = result.data?.data
             if (uri != null) {
@@ -143,7 +146,10 @@ class UploadActivity : AppCompatActivity() {
 
     private fun updateImagePreview(uri: Uri) {
         selectedImageUri = uri
-        imgPreview.setImageURI(uri)
-        imgPreview.scaleType = ImageView.ScaleType.CENTER_CROP
+        // 使用 Glide 來安全地載入圖片，避免因圖片過大造成記憶體溢出 (OutOfMemoryError)
+        Glide.with(this)
+            .load(uri)
+            .centerCrop() // 將圖片置中裁剪以填滿視圖
+            .into(imgPreview)
     }
 }

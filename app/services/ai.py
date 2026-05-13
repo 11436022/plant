@@ -68,7 +68,9 @@ Return valid JSON only:
         response = client.models.generate_content(model="gemini-2.5-flash", contents=[prompt, img])
         clean_text = (response.text or "").replace("```json", "").replace("```", "").strip()
         return json.loads(clean_text)
-    except Exception:
+    except Exception as e:
+        # 💡 這行會在你的終端機印出到底是 Gemini 斷線還是圖片問題
+        print(f"❌ AI 診斷發生錯誤: {str(e)}")
         return None
 
 
