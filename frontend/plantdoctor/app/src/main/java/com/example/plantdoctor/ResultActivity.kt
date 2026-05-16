@@ -3,8 +3,12 @@ package com.example.plantdoctor
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.MotionEvent
 import android.util.Log
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -14,6 +18,11 @@ import com.bumptech.glide.Glide
 import com.google.gson.Gson
 
 class ResultActivity : AppCompatActivity() {
+
+    private val windHandler = Handler(Looper.getMainLooper())
+    private val windRunnable = Runnable {
+        SoundManager.startWind()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,12 +36,14 @@ class ResultActivity : AppCompatActivity() {
         val tvAdvice = findViewById<TextView>(R.id.tv_advice)
         val imgPlant = findViewById<ImageView>(R.id.img_result_plant)
 
-        // 2. 接收【新流程】的資料
-        val imageUriString = intent.getStringExtra("IMAGE_URI") // <-- 新增：接收圖片 URI
+        // 🌟 重新改回綁定 EditText (注意組員原稿是轉成 EditText 格式)
+        val etUserNote = findViewById<EditText>(R.id.et_user_note)
+
+        // 2. 接收資料並使用 Glide 載入
+        val imageUriString = intent.getStringExtra("IMAGE_URI")
         val predictionId = intent.getStringExtra("PREDICTION_ID")
         val resultJson = intent.getStringExtra("ANALYSIS_RESULT_JSON")
 
-        // 使用 Glide 載入本地圖片
         if (!imageUriString.isNullOrEmpty()) {
             Glide.with(this)
                 .load(Uri.parse(imageUriString))
@@ -45,15 +56,11 @@ class ResultActivity : AppCompatActivity() {
             return
         }
 
-        // 【偵錯用】
         Log.d("DEBUG_ID", "Received Prediction ID: $predictionId")
         Log.d("DEBUG_JSON", "Received JSON: $resultJson")
 
         try {
-            // 使用 Gson 將 JSON 字串轉回 AnalysisResult 物件
             val data = Gson().fromJson(resultJson, AnalysisResult::class.java)
-
-            // 填入畫面文字
             tvPlantName.text = "植物：${data.crop_name ?: "無法辨識"}"
             tvDiseaseName.text = "診斷：${data.status_name ?: "未知"}"
 
@@ -63,31 +70,30 @@ class ResultActivity : AppCompatActivity() {
             }.toString()
             tvAdvice.text = fullAdvice
 
-            // 注意：由於 predict API 不直接回傳可公開訪問的 image_url，
-            // 這裡我們暫時不處理圖片顯示。若要顯示，需從 DiagnoseProgressActivity 傳遞原始 URI。
-
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "報告內容解析失敗", Toast.LENGTH_SHORT).show()
         }
 
-
         // 3. 按鈕：返回主頁
         btnBack.setOnClickListener {
+            SoundManager.playBubblePop()
             val intent = Intent(this, HomeActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
             finish()
         }
 
-        // 4. 按鈕：【新流程】確認儲存
+        // 4. 按鈕：【恢復組員連網功能】並附加療癒音效
         btnSave.setOnClickListener {
-            // 禁用按鈕，防止重複點擊
+            // 點擊瞬間播放泡泡聲
+            SoundManager.playBubblePop()
+
             btnSave.isEnabled = false
             btnSave.text = "儲存中..."
 
-            // 【新增】從 EditText 獲取使用者筆記
-            val userNote = findViewById<TextView>(R.id.et_user_note).text.toString()
+            // 從改回來的 etUserNote 獲取內容
+            val userNote = etUserNote.text.toString()
 
             val sharedPref = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
             val token = sharedPref.getString("token", null)
@@ -100,7 +106,6 @@ class ResultActivity : AppCompatActivity() {
             }
 
             val apiService = PlantApiService.create(token)
-            // 【修改】將使用者筆記放入請求中
             val request = ConfirmRequest(user_note = userNote)
 
             apiService.confirmDiary(predictionId, request).enqueue(object : retrofit2.Callback<GenericResponse> {
@@ -108,9 +113,6 @@ class ResultActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         Toast.makeText(this@ResultActivity, "紀錄已成功儲存！", Toast.LENGTH_SHORT).show()
                         btnSave.text = "已儲存"
-                        // 儲存成功後，可以考慮直接跳轉到歷史列表
-                        // startActivity(Intent(this@ResultActivity, HistoryListActivity::class.java))
-                        // finish()
                     } else {
                         Toast.makeText(this@ResultActivity, "儲存失敗: ${response.code()}", Toast.LENGTH_SHORT).show()
                         btnSave.isEnabled = true
@@ -125,5 +127,31 @@ class ResultActivity : AppCompatActivity() {
                 }
             })
         }
+    } // onCreate 結尾
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    windHandler.postDelayed(windRunnable, 500)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    windHandler.removeCallbacks(windRunnable)
+                    SoundManager.stopWind()
+                }
+            }
+        }
+        return super.onTouchEvent(event)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        SoundManager.stopWind()
+        windHandler.removeCallbacks(windRunnable)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        windHandler.removeCallbacksAndMessages(null)
     }
 }

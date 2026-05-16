@@ -8,6 +8,9 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
+import android.view.MotionEvent
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Button
@@ -28,6 +31,12 @@ class UploadActivity : AppCompatActivity() {
     private var selectedImageUri: Uri? = null
     private lateinit var imgPreview: ImageView
     private var photoFile: File? = null
+
+    // 🌟 1. 建立風聲延遲計時器與任務（放在 onCreate 外面）
+    private val windHandler = Handler(Looper.getMainLooper())
+    private val windRunnable = Runnable {
+        SoundManager.startWind() // 當按住滿 0.5 秒，正式吹起風聲
+    }
 
     // --- 1. 相權限請求處理 ---
     private val requestCameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -69,16 +78,35 @@ class UploadActivity : AppCompatActivity() {
         val btnAlbum = findViewById<Button>(R.id.btn_album)
         val btnAnalyze = findViewById<Button>(R.id.btn_analyze)
 
-        imgPreview.setOnClickListener { openAlbum() }
-        btnAlbum.setOnClickListener { openAlbum() }
-        btnBack.setOnClickListener { finish() }
+        // 🌟 核心修改：點擊中間預覽框（開啟相簿）播放泡泡聲
+        imgPreview.setOnClickListener {
+            SoundManager.playBubblePop()
+            openAlbum()
+        }
+
+        // 🌟 核心修改：點擊相簿按鈕播放泡泡聲
+        btnAlbum.setOnClickListener {
+            SoundManager.playBubblePop()
+            openAlbum()
+        }
+
+        // 🌟 核心修改：點擊返回按鈕播放泡泡聲
+        btnBack.setOnClickListener {
+            SoundManager.playBubblePop()
+            finish()
+        }
 
         // 修改：點擊拍照時先檢查權限
         btnCamera.setOnClickListener {
+            // 🌟 核心修改：點擊相機按鈕播放泡泡聲
+            SoundManager.playBubblePop()
             checkCameraPermission()
         }
 
         btnAnalyze.setOnClickListener {
+            // 🌟 核心修改：點擊分析按鈕播放泡泡聲
+            SoundManager.playBubblePop()
+
             if (selectedImageUri != null) {
                 val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
                 val token = sharedPref.getString("token", null)
@@ -146,10 +174,40 @@ class UploadActivity : AppCompatActivity() {
 
     private fun updateImagePreview(uri: Uri) {
         selectedImageUri = uri
-        // 使用 Glide 來安全地載入圖片，避免因圖片過大造成記憶體溢出 (OutOfMemoryError)
         Glide.with(this)
             .load(uri)
-            .centerCrop() // 將圖片置中裁剪以填滿視圖
+            .centerCrop()
             .into(imgPreview)
+    }
+
+    // 🌟 2. 核心修改：全螢幕長按雷達，判定長按 0.5 秒才吹風
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // 手指一碰到螢幕任意處：先設定一個 0.5 秒後的鬧鐘
+                    windHandler.postDelayed(windRunnable, 500)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    // 手指一離開或滑開螢幕：撤銷鬧鐘，停止風聲
+                    windHandler.removeCallbacks(windRunnable)
+                    SoundManager.stopWind()
+                }
+            }
+        }
+        return super.onTouchEvent(event)
+    }
+
+    // 🌟 3. 核心修改：離開畫面時，安全切斷風聲並復原計時器
+    override fun onStop() {
+        super.onStop()
+        SoundManager.stopWind()
+        windHandler.removeCallbacks(windRunnable)
+    }
+
+    // 🌟 4. 銷毀畫面時清空計時器，防止記憶體洩漏
+    override fun onDestroy() {
+        super.onDestroy()
+        windHandler.removeCallbacksAndMessages(null)
     }
 }

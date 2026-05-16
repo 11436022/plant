@@ -3,6 +3,9 @@ package com.example.plantdoctor
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.MotionEvent
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
@@ -27,6 +30,12 @@ class HistoryDetailActivity : AppCompatActivity() {
     private lateinit var tvAdvice: TextView
     private lateinit var btnAction: Button
     private lateinit var btnBack: ImageButton
+
+    // 🌟 1. 建立風聲延遲計時器與任務（放在 onCreate 外面）
+    private val windHandler = Handler(Looper.getMainLooper())
+    private val windRunnable = Runnable {
+        SoundManager.startWind() // 當按住滿 0.5 秒，正式吹起風聲
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,11 +66,15 @@ class HistoryDetailActivity : AppCompatActivity() {
         btnAction.backgroundTintList = getColorStateList(android.R.color.holo_red_light)
 
         btnAction.setOnClickListener {
+            // 🌟 核心修改：點擊刪除按鈕時播放泡泡聲
+            SoundManager.playBubblePop()
             // 放棄使用 AlertDialog，直接執行刪除
             executeDelete()
         }
 
         btnBack.setOnClickListener {
+            // 🌟 核心修改：點擊返回按鈕時播放泡泡聲
+            SoundManager.playBubblePop()
             finish()
         }
     }
@@ -145,5 +158,36 @@ class HistoryDetailActivity : AppCompatActivity() {
             }
         }
         return url
+    }
+
+    // 🌟 2. 核心修改：全螢幕長按雷達，判定長按 0.5 秒才吹風
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // 手指一碰到螢幕任意處：先設定一個 0.5 秒後的鬧鐘
+                    windHandler.postDelayed(windRunnable, 500)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    // 手指一離開或滑開螢幕：撤銷鬧鐘，停止風聲
+                    windHandler.removeCallbacks(windRunnable)
+                    SoundManager.stopWind()
+                }
+            }
+        }
+        return super.onTouchEvent(event)
+    }
+
+    // 🌟 3. 核心修改：離開畫面時，安全切斷風聲並復原計時器
+    override fun onStop() {
+        super.onStop()
+        SoundManager.stopWind()
+        windHandler.removeCallbacks(windRunnable)
+    }
+
+    // 🌟 4. 銷毀畫面時清空計時器，防止記憶體洩漏
+    override fun onDestroy() {
+        super.onDestroy()
+        windHandler.removeCallbacksAndMessages(null)
     }
 }

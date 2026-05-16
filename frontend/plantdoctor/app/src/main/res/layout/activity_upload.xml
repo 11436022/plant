@@ -67,7 +67,7 @@
         android:id="@+id/btn_analyze"
         android:layout_width="0dp"
         android:layout_height="70dp"
-        android:layout_marginBottom="180dp"
+        android:layout_marginBottom="124dp"
         android:backgroundTint="#FFB74D"
         android:text="開始分析"
         android:textSize="35sp"
@@ -75,7 +75,7 @@
         app:cornerRadius="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/img_preview"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@id/img_preview" />
 
     <ImageButton

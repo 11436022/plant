@@ -2,6 +2,9 @@ package com.example.plantdoctor
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.MotionEvent
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
@@ -14,6 +17,13 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class RegisterActivity : AppCompatActivity() {
+
+    // 🌟 1. 建立風聲延遲計時器與任務（放在 onCreate 外面）
+    private val windHandler = Handler(Looper.getMainLooper())
+    private val windRunnable = Runnable {
+        SoundManager.startWind() // 當按住滿 0.5 秒，正式吹起風聲
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
@@ -28,6 +38,9 @@ class RegisterActivity : AppCompatActivity() {
         val apiService = PlantApiService.create(null)
 
         btnSubmit.setOnClickListener {
+            // 🌟 核心修改：點擊送出按鈕播放泡泡聲
+            SoundManager.playBubblePop()
+
             val username = edtUsername.text.toString().trim()
             val password = edtPassword.text.toString().trim()
             val email = edtEmail.text.toString().trim()
@@ -71,9 +84,11 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         tvBackLogin.setOnClickListener {
+            // 🌟 核心修改：點擊返回登入播放泡泡聲
+            SoundManager.playBubblePop()
             finish()
         }
-    }
+    } // 👈 onCreate 的結尾
 
     // 顯示對話框，提醒使用者去驗證信箱
     private fun showVerificationDialog(email: String) {
@@ -82,9 +97,42 @@ class RegisterActivity : AppCompatActivity() {
             .setMessage("我們已發送驗證信至：$email\n請先前往信箱點擊驗證連結，再回來登入喔！")
             .setCancelable(false)
             .setPositiveButton("我知道了") { _, _ ->
+                // 🌟 核心修改：點擊對話框按鈕時播放泡泡聲
+                SoundManager.playBubblePop()
                 // 點擊後回到登入頁面
                 finish()
             }
             .show()
+    }
+
+    // 🌟 2. 核心修改：全螢幕長按雷達，判定長按 0.5 秒才吹風
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // 手指一碰到螢幕任意處：先設定一個 0.5 秒後的鬧鐘
+                    windHandler.postDelayed(windRunnable, 500)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    // 手指一離開或滑開螢幕：撤銷鬧鐘，停止風聲
+                    windHandler.removeCallbacks(windRunnable)
+                    SoundManager.stopWind()
+                }
+            }
+        }
+        return super.onTouchEvent(event)
+    }
+
+    // 🌟 3. 核心修改：離開畫面時，安全切斷風聲並復原計時器
+    override fun onStop() {
+        super.onStop()
+        SoundManager.stopWind()
+        windHandler.removeCallbacks(windRunnable)
+    }
+
+    // 🌟 4. 銷毀畫面時清空計時器，防止記憶體洩漏
+    override fun onDestroy() {
+        super.onDestroy()
+        windHandler.removeCallbacksAndMessages(null)
     }
 }

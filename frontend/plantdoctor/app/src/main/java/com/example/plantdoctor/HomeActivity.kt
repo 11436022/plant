@@ -2,38 +2,70 @@ package com.example.plantdoctor
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.MotionEvent
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 
 class HomeActivity : AppCompatActivity() {
 
+    private val windHandler = Handler(Looper.getMainLooper())
+    private val windRunnable = Runnable {
+        SoundManager.startWind()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 設定此 Activity 的佈局檔案為 activity_home.xml
         setContentView(R.layout.activity_home)
 
-        // 找到佈局檔案中的各個按鈕 (Button)
         val btnDiagnose: Button = findViewById(R.id.btn_diagnose)
         val btnHistory: Button = findViewById(R.id.btn_history)
         val btnSettings: Button = findViewById(R.id.btn_settings)
 
-        // 設定「診斷植物」按鈕的點擊事件
         btnDiagnose.setOnClickListener {
-            // 正確流程：跳轉到讓使用者選擇拍照或上傳的 UploadActivity
+            SoundManager.playBubblePop()
             val intent = Intent(this, UploadActivity::class.java)
             startActivity(intent)
         }
 
-        // 設定「歷史紀錄」按鈕的點擊事件
         btnHistory.setOnClickListener {
+            SoundManager.playBubblePop()
             val intent = Intent(this, HistoryListActivity::class.java)
             startActivity(intent)
         }
 
-        // 設定「設定」按鈕的點擊事件
         btnSettings.setOnClickListener {
+            SoundManager.playBubblePop()
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    // 🌟 修正：換頁時背景音樂不中斷！Activity 只需要管自己的風聲計時器就好
+    override fun onStop() {
+        super.onStop()
+        SoundManager.stopWind() // 離開這頁時，如果是按著風聲的，強制切斷風聲
+        windHandler.removeCallbacks(windRunnable) // 安全撤銷風聲鬧鐘
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    windHandler.postDelayed(windRunnable, 500)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    windHandler.removeCallbacks(windRunnable)
+                    SoundManager.stopWind()
+                }
+            }
+        }
+        return super.onTouchEvent(event)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        windHandler.removeCallbacksAndMessages(null)
     }
 }

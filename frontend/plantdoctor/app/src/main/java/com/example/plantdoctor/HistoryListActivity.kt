@@ -3,6 +3,9 @@ package com.example.plantdoctor
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.MotionEvent
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -23,7 +26,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -45,13 +47,16 @@ class HistoryListActivity : AppCompatActivity() {
     private lateinit var adapter: HistoryAdapter
     private val displayList = mutableListOf<HistoryItem>()
     private val fullHistoryList = mutableListOf<HistoryItem>()
-    private var lastQuery: String = "" // 儲存最後一次搜尋關鍵字
+    private var lastQuery: String = ""
 
-    // 【關鍵修復】註冊一個 ActivityResultLauncher 來處理從詳情頁返回的結果
+    // 🌟 1. 建立風聲延遲計時器與任務（放在 onCreate 外面）
+    private val windHandler = Handler(Looper.getMainLooper())
+    private val windRunnable = Runnable {
+        SoundManager.startWind() // 當按住滿 0.5 秒，正式吹起風聲
+    }
+
     private val detailActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        // 如果結果是 OK (表示在詳情頁有執行刪除成功等操作)
         if (result.resultCode == RESULT_OK) {
-            // 就重新從伺服器抓取最新資料
             fetchHistoryFromServer()
         }
     }
@@ -61,7 +66,11 @@ class HistoryListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_history_list)
 
         // 1. 返回按鈕
-        findViewById<ImageButton>(R.id.btn_back_home).setOnClickListener { finish() }
+        findViewById<ImageButton>(R.id.btn_back_home).setOnClickListener {
+            // 🌟 核心修改：點擊返回按鈕播放泡泡聲
+            SoundManager.playBubblePop()
+            finish()
+        }
 
         // 2. 搜尋框邏輯
         val etSearch = findViewById<EditText>(R.id.et_search)
@@ -81,10 +90,8 @@ class HistoryListActivity : AppCompatActivity() {
         rvHistory.adapter = adapter
     }
 
-    // --- 核心改動：當從詳情頁返回時觸發自動更新 ---
     override fun onResume() {
         super.onResume()
-        // 每次回到頁面都抓取最新資料，確保刪除後的資料不會留在畫面上
         fetchHistoryFromServer()
     }
 
@@ -105,7 +112,6 @@ class HistoryListActivity : AppCompatActivity() {
     private fun updateLists(newData: List<HistoryItem>) {
         fullHistoryList.clear()
         fullHistoryList.addAll(newData)
-        // 更新時套用最後一次搜尋，避免列表突然重置
         filterList(lastQuery)
     }
 
@@ -124,6 +130,35 @@ class HistoryListActivity : AppCompatActivity() {
                 Toast.makeText(this@HistoryListActivity, "網路連線失敗", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    // 🌟 2. 核心修改：全螢幕長按雷達，判定長按 0.5 秒才吹風
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    windHandler.postDelayed(windRunnable, 500)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    windHandler.removeCallbacks(windRunnable)
+                    SoundManager.stopWind()
+                }
+            }
+        }
+        return super.onTouchEvent(event)
+    }
+
+    // 🌟 3. 核心修改：離開畫面時，安全切斷風聲並復原計時器
+    override fun onStop() {
+        super.onStop()
+        SoundManager.stopWind()
+        windHandler.removeCallbacks(windRunnable)
+    }
+
+    // 🌟 4. 銷毀畫面時清空計時器，防止記憶體洩漏
+    override fun onDestroy() {
+        super.onDestroy()
+        windHandler.removeCallbacksAndMessages(null)
     }
 }
 
@@ -156,7 +191,6 @@ class HistoryAdapter(
         holder.tvDate.text = item.created_at
         holder.tvStatus.text = item.status_name
 
-        // 使用路徑修復邏輯
         val finalUrl = fixImageUrl(item.image_url)
 
         Glide.with(holder.itemView.context)
@@ -165,20 +199,20 @@ class HistoryAdapter(
             .error(android.R.drawable.ic_dialog_alert)
             .into(holder.imgHistory)
 
-        holder.tvAdvice.text = "點擊查看完整報告" // 簡化提示文字
+        holder.tvAdvice.text = "點擊查看完整報告"
 
-        // 隱藏不再需要的展開式佈局和箭頭
         holder.layoutDetail.visibility = View.GONE
         holder.imgArrow.visibility = View.GONE
         holder.btnGoDetail.visibility = View.GONE
 
         // 【新邏輯】點擊整個項目，直接跳轉到詳情頁
         holder.itemView.setOnClickListener {
+            // 🌟 核心修改：點擊歷史紀錄卡片項目時，播放清脆的泡泡聲！
+            SoundManager.playBubblePop()
+
             val intent = Intent(holder.itemView.context, HistoryDetailActivity::class.java).apply {
-                // 將被點擊項目的 ID 傳遞給詳情頁
                 putExtra("DIARY_ID", item.id)
             }
-            // 使用您已經建立好的 launcher 來啟動 Activity
             launcher.launch(intent)
         }
     }

@@ -3,6 +3,9 @@ package com.example.plantdoctor
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.MotionEvent
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -15,6 +18,12 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class SettingsActivity : AppCompatActivity() {
+
+    // 🌟 1. 建立風聲延遲計時器與任務（放在 onCreate 外面）
+    private val windHandler = Handler(Looper.getMainLooper())
+    private val windRunnable = Runnable {
+        SoundManager.startWind() // 當按住滿 0.5 秒，正式吹起風聲
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,25 +46,35 @@ class SettingsActivity : AppCompatActivity() {
         etGmail.setText(savedEmail)
 
 
-
         // --- 3. 點擊事件處理 ---
 
         // 返回上一頁
-        btnBack.setOnClickListener { finish() }
+        btnBack.setOnClickListener {
+            // 🌟 核心修改：點擊返回按鈕播放泡泡聲
+            SoundManager.playBubblePop()
+            finish()
+        }
 
         // 忘記密碼 / 更改密碼
         tvForgotPassword.setOnClickListener {
+            // 🌟 核心修改：點擊忘記密碼文字播放泡泡聲
+            SoundManager.playBubblePop()
             // 自動帶入當前已儲存的 Email
             showForgotPasswordDialog(savedEmail ?: "")
         }
 
         // 背景顏色選擇 (預留功能)
         findViewById<TextView>(R.id.tv_color_select).setOnClickListener {
+            // 🌟 核心修改：點擊顏色選擇文字播放泡泡聲
+            SoundManager.playBubblePop()
             Toast.makeText(this, "功能開發中：背景顏色切換", Toast.LENGTH_SHORT).show()
         }
 
         // --- 4. 登出按鈕邏輯 ---
         btnLogout.setOnClickListener {
+            // 🌟 核心修改：點擊登出按鈕播放泡泡聲
+            SoundManager.playBubblePop()
+
             // A. 清空所有登入資料
             with(sharedPref.edit()) {
                 clear()
@@ -70,7 +89,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-    }
+    } // 👈 onCreate 的結尾
 
     /**
      * 顯示忘記密碼彈窗
@@ -87,6 +106,8 @@ class SettingsActivity : AppCompatActivity() {
         builder.setView(input)
 
         builder.setPositiveButton("送出") { _, _ ->
+            // 🌟 核心修改：點擊重設密碼彈窗的「送出」播放泡泡聲
+            SoundManager.playBubblePop()
             val email = input.text.toString().trim()
             if (email.isNotEmpty()) {
                 sendResetEmail(email)
@@ -94,7 +115,10 @@ class SettingsActivity : AppCompatActivity() {
                 Toast.makeText(this, "Email 不能為空", Toast.LENGTH_SHORT).show()
             }
         }
-        builder.setNegativeButton("取消", null)
+        builder.setNegativeButton("取消") { _, _ ->
+            // 🌟 核心修改：點擊重設密碼彈窗的「取消」播放泡泡聲
+            SoundManager.playBubblePop()
+        }
         builder.show()
     }
 
@@ -102,7 +126,6 @@ class SettingsActivity : AppCompatActivity() {
      * 呼叫 API 發送重設郵件
      */
     private fun sendResetEmail(email: String) {
-        // 使用我們定義好的 ApiService (不需 Token)
         val apiService = PlantApiService.create(null)
         val request = ForgotPasswordRequest(email)
 
@@ -119,5 +142,36 @@ class SettingsActivity : AppCompatActivity() {
                 Toast.makeText(this@SettingsActivity, "網路連線失敗", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    // 🌟 2. 核心修改：全螢幕長按雷達，判定長按 0.5 秒才吹風
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // 手指一碰到螢幕任意處：先設定一個 0.5 秒後的鬧鐘
+                    windHandler.postDelayed(windRunnable, 500)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    // 手指一離開或滑開螢幕：撤銷鬧鐘，停止風聲
+                    windHandler.removeCallbacks(windRunnable)
+                    SoundManager.stopWind()
+                }
+            }
+        }
+        return super.onTouchEvent(event)
+    }
+
+    // 🌟 3. 核心修改：離開畫面時，安全切斷風聲並復原計時器
+    override fun onStop() {
+        super.onStop()
+        SoundManager.stopWind()
+        windHandler.removeCallbacks(windRunnable)
+    }
+
+    // 🌟 4. 銷毀畫面時清空計時器，防止記憶體洩漏
+    override fun onDestroy() {
+        super.onDestroy()
+        windHandler.removeCallbacksAndMessages(null)
     }
 }
