@@ -49,6 +49,9 @@ data class AnalysisResult(
 )
 data class ConfirmRequest(val user_note: String)
 
+// 用於 PATCH 的請求模型
+data class PatchDiaryRequest(val user_corrected_status: String)
+
 
 data class HistoryResponse(
     val status: String,
@@ -60,6 +63,14 @@ data class DetailDetailResponse(val status: String, val data: HistoryItem)
 
 // 通用回傳 (用於註冊成功、刪除成功、忘記密碼成功等)
 data class GenericResponse(val status: String, val message: String)
+
+// 【知識庫相關】
+data class DiagnosisItem(val name: String, val category: String)
+data class DiagnosesResponse(
+    val status: String,
+    val count: Int,
+    val data: List<DiagnosisItem>
+)
 
 
 // --- 2. API 接口定義 ---
@@ -114,6 +125,15 @@ interface PlantApiService {
 
     @DELETE("diaries/{diary_id}")
     fun deleteDiary(@Path("diary_id") diaryId: Int): Call<GenericResponse>
+
+    @PATCH("diaries/{diary_id}")
+    fun patchDiary(
+        @Path("diary_id") diaryId: Int,
+        @Body request: PatchDiaryRequest
+    ): Call<GenericResponse>
+
+    @GET("knowledge/diagnoses")
+    fun getDiagnoses(): Call<DiagnosesResponse>
 
 
     // --- 3. Retrofit 實例產生器 ---

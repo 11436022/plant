@@ -46,8 +46,8 @@ async def register_user(user: UserRegister):
                 INSERT INTO user (username, password_hash, email, full_name, is_email_verified)
                 VALUES (%s, %s, %s, %s, %s)
                 """,
-                (user.username, hashed_password, user.email, user.full_name, 0),
-            )
+                (user.username, hashed_password, user.email, user.full_name, 1),1),
+            
             user_id = cursor.lastrowid
         conn.commit()
     except HTTPException:

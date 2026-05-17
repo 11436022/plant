@@ -43,4 +43,5 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="title_activity_history_detail">HistoryDetailActivity</string>
+    <string name="feedback_link_text"><![CDATA[<u>診斷結果有誤？</u>]]></string>
 </resources>

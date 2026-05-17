@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.core.config import settings
-from app.routers import admin, auth, diaries, health, prediction
+from app.routers import admin, auth, diaries, health, prediction, knowledge
 from app.services.account_recovery import ensure_auth_schema
 
 # 取得專案根目錄，供 template 與 static 掛載使用。
@@ -56,6 +56,7 @@ def create_app() -> FastAPI:
     # 其他 API
     app.include_router(prediction.router, prefix="/api/v1")
     app.include_router(diaries.router, prefix="/api/v1")
+    app.include_router(knowledge.router, prefix="/api/v1")
 
     # Admin router (通常有自己的根路徑，不放在 /api/v1 內)
     app.include_router(admin.router)

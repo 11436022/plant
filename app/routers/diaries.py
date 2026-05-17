@@ -37,6 +37,7 @@ async def get_all_history(current_user: models.User = Depends(get_current_user))
                 d.id,
                 c.crop_name AS crop_name,
                 d.status_name,
+                d.user_corrected_status,
                 d.image_url,
                 d.created_at
             FROM plant_diary d
@@ -64,7 +65,7 @@ async def get_diary_detail(diary_id: int, current_user: models.User = Depends(ge
     try:
         with conn.cursor() as cursor:
             sql = """
-            SELECT d.*, c.crop_name AS crop_name
+            SELECT d.*, c.crop_name AS crop_name, d.user_corrected_status
             FROM plant_diary d
             LEFT JOIN crop c ON d.crop_id = c.crop_id
             WHERE d.id = %s AND d.user_id = %s
@@ -117,6 +118,9 @@ async def patch_diary(
         if value is not None:
             setattr(db_entry, field, value)
     
+    # 處理使用者修正的狀態
+    if update_data.user_corrected_status is not None:
+        db_entry.user_corrected_status = update_data.user_corrected_status
 
     db.commit()
     return {"status": "success", "message": "Diary updated successfully."}

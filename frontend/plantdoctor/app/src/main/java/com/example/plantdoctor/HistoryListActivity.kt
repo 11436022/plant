@@ -36,6 +36,7 @@ data class HistoryItem(
     @SerializedName("crop_name") val crop_name: String,
     @SerializedName("created_at") val created_at: String,
     @SerializedName("status_name") val status_name: String,
+    @SerializedName("user_corrected_status") val user_corrected_status: String?,
     @SerializedName("image_url") val image_url: String,
     @SerializedName("suggestion") var suggestion: String? = null,
     @SerializedName("treatment") var treatment: String? = null,

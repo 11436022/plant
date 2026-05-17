@@ -30,6 +30,7 @@ class HistoryDetailActivity : AppCompatActivity() {
     private lateinit var tvAdvice: TextView
     private lateinit var btnAction: Button
     private lateinit var btnBack: ImageButton
+    private lateinit var tvFeedbackLink: TextView
 
     // 🌟 1. 建立風聲延遲計時器與任務（放在 onCreate 外面）
     private val windHandler = Handler(Looper.getMainLooper())
@@ -55,6 +56,7 @@ class HistoryDetailActivity : AppCompatActivity() {
         tvAdvice = findViewById(R.id.tv_advice)
         btnAction = findViewById(R.id.btn_save_report) // 複用這個按鈕
         btnBack = findViewById(R.id.btn_back_home)
+        tvFeedbackLink = findViewById(R.id.tv_feedback_link)
 
         // 修改標題（XML 裡的 tv_title）
         findViewById<TextView>(R.id.tv_title)?.text = "病例詳情"
@@ -77,6 +79,13 @@ class HistoryDetailActivity : AppCompatActivity() {
             SoundManager.playBubblePop()
             finish()
         }
+
+        tvFeedbackLink.setOnClickListener {
+            SoundManager.playBubblePop()
+            // Toast.makeText(this, "已收到您的回饋請求！", Toast.LENGTH_SHORT).show()
+            // 移除舊的 Toast，改為呼叫顯示選擇對話框的函式
+            showDiagnosesSelectionDialog()
+        }
     }
 
     private fun fetchData() {
@@ -90,7 +99,21 @@ class HistoryDetailActivity : AppCompatActivity() {
 
                     // 填入資料
                     tvPlantName.text = "植物：${data.crop_name}"
-                    tvDiseaseName.text = data.status_name
+
+                    // --- 核心 UI 顯示邏輯 ---
+                    // 檢查是否有使用者修正過的狀態
+                    if (!data.user_corrected_status.isNullOrEmpty()) {
+                        // 如果有，優先顯示使用者修正的結果
+                        tvDiseaseName.text = data.user_corrected_status
+                        tvDiseaseName.setTextColor(Color.parseColor("#2E7D32")) // 設定為代表「已確認」的綠色
+                        tvFeedbackLink.visibility = android.view.View.GONE // 隱藏回饋按鈕
+                    } else {
+                        // 如果沒有，才顯示 AI 的原始診斷結果
+                        tvDiseaseName.text = data.status_name
+                        // 這裡可以根據需要，加入基於 confidence 的顏色判斷
+                        tvDiseaseName.setTextColor(Color.RED) // 暫時預設為紅色
+                        tvFeedbackLink.visibility = android.view.View.VISIBLE // 顯示回饋按鈕
+                    }
 
                     // 組合建議與處理方式
                     val fullAdvice = "【專家建議】\n${data.suggestion ?: "尚無建議"}\n\n" +
@@ -117,6 +140,7 @@ class HistoryDetailActivity : AppCompatActivity() {
                         // 如果沒有筆記，就隱藏這個元件
                         etUserNote.visibility = android.view.View.GONE
                     }
+
                 }
             }
             override fun onFailure(call: Call<DetailDetailResponse>, t: Throwable) {
@@ -189,5 +213,83 @@ class HistoryDetailActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         windHandler.removeCallbacksAndMessages(null)
+    }
+
+    /**
+     * 顯示一個對話框，其中包含從後端獲取的所有可選病症列表。
+     */
+    private fun showDiagnosesSelectionDialog() {
+        // 建立一個簡單的 "載入中" 對話框
+        val loadingDialog = AlertDialog.Builder(this)
+            .setView(R.layout.dialog_loading) // 假設你有一個簡單的載入中佈局
+            .setCancelable(false)
+            .create()
+        loadingDialog.show()
+
+        val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+        val token = sharedPref.getString("token", "") ?: ""
+
+        // 呼叫我們在 PlantApiService 中定義的新 API
+        PlantApiService.create(token).getDiagnoses().enqueue(object : Callback<DiagnosesResponse> {
+            override fun onResponse(call: Call<DiagnosesResponse>, response: Response<DiagnosesResponse>) {
+                loadingDialog.dismiss() // 無論成功或失敗，都先關閉載入對話框
+
+                if (response.isSuccessful) {
+                    val diagnoses = response.body()?.data ?: emptyList()
+                    if (diagnoses.isEmpty()) {
+                        Toast.makeText(this@HistoryDetailActivity, "無法獲取診斷列表", Toast.LENGTH_SHORT).show()
+                        return
+                    }
+
+                    // 將 List<DiagnosisItem> 轉換為 List<String> 以便顯示
+                    val items = diagnoses.map { it.name }.toTypedArray()
+
+                    // 建立並顯示選項列表對話框
+                    AlertDialog.Builder(this@HistoryDetailActivity)
+                        .setTitle("回報診斷結果")
+                        .setItems(items) { dialog, which ->
+                            // "which" 參數就是使用者點擊的項目的索引
+                            val selectedDiagnosis = items[which]
+                            
+                            // 建立請求主體
+                            val request = PatchDiaryRequest(user_corrected_status = selectedDiagnosis)
+
+                            // 呼叫 PATCH API
+                            PlantApiService.create(token).patchDiary(diaryId, request).enqueue(object : Callback<GenericResponse> {
+                                override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
+                                    if (response.isSuccessful) {
+                                        Toast.makeText(this@HistoryDetailActivity, "回饋已提交，感謝您！", Toast.LENGTH_LONG).show()
+
+                                        // --- 樂觀更新 UI ---
+                                        // 1. 立即將畫面上顯示的病名更新為使用者選擇的結果
+                                        tvDiseaseName.text = selectedDiagnosis
+                                        // 2. 改變文字顏色，以表示這是一個「已確認/已修正」的狀態 (改為較中性的綠色)
+                                        tvDiseaseName.setTextColor(Color.parseColor("#2E7D32"))
+                                        // 3. 隱藏「診斷結果有誤？」的按鈕，因為已經修正過了
+                                        tvFeedbackLink.visibility = android.view.View.GONE
+
+                                    } else {
+                                        Toast.makeText(this@HistoryDetailActivity, "提交失敗: ${response.code()}", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+
+                                override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
+                                    Toast.makeText(this@HistoryDetailActivity, "提交失敗: 網路連線問題", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                        }
+                        .setNegativeButton("取消", null)
+                        .show()
+
+                } else {
+                    Toast.makeText(this@HistoryDetailActivity, "獲取列表失敗: ${response.code()}", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<DiagnosesResponse>, t: Throwable) {
+                loadingDialog.dismiss()
+                Toast.makeText(this@HistoryDetailActivity, "網路連線問題", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 }

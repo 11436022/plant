@@ -81,6 +81,7 @@ class PlantDiary(Base):
     suggestion = Column(Text)
     treatment = Column(Text)
     user_note = Column(Text)
+    user_corrected_status = Column(String(100), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="plant_diary")
