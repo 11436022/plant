@@ -7,10 +7,21 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
         .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h1 { color: #2E7D32; border-bottom: 2px solid #2E7D32; padding-bottom: 10px; }
-        
-        /* 操作區塊樣式 */
+
+        /* 導覽列樣式 (Tab 風格) */
+        .nav { margin-bottom: 25px; border-bottom: 1px solid #ddd; }
+        .nav a { display: inline-block; margin-right: 10px; margin-bottom: -1px; padding: 12px 20px; text-decoration: none; color: #555; font-weight: 600; border: 1px solid transparent; border-bottom: none; border-radius: 8px 8px 0 0; transition: all 0.3s ease; }
+        .nav a:hover { background-color: #f5f5f5; color: #000; }
+        .nav a.active { color: #2E7D32; border-color: #ddd; border-bottom: 1px solid white; background-color: white; }
+
+        /* 儀表板卡片樣式 */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .summary-card { background: #e8f5e9; border-left: 5px solid #2E7D32; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .summary-card h3 { margin: 0 0 10px 0; color: #1b5e20; font-size: 16px; }
+        .summary-card p { margin: 0; font-size: 28px; font-weight: bold; color: #2E7D32; }
+
         .admin-actions { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; gap: 20px; }
-        .action-box { background: #e8f5e9; padding: 15px; border-radius: 8px; flex: 1; }
+        .action-box { background: #f1f8e9; padding: 15px; border-radius: 8px; flex: 1; }
         
         input[type="text"] { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 200px; }
         button { padding: 8px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; transition: 0.3s; }
@@ -22,22 +33,56 @@
         button:hover { opacity: 0.8; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; vertical-align: middle; }
         th { background-color: #f8f9fa; color: #333; }
         tr:hover { background-color: #f1f8e9; }
         
-        .plant-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        .plant-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; transition: transform 0.3s; }
+        .plant-img:hover { transform: scale(2.5); z-index: 10; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .ai-status { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        .user-corrected-status { background: #e8f5e9; color: #2E7D32; border: 1px solid #a5d6a7; }
         
         .edit-group { display: flex; gap: 5px; align-items: center; }
+
+        .pagination { margin-top: 30px; text-align: center; }
+        .pagination a, .pagination span { display: inline-block; padding: 8px 16px; margin: 0 4px; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #333; }
+        .pagination a:hover { background-color: #f1f8e9; }
+        .pagination .current { background-color: #2E7D32; color: white; border-color: #2E7D32; }
+        .pagination .disabled { color: #aaa; border-color: #ddd; cursor: not-allowed; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🌿 植物神醫 - 管理者後台</h1>
+
+        <!-- 導覽列 -->
+        <div class="nav">
+            <a href="/admin/" class="active">診斷紀錄管理</a>
+            <a href="/admin/users/">使用者管理</a>
+        </div>
+
+        <!-- 數據總覽儀表板 -->
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h3>註冊使用者總數</h3>
+                <p>{{ summary.total_users }}</p>
+            </div>
+            <div class="summary-card">
+                <h3>累計診斷紀錄總數</h3>
+                <p>{{ summary.total_diaries }}</p>
+            </div>
+            <div class="summary-card">
+                <h3>已辨識植物病害種類</h3>
+                <p>{{ summary.total_diseases }}</p>
+            </div>
+            <div class="summary-card">
+                <h3>今日新增紀錄數</h3>
+                <p>{{ summary.today_diaries }}</p>
+            </div>
+        </div>
         
         <div class="admin-actions">
-            <!-- 新增功能 -->
             <div class="action-box">
                 <form action="/admin/add" method="post">
                     <strong>➕ 手動新增紀錄：</strong>
@@ -46,11 +91,10 @@
                 </form>
             </div>
 
-            <!-- 搜尋功能 -->
             <div class="action-box" style="background: #e3f2fd;">
                 <form action="/admin/" method="get">
                     <strong>🔍 搜尋紀錄：</strong>
-                    <input type="text" name="search" placeholder="搜尋病害..." value="{{ search_query }}">
+                    <input type="text" name="search" placeholder="搜尋病害或使用者..." value="{{ search_query }}">
                     <button type="submit" class="btn-search">搜尋</button>
                     {% if search_query %}
                         <a href="/admin/" style="font-size: 12px; color: #1976D2; margin-left: 10px;">清除搜尋</a>
@@ -59,14 +103,16 @@
             </div>
         </div>
 
-        <p>目前資料顯示：<strong>{{ diaries|length }}</strong> 筆紀錄</p>
+        <p>目前資料顯示：<strong>{{ pagination.total_items }}</strong> 筆紀錄</p>
         
         <table>
             <thead>
                 <tr>
                     <th>圖片</th>
                     <th>ID</th>
-                    <th>診斷結果 (修改)</th>
+                    <th>使用者</th>
+                    <th>AI 診斷 (可修改)</th>
+                    <th>使用者回饋</th>
                     <th>診斷時間</th>
                     <th>管理操作</th>
                 </tr>
@@ -82,16 +128,22 @@
                         {% endif %}
                     </td>
                     <td>{{ diary.id }}</td>
+                    <td>{{ diary.username or 'N/A' }}</td>
                     <td>
-                        <!-- 修改功能：直接在表格內編輯 -->
                         <form action="/admin/update/{{ diary.id }}" method="post" class="edit-group">
-                            <input type="text" name="status_name" value="{{ diary.status_name }}" class="status-badge" style="width: 150px; background: white;">
+                            <input type="text" name="status_name" value="{{ diary.status_name }}" class="status-badge ai-status" style="width: 150px; background: white;">
                             <button type="submit" class="btn-save">💾 儲存</button>
                         </form>
                     </td>
-                    <td>{{ diary.created_at }}</td>
                     <td>
-                        <!-- 刪除功能 -->
+                        {% if diary.user_corrected_status %}
+                        <span class="status-badge user-corrected-status">{{ diary.user_corrected_status }}</span>
+                        {% else %}
+                        <span style="color: #999;">-</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ diary.created_at.strftime('%Y-%m-%d %H:%M') if diary.created_at else '' }}</td>
+                    <td>
                         <form action="/admin/delete/{{ diary.id }}" method="post" onsubmit="return confirm('警告：確定要永久刪除這筆紀錄嗎？');">
                             <button type="submit" class="btn-delete">🗑️ 刪除</button>
                         </form>
@@ -100,6 +152,21 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- 分頁 -->
+        <div class="pagination">
+            {% if pagination.total_pages > 1 %}
+                <a href="{{ pagination.base_url }}?page={{ pagination.current_page - 1 }}{% if search_query %}&search={{ search_query }}{% endif %}" 
+                   class="{{ 'disabled' if pagination.current_page == 1 else '' }}">&laquo; 上一頁</a>
+                {% for p in range(1, pagination.total_pages + 1) %}
+                    <a href="{{ pagination.base_url }}?page={{ p }}{% if search_query %}&search={{ search_query }}{% endif %}" 
+                       class="{{ 'current' if p == pagination.current_page else '' }}">{{ p }}</a>
+                {% endfor %}
+                <a href="{{ pagination.base_url }}?page={{ pagination.current_page + 1 }}{% if search_query %}&search={{ search_query }}{% endif %}" 
+                   class="{{ 'disabled' if pagination.current_page == pagination.total_pages else '' }}">下一頁 &raquo;</a>
+            {% endif %}
+        </div>
+
     </div>
 </body>
 </html>
