@@ -70,6 +70,9 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ImagePreviewActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
 
 
         <provider

@@ -70,4 +70,9 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation("com.squareup.retrofit2:retrofit-mock:2.9.0")
+    // 🌟 雙指自由縮放、平移的王者官方套件
+    implementation("com.github.chrisbanes:PhotoView:2.3.0")
+    // 🌟 新手功能引導氣泡對話框庫
+    implementation("com.getkeepsafe.taptargetview:taptargetview:1.13.3")
 }

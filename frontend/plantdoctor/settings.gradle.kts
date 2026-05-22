@@ -19,6 +19,24 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        pluginManagement {
+            repositories {
+                google()
+                mavenCentral()
+                gradlePluginPortal()
+            }
+        }
+        dependencyResolutionManagement {
+            repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+            repositories {
+                google()
+                mavenCentral()
+                // 🌟 核心：就是補上下面這行，系統就知道去哪裡撈 PhotoView 了！
+                maven { url = java.net.URI("https://jitpack.io") }
+            }
+        }
+        rootProject.name = "plantdoctor"
+        include(":app")
     }
 }
 

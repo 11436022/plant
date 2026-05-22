@@ -50,6 +50,17 @@ class ResultActivity : AppCompatActivity() {
                 .into(imgPlant)
         }
 
+        // 🌟 核心新增：點擊植物照片進入全螢幕放大查看！
+        imgPlant.setOnClickListener {
+            if (!imageUriString.isNullOrEmpty()) {
+                SoundManager.playBubblePop() // 播放音效
+                val intent = Intent(this, ImagePreviewActivity::class.java).apply {
+                    putExtra("IMAGE_PATH", imageUriString) // 把圖片路徑打包帶走
+                }
+                startActivity(intent)
+            }
+        }
+
         if (predictionId.isNullOrEmpty() || resultJson.isNullOrEmpty()) {
             Toast.makeText(this, "無法載入分析結果", Toast.LENGTH_SHORT).show()
             finish()

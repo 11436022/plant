@@ -21,49 +21,47 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.3" />
 
-    <Button
+    <ImageButton
         android:id="@+id/btn_settings"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:text="個人設定"
-        android:textColor="#FFFFFF"
-        android:textSize="25sp"
-        android:paddingHorizontal="20dp"
-        android:background="@drawable/bg_purple_button"
-        app:backgroundTint="@null"
-        app:layout_constraintTop_toTopOf="@+id/img_doctor_full"
-        app:layout_constraintStart_toStartOf="@+id/img_doctor_full"
+        android:layout_width="112dp"
+        android:layout_height="106dp"
+        android:layout_marginStart="15dp"
         android:layout_marginTop="40dp"
-        android:layout_marginStart="15dp" />
-
-    <Button
-        android:id="@+id/btn_diagnose"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:text="診斷植物"
-        android:textColor="#FFFFFF"
-        android:textSize="25sp"
-        android:paddingHorizontal="20dp"
-        android:background="@drawable/bg_purple_button"
-        app:backgroundTint="@null"
-        app:layout_constraintBottom_toBottomOf="@+id/img_doctor_full"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="個人設定"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_settings_logo"
         app:layout_constraintStart_toStartOf="@+id/img_doctor_full"
-        android:layout_marginBottom="40dp"
-        android:layout_marginStart="15dp" />
+        app:layout_constraintTop_toTopOf="@+id/img_doctor_full" />
 
     <Button
         android:id="@+id/btn_history"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/bg_purple_button"
+        android:paddingHorizontal="20dp"
         android:text="查詢病例"
         android:textColor="#FFFFFF"
         android:textSize="25sp"
-        android:paddingHorizontal="20dp"
-        android:background="@drawable/bg_purple_button"
         app:backgroundTint="@null"
         app:layout_constraintBottom_toBottomOf="@+id/img_doctor_full"
-        app:layout_constraintEnd_toEndOf="@+id/img_doctor_full"
-        android:layout_marginBottom="40dp"
-        android:layout_marginEnd="15dp" />
+        app:layout_constraintEnd_toEndOf="@+id/img_doctor_full" />
+
+    <Button
+        android:id="@+id/btn_diagnose"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/bg_purple_button"
+        android:paddingHorizontal="20dp"
+        android:text="診斷植物"
+        android:textColor="#FFFFFF"
+        android:textSize="25sp"
+        app:backgroundTint="@null"
+        app:layout_constraintBottom_toBottomOf="@+id/img_doctor_full"
+        app:layout_constraintStart_toStartOf="@+id/img_doctor_full" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
