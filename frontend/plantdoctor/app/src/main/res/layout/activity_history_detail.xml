@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
@@ -11,7 +12,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="60dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="返回主頁"
         android:padding="8dp"
@@ -25,10 +26,10 @@
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="診斷報告"
-        android:textSize="40sp"
+        android:text="病例詳情"
+        android:textSize="48sp"
         android:textStyle="bold"
-        android:textColor="#2E7D32"
+        android:textColor="#1B5E20"
         app:layout_constraintTop_toTopOf="@id/btn_back_home"
         app:layout_constraintBottom_toBottomOf="@id/btn_back_home"
         app:layout_constraintStart_toStartOf="parent"
@@ -53,9 +54,10 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/card_advice"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         app:cardCornerRadius="30dp"
         app:cardElevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -78,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:text="植物：辨識中..."
                     android:textColor="#2E7D32"
-                    android:textSize="14sp"
+                    android:textSize="18sp"
                     android:layout_marginBottom="4dp" />
 
                 <TextView
@@ -87,7 +89,7 @@
                     android:layout_height="wrap_content"
                     android:text="診斷結果"
                     android:textColor="#666666"
-                    android:textSize="14sp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/tv_disease_name"
@@ -95,8 +97,21 @@
                     android:layout_height="wrap_content"
                     android:text="患病：黑星病 (Black Spot)"
                     android:textColor="#D32F2F"
-                    android:textSize="24sp"
+                    android:textSize="28sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_feedback_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="診斷結果有誤？"
+                    android:textColor="#888888"
+                    android:textSize="16sp"
+                    android:padding="4dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -122,19 +137,33 @@
                     android:textColor="#444444"
                     android:textSize="16sp" />
 
+                <TextView
+                    android:id="@+id/et_user_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:textColor="#333333"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    tools:text="這是使用者筆記範例"/>
+
                 <Button
                     android:id="@+id/btn_save_report"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
+                    android:paddingVertical="14dp"
                     android:backgroundTint="#ED1930"
                     android:text="刪除病例"
-                    android:textSize="25sp"
+                    android:textSize="22sp"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     app:cornerRadius="15dp" />
 
-                <View android:layout_width="match_parent" android:layout_height="60dp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp" />
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

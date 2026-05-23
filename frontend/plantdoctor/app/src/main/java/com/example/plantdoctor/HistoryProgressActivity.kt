@@ -2,6 +2,8 @@ package com.example.plantdoctor
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList // 🌟 新增
+import android.graphics.Color // 🌟 新增
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,6 +12,7 @@ import android.util.Log
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout // 🌟 新增
 import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
@@ -27,10 +30,28 @@ class HistoryProgressActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history_progress)
 
+        // 🌟 核心新增：綁定最外層佈局與進度條
+        val historyProgressRoot = findViewById<ConstraintLayout>(R.id.history_progress_root_layout)
         val progressBar = findViewById<ProgressBar>(R.id.progressBar_history)
 
-        // 1. 從小本本拿 Token
+        // 🌟 核心新增：召喚大總管換好背景色
+        ThemeManager.applyTheme(
+            context = this,
+            rootLayout = historyProgressRoot
+        )
+
+        // 🌟 核心增強：根據目前使用者的主題，動態幫「歷史紀錄進度條」染上專屬主題顏色！
         val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+        val themeId = sharedPref.getInt("THEME_COLOR_ID", 0)
+        val progressColorStr = when (themeId) {
+            1 -> "#1565C0" // 海洋藍進度條
+            2 -> "#D84315" // 暖陽橙進度條
+            3 -> "#AD1457" // 蜜桃粉進度條
+            else -> "#2E7D32" // 經典陽光綠進度條
+        }
+        progressBar.progressTintList = ColorStateList.valueOf(Color.parseColor(progressColorStr))
+
+        // 1. 從小本本拿 Token
         val token = sharedPref.getString("token", null)
 
         if (token == null) {
@@ -74,16 +95,14 @@ class HistoryProgressActivity : AppCompatActivity() {
         })
     }
 
-    // 🌟 2. 核心修改：全螢幕長按雷達，判定長按 0.5 秒才吹風
+    // 🌟 全螢幕長按雷達，判定長按 0.5 秒才吹風
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event != null) {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    // 手指一碰到螢幕任意處：先設定一個 0.5 秒後的鬧鐘
                     windHandler.postDelayed(windRunnable, 500)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    // 手指一離開或滑開螢幕：撤銷鬧鐘，停止風聲
                     windHandler.removeCallbacks(windRunnable)
                     SoundManager.stopWind()
                 }
@@ -92,14 +111,12 @@ class HistoryProgressActivity : AppCompatActivity() {
         return super.onTouchEvent(event)
     }
 
-    // 🌟 3. 核心修改：離開畫面時（例如載入完自動換頁），安全切斷風聲並復原計時器
     override fun onStop() {
         super.onStop()
         SoundManager.stopWind()
         windHandler.removeCallbacks(windRunnable)
     }
 
-    // 🌟 4. 銷毀畫面時清空計時器，防止記憶體洩漏
     override fun onDestroy() {
         super.onDestroy()
         windHandler.removeCallbacksAndMessages(null)

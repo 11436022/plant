@@ -21,17 +21,29 @@ object SoundManager : DefaultLifecycleObserver {
     private var windPlayer: MediaPlayer? = null
     private var bgmPlayer: MediaPlayer? = null
 
-    // 🌟 核心防禦：增加一個防搶跑開關，預設為 true（代表正在執行開機木魚交響樂）
     private var isFirstLaunch = true
+
+    // 🌟 核心變數：儲存各軌音量
+    private var volStartApp = 0.7f
+    private var volBgm = 0.7f
+    private var volBubble = 0.7f
+    private var volWind = 0.7f
 
     fun init(context: Context) {
         if (soundPool != null) return
 
         val appContext = context.applicationContext
 
+        // 初始化時讀取進度條設定
+        val sharedPref = appContext.getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+        volStartApp = sharedPref.getInt("VOL_START_APP", 35) / 100f
+        volBgm = sharedPref.getInt("VOL_BGM", 70) / 100f
+        volBubble = sharedPref.getInt("VOL_BUBBLE", 70) / 100f
+        volWind = sharedPref.getInt("VOL_WIND", 70) / 100f
+
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
-        // === [A] 初始化 SoundPool ===
+        // === [A] SoundPool ===
         val audioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_GAME)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -71,7 +83,7 @@ object SoundManager : DefaultLifecycleObserver {
             e.printStackTrace()
         }
 
-        // === [B] 初始化風聲 ===
+        // === [B] 風聲 ===
         try {
             val assetFileDescriptor = appContext.assets.openFd("wind.mp3")
             windPlayer = MediaPlayer()
@@ -84,11 +96,12 @@ object SoundManager : DefaultLifecycleObserver {
             assetFileDescriptor.close()
             windPlayer?.isLooping = true
             windPlayer?.prepare()
+            windPlayer?.setVolume(volWind, volWind)
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
-        // === [C] 初始化背景音樂 ===
+        // === [C] 背景音樂 ===
         try {
             val assetFileDescriptor = appContext.assets.openFd("forest.mp3")
             bgmPlayer = MediaPlayer()
@@ -101,57 +114,72 @@ object SoundManager : DefaultLifecycleObserver {
             assetFileDescriptor.close()
             bgmPlayer?.isLooping = true
             bgmPlayer?.prepare()
-            bgmPlayer?.setVolume(1.0f, 1.0f)
+            bgmPlayer?.setVolume(volBgm, volBgm)
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    // 🌟 手動啟動背景音樂的方法
+    // 🌟 核心新增：讓外界播放開 APP 音效（如木魚）的地方可以獲取目前設定的音量（回傳 0.0f ~ 1.0f）
+    fun getStartAppVolume(): Float {
+        return volStartApp
+    }
+
+    fun setStartAppVolume(volume: Float) {
+        this.volStartApp = volume
+    }
+
+    fun setBgmVolume(volume: Float) {
+        this.volBgm = volume
+        if (bgmPlayer != null && bgmPlayer!!.isPlaying) {
+            bgmPlayer?.setVolume(volume, volume)
+        }
+    }
+
+    fun setBubbleVolume(volume: Float) {
+        this.volBubble = volume
+    }
+
+    fun setWindVolume(volume: Float) {
+        this.volWind = volume
+        windPlayer?.setVolume(volume, volume)
+    }
+
     fun startBGM() {
-        // 只要手動叫音樂響起，就代表開機木魚時間結束了，解除防線
         isFirstLaunch = false
         if (bgmPlayer != null && !bgmPlayer!!.isPlaying) {
+            bgmPlayer?.setVolume(volBgm, volBgm)
             bgmPlayer?.start()
         }
     }
 
-    // 🌟 當整個 App 回到前台時
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
-
-        // 🌟 核心修正：如果是「第一次開機點開 App」，全域攔截器不准偷放音樂！把舞台留給木魚！
-        if (isFirstLaunch) {
-            Log.d("SoundManager", "🛑 檢測到冷啟動開機，攔截自動播放音樂，保留木魚獨奏。")
-            return
-        }
-
+        if (isFirstLaunch) return
         if (bgmPlayer != null && !bgmPlayer!!.isPlaying) {
+            bgmPlayer?.setVolume(volBgm, volBgm)
             bgmPlayer?.start()
-            Log.d("SoundManager", "📱 App 從後台回來，自動恢復背景音樂")
         }
     }
 
-    // 🌟 當整個 App 退到手機桌面時
     override fun onStop(owner: LifecycleOwner) {
         super.onStop(owner)
-        // 使用者退到桌面了，下一次再進來時肯定不是冷啟動了，安全關閉開關
         isFirstLaunch = false
         if (bgmPlayer != null && bgmPlayer!!.isPlaying) {
             bgmPlayer?.pause()
-            Log.d("SoundManager", "🏠 User 回到手機桌面，自動暫停背景音樂")
         }
     }
 
     fun playBubblePop() {
         if (isSoundPoolLoaded && soundPool != null) {
             val randomIndex = random.nextInt(4)
-            soundPool?.play(popSoundIds[randomIndex], 1.0f, 1.0f, 1, 0, 1.0f)
+            soundPool?.play(popSoundIds[randomIndex], volBubble, volBubble, 1, 0, 1.0f)
         }
     }
 
     fun startWind() {
         if (windPlayer != null && !windPlayer!!.isPlaying) {
+            windPlayer?.setVolume(volWind, volWind)
             windPlayer?.start()
         }
     }

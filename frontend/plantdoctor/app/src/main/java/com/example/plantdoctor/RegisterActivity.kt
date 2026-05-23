@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout // 🌟 新增
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,17 +29,28 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
+        // --- 2. 綁定 UI 元件 ---
+        val registerRoot = findViewById<ConstraintLayout>(R.id.register_root_layout) // 🌟 核心新增：最外層佈局
         val edtUsername = findViewById<EditText>(R.id.et_reg_username)
         val edtPassword = findViewById<EditText>(R.id.et_reg_password)
         val edtEmail = findViewById<EditText>(R.id.et_reg_gmail)
         val btnSubmit = findViewById<Button>(R.id.btn_register_submit)
         val tvBackLogin = findViewById<TextView>(R.id.tv_back_to_login)
+        val tvRegisterTitle = findViewById<TextView>(R.id.tv_register_title)
+
+        // 🌟 核心新增：召喚大總管！將最外層背景、註冊按鈕、返回文字交給它處理
+        ThemeManager.applyTheme(
+            context = this,
+            rootLayout = registerRoot,
+            titles = listOf(tvBackLogin,tvRegisterTitle), // 讓「返回登入」文字同步換成主題深色系字體
+            mainButtons = listOf(btnSubmit) // 讓「註冊送出按鈕」同步對齊主題色
+        )
 
         // 註冊時不需要 Token，所以傳 null 建立 API Service
         val apiService = PlantApiService.create(null)
 
         btnSubmit.setOnClickListener {
-            // 🌟 核心修改：點擊送出按鈕播放泡泡聲
+            // 點擊送出按鈕播放泡泡聲
             SoundManager.playBubblePop()
 
             val username = edtUsername.text.toString().trim()
@@ -84,11 +96,11 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         tvBackLogin.setOnClickListener {
-            // 🌟 核心修改：點擊返回登入播放泡泡聲
+            // 點擊返回登入播放泡泡聲
             SoundManager.playBubblePop()
             finish()
         }
-    } // 👈 onCreate 的結尾
+    } // onCreate 的結尾
 
     // 顯示對話框，提醒使用者去驗證信箱
     private fun showVerificationDialog(email: String) {
@@ -97,7 +109,7 @@ class RegisterActivity : AppCompatActivity() {
             .setMessage("我們已發送驗證信至：$email\n請先前往信箱點擊驗證連結，再回來登入喔！")
             .setCancelable(false)
             .setPositiveButton("我知道了") { _, _ ->
-                // 🌟 核心修改：點擊對話框按鈕時播放泡泡聲
+                // 點擊對話框按鈕時播放泡泡聲
                 SoundManager.playBubblePop()
                 // 點擊後回到登入頁面
                 finish()
@@ -105,16 +117,14 @@ class RegisterActivity : AppCompatActivity() {
             .show()
     }
 
-    // 🌟 2. 核心修改：全螢幕長按雷達，判定長按 0.5 秒才吹風
+    // 🌟 全螢幕長按雷達，判定長按 0.5 秒才吹風
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event != null) {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    // 手指一碰到螢幕任意處：先設定一個 0.5 秒後的鬧鐘
                     windHandler.postDelayed(windRunnable, 500)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    // 手指一離開或滑開螢幕：撤銷鬧鐘，停止風聲
                     windHandler.removeCallbacks(windRunnable)
                     SoundManager.stopWind()
                 }
@@ -123,14 +133,12 @@ class RegisterActivity : AppCompatActivity() {
         return super.onTouchEvent(event)
     }
 
-    // 🌟 3. 核心修改：離開畫面時，安全切斷風聲並復原計時器
     override fun onStop() {
         super.onStop()
         SoundManager.stopWind()
         windHandler.removeCallbacks(windRunnable)
     }
 
-    // 🌟 4. 銷毀畫面時清空計時器，防止記憶體洩漏
     override fun onDestroy() {
         super.onDestroy()
         windHandler.removeCallbacksAndMessages(null)

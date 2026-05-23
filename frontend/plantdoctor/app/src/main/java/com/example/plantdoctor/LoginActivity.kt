@@ -13,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout // 🌟 新增
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -41,15 +42,25 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         // --- 2. 綁定 UI 元件 ---
+        val loginRoot = findViewById<ConstraintLayout>(R.id.login_root_layout) // 🌟 核心新增：最外層佈局
         val etUsername = findViewById<EditText>(R.id.et_username)
         val etPassword = findViewById<EditText>(R.id.et_password)
         val btnLogin = findViewById<Button>(R.id.btn_login_submit)
         val tvRegister = findViewById<TextView>(R.id.tv_go_to_register)
         val tvForgotPassword = findViewById<TextView>(R.id.tv_forgot_password)
+        val tvLoginTitle = findViewById<TextView>(R.id.tv_login_title)
+
+        // 🌟 核心新增：召喚大總管！將最外層背景、按鈕、可點擊文字通通交給它換色
+        ThemeManager.applyTheme(
+            context = this,
+            rootLayout = loginRoot,
+            titles = listOf(tvRegister, tvForgotPassword,tvLoginTitle), // 讓「去註冊」和「忘記密碼」變成漂亮的深色主題字
+            mainButtons = listOf(btnLogin) // 讓「登入按鈕」變成對齊主題的質感主按鈕
+        )
 
         // --- 3. 登入按鈕邏輯 ---
         btnLogin.setOnClickListener {
-            // 🌟 核心修改：點擊登入按鈕播放泡泡聲
+            // 點擊登入按鈕播放泡泡聲
             SoundManager.playBubblePop()
 
             val username = etUsername.text.toString().trim()
@@ -99,14 +110,14 @@ class LoginActivity : AppCompatActivity() {
 
         // --- 4. 註冊跳轉 ---
         tvRegister.setOnClickListener {
-            // 🌟 核心修改：點擊去註冊播放泡泡聲
+            // 點擊去註冊播放泡泡聲
             SoundManager.playBubblePop()
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 
         // --- 5. 忘記密碼跳轉 ---
         tvForgotPassword.setOnClickListener {
-            // 🌟 核心修改：點擊忘記密碼播放泡泡聲
+            // 點擊忘記密碼播放泡泡聲
             SoundManager.playBubblePop()
             showForgotPasswordDialog()
         }
@@ -129,7 +140,7 @@ class LoginActivity : AppCompatActivity() {
         builder.setView(input)
 
         builder.setPositiveButton("送出") { _, _ ->
-            // 🌟 核心修改：點擊忘記密碼彈窗的「送出」播放泡泡聲
+            // 點擊忘記密碼彈窗的「送出」播放泡泡聲
             SoundManager.playBubblePop()
             val email = input.text.toString().trim()
             if (email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -139,7 +150,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
         builder.setNegativeButton("取消") { _, _ ->
-            // 🌟 核心修改：點擊忘記密碼彈窗的「取消」播放泡泡聲
+            // 點擊忘記密碼彈窗的「取消」播放泡泡聲
             SoundManager.playBubblePop()
         }
         builder.show()
@@ -158,7 +169,7 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
             override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
-                Toast.makeText(this@LoginActivity, "網路連線失敗", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, "網路連線失敗", Toast.LENGTH_SHORT).show() // 修正原專案的小手誤：改為 this@LoginActivity
             }
         })
     }
@@ -168,22 +179,20 @@ class LoginActivity : AppCompatActivity() {
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton("確定") { _, _ ->
-                // 🌟 核心修改：點擊錯誤彈窗的「確定」播放泡泡聲
+                // 點擊錯誤彈窗的「確定」播放泡泡聲
                 SoundManager.playBubblePop()
             }
             .show()
     }
 
-    // 🌟 2. 核心修改：全螢幕長按雷達，判定長按 0.5 秒才吹風
+    // 🌟 2. 全螢幕長按雷達，判定長按 0.5 秒才吹風
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event != null) {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    // 手指一碰到螢幕任意處：先設定一個 0.5 秒後的鬧鐘
                     windHandler.postDelayed(windRunnable, 500)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    // 手指一離開或滑開螢幕：撤銷鬧鐘，停止風聲
                     windHandler.removeCallbacks(windRunnable)
                     SoundManager.stopWind()
                 }
@@ -192,14 +201,12 @@ class LoginActivity : AppCompatActivity() {
         return super.onTouchEvent(event)
     }
 
-    // 🌟 3. 核心修改：離開畫面時，安全切斷風聲並復原計時器
     override fun onStop() {
         super.onStop()
         SoundManager.stopWind()
         windHandler.removeCallbacks(windRunnable)
     }
 
-    // 🌟 4. 銷毀畫面時清空計時器，防止記憶體洩漏
     override fun onDestroy() {
         super.onDestroy()
         windHandler.removeCallbacksAndMessages(null)

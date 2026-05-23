@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background"
+    android:id="@+id/upload_root_layout"
     tools:context=".UploadActivity">
 
     <ImageView
@@ -27,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="132dp"
         android:text="上傳植物照片"
-        android:textColor="#2E7D32"
+        android:textColor="#1B5E20"
         android:textSize="40sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -44,6 +45,7 @@
         android:layout_weight="1"
         android:backgroundTint="#2E7D32"
         android:text="開啟相機"
+        android:textColor="#FFFFFF"
         android:textSize="25sp"
         app:cornerRadius="45dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -56,9 +58,10 @@
         android:layout_marginTop="590dp"
         android:layout_marginEnd="40dp"
         android:layout_weight="1"
-        android:backgroundTint="#81C784"
+        android:backgroundTint="#2E7D32"
         android:text="相簿選擇"
         android:textSize="25sp"
+        android:textColor="#FFFFFF"
         app:cornerRadius="45dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -72,6 +75,7 @@
         android:text="開始分析"
         android:textSize="35sp"
         android:textStyle="bold"
+        android:textColor="#FFFFFF"
         app:cornerRadius="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/img_preview"

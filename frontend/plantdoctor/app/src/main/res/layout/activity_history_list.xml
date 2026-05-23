@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/history_list_root_layout"
     android:background="@drawable/gradient_background">
 
     <ImageButton
@@ -12,8 +13,9 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="72dp"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="返回主頁"
         android:padding="8dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_back"
@@ -26,9 +28,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="歷史診斷紀錄"
-        android:textSize="24sp"
+        android:textSize="28sp"
         android:textStyle="bold"
-        android:textColor="#2E7D32"
+        android:textColor="#1B5E20"
         app:layout_constraintTop_toTopOf="@id/btn_back_home"
         app:layout_constraintBottom_toBottomOf="@id/btn_back_home"
         app:layout_constraintStart_toStartOf="parent"

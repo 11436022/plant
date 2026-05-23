@@ -49,6 +49,10 @@ class IntroActivity : AppCompatActivity() {
                 // 如果不是最後一頁，點擊就自動平滑滑到下一頁
                 viewPagerIntro.setCurrentItem(currentItem + 1, true)
             } else {
+                // 🌟 新增：紀錄「我已經看過介紹了」，下次開機不要再秀給我看
+                val sharedPref = getSharedPreferences("PlantDoctor", 0)
+                sharedPref.edit().putBoolean("is_first_open", false).apply()
+
                 // 如果已經是最後一頁（開始使用），執行跳轉登入頁
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)

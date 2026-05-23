@@ -9,6 +9,7 @@ import android.os.Looper
 import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout // 🌟 新增
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,33 +20,55 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 1. 初始化全域音效管理員
+        // 1. 初始化全域音效管理員（此時會自動去讀取本地 SharedPreferences 儲存的音量）
         SoundManager.init(this)
+
+        // 🌟 核心新增：抓取開機畫面的最外層佈局，讓它能跟著主題變色
+        val mainRoot = findViewById<ConstraintLayout>(R.id.main_root_layout)
 
         val tvZhi = findViewById<TextView>(R.id.tv_zhi)
         val tvYe = findViewById<TextView>(R.id.tv_ye)
         val tvShen = findViewById<TextView>(R.id.tv_shen)
         val tvYi = findViewById<TextView>(R.id.tv_yi)
 
+        // 🌟 核心新增：直接呼叫大總管！把背景和四個木魚大字一起丟進去同步變色
+        ThemeManager.applyTheme(
+            context = this,
+            rootLayout = mainRoot,
+            titles = listOf(tvZhi, tvYe, tvShen, tvYi) // 這四個字會自動換成該主題的深色系字體
+        )
+
         // 2. 啟動非同步預載與整齊敲擊順序
         prepareAndStartSequence(tvZhi, tvYe, tvShen, tvYi)
 
-        // 3. 🌟 核心修改：在第 1.6 秒（第四下木魚敲完後），音樂無縫接續流淌出來！
+        // 3. 在第 1.6 秒（第四下木魚敲完後），音樂無縫接續流淌出來！
         mainHandler.postDelayed({
             SoundManager.startBGM()
         }, 1600)
 
-        // 4. 頁面跳轉邏輯
+        // 4. 頁面跳轉智慧邏輯
         mainHandler.postDelayed({
             val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+
+            // 讀取兩個獨立的指標
+            val isFirstOpen = sharedPref.getBoolean("is_first_open", true) // 預設沒開過，是 true
             val token = sharedPref.getString("token", null)
 
-            if (token != null) {
-                val intent = Intent(this, HomeActivity::class.java)
-                startActivity(intent)
-            } else {
+            if (isFirstOpen) {
+                // 1. 如果是全新下載、第一次打開 APP -> 去介紹頁
                 val intent = Intent(this, IntroActivity::class.java)
                 startActivity(intent)
+            } else {
+                // 2. 不是第一次開了（看過介紹了）-> 檢查登入狀態
+                if (token != null) {
+                    // 已登入 -> 去首頁
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    // 未登入（或剛登出）-> 直接去登入頁，不要再去介紹頁鬧了！
+                    val intent = Intent(this, LoginActivity::class.java)
+                    startActivity(intent)
+                }
             }
             finish()
         }, 3800) // 稍微延長一點留白時間，讓背景音樂在開機畫面鋪墊得更優雅
@@ -59,8 +82,10 @@ class MainActivity : AppCompatActivity() {
             afd.close()
 
             firstPlayer.setOnPreparedListener { mp ->
-                // 🌟 核心修改：將第一個木魚的音量降低 65% (設定為 0.35f)
-                mp.setVolume(0.35f, 0.35f)
+                // 讀取 SoundManager 中使用者設定好的「開 APP 音效音量」
+                val currentVol = SoundManager.getStartAppVolume()
+                mp.setVolume(currentVol, currentVol)
+
                 mp.start()
                 players.add(mp)
 
@@ -90,8 +115,9 @@ class MainActivity : AppCompatActivity() {
             afd.close()
             mediaPlayer.prepare()
 
-            // 🌟 核心修改：將第二、三、四個木魚的音量同樣降低 65% (設定為 0.35f)
-            mediaPlayer.setVolume(0.35f, 0.35f)
+            // 同樣讀取 SoundManager 中最新設定的開 APP 音量，不再寫死
+            val currentVol = SoundManager.getStartAppVolume()
+            mediaPlayer.setVolume(currentVol, currentVol)
 
             mediaPlayer.start()
             players.add(mediaPlayer)

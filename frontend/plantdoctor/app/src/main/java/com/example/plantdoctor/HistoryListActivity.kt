@@ -21,6 +21,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout // 🌟 新增
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -66,9 +67,24 @@ class HistoryListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history_list)
 
-        // 1. 返回按鈕
-        findViewById<ImageButton>(R.id.btn_back_home).setOnClickListener {
-            // 🌟 核心修改：點擊返回按鈕播放泡泡聲
+        // 🌟 核心新增：綁定最外層佈局、返回鍵與頂部大字標題
+        val historyListRoot = findViewById<ConstraintLayout>(R.id.history_list_root_layout)
+        val btnBack = findViewById<ImageButton>(R.id.btn_back_home)
+
+        // 🌟 核心新增：綁定你的頂部大字標題（請依據你 XML 的真實 ID 做修改，例如 tv_history_main_title）
+        val tvHistoryMainTitle = findViewById<TextView>(R.id.tv_history_title)
+
+        // 🌟 核心新增：召喚大總管！
+        // 依照需求，我們只丟入大背景、大標題文字與返回按鈕，搜尋框 etSearch 則完全不傳入，維持原色！
+        ThemeManager.applyTheme(
+            context = this,
+            rootLayout = historyListRoot,
+            titles = listOf(tvHistoryMainTitle),
+            imageButtons = listOf(btnBack)
+        )
+
+        // 1. 返回按鈕點擊事件
+        btnBack.setOnClickListener {
             SoundManager.playBubblePop()
             finish()
         }
@@ -133,7 +149,7 @@ class HistoryListActivity : AppCompatActivity() {
         })
     }
 
-    // 🌟 2. 核心修改：全螢幕長按雷達，判定長按 0.5 秒才吹風
+    // 🌟 全螢幕長按雷達，判定長按 0.5 秒才吹風
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event != null) {
             when (event.action) {
@@ -149,14 +165,12 @@ class HistoryListActivity : AppCompatActivity() {
         return super.onTouchEvent(event)
     }
 
-    // 🌟 3. 核心修改：離開畫面時，安全切斷風聲並復原計時器
     override fun onStop() {
         super.onStop()
         SoundManager.stopWind()
         windHandler.removeCallbacks(windRunnable)
     }
 
-    // 🌟 4. 銷毀畫面時清空計時器，防止記憶體洩漏
     override fun onDestroy() {
         super.onDestroy()
         windHandler.removeCallbacksAndMessages(null)
@@ -208,7 +222,7 @@ class HistoryAdapter(
 
         // 【新邏輯】點擊整個項目，直接跳轉到詳情頁
         holder.itemView.setOnClickListener {
-            // 🌟 核心修改：點擊歷史紀錄卡片項目時，播放清脆的泡泡聲！
+            // 🌟 點擊歷史紀錄卡片項目時，播放清脆的泡泡聲！
             SoundManager.playBubblePop()
 
             val intent = Intent(holder.itemView.context, HistoryDetailActivity::class.java).apply {

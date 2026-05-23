@@ -2,9 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/settings_root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background">
+    android:background="@drawable/gradient_green">
 
     <ImageButton
         android:id="@+id/btn_back_home"
@@ -26,13 +27,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="設定"
-        android:textColor="#D88A5E"
+        android:textColor="#1B5E20"
         android:textSize="48sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_back_home"
         android:layout_marginTop="24dp" />
+
+    <ImageButton
+        android:id="@+id/btn_volume_mixer"
+        android:layout_width="70dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="24dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="開啟調音台"
+        android:scaleType="fitCenter"
+        android:src="@android:drawable/ic_lock_silent_mode_off"
+        app:layout_constraintBottom_toBottomOf="@id/tv_settings_title"
+        app:layout_constraintStart_toEndOf="@id/tv_settings_title"
+        app:layout_constraintTop_toTopOf="@id/tv_settings_title"
+        app:tint="#2E7D32" />
 
     <LinearLayout
         android:id="@+id/layout_account"
@@ -61,7 +76,11 @@
             android:background="@null"
             android:hint="請輸入帳號"
             android:paddingVertical="12dp"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:focusable="false"
+            android:longClickable="false"
+            android:cursorVisible="false"
+            android:textColor="#333333" />
     </LinearLayout>
 
     <LinearLayout
@@ -91,7 +110,11 @@
             android:background="@null"
             android:hint="example@gmail.com"
             android:paddingVertical="12dp"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:focusable="false"
+            android:longClickable="false"
+            android:cursorVisible="false"
+            android:textColor="#333333" />
 
     </LinearLayout>
 
@@ -107,7 +130,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_gmail" />
 
-
     <TextView
         android:id="@+id/tv_color_select"
         android:layout_width="wrap_content"
@@ -115,7 +137,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="492dp"
         android:text="背景顏色選擇"
-        android:textColor="#D88A5E"
+        android:textColor="#1B5E20"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"

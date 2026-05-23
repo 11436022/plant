@@ -8,6 +8,7 @@ import android.view.MotionEvent
 import android.widget.Button
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout // 🌟 新增
 import com.getkeepsafe.taptargetview.TapTarget
 import com.getkeepsafe.taptargetview.TapTargetView
 
@@ -18,14 +19,21 @@ class HomeActivity : AppCompatActivity() {
         SoundManager.startWind()
     }
 
+    // 🌟 全域宣告元件，方便在 onCreate 與 onResume 都能安全存取
+    private lateinit var homeRoot: ConstraintLayout
+    private lateinit var btnDiagnose: Button
+    private lateinit var btnHistory: Button
+    private lateinit var btnSettings: ImageButton
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
         // 1. 綁定元件
-        val btnDiagnose: Button = findViewById(R.id.btn_diagnose)
-        val btnHistory: Button = findViewById(R.id.btn_history)
-        val btnSettings: ImageButton = findViewById(R.id.btn_settings)
+        homeRoot = findViewById(R.id.home_root_layout) // 🌟 核心新增
+        btnDiagnose = findViewById(R.id.btn_diagnose)
+        btnHistory = findViewById(R.id.btn_history)
+        btnSettings = findViewById(R.id.btn_settings)
 
         // 2. 按鈕點擊事件
         btnDiagnose.setOnClickListener {
@@ -81,7 +89,7 @@ class HomeActivity : AppCompatActivity() {
                     targetView3 = TapTargetView.showFor(this,
                         TapTarget.forView(
                             btnSettings, "第三步：個人設定", "在這裡查看個人資料、帳號密碼，或是調整 App 的基礎設定。"
-                        ).outerCircleColor(targetColorRes) // 🌟 這裡改用標準 .outerCircleColor() 傳入資源 ID
+                        ).outerCircleColor(targetColorRes) // 這裡改用標準 .outerCircleColor() 傳入資源 ID
                             .targetCircleColor(android.R.color.white)
                             .titleTextSize(24)
                             .descriptionTextSize(16)
@@ -115,7 +123,7 @@ class HomeActivity : AppCompatActivity() {
                     targetView2 = TapTargetView.showFor(this,
                         TapTarget.forView(
                             btnHistory, "第二步：查詢病例", "查看過去所有的植物診斷報告與觀察日記，掌握植物健康歷程。"
-                        ).outerCircleColor(targetColorRes) // 🌟 這裡改用標準 .outerCircleColor()
+                        ).outerCircleColor(targetColorRes) // 這裡改用標準 .outerCircleColor()
                             .targetCircleColor(android.R.color.white)
                             .titleTextSize(24)
                             .descriptionTextSize(16)
@@ -145,7 +153,7 @@ class HomeActivity : AppCompatActivity() {
             targetView1 = TapTargetView.showFor(this,
                 TapTarget.forView(
                     btnDiagnose, "第一步：診斷植物", "點擊這裡可以拍照或上傳植物照片，讓 AI 馬上幫你分析病害！"
-                ).outerCircleColor(targetColorRes) // 🌟 這裡改用標準 .outerCircleColor()
+                ).outerCircleColor(targetColorRes) // 這裡改用標準 .outerCircleColor()
                     .targetCircleColor(android.R.color.white)
                     .titleTextSize(24)
                     .descriptionTextSize(16)
@@ -168,6 +176,17 @@ class HomeActivity : AppCompatActivity() {
             autoJumpHandler.postDelayed(jumpToStep2Runnable, 3000)
         }
     } // onCreate 結束
+
+    // 🌟 核心新增：在 onResume 觸發大總管換色，確保從設定頁按返回時能秒速變色
+    override fun onResume() {
+        super.onResume()
+        ThemeManager.applyTheme(
+            context = this,
+            rootLayout = homeRoot,
+            mainButtons = listOf(btnDiagnose, btnHistory) // 只讓這兩個功能按鈕跟隨主題變色
+            // imageButtons 留空不傳，這樣你的圖片按鈕就不會被改動到囉！
+        )
+    }
 
     override fun onStop() {
         super.onStop()

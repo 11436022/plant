@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background"
+    android:id="@+id/register_root_layout"
     tools:context=".RegisterActivity">
 
     <TextView
@@ -15,7 +16,7 @@
         android:text="註冊帳號"
         android:textSize="32sp"
         android:textStyle="bold"
-        android:textColor="@color/app_main_text"
+        android:textColor="#1B5E20"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
