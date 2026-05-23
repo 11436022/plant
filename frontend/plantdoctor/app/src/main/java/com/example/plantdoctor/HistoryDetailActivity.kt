@@ -7,8 +7,13 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
-import android.util.Log
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
+import android.widget.LinearLayout
+
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -35,7 +40,16 @@ class HistoryDetailActivity : AppCompatActivity() {
     private lateinit var tvAdvice: TextView
     private lateinit var btnAction: Button
     private lateinit var btnBack: ImageButton
-    private lateinit var tvFeedbackLink: TextView
+    private lateinit var tvFeedbackLink: TextView // 改回 TextView
+
+    // ▼▼▼ 使用者筆記 UI 元件 ▼▼▼
+    private lateinit var layoutNoteDisplay: LinearLayout
+    private lateinit var layoutNoteEdit: LinearLayout
+    private lateinit var tvUserNoteDisplay: TextView
+    private lateinit var etUserNoteEdit: EditText
+    private lateinit var ivEditNote: ImageView
+    private lateinit var btnSaveNote: Button
+    // ▲▲▲ 使用者筆記 UI 元件 ▲▲▲
 
     // 風聲延遲計時器與任務
     private val windHandler = Handler(Looper.getMainLooper())
@@ -68,7 +82,16 @@ class HistoryDetailActivity : AppCompatActivity() {
         tvAdvice = findViewById(R.id.tv_advice)
         btnAction = findViewById(R.id.btn_save_report) // 複用儲存按鈕來做刪除
         btnBack = findViewById(R.id.btn_back_home)
-        tvFeedbackLink = findViewById(R.id.tv_feedback_link)
+        tvFeedbackLink = findViewById(R.id.tv_feedback_link) // 綁定回 TextView
+
+        // ▼▼▼ 綁定使用者筆記 UI 元件 ▼▼▼
+        layoutNoteDisplay = findViewById(R.id.layout_note_display)
+        layoutNoteEdit = findViewById(R.id.layout_note_edit)
+        tvUserNoteDisplay = findViewById(R.id.tv_user_note_display)
+        etUserNoteEdit = findViewById(R.id.et_user_note_edit)
+        ivEditNote = findViewById(R.id.iv_edit_note)
+        btnSaveNote = findViewById(R.id.btn_save_note)
+        // ▲▲▲ 綁定使用者筆記 UI 元件 ▲▲▲
 
         // 修改標題大字
         tvMainTitle?.text = "病例詳情"
@@ -113,6 +136,62 @@ class HistoryDetailActivity : AppCompatActivity() {
             SoundManager.playBubblePop()
             showDiagnosesSelectionDialog()
         }
+
+        // 鉛筆圖示點擊，切換到編輯模式
+        ivEditNote.setOnClickListener {
+            switchToEditMode()
+        }
+
+        // 儲存筆記按鈕的邏輯
+        btnSaveNote.setOnClickListener {
+            handleSaveNote()
+        }
+    }
+
+    private fun switchToDisplayMode() {
+        layoutNoteDisplay.visibility = View.VISIBLE
+        layoutNoteEdit.visibility = View.GONE
+    }
+
+    private fun switchToEditMode() {
+        layoutNoteDisplay.visibility = View.GONE
+        layoutNoteEdit.visibility = View.VISIBLE
+        // 將目前顯示的文字填入編輯框
+        etUserNoteEdit.setText(tvUserNoteDisplay.text)
+        // 將游標移到文字末尾
+        etUserNoteEdit.setSelection(etUserNoteEdit.text.length)
+    }
+
+    private fun handleSaveNote() {
+        val updatedNote = etUserNoteEdit.text.toString()
+
+        // 禁用按鈕防止重複提交
+        btnSaveNote.isEnabled = false
+
+        val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+        val token = sharedPref.getString("token", "") ?: ""
+
+        val request = PatchDiaryRequest(user_note = updatedNote)
+
+        PlantApiService.create(token).patchDiary(diaryId, request).enqueue(object : Callback<GenericResponse> {
+            override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
+                btnSaveNote.isEnabled = true // 無論成功或失敗，都恢復按鈕
+                if (response.isSuccessful) {
+                    Toast.makeText(this@HistoryDetailActivity, "筆記已儲存", Toast.LENGTH_SHORT).show()
+                    // 更新顯示的文字
+                    tvUserNoteDisplay.text = updatedNote
+                    // 切換回顯示模式
+                    switchToDisplayMode()
+                } else {
+                    Toast.makeText(this@HistoryDetailActivity, "儲存失敗: ${response.code()}", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
+                btnSaveNote.isEnabled = true // 恢復按鈕
+                Toast.makeText(this@HistoryDetailActivity, "儲存失敗: 網路問題", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun setupHistoryDetailGuide() {
@@ -187,17 +266,10 @@ class HistoryDetailActivity : AppCompatActivity() {
                         .placeholder(android.R.drawable.ic_menu_gallery)
                         .into(imgPlant)
 
-                    // 隱藏不必要的輸入筆記框細節
-                    val etUserNote = findViewById<TextView>(R.id.et_user_note)
-                    if (!data.user_note.isNullOrEmpty()) {
-                        etUserNote.visibility = android.view.View.VISIBLE
-                        etUserNote.text = data.user_note
-                        etUserNote.background = null
-                        etUserNote.isFocusable = false
-                        etUserNote.isClickable = false
-                    } else {
-                        etUserNote.visibility = android.view.View.GONE
-                    }
+                    // 處理使用者筆記
+                    tvUserNoteDisplay.text = data.user_note ?: "點選右側鉛筆圖示新增筆記"
+                    switchToDisplayMode() // 確保初始為顯示模式
+
                 }
             }
             override fun onFailure(call: Call<DetailDetailResponse>, t: Throwable) {

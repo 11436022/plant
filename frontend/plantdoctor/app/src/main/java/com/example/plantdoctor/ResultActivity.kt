@@ -7,6 +7,8 @@ import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
 import android.util.Log
+import android.view.View
+import android.widget.LinearLayout
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -39,20 +41,15 @@ class ResultActivity : AppCompatActivity() {
         val tvAdvice = findViewById<TextView>(R.id.tv_advice)
         val imgPlant = findViewById<ImageView>(R.id.img_result_plant)
 
-// 🌟 修正點 1：對應你 XML 裡真正的大字標題 ID -> tv_title
-        val tvMainTitle = findViewById<TextView>(R.id.tv_title)
+        // 🌟 綁定新的 EditText ID
+        val etUserNote = findViewById<EditText>(R.id.et_user_note_edit)
 
-// 召喚大總管精準換色（報告內文文字已被抽離，維持白底原色）
-        ThemeManager.applyTheme(
-            context = this,
-            rootLayout = resultRoot,
-            titles = listOf(tvMainTitle), // 頂部「診斷報告」大字會跟著主題變色
-            mainButtons = listOf(btnSave), // 「儲存至歷史病例」按鈕會跟著主題變色
-            imageButtons = listOf(btnBack) // 返回箭頭會跟著主題變色
-        )
-
-// 綁定觀察筆記
-        val etUserNote = findViewById<EditText>(R.id.et_user_note)
+        // --- 強制設定使用者筆記區塊為「編輯模式」 ---
+        val layoutNoteDisplay = findViewById<LinearLayout>(R.id.layout_note_display)
+        val layoutNoteEdit = findViewById<LinearLayout>(R.id.layout_note_edit)
+        layoutNoteDisplay.visibility = View.GONE
+        layoutNoteEdit.visibility = View.VISIBLE
+        // -----------------------------------------
 
 // 2. 接收資料並使用 Glide 載入
         val imageUriString = intent.getStringExtra("IMAGE_URI")
@@ -238,4 +235,3 @@ class ResultActivity : AppCompatActivity() {
         windHandler.removeCallbacksAndMessages(null)
     }
 }
-

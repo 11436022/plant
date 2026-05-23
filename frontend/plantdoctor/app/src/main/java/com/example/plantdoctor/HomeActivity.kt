@@ -21,6 +21,9 @@ class HomeActivity : AppCompatActivity() {
 
     // 🌟 全域宣告元件，方便在 onCreate 與 onResume 都能安全存取
     private lateinit var homeRoot: ConstraintLayout
+    private lateinit var cardDiagnose: androidx.cardview.widget.CardView
+    private lateinit var cardHistory: androidx.cardview.widget.CardView
+    private lateinit var cardSettings: androidx.cardview.widget.CardView
     private lateinit var btnDiagnose: Button
     private lateinit var btnHistory: Button
     private lateinit var btnSettings: ImageButton
@@ -30,25 +33,28 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home)
 
         // 1. 綁定元件
-        homeRoot = findViewById(R.id.home_root_layout) // 🌟 核心新增
+        homeRoot = findViewById(R.id.home_root_layout)
         btnDiagnose = findViewById(R.id.btn_diagnose)
         btnHistory = findViewById(R.id.btn_history)
         btnSettings = findViewById(R.id.btn_settings)
+        cardDiagnose = findViewById(R.id.card_diagnose)
+        cardHistory = findViewById(R.id.card_history)
+        cardSettings = findViewById(R.id.card_settings)
 
-        // 2. 按鈕點擊事件
-        btnDiagnose.setOnClickListener {
+        // 2. 按鈕點擊事件 (改由 CardView 觸發)
+        cardDiagnose.setOnClickListener {
             SoundManager.playBubblePop()
             val intent = Intent(this, UploadActivity::class.java)
             startActivity(intent)
         }
 
-        btnHistory.setOnClickListener {
+        cardHistory.setOnClickListener {
             SoundManager.playBubblePop()
             val intent = Intent(this, HistoryListActivity::class.java)
             startActivity(intent)
         }
 
-        btnSettings.setOnClickListener {
+        cardSettings.setOnClickListener {
             SoundManager.playBubblePop()
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
@@ -88,7 +94,7 @@ class HomeActivity : AppCompatActivity() {
                     SoundManager.playBubblePop()
                     targetView3 = TapTargetView.showFor(this,
                         TapTarget.forView(
-                            btnSettings, "第三步：個人設定", "在這裡查看個人資料、帳號密碼，或是調整 App 的基礎設定。"
+                            cardSettings, "第三步：個人設定", "在這裡查看個人資料、帳號密碼，或是調整 App 的基礎設定。"
                         ).outerCircleColor(targetColorRes) // 這裡改用標準 .outerCircleColor() 傳入資源 ID
                             .targetCircleColor(android.R.color.white)
                             .titleTextSize(24)
@@ -122,7 +128,7 @@ class HomeActivity : AppCompatActivity() {
                     SoundManager.playBubblePop()
                     targetView2 = TapTargetView.showFor(this,
                         TapTarget.forView(
-                            btnHistory, "第二步：查詢病例", "查看過去所有的植物診斷報告與觀察日記，掌握植物健康歷程。"
+                            cardHistory, "第二步：查詢病例", "查看過去所有的植物診斷報告與觀察日記，掌握植物健康歷程。"
                         ).outerCircleColor(targetColorRes) // 這裡改用標準 .outerCircleColor()
                             .targetCircleColor(android.R.color.white)
                             .titleTextSize(24)
@@ -152,7 +158,7 @@ class HomeActivity : AppCompatActivity() {
             // ----------------------------------------
             targetView1 = TapTargetView.showFor(this,
                 TapTarget.forView(
-                    btnDiagnose, "第一步：診斷植物", "點擊這裡可以拍照或上傳植物照片，讓 AI 馬上幫你分析病害！"
+                    cardDiagnose, "第一步：診斷植物", "點擊這裡可以拍照或上傳植物照片，讓 AI 馬上幫你分析病害！"
                 ).outerCircleColor(targetColorRes) // 這裡改用標準 .outerCircleColor()
                     .targetCircleColor(android.R.color.white)
                     .titleTextSize(24)

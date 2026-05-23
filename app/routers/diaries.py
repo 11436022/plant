@@ -108,10 +108,25 @@ async def patch_diary(
         category = await classify_agriculture_term(new_status)
         if category == "invalid":
             raise HTTPException(status_code=400, detail="Status must be a disease or pest.")
+
+        # 呼叫知識庫服務，主要目的是為了拿到新診斷的 ID，並確保它存在於知識庫中
         knowledge = await get_or_complete_knowledge(category, new_status, db)
+        
+        # 更新日記的狀態名稱
         db_entry.status_name = new_status
-        db_entry.suggestion = knowledge["suggestion"]
-        db_entry.treatment = knowledge["treatment"]
+        
+        # 根據分類，更新對應的關聯 ID，並清除另一個
+        if category == "disease":
+            db_entry.disease_id = knowledge["id"]
+            db_entry.pest_id = None
+        elif category == "pest":
+            db_entry.pest_id = knowledge["id"]
+            db_entry.disease_id = None
+        
+        # 關鍵：不再用知識庫的通用 description 和 treatment 覆蓋 AI 的原始分析結果
+        # db_entry.suggestion = knowledge["suggestion"]
+        # db_entry.treatment = knowledge["treatment"]
+
     optional_fields = ["user_note"]
     for field in optional_fields:
         value = getattr(update_data, field)

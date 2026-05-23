@@ -50,7 +50,10 @@ data class AnalysisResult(
 data class ConfirmRequest(val user_note: String)
 
 // 用於 PATCH 的請求模型
-data class PatchDiaryRequest(val user_corrected_status: String)
+data class PatchDiaryRequest(
+    val user_corrected_status: String? = null,
+    val user_note: String? = null
+)
 
 
 data class HistoryResponse(
