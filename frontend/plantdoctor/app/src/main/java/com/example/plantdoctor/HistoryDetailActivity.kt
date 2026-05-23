@@ -259,7 +259,7 @@ class HistoryDetailActivity : AppCompatActivity() {
                     tvAdvice.text = fullAdvice
 
                     // 🌟 核心修正：直接保留原始網址，不再進行惡意的字串裁切，這樣網路圖片（Unsplash）跟快取圖就都能抓到了！
-                    currentImageUrl = data.image_url
+                    currentImageUrl = fixImageUrl(data.image_url ?: "")
 
                     Glide.with(this@HistoryDetailActivity)
                         .load(currentImageUrl)
@@ -276,6 +276,20 @@ class HistoryDetailActivity : AppCompatActivity() {
                 Toast.makeText(this@HistoryDetailActivity, "載入失敗", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun fixImageUrl(rawUrl: String): String {
+        var url = rawUrl.replace("127.0.0.1", "10.0.2.2").replace("localhost", "10.0.2.2")
+        val keyword = "static/"
+        if (url.contains(keyword)) {
+            val startIndex = url.indexOf(keyword)
+            val firstSlash = url.indexOf("/", 8)
+            if (firstSlash != -1) {
+                val baseUrl = url.substring(0, firstSlash + 1)
+                return baseUrl + url.substring(startIndex)
+            }
+        }
+        return url
     }
 
     private fun executeDelete() {
