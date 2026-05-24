@@ -14,7 +14,7 @@ from app.services.files import (
     ensure_image_upload,
 )
 from app.services.knowledge import get_or_complete_knowledge
-from app.schemas.patch import DiaryUpdate
+from app.schemas.patch import DiaryUpdate, DiaryConfirm
 
 # 從 prediction 路由器引入暫存區
 from app.routers.prediction import prediction_cache
@@ -179,7 +179,7 @@ async def delete_diary(diary_id: int, current_user: models.User = Depends(get_cu
 @router.post("/confirm/{prediction_id}", status_code=201)
 async def confirm_and_create_diary(
     prediction_id: str,
-    user_note: str = Body("", embed=True),  # 讓 App 可以選擇性傳入 user_note
+    payload: DiaryConfirm,  # <-- 使用新的 Pydantic 模型
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -199,23 +199,39 @@ async def confirm_and_create_diary(
         raise HTTPException(status_code=404, detail="Temporary image file not found.")
 
     # 3. 將圖片從臨時資料夾移動到正式的 uploads 資料夾
-    #    這裡我們直接使用 create_safe_upload_path 來產生一個新的、安全的正式路徑
-    #    這樣可以避免檔案名稱衝突
     formal_path = create_safe_upload_path(temp_path.name)
     shutil.move(str(temp_path), formal_path)
 
+    # ================= 核心修改 =================
+    # 4. 用前端傳來確認過的資料，覆蓋 AI 的原始分析結果
+    #    這確保了「使用者看到的」就是「被儲存的」
     try:
-        # 4. 呼叫既有的 save_to_db 服務，將資料寫入資料庫
-        #    注意：這裡我們傳入的是 `formal_path`
+        # 從 payload.gemini_advice 中解析出 suggestion 和 treatment
+        # 這裡我們做一個簡單的分割，實際情況可能需要更穩健的解析
+        parts = payload.gemini_advice.split("【治療方法】")
+        suggestion = parts[0].replace("【專家建議】", "").strip()
+        treatment = parts[1].strip() if len(parts) > 1 else ""
+
+        ai_result["status_name"] = payload.disease_name.replace("診斷：", "").strip()
+        ai_result["suggestion"] = suggestion
+        ai_result["treatment"] = treatment
+
+    except Exception as e:
+        # 如果解析失敗，就用原始的 ai_result，但記錄一個警告
+        print(f"Warning: Could not parse gemini_advice from payload. Using original AI result. Error: {e}")
+
+
+    try:
+        # 5. 呼叫既有的 save_to_db 服務，將資料寫入資料庫
         diary_id = await save_to_db(
             data=ai_result,
-            image_path=formal_path,  # <-- 將 'file_path' 修正為 'image_path'
+            image_path=formal_path,
             user_id=current_user.user_id,
-            user_note=user_note,
+            user_note=payload.user_note, # <-- 使用 payload 中的 user_note
             db=db,
         )
 
-        # 5. 從資料庫重新讀取，以回傳完整的資料給 App
+        # 6. 從資料庫重新讀取，以回傳完整的資料給 App
         new_diary_entry = (
             db.query(models.PlantDiary)
             .options(joinedload(models.PlantDiary.crop))
@@ -226,10 +242,10 @@ async def confirm_and_create_diary(
         if not new_diary_entry:
             raise HTTPException(status_code=500, detail="Failed to retrieve diary after saving.")
 
-        # 6. 清除快取
+        # 7. 清除快取
         del prediction_cache[prediction_id]
 
-        # 7. 回傳成功的結果
+        # 8. 回傳成功的結果 (使用新的屬性名稱)
         return {
             "status": "success",
             "message": "Diary created successfully from prediction.",
@@ -239,14 +255,11 @@ async def confirm_and_create_diary(
                 "status_name": new_diary_entry.status_name,
                 "confidence": new_diary_entry.confidence,
                 "image_url": build_public_image_url(new_diary_entry.image_url),
-                "suggestion": new_diary_entry.suggestion,
-                "treatment": new_diary_entry.treatment,
+                "suggestion": new_diary_entry.gemini_suggestion, # <-- 使用新的屬性名
+                "treatment": new_diary_entry.gemini_treatment,   # <-- 使用新的屬性名
             },
         }
     except Exception as e:
-        # 如果儲存過程中發生任何錯誤，最好把移動的檔案移回去，或者記錄下來
-        # 這裡我們簡單地回傳錯誤
-        # 如果 formal_path 已經存在，可以考慮是否要刪除它
         if formal_path.exists():
-            formal_path.unlink()  # 避免留下孤兒檔案
+            formal_path.unlink()
         raise HTTPException(status_code=500, detail=f"Failed to save diary: {str(e)}")

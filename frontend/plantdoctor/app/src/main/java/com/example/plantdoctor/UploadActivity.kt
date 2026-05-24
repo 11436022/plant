@@ -197,8 +197,7 @@ class UploadActivity : AppCompatActivity() {
                 runOnUiThread {
                     selectedImageUri = compressedUri
 
-                    // 🌟 核心對接：把剛剛壓縮完成的快取 Uri 字串偷偷塞給假 API 的暫存器！
-                    // PlantApiService.latestMockImageUri = compressedUri.toString()
+
 
                     Glide.with(this)
                         .load(compressedUri)

@@ -49,6 +49,13 @@ data class AnalysisResult(
 )
 data class ConfirmRequest(val user_note: String)
 
+// 【新流程】前端送往後端，用來確認日記的資料模型
+data class DiaryConfirmRequest(
+    val user_note: String?,
+    val disease_name: String,
+    val gemini_advice: String
+)
+
 // 用於 PATCH 的請求模型
 data class PatchDiaryRequest(
     val user_corrected_status: String? = null,
@@ -116,7 +123,7 @@ interface PlantApiService {
     @POST("diaries/confirm/{prediction_id}")
     fun confirmDiary(
         @Path("prediction_id") predictionId: String,
-        @Body request: ConfirmRequest
+        @Body request: DiaryConfirmRequest // <-- 使用新的 Request Body
     ): Call<GenericResponse> // 假設成功只回傳通用訊息
 
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -65,6 +65,23 @@ class User(Base):
     plant_diary = relationship("PlantDiary", back_populates="user")
 
 
+class UserOneTimeToken(Base):
+    """使用者一次性權杖資料表。"""
+
+    __tablename__ = "user_one_time_tokens"
+
+    id = Column(BigInteger, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("user.user_id"), nullable=False)
+    purpose = Column(String(32), nullable=False)
+    token_hash = Column(String(64), nullable=False, unique=True)
+    expires_at = Column(DateTime, nullable=False)
+    used_at = Column(DateTime, nullable=True)  # 可為空
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+
+    # 建立與 User 模型的多對一關聯
+    user = relationship("User")
+
+
 class PlantDiary(Base):
     """植物診斷日誌資料表。"""
 
@@ -78,8 +95,8 @@ class PlantDiary(Base):
     disease_id = Column(Integer, ForeignKey("disease.disease_id"), nullable=True)
     pest_id = Column(Integer, ForeignKey("pests.pest_id"), nullable=True)
     confidence = Column(Float)
-    suggestion = Column(Text)
-    treatment = Column(Text)
+    gemini_suggestion = Column("suggestion", Text)  # 重新命名 suggestion -> gemini_suggestion
+    gemini_treatment = Column("treatment", Text)    # 重新命名 treatment -> gemini_treatment
     user_note = Column(Text)
     user_corrected_status = Column(String(100), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

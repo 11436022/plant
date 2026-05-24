@@ -107,29 +107,52 @@ class ResultActivity : AppCompatActivity() {
 // 4. 按鈕：存入日記功能
         btnSave.setOnClickListener {
             SoundManager.playBubblePop()
-            btnSave.isEnabled = false
-            btnSave.text = "儲存中..."
+
+            // --- 步驟 1: 獲取所有需要儲存的資訊 ---
+            val diseaseName = tvDiseaseName.text.toString().removePrefix("診斷：")
+            val adviceText = tvAdvice.text.toString()
             val userNote = etUserNote.text.toString()
+
+            // --- 步驟 2: 檢查 Token ---
             val token = sharedPref.getString("token", null)
             if (token == null) {
                 Toast.makeText(this, "請先登入", Toast.LENGTH_SHORT).show()
-                btnSave.isEnabled = true
-                btnSave.text = "儲存至歷史病例"
                 return@setOnClickListener
             }
+
+            // --- 步驟 3: 建立請求物件並呼叫 API ---
+            btnSave.isEnabled = false
+            btnSave.text = "儲存中..."
+
+            val request = DiaryConfirmRequest(
+                user_note = userNote,
+                disease_name = diseaseName,
+                gemini_advice = adviceText
+            )
+
             val apiService = PlantApiService.create(token)
-            val request = ConfirmRequest(user_note = userNote)
-            apiService.confirmDiary(predictionId, request).enqueue(object : retrofit2.Callback<GenericResponse> {
+            apiService.confirmDiary(predictionId!!, request).enqueue(object : retrofit2.Callback<GenericResponse> {
                 override fun onResponse(call: retrofit2.Call<GenericResponse>, response: retrofit2.Response<GenericResponse>) {
                     if (response.isSuccessful) {
                         Toast.makeText(this@ResultActivity, "紀錄已成功儲存！", Toast.LENGTH_SHORT).show()
                         btnSave.text = "已儲存"
+
+                        // 新增：延遲 0.5 秒後跳轉回主頁
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            val intent = Intent(this@ResultActivity, HomeActivity::class.java)
+                            // 清除所有舊的 Activity，確保 HomeActivity 是新的根
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                            startActivity(intent)
+                            finish() // 關閉目前的 ResultActivity
+                        }, 500) // 500 毫秒延遲
+
                     } else {
                         Toast.makeText(this@ResultActivity, "儲存失敗: ${response.code()}", Toast.LENGTH_SHORT).show()
                         btnSave.isEnabled = true
                         btnSave.text = "儲存至歷史病例"
                     }
                 }
+
                 override fun onFailure(call: retrofit2.Call<GenericResponse>, t: Throwable) {
                     Toast.makeText(this@ResultActivity, "網路連線失敗", Toast.LENGTH_SHORT).show()
                     btnSave.isEnabled = true
