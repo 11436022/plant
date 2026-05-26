@@ -23,7 +23,7 @@ class IntroActivity : AppCompatActivity() {
         val viewPagerIntro = findViewById<ViewPager2>(R.id.viewPager_intro)
         val btnStart = findViewById<Button>(R.id.btn_start)
 
-        // 1. 綁定剛剛寫好的 IntroAdapter
+        // 1. 綁定 IntroAdapter
         val adapter = IntroAdapter()
         viewPagerIntro.adapter = adapter
 
@@ -31,8 +31,8 @@ class IntroActivity : AppCompatActivity() {
         viewPagerIntro.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                // 索引從 0 開始，所以 position == 2 代表第三頁（最後一頁）
-                if (position == 2) {
+                // 🌟 修正：因為有四頁，當 position == 3 時代表第四頁（最後一頁）
+                if (position == 3) {
                     btnStart.text = "開始使用"
                 } else {
                     btnStart.text = "下一頁"
@@ -45,15 +45,15 @@ class IntroActivity : AppCompatActivity() {
             SoundManager.playBubblePop() // 播放清脆泡泡音
 
             val currentItem = viewPagerIntro.currentItem
-            if (currentItem < 2) {
-                // 如果不是最後一頁，點擊就自動平滑滑到下一頁
+            // 🌟 修正：小於 3 時（也就是第 1、2、3 頁），點擊自動滑到下一頁
+            if (currentItem < 3) {
                 viewPagerIntro.setCurrentItem(currentItem + 1, true)
             } else {
-                // 🌟 新增：紀錄「我已經看過介紹了」，下次開機不要再秀給我看
+                // 紀錄「我已經看過介紹了」，下次開機不要再秀給我看
                 val sharedPref = getSharedPreferences("PlantDoctor", 0)
                 sharedPref.edit().putBoolean("is_first_open", false).apply()
 
-                // 如果已經是最後一頁（開始使用），執行跳轉登入頁
+                // 如果已經是第四頁（開始使用），執行跳轉登入頁
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
                 finish() // 關閉介紹頁
@@ -61,7 +61,7 @@ class IntroActivity : AppCompatActivity() {
         }
     }
 
-    // 🌟 保留原汁原味的全螢幕長按吹風聲雷達
+    // 保留原汁原味的全螢幕長按吹風聲雷達
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event != null) {
             when (event.action) {

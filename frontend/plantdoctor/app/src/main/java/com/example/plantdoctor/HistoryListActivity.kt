@@ -235,6 +235,11 @@ class HistoryAdapter(
     override fun getItemCount() = historyList.size
 
     private fun fixImageUrl(rawUrl: String): String {
+        // 🌟 新增防禦：如果是測試環境儲存的本地 Uri 路徑，直接回傳，不要去破壞它！
+        if (rawUrl.startsWith("content://") || rawUrl.startsWith("file://")) {
+            return rawUrl
+        }
+
         var url = rawUrl.replace("127.0.0.1", "10.0.2.2").replace("localhost", "10.0.2.2")
         val keyword = "static/"
         if (url.contains(keyword)) {
