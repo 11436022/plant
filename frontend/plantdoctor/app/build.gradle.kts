@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
 
     implementation("androidx.lifecycle:lifecycle-process:2.6.2")
+    implementation(libs.androidx.room.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

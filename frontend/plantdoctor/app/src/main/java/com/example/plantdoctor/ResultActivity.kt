@@ -1,5 +1,6 @@
 package com.example.plantdoctor
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -14,9 +15,11 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.room.util.copy
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
@@ -36,6 +39,9 @@ class ResultActivity : AppCompatActivity() {
     private lateinit var cvPipContainer: CardView
     private lateinit var imgPipPlant: ImageView
     private lateinit var cardAdvice: CardView
+    private lateinit var etUserNote: EditText
+    private lateinit var tvDiseaseName: TextView
+    private lateinit var tvAdvice: TextView
 
     private var dX = 0f
     private var dY = 0f
@@ -54,18 +60,15 @@ class ResultActivity : AppCompatActivity() {
         btnBack = findViewById(R.id.btn_back_home)
         btnSave = findViewById(R.id.btn_save_report)
         val tvPlantName = findViewById<TextView>(R.id.tv_plant_name)
-        val tvDiseaseName = findViewById<TextView>(R.id.tv_disease_name)
-        val tvAdvice = findViewById<TextView>(R.id.tv_advice)
+        tvDiseaseName = findViewById(R.id.tv_disease_name)
+        tvAdvice = findViewById(R.id.tv_advice)
         val imgPlant = findViewById<ImageView>(R.id.img_result_plant)
         tvMainTitle = findViewById(R.id.tv_title)
         cvImageContainer = findViewById(R.id.cv_image_container)
-        cardAdvice = findViewById<CardView>(R.id.card_advice)
-        val etUserNote = findViewById<EditText>(R.id.et_user_note)
+        cardAdvice = findViewById(R.id.card_advice)
+        etUserNote = findViewById(R.id.et_user_note)
 
-
-        // 🌟 改成綁定手把線元件
         val viewDragHandle = findViewById<View>(R.id.view_drag_handle)
-
         cvPipContainer = findViewById(R.id.cv_pip_container)
         imgPipPlant = findViewById(R.id.img_pip_plant)
 
@@ -78,9 +81,8 @@ class ResultActivity : AppCompatActivity() {
             behavior.expandedOffset = titleBottom + marginPx
         }
 
-        // 3. 宣告並實作 5 步新手指引 (TapTargetView)
+        // 3. 新手指引狀態變數
         val isFirstTimeResult = sharedPref.getBoolean("IS_FIRST_TIME_RESULT", true)
-
         var startStep3: (() -> Unit)? = null
 
         behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -103,6 +105,7 @@ class ResultActivity : AppCompatActivity() {
                 cvImageContainer.alpha = 1f
 
                 if (slideOffset > 0.8f) {
+                    //  修正為下面這一行：正常指定為 View.VISIBLE 即可！
                     cvPipContainer.visibility = View.VISIBLE
                     cvPipContainer.alpha = (slideOffset - 0.8f) * 5f
                 } else {
@@ -155,64 +158,20 @@ class ResultActivity : AppCompatActivity() {
             Toast.makeText(this, "報告內容解析失敗", Toast.LENGTH_SHORT).show()
         }
 
-        // 返回主頁
+        // 🌟 修改後：點擊左上角返回鍵，跳出未儲存提示對話框
         btnBack.setOnClickListener {
             SoundManager.playBubblePop()
-            val intent = Intent(this, HomeActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-            finish()
+            showSaveConfirmationDialog(predictionId)
         }
 
-        // 儲存功能
+        // 🌟 還原後：點擊右下角儲存，直接執行儲存
         btnSave.setOnClickListener {
             SoundManager.playBubblePop()
-            val diseaseName = tvDiseaseName.text.toString().removePrefix("診斷：")
-            val adviceText = tvAdvice.text.toString()
-            val userNote = etUserNote.text.toString()
-
-            val token = sharedPref.getString("token", null)
-            if (token == null) {
-                Toast.makeText(this, "請先登入", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            btnSave.isEnabled = false
-            btnSave.text = "儲存中..."
-
-            val request = DiaryConfirmRequest(
-                user_note = userNote,
-                disease_name = diseaseName,
-                gemini_advice = adviceText
-            )
-
-            val apiService = PlantApiService.create(token)
-            apiService.confirmDiary(predictionId!!, request).enqueue(object : retrofit2.Callback<GenericResponse> {
-                override fun onResponse(call: retrofit2.Call<GenericResponse>, response: retrofit2.Response<GenericResponse>) {
-                    if (response.isSuccessful) {
-                        Toast.makeText(this@ResultActivity, "紀錄已成功儲存！", Toast.LENGTH_SHORT).show()
-                        btnSave.text = "已儲存"
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            val intent = Intent(this@ResultActivity, HomeActivity::class.java)
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                            startActivity(intent)
-                            finish()
-                        }, 500)
-                    } else {
-                        Toast.makeText(this@ResultActivity, "儲存失敗: ${response.code()}", Toast.LENGTH_SHORT).show()
-                        btnSave.isEnabled = true
-                        btnSave.text = "儲存至歷史病例"
-                    }
-                }
-                override fun onFailure(call: retrofit2.Call<GenericResponse>, t: Throwable) {
-                    Toast.makeText(this@ResultActivity, "網路連線失敗", Toast.LENGTH_SHORT).show()
-                    btnSave.isEnabled = true
-                    btnSave.text = "儲存至歷史病例"
-                }
-            })
+            val sharedPref = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
+            executeSaveLogic(predictionId, sharedPref)
         }
 
-        // 啟動 5 步新手指引邏輯
+        // 🌟 啟動防連點、防重複指引邏輯
         if (isFirstTimeResult) {
             val targetColorRes = android.R.color.holo_green_dark
             val guideHandler = Handler(Looper.getMainLooper())
@@ -223,6 +182,9 @@ class ResultActivity : AppCompatActivity() {
             var targetView4: com.getkeepsafe.taptargetview.TapTargetView? = null
             var targetView5: com.getkeepsafe.taptargetview.TapTargetView? = null
 
+            // 狀態鎖控制
+            var currentStep = 1
+
             val jumpToStep2Runnable = Runnable { targetView1?.dismiss(true) }
             val jumpToStep3Runnable = Runnable { targetView2?.dismiss(true) }
             val jumpToStep4Runnable = Runnable { targetView3?.dismiss(true) }
@@ -231,106 +193,115 @@ class ResultActivity : AppCompatActivity() {
 
             // 5️⃣ 第五步：儲存按鈕
             val startStep5 = {
-                SoundManager.playBubblePop()
-                targetView5 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
-                    com.getkeepsafe.taptargetview.TapTarget.forView(
-                        btnSave, "第五步：儲存至歷史病例", "最後，點擊這裡可以把這次的診斷結果與你的觀察筆記永久保存下來！"
-                    ).outerCircleColor(targetColorRes)
-                        .targetCircleColor(android.R.color.white)
-                        .titleTextSize(24).descriptionTextSize(16)
-                        .textColor(android.R.color.white).transparentTarget(true).drawShadow(true).cancelable(false),
-                    object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
-                        override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
-                            super.onTargetClick(view)
-                            guideHandler.removeCallbacks(finishGuideRunnable)
-                            sharedPref.edit().putBoolean("IS_FIRST_TIME_RESULT", false).apply()
+                if (currentStep == 5) {
+                    SoundManager.playBubblePop()
+                    targetView5 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
+                        com.getkeepsafe.taptargetview.TapTarget.forView(
+                            btnSave, "第五步：儲存至歷史病例", "最後，點擊這裡可以把這次的診斷結果與你的觀察筆記永久保存下來！"
+                        ).outerCircleColor(targetColorRes)
+                            .targetCircleColor(android.R.color.white)
+                            .titleTextSize(24).descriptionTextSize(16)
+                            .textColor(android.R.color.white).transparentTarget(true).drawShadow(true).cancelable(false),
+                        object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
+                            override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
+                                super.onTargetClick(view)
+                                guideHandler.removeCallbacks(finishGuideRunnable)
+                            }
+                            override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
+                                super.onTargetDismissed(view, userInitiated)
+                                sharedPref.edit().putBoolean("IS_FIRST_TIME_RESULT", false).apply()
+                            }
                         }
-                        override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
-                            super.onTargetDismissed(view, userInitiated)
-                            sharedPref.edit().putBoolean("IS_FIRST_TIME_RESULT", false).apply()
-                        }
-                    }
-                )
-                guideHandler.postDelayed(finishGuideRunnable, 3000)
+                    )
+                    guideHandler.postDelayed(finishGuideRunnable, 3000)
+                }
             }
 
             // 4️⃣ 第四步：浮動縮小小圖
             val startStep4 = {
-                SoundManager.playBubblePop()
-                targetView4 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
-                    com.getkeepsafe.taptargetview.TapTarget.forView(
-                        cvPipContainer, "第四步：小窗隨身看", "展開報告後，照片會縮小到這裡。你可以隨意拖曳它，或點擊它重新放大！"
-                    ).outerCircleColor(targetColorRes)
-                        .targetCircleColor(android.R.color.white)
-                        .titleTextSize(24).descriptionTextSize(16)
-                        .textColor(android.R.color.white).transparentTarget(true).drawShadow(true).cancelable(false),
-                    object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
-                        override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
-                            super.onTargetClick(view)
-                            guideHandler.removeCallbacks(jumpToStep5Runnable)
-                            startStep5()
+                if (currentStep == 4) {
+                    SoundManager.playBubblePop()
+                    targetView4 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
+                        com.getkeepsafe.taptargetview.TapTarget.forView(
+                            cvPipContainer, "第四步：小窗隨身看", "展開報告後，照片會縮小到這裡。你可以隨意拖曳它，或點擊它重新放大！"
+                        ).outerCircleColor(targetColorRes)
+                            .targetCircleColor(android.R.color.white)
+                            .titleTextSize(24).descriptionTextSize(16)
+                            .textColor(android.R.color.white).transparentTarget(true).drawShadow(true).cancelable(false),
+                        object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
+                            override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
+                                super.onTargetClick(view)
+                                guideHandler.removeCallbacks(jumpToStep5Runnable)
+                            }
+                            override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
+                                super.onTargetDismissed(view, userInitiated)
+                                if (currentStep == 4) {
+                                    currentStep = 5
+                                    startStep5()
+                                }
+                            }
                         }
-                        override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
-                            super.onTargetDismissed(view, userInitiated)
-                            startStep5()
-                        }
-                    }
-                )
-                guideHandler.postDelayed(jumpToStep5Runnable, 3000)
+                    )
+                    guideHandler.postDelayed(jumpToStep5Runnable, 3000)
+                }
             }
 
             // 3️⃣ 第三步：AI 醫生處方箋說明
             startStep3 = {
-                SoundManager.playBubblePop()
-                targetView3 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
-                    com.getkeepsafe.taptargetview.TapTarget.forView(
-                        tvAdvice, "第三步：AI 醫生處方箋", "這裡會顯示詳細的病害分析、澆水與除蟲建議，幫你對症下藥！"
-                    ).outerCircleColor(targetColorRes)
-                        .targetCircleColor(android.R.color.white)
-                        .titleTextSize(24).descriptionTextSize(16)
-                        .textColor(android.R.color.white).transparentTarget(true).drawShadow(true).cancelable(false),
-                    object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
-                        override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
-                            super.onTargetClick(view)
-                            guideHandler.removeCallbacks(jumpToStep4Runnable)
-                            startStep4()
+                if (currentStep == 3) {
+                    SoundManager.playBubblePop()
+                    targetView3 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
+                        com.getkeepsafe.taptargetview.TapTarget.forView(
+                            tvAdvice, "第三步：AI 醫生處方箋", "這裡會顯示詳細的病害分析、澆水與除蟲建議，幫你對症下藥！"
+                        ).outerCircleColor(targetColorRes)
+                            .targetCircleColor(android.R.color.white)
+                            .titleTextSize(24).descriptionTextSize(16)
+                            .textColor(android.R.color.white).transparentTarget(true).drawShadow(true).cancelable(false),
+                        object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
+                            override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
+                                super.onTargetClick(view)
+                                guideHandler.removeCallbacks(jumpToStep4Runnable)
+                            }
+                            override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
+                                super.onTargetDismissed(view, userInitiated)
+                                if (currentStep == 3) {
+                                    currentStep = 4
+                                    startStep4()
+                                }
+                            }
                         }
-                        override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
-                            super.onTargetDismissed(view, userInitiated)
-                            startStep4()
-                        }
-                    }
-                )
-                guideHandler.postDelayed(jumpToStep4Runnable, 3000)
+                    )
+                    guideHandler.postDelayed(jumpToStep4Runnable, 3000)
+                }
             }
 
             // 2️⃣ 第二步：說明能展開詳細報告
-            // 🌟 將目標改成 viewDragHandle，圈圈就會精準鎖定在手把線上
             val startStep2 = {
-                SoundManager.playBubblePop()
-                targetView2 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
-                    com.getkeepsafe.taptargetview.TapTarget.forView(
-                        viewDragHandle, "第二步：展開完整報告", "將這個卡片向上滑動，就能解鎖 AI 醫生為你準備的完整病害處方箋喔！"
-                    ).outerCircleColor(targetColorRes)
-                        .targetCircleColor(android.R.color.white)
-                        .titleTextSize(24).descriptionTextSize(16)
-                        .textColor(android.R.color.white).transparentTarget(true).drawShadow(true).cancelable(false),
-                    object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
-                        private fun proceedToExpand() {
-                            guideHandler.removeCallbacks(jumpToStep3Runnable)
-                            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                if (currentStep == 2) {
+                    SoundManager.playBubblePop()
+                    targetView2 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
+                        com.getkeepsafe.taptargetview.TapTarget.forView(
+                            viewDragHandle, "第二步：展開完整報告", "將這個卡片向上滑動，就能解鎖 AI 醫生為你準備的完整病害處方箋喔！"
+                        ).outerCircleColor(targetColorRes)
+                            .targetCircleColor(android.R.color.white)
+                            .titleTextSize(24).descriptionTextSize(16)
+                            .textColor(android.R.color.white).transparentTarget(true).drawShadow(true).cancelable(false),
+                        object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
+                            override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
+                                super.onTargetClick(view)
+                                guideHandler.removeCallbacks(jumpToStep3Runnable)
+                            }
+                            override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
+                                super.onTargetDismissed(view, userInitiated)
+                                if (currentStep == 2) {
+                                    currentStep = 3
+                                    behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                                }
+                            }
                         }
-                        override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
-                            super.onTargetClick(view)
-                            proceedToExpand()
-                        }
-                        override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
-                            super.onTargetDismissed(view, userInitiated)
-                            proceedToExpand()
-                        }
-                    }
-                )
-                guideHandler.postDelayed(jumpToStep3Runnable, 3000)
+                    )
+                    guideHandler.postDelayed(jumpToStep3Runnable, 3000)
+                }
             }
 
             // 1️⃣ 第一步：雙指縮放看細節
@@ -345,16 +316,119 @@ class ResultActivity : AppCompatActivity() {
                     override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
                         super.onTargetClick(view)
                         guideHandler.removeCallbacks(jumpToStep2Runnable)
-                        startStep2()
                     }
                     override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
                         super.onTargetDismissed(view, userInitiated)
-                        startStep2()
+                        if (currentStep == 1) {
+                            currentStep = 2
+                            startStep2()
+                        }
                     }
                 }
             )
             guideHandler.postDelayed(jumpToStep2Runnable, 3000)
         }
+    }
+
+    // 🌟 核心新增：彈出式對話框，具備三個功能按鈕且顏色自適應
+    // 🌟 全新客製化對話框：具備左上角叉叉、固定顏色（不隨深色模式改變）
+    private fun showSaveConfirmationDialog(predictionId: String?) {
+        val sharedPref = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_save_confirm, null)
+
+        val builder = AlertDialog.Builder(this)
+        builder.setView(dialogView)
+        builder.setCancelable(true)
+
+        val alertDialog = builder.create()
+        alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        alertDialog.show()
+
+        // 1. 綁定元件
+        val cardRoot = dialogView.findViewById<CardView>(R.id.dialog_card_root)
+        val btnClose = dialogView.findViewById<ImageButton>(R.id.dialog_btn_close)
+        val tvTitle = dialogView.findViewById<TextView>(R.id.dialog_title)
+        val tvMessage = dialogView.findViewById<TextView>(R.id.dialog_message)
+        val btnSaveReport = dialogView.findViewById<Button>(R.id.dialog_btn_save)
+        val btnDontSave = dialogView.findViewById<Button>(R.id.dialog_btn_dont_save)
+
+        // 🌟 2. 核心改動：直接呼叫專屬 Dialog 換色器，讓小視窗完美融入當前的 KT 風格！
+        ThemeManager.applyThemeToDialog(
+            context = this,
+            cardRoot = cardRoot,
+            btnClose = btnClose,
+            tvTitle = tvTitle,
+            tvMessage = tvMessage
+        )
+
+        // 3. 按鈕點擊監聽
+        btnClose.setOnClickListener {
+            SoundManager.playBubblePop()
+            alertDialog.dismiss()
+        }
+
+        btnSaveReport.setOnClickListener {
+            alertDialog.dismiss()
+            executeSaveLogic(predictionId, sharedPref)
+        }
+
+        btnDontSave.setOnClickListener {
+            alertDialog.dismiss()
+            SoundManager.playBubblePop()
+            Toast.makeText(this, "已取消儲存", Toast.LENGTH_SHORT).show()
+
+            val intent = Intent(this, HomeActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+            finish()
+        }
+    }
+
+    // 🌟 將原本的網路儲存邏輯抽離出來供 Dialog 呼叫
+    private fun executeSaveLogic(predictionId: String?, sharedPref: android.content.SharedPreferences) {
+        val diseaseName = tvDiseaseName.text.toString().removePrefix("診斷：")
+        val adviceText = tvAdvice.text.toString()
+        val userNote = etUserNote.text.toString()
+
+        val token = sharedPref.getString("token", null)
+        if (token == null) {
+            Toast.makeText(this, "請先登入", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        btnSave.isEnabled = false
+        btnSave.text = "儲存中..."
+
+        val request = DiaryConfirmRequest(
+            user_note = userNote,
+            disease_name = diseaseName,
+            gemini_advice = adviceText
+        )
+
+        val apiService = PlantApiService.create(token)
+        apiService.confirmDiary(predictionId!!, request).enqueue(object : retrofit2.Callback<GenericResponse> {
+            override fun onResponse(call: retrofit2.Call<GenericResponse>, response: retrofit2.Response<GenericResponse>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(this@ResultActivity, "紀錄已成功儲存！", Toast.LENGTH_SHORT).show()
+                    btnSave.text = "已儲存"
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        val intent = Intent(this@ResultActivity, HomeActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(intent)
+                        finish()
+                    }, 500)
+                } else {
+                    Toast.makeText(this@ResultActivity, "儲存失敗: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    btnSave.isEnabled = true
+                    btnSave.text = "儲存至歷史病例"
+                }
+            }
+            override fun onFailure(call: retrofit2.Call<GenericResponse>, t: Throwable) {
+                Toast.makeText(this@ResultActivity, "網路連線失敗", Toast.LENGTH_SHORT).show()
+                btnSave.isEnabled = true
+                btnSave.text = "儲存至歷史病例"
+            }
+        })
     }
 
     override fun onResume() {

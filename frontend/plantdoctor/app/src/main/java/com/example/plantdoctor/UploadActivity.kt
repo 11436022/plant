@@ -141,6 +141,27 @@ class UploadActivity : AppCompatActivity() {
         }
     }
 
+    // 🌟 新增這個方法：把 content:// 權限容易過期的 Uri 複製一份到 App 的私有快取夾，變成永久可讀的絕對路徑！
+    private fun getCachePathFromUri(context: android.content.Context, uri: android.net.Uri): String {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            // 在 App 的私有快取資料夾建立一個臨時圖檔
+            val tempFile = java.io.File(context.cacheDir, "temp_mock_plant_image.jpg")
+            val outputStream = java.io.FileOutputStream(tempFile)
+
+            inputStream?.use { input ->
+                outputStream.use { output ->
+                    input.copyTo(output)
+                }
+            }
+            // 回傳這個私有檔案的絕對路徑
+            tempFile.absolutePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+            uri.toString() // 如果失敗才退回原本的字串
+        }
+    }
+
     private fun checkCameraPermission() {
         when {
             ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
@@ -186,18 +207,19 @@ class UploadActivity : AppCompatActivity() {
     }
 
     // 🌟 核心增強：在預覽與指派 Uri 前，先在背景進行高效壓縮
+    // 🌟 請找到 UploadActivity.kt 裡的 updateImagePreview 方法，將 runOnUiThread 內修改如下：
     private fun updateImagePreview(uri: Uri) {
-        // 為了避免大圖卡住 UI 執行緒，使用執行緒進行非同步壓縮
         Thread {
             val compressedFile = compressImage(this, uri)
             if (compressedFile != null) {
                 val compressedUri = Uri.fromFile(compressedFile)
 
-                // 壓縮成功，切回主執行緒更新 UI 與暫存變數
                 runOnUiThread {
                     selectedImageUri = compressedUri
 
-
+                    // 🌟 【就是這裡！】壓縮成功後，順手把這個絕對路徑塞給假 API 的小倉庫！
+                    // 這樣等一下 confirmDiary 儲存時，才能百分之百抓到這張剛拍好的圖！
+                    PlantApiService.latestMockImageUri = compressedFile.absolutePath
 
                     Glide.with(this)
                         .load(compressedUri)
@@ -205,9 +227,12 @@ class UploadActivity : AppCompatActivity() {
                         .into(imgPreview)
                 }
             } else {
-                // 如果壓縮有萬一失敗，則備用原本的 Uri 確保程式不崩潰
                 runOnUiThread {
                     selectedImageUri = uri
+
+                    // 🌟 【安全防禦】如果壓縮失敗退回原 Uri，也同步把原本的字串塞給假 API
+                    PlantApiService.latestMockImageUri = uri.toString()
+
                     Glide.with(this)
                         .load(uri)
                         .centerCrop()
