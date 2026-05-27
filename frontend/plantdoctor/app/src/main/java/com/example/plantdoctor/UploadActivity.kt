@@ -217,9 +217,8 @@ class UploadActivity : AppCompatActivity() {
                 runOnUiThread {
                     selectedImageUri = compressedUri
 
-                    // 🌟 【就是這裡！】壓縮成功後，順手把這個絕對路徑塞給假 API 的小倉庫！
-                    // 這樣等一下 confirmDiary 儲存時，才能百分之百抓到這張剛拍好的圖！
-                    PlantApiService.latestMockImageUri = compressedFile.absolutePath
+                    // 舊的測試用程式碼，可以安全移除
+                    // PlantApiService.latestMockImageUri = compressedFile.absolutePath
 
                     Glide.with(this)
                         .load(compressedUri)
@@ -230,8 +229,8 @@ class UploadActivity : AppCompatActivity() {
                 runOnUiThread {
                     selectedImageUri = uri
 
-                    // 🌟 【安全防禦】如果壓縮失敗退回原 Uri，也同步把原本的字串塞給假 API
-                    PlantApiService.latestMockImageUri = uri.toString()
+                    // 舊的測試用程式碼，可以安全移除
+                    // PlantApiService.latestMockImageUri = uri.toString()
 
                     Glide.with(this)
                         .load(uri)
