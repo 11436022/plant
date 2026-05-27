@@ -77,7 +77,7 @@ class HistoryDetailActivity : AppCompatActivity() {
         initViews()
         setupLogic()
         fetchData()
-        setupHistoryDetailGuide()
+        //setupHistoryDetailGuide()
     }
 
     private fun initViews() {
@@ -288,61 +288,68 @@ class HistoryDetailActivity : AppCompatActivity() {
             var targetView2: TapTargetView? = null
             var targetView3: TapTargetView? = null
 
+            // 🌟 核心狀態鎖：防止連點、防分身重複觸發
+            var currentStep = 1
+
             val jumpToStep2Runnable = Runnable { targetView1?.dismiss(true) }
             val jumpToStep3Runnable = Runnable { targetView2?.dismiss(true) }
             val finishGuideRunnable = Runnable { targetView3?.dismiss(true) }
 
             // 3️⃣ 第三步：懸浮窗小圖
             val startStep3 = {
-                SoundManager.playBubblePop()
-                targetView3 = TapTargetView.showFor(this,
-                    TapTarget.forView(cvPipContainer, "小窗隨身看", "展開報告後，照片會縮小到這裡。你可以隨意拖曳它，或點擊它重新放大！")
-                        .outerCircleColor(targetColorRes)
-                        .targetCircleColor(android.R.color.white)
-                        .titleTextSize(24).descriptionTextSize(16)
-                        .textColor(android.R.color.white).transparentTarget(true).drawShadow(true).cancelable(false),
-                    object : TapTargetView.Listener() {
-                        override fun onTargetClick(view: TapTargetView?) {
-                            super.onTargetClick(view)
-                            autoJumpHandler.removeCallbacks(finishGuideRunnable)
-                            sharedPref.edit().putBoolean("IS_FIRST_TIME_HISTORY_DETAIL", false).apply()
+                if (currentStep == 3) { // 確保只執行一次
+                    SoundManager.playBubblePop()
+                    targetView3 = TapTargetView.showFor(this,
+                        TapTarget.forView(cvPipContainer, "小窗隨身看", "展開報告後，照片會縮小到這裡。你可以隨意拖曳它，或點擊它重新放大！")
+                            .outerCircleColor(targetColorRes)
+                            .targetCircleColor(android.R.color.white)
+                            .titleTextSize(24).descriptionTextSize(16)
+                            .textColor(android.R.color.white).transparentTarget(true).drawShadow(true).cancelable(false),
+                        object : TapTargetView.Listener() {
+                            override fun onTargetClick(view: TapTargetView?) {
+                                super.onTargetClick(view)
+                                // 點擊只負責拔除定時器，交給 onTargetDismissed 完結
+                                autoJumpHandler.removeCallbacks(finishGuideRunnable)
+                            }
+                            override fun onTargetDismissed(view: TapTargetView?, userInitiated: Boolean) {
+                                super.onTargetDismissed(view, userInitiated)
+                                sharedPref.edit().putBoolean("IS_FIRST_TIME_HISTORY_DETAIL", false).apply()
+                            }
                         }
-                        override fun onTargetDismissed(view: TapTargetView?, userInitiated: Boolean) {
-                            super.onTargetDismissed(view, userInitiated)
-                            sharedPref.edit().putBoolean("IS_FIRST_TIME_HISTORY_DETAIL", false).apply()
-                        }
-                    }
-                )
-                autoJumpHandler.postDelayed(finishGuideRunnable, 3000)
+                    )
+                    autoJumpHandler.postDelayed(finishGuideRunnable, 3000)
+                }
             }
 
-            // 2️⃣ 第二步：AI 醫生處方箋（展開後才介紹）
+            // 2️⃣ 第二步：AI 醫生處方箋
             val startStep2 = {
-                SoundManager.playBubblePop()
-                targetView2 = TapTargetView.showFor(this,
-                    TapTarget.forView(tvAdvice, "AI 醫生處方箋", "這裡顯示了歷史病害分析與澆水除蟲建議，幫你隨時複習對症下藥！")
-                        .outerCircleColor(targetColorRes)
-                        .targetCircleColor(android.R.color.white)
-                        .titleTextSize(24).descriptionTextSize(16)
-                        .textColor(android.R.color.white).transparentTarget(true).drawShadow(true).cancelable(false),
-                    object : TapTargetView.Listener() {
-                        override fun onTargetClick(view: TapTargetView?) {
-                            super.onTargetClick(view)
-                            autoJumpHandler.removeCallbacks(jumpToStep3Runnable)
-                            startStep3()
+                if (currentStep == 2) { // 確保只執行一次
+                    SoundManager.playBubblePop()
+                    targetView2 = TapTargetView.showFor(this,
+                        TapTarget.forView(tvAdvice, "AI 醫生處方箋", "這裡顯示了歷史病害分析與澆水除蟲建議，幫你隨時複習對症下藥！")
+                            .outerCircleColor(targetColorRes)
+                            .targetCircleColor(android.R.color.white)
+                            .titleTextSize(24).descriptionTextSize(16)
+                            .textColor(android.R.color.white).transparentTarget(true).drawShadow(true).cancelable(false),
+                        object : TapTargetView.Listener() {
+                            override fun onTargetClick(view: TapTargetView?) {
+                                super.onTargetClick(view)
+                                // 點擊只負責拔除定時器
+                                autoJumpHandler.removeCallbacks(jumpToStep3Runnable)
+                            }
+                            override fun onTargetDismissed(view: TapTargetView?, userInitiated: Boolean) {
+                                super.onTargetDismissed(view, userInitiated)
+                                // 消失時統一安全推進到第三步
+                                if (currentStep == 2) {
+                                    currentStep = 3
+                                    startStep3()
+                                }
+                            }
                         }
-                        override fun onTargetDismissed(view: TapTargetView?, userInitiated: Boolean) {
-                            super.onTargetDismissed(view, userInitiated)
-                            startStep3()
-                        }
-                    }
-                )
-                autoJumpHandler.postDelayed(jumpToStep3Runnable, 3000)
+                    )
+                    autoJumpHandler.postDelayed(jumpToStep3Runnable, 3000)
+                }
             }
-
-            // 🌟 將剛剛寫在監聽器上方的 startStep2 指向實作，讓 BottomSheet 展開後可以呼叫
-            // （如果你是在 initViews 裡宣告，可以直接將此處的 startStep2 賦值給全域/區域變數）
-            // 這裡為了邏輯連貫，也可以直接利用剛才設定在行為裡的 Callback
 
             // 1️⃣ 第一步：雙指縮放看細節
             targetView1 = TapTargetView.showFor(this,
@@ -352,21 +359,24 @@ class HistoryDetailActivity : AppCompatActivity() {
                     .titleTextSize(24).descriptionTextSize(16)
                     .textColor(android.R.color.white).transparentTarget(true).drawShadow(true).cancelable(false),
                 object : TapTargetView.Listener() {
-                    private fun proceedToExpand() {
-                        autoJumpHandler.removeCallbacks(jumpToStep2Runnable)
-                        // 🌟 強制手動展開卡片，展開成功後透過 Callback 就會觸發 startStep2 囉！
-                        behavior.state = BottomSheetBehavior.STATE_EXPANDED
-
-                        // 防禦防漏：若監聽器沒串好，可以直接在 300 毫秒後強制補刀啟動第二步
-                        autoJumpHandler.postDelayed({ startStep2() }, 400)
-                    }
                     override fun onTargetClick(view: TapTargetView?) {
                         super.onTargetClick(view)
-                        proceedToExpand()
+                        // 點擊只負責拔除定時器
+                        autoJumpHandler.removeCallbacks(jumpToStep2Runnable)
                     }
                     override fun onTargetDismissed(view: TapTargetView?, userInitiated: Boolean) {
                         super.onTargetDismissed(view, userInitiated)
-                        proceedToExpand()
+
+                        // 無論時間到還是手動點，消失時「唯一執行一次」前進邏輯
+                        if (currentStep == 1) {
+                            currentStep = 2
+
+                            // 強制手動展開卡片
+                            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+                            // 延遲 400 毫秒等 BottomSheet 展開動畫跑完，再漂亮地喚醒第二步
+                            autoJumpHandler.postDelayed({ startStep2() }, 400)
+                        }
                     }
                 }
             )
@@ -404,6 +414,8 @@ class HistoryDetailActivity : AppCompatActivity() {
 
                     tvUserNoteDisplay.text = data.user_note ?: "點選右側鉛筆圖示新增筆記"
                     switchToDisplayMode()
+
+                    setupHistoryDetailGuide()
                 }
             }
             override fun onFailure(call: Call<DetailDetailResponse>, t: Throwable) {

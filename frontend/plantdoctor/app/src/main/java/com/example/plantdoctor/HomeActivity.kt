@@ -88,6 +88,9 @@ class HomeActivity : AppCompatActivity() {
         var targetView2: com.getkeepsafe.taptargetview.TapTargetView? = null
         var targetView3: com.getkeepsafe.taptargetview.TapTargetView? = null
 
+        // 🌟 狀態防禦鎖：記錄當前真正執行的步驟，防止連點與重複觸發
+        var currentStep = 1
+
         // 🌟 定義 3 秒時間到的自動跳轉指令 (Runnable)
         val jumpToStep2Runnable = Runnable { targetView1?.dismiss(true) }
         val jumpToStep3Runnable = Runnable { targetView2?.dismiss(true) }
@@ -95,54 +98,63 @@ class HomeActivity : AppCompatActivity() {
 
         // 3️⃣ 第三步：設定
         val startStep3 = {
-            SoundManager.playBubblePop()
-            targetView3 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
-                com.getkeepsafe.taptargetview.TapTarget.forView(cardSettings, "設定", "調整應用程式設定")
-                    .outerCircleColor(targetColorRes)
-                    .targetCircleColor(android.R.color.white)
-                    .titleTextColor(android.R.color.white)
-                    .descriptionTextColor(android.R.color.white)
-                    .cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
-                object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
-                    override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
-                        super.onTargetClick(view)
-                        guideHandler.removeCallbacks(finishGuideRunnable) // 被手動點擊了，就取消定時器
-                        sharedPref.edit().putBoolean("IS_FIRST_TIME_HOME", false).apply()
+            if (currentStep == 3) { // 確保只會執行一次
+                SoundManager.playBubblePop()
+                targetView3 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
+                    com.getkeepsafe.taptargetview.TapTarget.forView(cardSettings, "設定", "調整應用程式設定")
+                        .outerCircleColor(targetColorRes)
+                        .targetCircleColor(android.R.color.white)
+                        .titleTextColor(android.R.color.white)
+                        .descriptionTextColor(android.R.color.white)
+                        .cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
+                    object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
+                        override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
+                            super.onTargetClick(view)
+                            // 手動點擊時，只負責移除定時器，其餘不做，放手交給 onTargetDismissed
+                            guideHandler.removeCallbacks(finishGuideRunnable)
+                        }
+                        override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
+                            super.onTargetDismissed(view, userInitiated)
+                            // 整個指引正式安全結束，再寫入 SharedPreferences
+                            sharedPref.edit().putBoolean("IS_FIRST_TIME_HOME", false).apply()
+                        }
                     }
-                    override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
-                        super.onTargetDismissed(view, userInitiated)
-                        sharedPref.edit().putBoolean("IS_FIRST_TIME_HOME", false).apply()
-                    }
-                }
-            )
-            // 3 秒後自動結束整個指引
-            guideHandler.postDelayed(finishGuideRunnable, 3000)
+                )
+                // 3 秒後自動結束整個指引
+                guideHandler.postDelayed(finishGuideRunnable, 3000)
+            }
         }
 
         // 2️⃣ 第二步：歷史紀錄
         val startStep2 = {
-            SoundManager.playBubblePop()
-            targetView2 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
-                com.getkeepsafe.taptargetview.TapTarget.forView(cardHistory, "歷史紀錄", "查看過去的辨識結果")
-                    .outerCircleColor(targetColorRes)
-                    .targetCircleColor(android.R.color.white)
-                    .titleTextColor(android.R.color.white)
-                    .descriptionTextColor(android.R.color.white)
-                    .cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
-                object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
-                    override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
-                        super.onTargetClick(view)
-                        guideHandler.removeCallbacks(jumpToStep3Runnable) // 手動點擊，取消這步的定時
-                        startStep3()
+            if (currentStep == 2) { // 確保只會執行一次
+                SoundManager.playBubblePop()
+                targetView2 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
+                    com.getkeepsafe.taptargetview.TapTarget.forView(cardHistory, "歷史紀錄", "查看過去的辨識結果")
+                        .outerCircleColor(targetColorRes)
+                        .targetCircleColor(android.R.color.white)
+                        .titleTextColor(android.R.color.white)
+                        .descriptionTextColor(android.R.color.white)
+                        .cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
+                    object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
+                        override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
+                            super.onTargetClick(view)
+                            // 手動點擊時，只負責移除定時器
+                            guideHandler.removeCallbacks(jumpToStep3Runnable)
+                        }
+                        override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
+                            super.onTargetDismissed(view, userInitiated)
+                            // 無論是手動點還是時間到，元件消失時「統一」推進狀態並前往下一步
+                            if (currentStep == 2) {
+                                currentStep = 3
+                                startStep3()
+                            }
+                        }
                     }
-                    override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
-                        super.onTargetDismissed(view, userInitiated)
-                        startStep3() // 3 秒時間到觸發消失後，自動進入下一步
-                    }
-                }
-            )
-            // 3 秒後自動跳到第三步
-            guideHandler.postDelayed(jumpToStep3Runnable, 3000)
+                )
+                // 3 秒後自動跳到第三步
+                guideHandler.postDelayed(jumpToStep3Runnable, 3000)
+            }
         }
 
         // 1️⃣ 第一步：植物診斷
@@ -156,12 +168,16 @@ class HomeActivity : AppCompatActivity() {
             object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
                 override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
                     super.onTargetClick(view)
-                    guideHandler.removeCallbacks(jumpToStep2Runnable) // 手動點擊，取消這步的定時
-                    startStep2()
+                    // 手動點擊時，只負責移除定時器
+                    guideHandler.removeCallbacks(jumpToStep2Runnable)
                 }
                 override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
                     super.onTargetDismissed(view, userInitiated)
-                    startStep2() // 3 秒時間到觸發消失後，自動進入下一步
+                    // 消失時統一安全推進
+                    if (currentStep == 1) {
+                        currentStep = 2
+                        startStep2()
+                    }
                 }
             }
         )
