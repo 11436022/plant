@@ -20,6 +20,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.view.View
+
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -116,22 +118,96 @@ class SettingsActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
         val currentTheme = sharedPref.getInt("THEME_COLOR_ID", 0)
 
-        AlertDialog.Builder(this)
-            .setTitle("選擇背景主題色彩")
-            .setSingleChoiceItems(themes, currentTheme) { dialog, which ->
+        // 1. 根據目前的主題，動態決定「底色」與「字體顏色」
+        val bgColorStr = when (currentTheme) {
+            1 -> "#1A237E" // 藍底
+            2 -> "#3E2723" // 棕底
+            3 -> "#4A0033" // 粉底
+            else -> "#FFFFFF" // 綠色（預設白底）
+        }
+        val textColorStr = when (currentTheme) {
+            1, 2, 3 -> "#FFFFFF" // 暗色系背景配純白字
+            else -> "#222222" // 綠色主題白底配深灰色字
+        }
+
+        val bgColor = Color.parseColor(bgColorStr)
+        val textColor = Color.parseColor(textColorStr)
+
+        val context = this
+        // 2. 自己建立最外層的大佈局
+        val dialogLayout = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(60, 50, 60, 40)
+        }
+
+        // 3. 自己建立大標題 (保證顏色絕對聽話)
+        val tvDialogTitle = TextView(context).apply {
+            text = "選擇背景主題色彩"
+            textSize = 20f
+            typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
+            setTextColor(textColor)
+            setPadding(0, 10, 0, 30)
+        }
+        dialogLayout.addView(tvDialogTitle)
+
+        // 4. 自己建立 RadioGroup 讓使用者單選
+        val radioGroup = android.widget.RadioGroup(context).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+
+        // 5. 動態產生 4 個 RadioButton 項目，並強制上色！
+        themes.forEachIndexed { index, themeName ->
+            val radioButton = android.widget.RadioButton(context).apply {
+                id = index
+                text = themeName
+                textSize = 16f
+                setTextColor(textColor) // 🌟 強制選項文字顏色
+                setPadding(20, 20, 0, 20)
+
+                // 🌟 這裡連單選的小圓圈都一起換色！
+                buttonTintList = ColorStateList.valueOf(textColor)
+
+                // 勾選目前正在使用的主題
+                isChecked = (index == currentTheme)
+            }
+            radioGroup.addView(radioButton)
+        }
+        dialogLayout.addView(radioGroup)
+
+        // 6. 用這個 100% 自訂的佈局建立對話框，不使用原生 setTitle 和 setSingleChoiceItems 了！
+        val builder = AlertDialog.Builder(this)
+            .setView(dialogLayout)
+            .setPositiveButton("確定") { _, _ ->
                 SoundManager.playBubblePop()
-                // 1. 儲存選擇的主題編號
-                sharedPref.edit().putInt("THEME_COLOR_ID", which).apply()
-                // 2. 即時更換當前頁面所有色彩
-                applyThemeSettings(which)
-                dialog.dismiss()
-                Toast.makeText(this, "主題切換成功！", Toast.LENGTH_SHORT).show()
+                val selectedId = radioGroup.checkedRadioButtonId
+                if (selectedId != -1) {
+                    // 儲存選擇的主題編號
+                    sharedPref.edit().putInt("THEME_COLOR_ID", selectedId).apply()
+                    // 即時更換當前頁面所有色彩
+                    applyThemeSettings(selectedId)
+                    Toast.makeText(this, "主題切換成功！", Toast.LENGTH_SHORT).show()
+                }
             }
             .setNegativeButton("取消") { dialog, _ ->
                 SoundManager.playBubblePop()
                 dialog.dismiss()
             }
-            .show()
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        // 7. 渲染最後的大底盤背景色與按鈕顏色
+        alertDialog.window?.let { window ->
+            val background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(bgColor)
+                cornerRadius = 32f
+            }
+            window.setBackgroundDrawable(background)
+
+            // 幫下方的「確定」與「取消」按鈕字體上色
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(textColor)
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(textColor)
+        }
     }
 
     /**
@@ -155,38 +231,60 @@ class SettingsActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
         val currentTheme = sharedPref.getInt("THEME_COLOR_ID", 0)
 
-        // 根據當前主題決定調音台滑桿的顏色
         val themeColorStr = when (currentTheme) {
-            1 -> "#64B5F6" // 藍
-            2 -> "#C2185B" // 粉
-            3 -> "#7B1FA2" // 紫
-            else -> "#2E7D32" // 綠
+            1 -> "#64B5F6" // 海洋藍
+            2 -> "#FFCC80" // 暖陽橙 (棕)
+            3 -> "#F48FB1" // 蜜桃粉
+            else -> "#2E7D32" // 經典綠
         }
         val themeColor = Color.parseColor(themeColorStr)
 
-        val volStartApp = sharedPref.getInt("VOL_START_APP", 35)
-        val volBgm = sharedPref.getInt("VOL_BGM", 70)
-        val volBubble = sharedPref.getInt("VOL_BUBBLE", 70)
-        val volWind = sharedPref.getInt("VOL_WIND", 70)
+        // 根據主題決定對話框的底色與最上方大標題文字顏色
+        val dialogBgColorStr = when (currentTheme) {
+            1 -> "#1A237E" // 深藍底
+            2 -> "#3E2723" // 深可可底
+            3 -> "#4A0033" // 深莓紅底
+            else -> "#FFFFFF" // 清爽白底
+        }
+        val mainTitleColor = when (currentTheme) {
+            1, 2, 3 -> Color.WHITE // 暗色系背景時，大標題用白色才突兀、好看
+            else -> Color.parseColor("#2E7D32") // 綠色主題白底時，大標題用深綠色
+        }
 
         val context = this
         val dialogLayout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(50, 40, 50, 40)
+            setPadding(60, 50, 60, 50) // 稍微加寬間距，排版更美
         }
 
+        // 🌟 修正點：直接把「大標題」自己用 TextView 刻出來並塞進佈局最上方！100% 聽話不受系統劫持
+        val tvDialogTitle = TextView(context).apply {
+            text = "進階音量控制調音台"
+            textSize = 20f
+            typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
+            setTextColor(mainTitleColor) // 🌟 精準控制大標題顏色！
+            setPadding(0, 10, 0, 30)
+        }
+        dialogLayout.addView(tvDialogTitle)
+
         fun createVolumeRow(label: String, currentProgress: Int, onRelease: (Int) -> Unit): SeekBar {
+            // 這裡的文字顏色，如果是暗色底就給白色，白底就給主題色，確保字字清晰
+            val rowTextColor = when (currentTheme) {
+                1, 2, 3 -> Color.WHITE
+                else -> themeColor
+            }
+
             val tv = TextView(context).apply {
                 text = "$label ($currentProgress%)"
                 textSize = 16f
-                setTextColor(themeColor) // 🌟 同步換色：對齊主題色
+                setTextColor(rowTextColor) // 同步換色：對齊內部項目字體色
                 setPadding(0, 20, 0, 10)
             }
             val seekBar = SeekBar(context).apply {
                 max = 100
                 progress = currentProgress
-                thumbTintList = ColorStateList.valueOf(themeColor) // 🌟 同步換色：滑桿按鈕
-                progressTintList = ColorStateList.valueOf(themeColor) // 🌟 同步換色：進度條
+                thumbTintList = ColorStateList.valueOf(themeColor)
+                progressTintList = ColorStateList.valueOf(themeColor)
             }
 
             seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -203,6 +301,11 @@ class SettingsActivity : AppCompatActivity() {
             dialogLayout.addView(seekBar)
             return seekBar
         }
+
+        val volStartApp = sharedPref.getInt("VOL_START_APP", 35)
+        val volBgm = sharedPref.getInt("VOL_BGM", 70)
+        val volBubble = sharedPref.getInt("VOL_BUBBLE", 70)
+        val volWind = sharedPref.getInt("VOL_WIND", 70)
 
         createVolumeRow("1. 開 App 音效音量", volStartApp) { progress ->
             val volFloat = progress / 100f
@@ -231,11 +334,25 @@ class SettingsActivity : AppCompatActivity() {
             Handler(Looper.getMainLooper()).postDelayed({ SoundManager.stopWind() }, 600)
         }
 
-        AlertDialog.Builder(this)
-            .setTitle("進階音量控制調音台")
+        // 🌟 修正點：在這裡不要呼叫 .setTitle() 了，因為上面已經自己加了 tvDialogTitle
+        val builder = AlertDialog.Builder(this)
             .setView(dialogLayout)
             .setPositiveButton("完成設定") { _, _ -> SoundManager.playBubblePop() }
-            .show()
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        alertDialog.window?.let { window ->
+            // 建立帶圓角的純色背景，完全覆蓋掉原本系統的灰色背景
+            val background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(Color.parseColor(dialogBgColorStr))
+                cornerRadius = 32f
+            }
+            window.setBackgroundDrawable(background)
+
+            // 順手把右下角「完成設定」按鈕文字也改成對應的主題色
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(mainTitleColor)
+        }
     }
 
     /**

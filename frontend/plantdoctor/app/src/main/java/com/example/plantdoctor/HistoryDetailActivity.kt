@@ -154,9 +154,10 @@ class HistoryDetailActivity : AppCompatActivity() {
         btnAction.text = "刪除此筆病例"
         btnAction.backgroundTintList = getColorStateList(android.R.color.holo_red_light)
 
+        // 🌟 修改：點擊刪除按鈕時，改為跳出客製化刪除確認對話框
         btnAction.setOnClickListener {
             SoundManager.playBubblePop()
-            executeDelete()
+            showDeleteConfirmationDialog()
         }
 
         btnBack.setOnClickListener {
@@ -525,4 +526,66 @@ class HistoryDetailActivity : AppCompatActivity() {
             override fun onFailure(call: Call<DiagnosesResponse>, t: Throwable) { loadingDialog.dismiss() }
         })
     }
+
+    // 🌟 全新新增：刪除確認對話框（直接套用儲存確認的樣式與 ThemeManager 變色機制）
+    private fun showDeleteConfirmationDialog() {
+        // 1. 直接複用之前刻好的自訂佈局
+        val dialogView = layoutInflater.inflate(R.layout.dialog_save_confirm, null)
+
+        val builder = AlertDialog.Builder(this)
+        builder.setView(dialogView)
+        builder.setCancelable(true)
+
+        val alertDialog = builder.create()
+        alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        alertDialog.show()
+
+        // 2. 綁定自訂對話框的畫面元件
+        val cardRoot = dialogView.findViewById<CardView>(R.id.dialog_card_root)
+        val btnClose = dialogView.findViewById<ImageButton>(R.id.dialog_btn_close)
+        val tvTitle = dialogView.findViewById<TextView>(R.id.dialog_title)
+        val tvMessage = dialogView.findViewById<TextView>(R.id.dialog_message)
+        val btnConfirmDelete = dialogView.findViewById<Button>(R.id.dialog_btn_save) // 複用儲存按鈕位置當確認鍵
+        val btnCancel = dialogView.findViewById<Button>(R.id.dialog_btn_dont_save)     // 複用不儲存按鈕位置當取消鍵
+
+        // 🌟 3. 動態更換文字：將原本的「儲存提示」替換成「刪除提示」
+        tvTitle.text = "確認刪除病例"
+        tvMessage.text = "刪除後將無法恢復此筆紀錄，\n您確定要刪除這筆歷史病例嗎？"
+
+        // 更換按鈕文字與色彩語意
+        btnConfirmDelete.text = "確定刪除"
+        btnConfirmDelete.backgroundTintList = getColorStateList(android.R.color.holo_red_dark) // 🌟 刪除是危險動作，將主按鈕改成深紅色
+
+        btnCancel.text = "取消"
+        btnCancel.backgroundTintList = getColorStateList(android.R.color.darker_gray)         // 取消改成灰色
+
+        // 🌟 4. 風格染色：直接呼叫先前在 ThemeManager 擴充的方法，讓背景與文字顏色完全跟隨 KT 風格
+        ThemeManager.applyThemeToDialog(
+            context = this,
+            cardRoot = cardRoot,
+            btnClose = btnClose,
+            tvTitle = tvTitle,
+            tvMessage = tvMessage
+        )
+
+        // 5. 綁定按鈕監聽事件
+        // 左上角叉叉 ＝ 關掉對話框
+        btnClose.setOnClickListener {
+            SoundManager.playBubblePop()
+            alertDialog.dismiss()
+        }
+
+        // 綠色按鈕位置（已被我們改為確定刪除）
+        btnConfirmDelete.setOnClickListener {
+            alertDialog.dismiss()
+            executeDelete() // 真正執行刪除 API
+        }
+
+        // 紅色按鈕位置（已被我們改為取消）
+        btnCancel.setOnClickListener {
+            SoundManager.playBubblePop()
+            alertDialog.dismiss() // 單純關閉對話框，留在原頁
+        }
+    }
+
 }
