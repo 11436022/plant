@@ -35,3 +35,9 @@ class ResetPasswordRequest(BaseModel):
     token: str = Field(min_length=20)
     new_password: str = Field(min_length=8)
     confirm_password: str = Field(min_length=8)
+
+
+class TokenData(BaseModel):
+    """JWT token payload 的資料結構。"""
+
+    username: str | None = None

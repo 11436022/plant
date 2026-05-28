@@ -48,27 +48,34 @@ def diagnostic_plant(image_path, crops=None, diseases=None, pests=None):
     img = Image.open(image_path)
 
     prompt = f"""
-Identify the crop and health status from this image.
-只有suggestion/treatment中文回答
-Known crops: {crop_list_str}
-Known diseases: {disease_list_str}
-Known pests: {pest_list_str}
+    Analyze the provided image and respond in valid JSON format, using Traditional Chinese for all user-facing text.
 
-Return valid JSON only:
-{{
-  "crop_name": "string",
-  "category": "Healthy|Disease|Pest",
-  "status_name": "string",(若健康則填Healthy)
-  "confidence": 0.0,
-  "suggestion": "string",
-  "treatment": "string"
-}}
-"""
+    Reference Lists (for name standardization):
+    - Known crops: {crop_list_str}
+    - Known diseases: {disease_list_str}
+    - Known pests: {pest_list_str}
+
+    JSON Output Structure:
+    {{
+      "crop_name": "string (The crop's name in Traditional Chinese)",
+      "category": "string (One of 'disease', 'pest', or 'healthy')",
+      "status_name": "string (The specific name of the status in Traditional Chinese. If healthy, use '健康')",
+      "confidence": "float (A value between 0.0 and 1.0)",
+      "suggestion": "string (A bulleted list of 2-3 key visual symptoms, using '-' for each point and '\\n' for new lines. Example: '- 葉片有黃斑\\n- 葉緣焦枯')",
+      "treatment": "string (If not healthy, provide a numbered list of actionable steps using '1.', '2.', etc., and '\\n' for new lines. If healthy, provide a positive confirmation like '繼續保持良好照顧。')"
+    }}
+    """
     try:
         response = client.models.generate_content(model="gemini-2.5-flash", contents=[prompt, img])
         clean_text = (response.text or "").replace("```json", "").replace("```", "").strip()
         return json.loads(clean_text)
-    except Exception:
+    except json.JSONDecodeError as e:
+        # 當 AI 回應的不是有效的 JSON 時
+        print(f"❌ AI 回應格式錯誤: 無法解析 JSON。原始回應: '{clean_text}'. 錯誤: {str(e)}")
+        return None
+    except Exception as e:
+        # 捕捉所有其他錯誤，例如網路問題、API 金鑰問題等
+        print(f"❌ AI 診斷服務發生未知錯誤: {str(e)}")
         return None
 
 
@@ -123,20 +130,19 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
     status_name = data.get("status_name")
     disease_id = None
     pest_id = None
+
+    # 現在，suggestion 和 treatment 直接來自 data，不再被知識庫覆蓋
     final_suggestion = data.get("suggestion")
     final_treatment = data.get("treatment")
 
     try:
+        # 我們仍然需要查找 disease/pest ID，但不再覆蓋建議
         if category == "disease":
             knowledge = await get_or_complete_knowledge("disease", status_name, db)
             disease_id = knowledge["id"]
-            final_suggestion = knowledge["suggestion"]
-            final_treatment = knowledge["treatment"]
         elif category == "pest":
             knowledge = await get_or_complete_knowledge("pest", status_name, db)
             pest_id = knowledge["id"]
-            final_suggestion = knowledge["suggestion"]
-            final_treatment = knowledge["treatment"]
 
         new_diary = models.PlantDiary(
             user_id=user_id,
@@ -146,8 +152,8 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
             disease_id=disease_id,
             pest_id=pest_id,
             confidence=data.get("confidence"),
-            suggestion=final_suggestion,
-            treatment=final_treatment,
+            gemini_suggestion=final_suggestion, # <-- 使用正確的屬性名
+            gemini_treatment=final_treatment,   # <-- 使用正確的屬性名
             user_note=user_note,
             created_at=datetime.now(),
         )

@@ -1,7 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.security import OAuth2PasswordRequestForm
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 
-from app.db.session import get_db_connection
+from app.db.session import get_db
+from app.db.models import User
 from app.schemas.auth import (
     EmailVerificationRequest,
     ForgotPasswordRequest,
@@ -11,7 +14,6 @@ from app.schemas.auth import (
 )
 from app.services.account_recovery import (
     consume_password_reset_token,
-    ensure_auth_schema,
     issue_email_verification,
     send_password_reset_email,
     update_password,
@@ -23,43 +25,57 @@ router = APIRouter(tags=["auth"])
 pwd_context = CryptContext(schemes=["bcrypt"], bcrypt__ident="2b")
 
 
+# --- CRUD輔助函數 ---
+def get_user_by_email(db: Session, email: str) -> User | None:
+    """透過信箱查詢使用者。"""
+    return db.query(User).filter(User.email == email).first()
+
+
+def get_user_by_username(db: Session, username: str) -> User | None:
+    """透過使用者名稱查詢使用者。"""
+    return db.query(User).filter(User.username == username).first()
+
+
+def get_user_by_username_or_email(db: Session, username: str, email: str) -> User | None:
+    """透過使用者名稱或信箱查詢使用者。"""
+    return db.query(User).filter((User.username == username) | (User.email == email)).first()
+
+
+def create_user(db: Session, user: UserRegister) -> User:
+    """使用 ORM 建立新使用者。"""
+    hashed_password = pwd_context.hash(user.password)
+    db_user = User(
+        username=user.username,
+        password_hash=hashed_password,
+        email=user.email,
+        full_name=user.full_name,
+        is_email_verified=False,  # 新註冊使用者預設為未驗證
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
 @router.post("/users/register")
-async def register_user(user: UserRegister):
-    """建立帳號，並寄出信箱驗證信。"""
+async def register_user(user: UserRegister, db: Session = Depends(get_db)):
+    """使用 ORM 建立帳號，並寄出信箱驗證信。"""
+    db_user = get_user_by_username_or_email(db, username=user.username, email=user.email)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Username or email already exists.")
 
-    ensure_auth_schema()
-    conn = get_db_connection()
     try:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                "SELECT user_id FROM user WHERE username = %s OR email = %s",
-                (user.username, user.email),
-            )
-            if cursor.fetchone():
-                raise HTTPException(status_code=400, detail="Username or email already exists.")
-
-            hashed_password = pwd_context.hash(user.password)
-            cursor.execute(
-                """
-                INSERT INTO user (username, password_hash, email, full_name, is_email_verified)
-                VALUES (%s, %s, %s, %s, %s)
-                """,
-                (user.username, hashed_password, user.email, user.full_name, 0),
-            )
-            user_id = cursor.lastrowid
-        conn.commit()
-    except HTTPException:
-        raise
+        new_user = create_user(db, user)
     except Exception as exc:
+        db.rollback()
         raise HTTPException(status_code=500, detail=f"Registration failed: {exc}")
-    finally:
-        conn.close()
 
-    # 註冊成功後仍保留帳號，即使寄信失敗也可透過補寄流程重送。
+    # 註冊成功後寄送驗證信
     email_sent = True
     warning = None
     try:
-        issue_email_verification(user_id, user.username, user.email)
+        # 注意： issue_email_verification 現在也需要 db session
+        issue_email_verification(new_user.user_id, new_user.username, new_user.email, db=db)
     except Exception as exc:
         email_sent = False
         warning = str(exc)
@@ -67,103 +83,75 @@ async def register_user(user: UserRegister):
     return {
         "status": "success",
         "message": f"User {user.username} registered.",
+        "user_id": new_user.user_id,
         "verification_required": True,
         "email_sent": email_sent,
         "warning": warning,
     }
 
 
-@router.post("/user/login")
-async def login_user(user: UserLogin):
-    """登入帳號，未驗證信箱者不可取得 JWT。"""
+@router.post("/login")
+async def login_user(
+    db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
+):
+    """使用 ORM 登入帳號，未驗證信箱者不可取得 JWT。"""
+    db_user = get_user_by_username(db, username=form_data.username)
 
-    ensure_auth_schema()
-    conn = get_db_connection()
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT user_id, username, email, password_hash, role, is_email_verified
-                FROM user
-                WHERE username = %s
-                """,
-                (user.username,),
-            )
-            db_user = cursor.fetchone()
-            if not db_user:
-                raise HTTPException(status_code=400, detail="Invalid username or password.")
-            if not pwd_context.verify(user.password, db_user["password_hash"]):
-                raise HTTPException(status_code=400, detail="Invalid username or password.")
-            if not db_user.get("is_email_verified"):
-                raise HTTPException(
-                    status_code=403,
-                    detail="Email not verified. Please verify your email before logging in.",
-                )
+    if not db_user:
+        raise HTTPException(status_code=400, detail="Invalid username or password.")
+    if not pwd_context.verify(form_data.password, db_user.password_hash):
+        raise HTTPException(status_code=400, detail="Invalid username or password.")
+    if not db_user.is_email_verified:
+        raise HTTPException(
+            status_code=403,
+            detail="Email not verified. Please verify your email before logging in.",
+        )
 
-            token = create_access_token(
-                {
-                    "user_id": db_user["user_id"],
-                    "username": db_user["username"],
-                    "role": db_user["role"],
-                }
-            )
-            return {
-                "status": "success",
-                "message": "Login successful.",
-                "access_token": token,
-                "token_type": "bearer",
-            }
-    finally:
-        conn.close()
+    token = create_access_token(
+        {
+            "sub": db_user.username,
+            "user_id": db_user.user_id,
+            "role": db_user.role,
+        }
+    )
+    return {
+        "status": "success",
+        "message": "Login successful.",
+        "access_token": token,
+        "token_type": "bearer",
+    }
 
 
 @router.get("/user/me")
-async def get_user_profile(current_user: dict = Depends(get_current_user)):
+async def get_user_profile(current_user: User = Depends(get_current_user)):
     """取得目前登入者的基本資料。"""
 
-    ensure_auth_schema()
-    conn = get_db_connection()
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT username, email, full_name, created_at, is_email_verified, email_verified_at
-                FROM user
-                WHERE user_id = %s
-                """,
-                (current_user["user_id"],),
-            )
-            user_info = cursor.fetchone()
-            if not user_info:
-                raise HTTPException(status_code=404, detail="User not found.")
-            return {"status": "success", "data": user_info}
-    finally:
-        conn.close()
+    # get_current_user 已經從資料庫中獲取了完整的 User 物件，
+    # 我們可以直接使用它，無需再次查詢資料庫。
+    return {
+        "status": "success",
+        "data": {
+            "username": current_user.username,
+            "email": current_user.email,
+            "full_name": current_user.full_name,
+            "created_at": current_user.created_at,
+            "is_email_verified": current_user.is_email_verified,
+            "email_verified_at": current_user.email_verified_at,
+        },
+    }
 
 
 @router.post("/user/verify-email/request")
-async def request_email_verification(payload: EmailVerificationRequest):
+async def request_email_verification(
+    payload: EmailVerificationRequest, db: Session = Depends(get_db)
+):
     """補寄驗證信；回應固定化，避免直接暴露帳號是否存在。"""
+    db_user = get_user_by_email(db, email=payload.email)
 
-    ensure_auth_schema()
-    conn = get_db_connection()
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT user_id, username, email, is_email_verified
-                FROM user
-                WHERE email = %s
-                """,
-                (payload.email,),
-            )
-            db_user = cursor.fetchone()
-    finally:
-        conn.close()
-
-    if db_user and not db_user.get("is_email_verified"):
+    if db_user and not db_user.is_email_verified:
         try:
-            issue_email_verification(db_user["user_id"], db_user["username"], db_user["email"])
+            # 呼叫已重構的服務，傳入 db session
+            issue_email_verification(db_user.user_id, db_user.username, db_user.email, db)
         except Exception:
             # 補寄端點維持通用成功回應，避免成為探測信箱存在性的工具。
             pass
@@ -175,37 +163,23 @@ async def request_email_verification(payload: EmailVerificationRequest):
 
 
 @router.get("/user/verify-email")
-async def confirm_email_verification(token: str = Query(..., min_length=20)):
+async def confirm_email_verification(
+    token: str = Query(..., min_length=20), db: Session = Depends(get_db)
+):
     """使用驗證連結中的一次性 token 完成信箱驗證。"""
-
-    ensure_auth_schema()
-    verify_email_token(token)
+    verify_email_token(token, db)
     return {"status": "success", "message": "Email verified successfully."}
 
 
 @router.post("/user/forgot-password")
-async def forgot_password(payload: ForgotPasswordRequest):
+async def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
     """寄送一次性重設密碼連結與 token。"""
-
-    ensure_auth_schema()
-    conn = get_db_connection()
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT user_id, username, email
-                FROM user
-                WHERE email = %s
-                """,
-                (payload.email,),
-            )
-            db_user = cursor.fetchone()
-    finally:
-        conn.close()
+    db_user = get_user_by_email(db, email=payload.email)
 
     if db_user:
         try:
-            send_password_reset_email(db_user["user_id"], db_user["username"], db_user["email"])
+            # 呼叫已重構的服務，傳入 db session
+            send_password_reset_email(db_user.user_id, db_user.username, db_user.email, db)
         except Exception:
             # 忘記密碼也採固定回應，避免暴露帳號存在性與寄信失敗細節。
             pass
@@ -217,15 +191,13 @@ async def forgot_password(payload: ForgotPasswordRequest):
 
 
 @router.post("/user/reset-password")
-async def reset_password(payload: ResetPasswordRequest):
+async def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db)):
     """使用一次性 token 重設密碼。"""
-
-    ensure_auth_schema()
     if payload.new_password != payload.confirm_password:
         raise HTTPException(status_code=400, detail="Passwords do not match.")
 
-    token_record = consume_password_reset_token(payload.token)
+    token_record = consume_password_reset_token(payload.token, db)
     new_password_hash = pwd_context.hash(payload.new_password)
-    update_password(token_record["user_id"], new_password_hash)
+    update_password(token_record.user_id, new_password_hash, db)
 
     return {"status": "success", "message": "Password has been reset successfully."}

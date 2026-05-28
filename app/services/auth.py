@@ -1,13 +1,18 @@
 import datetime
 
-import jwt
-from fastapi import Depends, HTTPException
-from fastapi.security import HTTPBearer
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from pydantic import ValidationError
+from sqlalchemy.orm import Session
 
-from app.core.config import JWT_ALGORITHM, JWT_EXPIRE_MINUTES, JWT_SECRET_KEY
-from app.db.session import get_db_connection
+from app.core.config import settings
+from app.db.models import User
+from app.db.session import get_db
+from app.schemas.auth import TokenData
+from app.crud import get_user_by_username
 
-security = HTTPBearer()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
 def create_access_token(payload: dict) -> str:
@@ -15,44 +20,31 @@ def create_access_token(payload: dict) -> str:
 
     token_payload = payload.copy()
     token_payload["exp"] = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
-        minutes=JWT_EXPIRE_MINUTES
+        minutes=settings.JWT_EXPIRE_MINUTES
     )
-    return jwt.encode(token_payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    return jwt.encode(token_payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
-async def get_current_user(authorization=Depends(security)):
-    """解析 Bearer Token，並回查目前登入使用者。"""
-
-    token = authorization.credentials
+def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> User:
+    """從 token 取得當前使用者，並從資料庫中驗證其存在。"""
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        user_id = payload.get("user_id")
-        if user_id is None:
-            raise HTTPException(status_code=401, detail="Invalid token.")
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        username: str | None = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username)
+    except (JWTError, ValidationError):
+        raise credentials_exception
 
-        conn = get_db_connection()
-        try:
-            with conn.cursor() as cursor:
-                cursor.execute(
-                    """
-                    SELECT user_id, username, role, is_email_verified
-                    FROM user
-                    WHERE user_id = %s
-                    """,
-                    (user_id,),
-                )
-                user = cursor.fetchone()
-                if not user:
-                    raise HTTPException(status_code=401, detail="User not found.")
-                return user
-        finally:
-            conn.close()
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired.")
-    except HTTPException:
-        raise
-    except Exception as exc:
-        raise HTTPException(status_code=401, detail=f"Authentication failed: {exc}")
+    user = get_user_by_username(db, username=token_data.username)
+    if user is None:
+        raise credentials_exception
+    return user
 
 
 async def verify_admin(current_user: dict = Depends(get_current_user)):
