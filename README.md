@@ -66,3 +66,5 @@ python -m alembic upgrade head
 # Alembic 抓法
 git pull origin main
 python -m alembic upgrade head
+
+# 0528 data.json待更新
