@@ -406,7 +406,11 @@ class HistoryDetailActivity : AppCompatActivity() {
                         tvFeedbackLink.visibility = View.VISIBLE
                     }
 
-                    val fullAdvice = "【專家建議】\n${data.suggestion ?: "尚無建議"}\n\n【治療方法】\n${data.treatment ?: "請諮詢專業人員"}"
+                    val fullAdvice = StringBuilder().apply {
+                        append("【專家建議】\n${data.suggestion ?: "尚無建議"}\n\n")
+                        //append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
+                        append("【過往筆記】")
+                    }.toString()
                     tvAdvice.text = fullAdvice
                     currentImageUrl = fixImageUrl(data.image_url ?: "")
 
@@ -430,16 +434,30 @@ class HistoryDetailActivity : AppCompatActivity() {
         if (rawUrl.startsWith("content://") || rawUrl.startsWith("file://")) {
             return rawUrl
         }
+        // 🌟 將這裡換成你用 ipconfig 查到的真實電腦 IP19
+        val computerWifiIp = "輸入你的IP"
 
-        var url = rawUrl.replace("127.0.0.1", "10.0.2.2").replace("localhost", "10.0.2.2")
-        val keyword = "static/"
-        if (url.contains(keyword)) {
-            val startIndex = url.indexOf(keyword)
-            val firstSlash = url.indexOf("/", 8)
-            if (firstSlash != -1) {
-                val baseUrl = url.substring(0, firstSlash + 1)
-                return baseUrl + url.substring(startIndex)
-            }
+        // 這裡的意思是：不管後端傳來的是 127.0.0.1 還是 localhost，通通強制換成無線網路摸得著的真實 IP
+        var url = rawUrl.replace("輸入你的IP", computerWifiIp).replace("輸入你的IP", computerWifiIp)
+        // 3. 基本防禦：如果後端給的是相對路徑（例如 "/uploads/..."），手動幫它加上 http 開頭與 Port
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            val safePath = if (url.startsWith("/")) url else "/$url"
+            url = "http://$computerWifiIp:8000$safePath"
+        }
+
+        // 🌟 4. 【新加進去】原本的 static/ 路由安全防禦
+        val keywordStatic = "static/"
+        if (url.contains(keywordStatic)) {
+            val startIndex = url.indexOf(keywordStatic)
+            // 優化原本的裁切機制：直接用安全的 http://IP:8000/ 拼接，絕對不會因為 IP 長度不同而切碎網址
+            url = "http://$computerWifiIp:8000/$keywordStatic" + url.substring(startIndex + keywordStatic.length)
+        }
+
+        // 🌟 5. 你後端目前正在使用的 uploads/ 路由精準防禦
+        val keywordUploads = "uploads/"
+        if (url.contains(keywordUploads)) {
+            val startIndex = url.indexOf(keywordUploads)
+            url = "http://$computerWifiIp:8000/$keywordUploads" + url.substring(startIndex + keywordUploads.length)
         }
         return url
     }

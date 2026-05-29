@@ -94,7 +94,15 @@ class LoginActivity : AppCompatActivity() {
                         }
                     } else {
                         when (response.code()) {
-                            403 -> showErrorDialog("登入失敗", "您的信箱尚未驗證，請先至信箱點擊驗證連結。")
+                            // 🌟 修改這裡：把使用者輸入的帳號/Email (username變數) 傳進去
+                            403 -> {
+                                // 🌟 核心改動：從 SharedPreferences 撈出剛剛註冊存好的 Email
+                                val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+                                val savedEmail = sharedPref.getString("registered_email", "") ?: ""
+
+                                // 把撈出來的 Email (可能是正確的信箱，也可能是空字串) 丟給彈窗
+                                showErrorDialog("驗證提示", "您的信箱尚未驗證，請先至信箱點擊驗證連結。", savedEmail)
+                            }
                             400 -> Toast.makeText(this@LoginActivity, "帳號或密碼錯誤", Toast.LENGTH_SHORT).show()
                             else -> Toast.makeText(this@LoginActivity, "登入失敗，請稍後再試", Toast.LENGTH_SHORT).show()
                         }
@@ -121,6 +129,23 @@ class LoginActivity : AppCompatActivity() {
             SoundManager.playBubblePop()
             showForgotPasswordDialog()
         }
+    }
+
+    private fun sendVerificationEmail(email: String) {
+        val apiService = PlantApiService.create(null)
+        // 包裝成後端要的 JSON Payload，例如 {"email": "xxx"}
+        val request = EmailVerificationRequest(email)
+
+        apiService.requestEmailVerification(request).enqueue(object : Callback<GenericResponse> {
+            override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
+                // 因為後端做了安全防禦，不論信箱是否存在，固定回傳 200 success，所以這裡統一提示成功
+                Toast.makeText(this@LoginActivity, "若 Email 正確且未驗證，驗證信已補寄完成！", Toast.LENGTH_LONG).show()
+            }
+
+            override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
+                Toast.makeText(this@LoginActivity, "網路連線失敗，請稍後再試", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun goToHome() {
@@ -174,15 +199,93 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
-    private fun showErrorDialog(title: String, message: String) {
-        AlertDialog.Builder(this)
-            .setTitle(title)
-            .setMessage(message)
-            .setPositiveButton("確定") { _, _ ->
-                // 點擊錯誤彈窗的「確定」播放泡泡聲
-                SoundManager.playBubblePop()
+    private fun showErrorDialog(title: String, message: String, defaultEmail: String) {
+        val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+        val currentTheme = sharedPref.getInt("THEME_COLOR_ID", 0)
+
+        val textColorStr = if (currentTheme in 1..3) "#FFFFFF" else "#222222"
+        val bgColorStr = when (currentTheme) {
+            1 -> "#1A237E"
+            2 -> "#3E2723"
+            3 -> "#4A0033"
+            else -> "#FFFFFF"
+        }
+        val textColor = android.graphics.Color.parseColor(textColorStr)
+        val bgColor = android.graphics.Color.parseColor(bgColorStr)
+
+        val context = this
+        val dialogLayout = android.widget.LinearLayout(context).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(60, 50, 60, 40)
+        }
+
+        val tvTitle = android.widget.TextView(context).apply {
+            text = title
+            textSize = 20f
+            typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
+            setTextColor(textColor)
+            setPadding(0, 10, 0, 20)
+        }
+
+        val tvMessage = android.widget.TextView(context).apply {
+            text = message
+            textSize = 16f
+            setTextColor(textColor)
+            setPadding(0, 10, 0, 30) // 留一點間距給底下的輸入框
+        }
+
+        dialogLayout.addView(tvTitle)
+        dialogLayout.addView(tvMessage)
+
+        // 🌟 1. 檢查傳進來的 Email 格式是否有效
+        val isEmailValid = defaultEmail.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(defaultEmail).matches()
+
+        // 🌟 2. 建立輸入框（這次不論如何都保持顯示！）
+        val etEmailInput = android.widget.EditText(context).apply {
+            hint = "請輸入您的註冊 Email"
+            setTextColor(textColor)
+            setHintTextColor(android.graphics.Color.GRAY)
+            visibility = android.view.View.VISIBLE // 👈 情況一：保持輸入框可見！
+
+            // 🌟 如果手機裡有存到正確的 Email，直接自動幫使用者填入
+            if (isEmailValid) {
+                setText(defaultEmail)
             }
-            .show()
+        }
+        dialogLayout.addView(etEmailInput)
+
+        val builder = AlertDialog.Builder(this)
+            .setView(dialogLayout)
+            .setPositiveButton("補寄驗證信") { _, _ ->
+                SoundManager.playBubblePop()
+
+                // 🌟 3. 永遠以「使用者在輸入框裡看到的文字」為準（方便他們修改打錯的字）
+                val finalEmail = etEmailInput.text.toString().trim()
+
+                if (finalEmail.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(finalEmail).matches()) {
+                    // 🚀 執行發送至後端
+                    sendVerificationEmail(finalEmail)
+                } else {
+                    Toast.makeText(context, "請輸入正確的 Email 格式", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("知道了") { dialog, _ ->
+                SoundManager.playBubblePop()
+                dialog.dismiss()
+            }
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        alertDialog.window?.let { window ->
+            val background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(bgColor)
+                cornerRadius = 32f
+            }
+            window.setBackgroundDrawable(background)
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(textColor)
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(textColor)
+        }
     }
 
     // 🌟 2. 全螢幕長按雷達，判定長按 0.5 秒才吹風

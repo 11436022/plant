@@ -77,6 +77,13 @@ class RegisterActivity : AppCompatActivity() {
                         val body = response.body()
                         Log.d("RegisterActivity", "Success: ${body?.message}")
 
+                        // 🌟 在 RegisterActivity 收到註冊成功回應的地方加入這段：
+                        val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+                        with(sharedPref.edit()) {
+                            putString("registered_email", email) // 👈 把剛註冊成功的 Email 存起來，鑰匙叫 "registered_email"
+                            apply()
+                        }
+
                         // --- 【邏輯變更：引導去收信】 ---
                         showVerificationDialog(email)
 

@@ -35,6 +35,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var rootLayout: ConstraintLayout
     private lateinit var tvSettingsTitle: TextView
     private lateinit var tvColorSelect: TextView
+    private lateinit var tvForgotPassword: TextView
     private lateinit var btnBack: android.widget.ImageButton
     private lateinit var btnVolumeMixer: android.widget.ImageButton
 
@@ -54,9 +55,10 @@ class SettingsActivity : AppCompatActivity() {
         btnBack = findViewById(R.id.btn_back_home)
         btnVolumeMixer = findViewById(R.id.btn_volume_mixer)
 
+
         val etUsername = findViewById<EditText>(R.id.et_username)
         val etGmail = findViewById<EditText>(R.id.et_gmail)
-        val tvForgotPassword = findViewById<TextView>(R.id.tv_forgot_password)
+        tvForgotPassword = findViewById(R.id.tv_forgot_password)
         val btnLogout = findViewById<Button>(R.id.btn_logout)
 
         etUsername.setText(savedUsername)
@@ -114,7 +116,7 @@ class SettingsActivity : AppCompatActivity() {
      * 🌟 核心新增：顯示背景顏色選擇器彈窗
      */
     private fun showColorSelectDialog() {
-        val themes = arrayOf("🌿 經典陽光綠", "🌌 深邃星空藍", "\uD83E\uDEB5 暖陽落日橙", "\uD83C\uDF38 微醺初戀粉")
+        val themes = arrayOf("🌿 經典陽光綠", "🌌 清新大海藍", "\uD83E\uDEB5 暖陽落日橙", "\uD83C\uDF38 微醺初戀粉")
         val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
         val currentTheme = sharedPref.getInt("THEME_COLOR_ID", 0)
 
@@ -218,7 +220,7 @@ class SettingsActivity : AppCompatActivity() {
         ThemeManager.applyTheme(
             context = this,
             rootLayout = rootLayout,
-            titles = listOf(tvSettingsTitle, tvColorSelect),
+            titles = listOf(tvSettingsTitle, tvColorSelect,tvForgotPassword),
             imageButtons = listOf(btnBack, btnVolumeMixer)
             // 💡 登出按鈕和照片按鈕因為你想維持特殊色（紅色/橘黃），這裡就故意不傳進去，它們就不會被動到！
         )

@@ -31,6 +31,10 @@ data class RegisterRequest(
 // 忘記密碼
 data class ForgotPasswordRequest(val email: String)
 
+data class EmailVerificationRequest(
+    val email: String
+)
+
 // 診斷紀錄相關 (共用 HistoryItem)
 // data class UploadResponse(val status: String, val data: HistoryItem) // <--- 舊的上傳回傳，將被取代
 
@@ -101,6 +105,10 @@ interface PlantApiService {
     @POST("auth/user/forgot-password")
     fun forgotPassword(@Body request: ForgotPasswordRequest): Call<GenericResponse>
 
+    // 🌟 補寄驗證信：
+    @POST("auth/user/verify-email/request")
+    fun requestEmailVerification(@Body request: EmailVerificationRequest): Call<GenericResponse>
+
     // 【診斷日誌相關】 (注意：這些會自動由 Interceptor 加上 Token)
 
     // @Multipart
@@ -149,7 +157,7 @@ interface PlantApiService {
     // --- 3. Retrofit 實例產生器 ---
     companion object {
         // 模擬器連線本機電腦後端的專用 IP，並包含 API 版本
-        private const val BASE_URL = "http://10.0.2.2:8000/api/v1/"
+        private const val BASE_URL = "http://輸入你的IP:8000/api/v1/"
 
         fun create(token: String? = null): PlantApiService {
 
