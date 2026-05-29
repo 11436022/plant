@@ -156,8 +156,8 @@ interface PlantApiService {
 
     // --- 3. Retrofit 實例產生器 ---
     companion object {
-        // 模擬器連線本機電腦後端的專用 IP，並包含 API 版本
-        private const val BASE_URL = "http://輸入你的IP:8000/api/v1/"
+        // 模擬器連線本機電腦後端的專用 IP (10.0.2.2)，若是實體手機請改為電腦的區域網路 IP (如 192.168.x.x)
+        private const val BASE_URL = "http://10.0.2.2:8000/api/v1/"
 
         fun create(token: String? = null): PlantApiService {
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="app_main_bg">#D9F379</color>
+    <color name="app_main_text">#2E7D32</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <string name="app_name">plant doctor</string>
+    <style name="Base.Theme.PlantDoctor" parent="Theme.Material3.DayNight.NoActionBar">
+        
+        
+    </style>
+    <style name="Theme.PlantDoctor" parent="Base.Theme.PlantDoctor"/>
+</resources>
