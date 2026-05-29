@@ -240,9 +240,9 @@ class HistoryAdapter(
             return rawUrl
         }
         // 🌟 將這裡換成你用 ipconfig 查到的真實電腦 IP
-        val computerWifiIp = "輸入你的IP"
+        val computerWifiIp = "192.168.56.1"
         // 這裡的意思是：不管後端傳來的是 127.0.0.1 還是 localhost，通通強制換成無線網路摸得著的真實 IP
-        var url = rawUrl.replace("輸入你的IP", computerWifiIp).replace("輸入你的IP", computerWifiIp)
+        var url = rawUrl.replace("127.0.0.1", computerWifiIp).replace("localhost", computerWifiIp)
         // 3. 基本防禦：如果後端給的是相對路徑（例如 "/uploads/..."），手動幫它加上 http 開頭與 Port
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             val safePath = if (url.startsWith("/")) url else "/$url"
