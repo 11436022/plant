@@ -19,7 +19,7 @@ from app.schemas.patch import DiaryUpdate, DiaryConfirm
 # 從 prediction 路由器引入暫存區
 from app.routers.prediction import prediction_cache
 
-router = APIRouter(prefix="/diaries", tags=["diaries"])
+router = APIRouter(tags=["diaries"])
 
 
 
@@ -203,22 +203,20 @@ async def confirm_and_create_diary(
     shutil.move(str(temp_path), formal_path)
 
     # ================= 核心修改 =================
-    # 4. 用前端傳來確認過的資料，覆蓋 AI 的原始分析結果
-    #    這確保了「使用者看到的」就是「被儲存的」
+    # 4. 直接使用前端傳來的資料，不再進行複雜的字串拆分解析
     try:
-        # 從 payload.gemini_advice 中解析出 suggestion 和 treatment
-        # 這裡我們做一個簡單的分割，實際情況可能需要更穩健的解析
-        parts = payload.gemini_advice.split("【治療方法】")
-        suggestion = parts[0].replace("【專家建議】", "").strip()
-        treatment = parts[1].strip() if len(parts) > 1 else ""
-
         ai_result["status_name"] = payload.disease_name.replace("診斷：", "").strip()
-        ai_result["suggestion"] = suggestion
-        ai_result["treatment"] = treatment
+        ai_result["suggestion"] = payload.gemini_advice
+        ai_result["treatment"] = "" # 或是從 advice 中嘗試拆分，但失敗也不要崩潰
 
+        if "【治療方法】" in payload.gemini_advice:
+            parts = payload.gemini_advice.split("【治療方法】")
+            ai_result["suggestion"] = parts[0].replace("【專家建議】", "").strip()
+            ai_result["treatment"] = parts[1].strip()
     except Exception as e:
-        # 如果解析失敗，就用原始的 ai_result，但記錄一個警告
-        print(f"Warning: Could not parse gemini_advice from payload. Using original AI result. Error: {e}")
+        print(f"解析建議文字出錯，將儲存原始文字: {e}")
+        ai_result["suggestion"] = payload.gemini_advice
+        ai_result["treatment"] = ""
 
 
     try:

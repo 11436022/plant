@@ -77,8 +77,9 @@ async def register_user(user: UserRegister, db: Session = Depends(get_db)):
         # 注意： issue_email_verification 現在也需要 db session
         issue_email_verification(new_user.user_id, new_user.username, new_user.email, db=db)
     except Exception as exc:
-        email_sent = False
-        warning = str(exc)
+                print(f"[EMAIL SEND FAILED]: {exc}") # 印出詳細錯誤
+                email_sent = False
+                warning = str(exc)
 
     return {
         "status": "success",
@@ -152,7 +153,8 @@ async def request_email_verification(
         try:
             # 呼叫已重構的服務，傳入 db session
             issue_email_verification(db_user.user_id, db_user.username, db_user.email, db)
-        except Exception:
+        except Exception as exc:
+            print(f"[RE-SEND EMAIL FAILED]: {exc}") # 印出詳細錯誤
             # 補寄端點維持通用成功回應，避免成為探測信箱存在性的工具。
             pass
 

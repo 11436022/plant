@@ -136,7 +136,7 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
     final_treatment = data.get("treatment")
 
     try:
-        # 我們仍然需要查找 disease/pest ID，但不再覆蓋建議
+        # 我們仍然需要查找 disease/pest ID
         if category == "disease":
             knowledge = await get_or_complete_knowledge("disease", status_name, db)
             disease_id = knowledge["id"]
@@ -144,19 +144,22 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
             knowledge = await get_or_complete_knowledge("pest", status_name, db)
             pest_id = knowledge["id"]
 
-        new_diary = models.PlantDiary(
-            user_id=user_id,
-            crop_id=target_crop_id,
-            status_name=status_name,
-            image_url=str(Path(image_path).as_posix()),
-            disease_id=disease_id,
-            pest_id=pest_id,
-            confidence=data.get("confidence"),
-            gemini_suggestion=final_suggestion, # <-- 使用正確的屬性名
-            gemini_treatment=final_treatment,   # <-- 使用正確的屬性名
-            user_note=user_note,
-            created_at=datetime.now(),
-        )
+        new_diary = models.PlantDiary()
+        new_diary.user_id = user_id
+        new_diary.crop_id = target_crop_id
+        new_diary.status_name = status_name
+        new_diary.image_url = str(Path(image_path).as_posix())
+        new_diary.disease_id = disease_id
+        new_diary.pest_id = pest_id
+        new_diary.confidence = data.get("confidence")
+
+        # 🌟 這裡使用手動賦值，避免建構子屬性名稱混淆
+        # 如果您的資料庫欄位是 suggestion，這會正確運作
+        new_diary.gemini_suggestion = final_suggestion
+        new_diary.gemini_treatment = final_treatment
+
+        new_diary.user_note = user_note
+        new_diary.created_at = datetime.now()
 
         db.add(new_diary)
         db.commit()
@@ -164,4 +167,5 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
         return new_diary.id
     except Exception as exc:
         db.rollback()
-        raise RuntimeError(f"Failed to save diary: {exc}") from exc
+        print(f"CRITICAL DATABASE ERROR: {str(exc)}") # 🌟 這行會把真正的錯誤原因印在後端視窗
+        raise RuntimeError(f"Database Save Failed: {exc}") from exc

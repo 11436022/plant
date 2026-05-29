@@ -55,7 +55,7 @@ def create_app() -> FastAPI:
 
     # 其他 API
     app.include_router(prediction.router, prefix="/api/v1")
-    app.include_router(diaries.router, prefix="/api/v1")
+    app.include_router(diaries.router, prefix="/api/v1/diaries", tags=["Diaries"])
     app.include_router(knowledge.router, prefix="/api/v1")
 
     # Admin router (通常有自己的根路徑，不放在 /api/v1 內)

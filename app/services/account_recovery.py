@@ -17,25 +17,22 @@ PASSWORD_RESET_PURPOSE = "password_reset"
 
 
 def ensure_auth_schema() -> None:
-    """補齊忘記密碼與信箱驗證所需的欄位與資料表。"""
+    """補齊忘記密碼與信箱驗證所需的欄位與資料表，以及 PlantDiary 缺少的欄位。"""
 
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
+            # 1. User 表相關
             if not _column_exists(cursor, "user", "is_email_verified"):
-                cursor.execute(
-                    """
-                    ALTER TABLE user
-                    ADD COLUMN is_email_verified TINYINT(1) NOT NULL DEFAULT 1
-                    """
-                )
+                cursor.execute("ALTER TABLE user ADD COLUMN is_email_verified TINYINT(1) NOT NULL DEFAULT 1")
             if not _column_exists(cursor, "user", "email_verified_at"):
-                cursor.execute(
-                    """
-                    ALTER TABLE user
-                    ADD COLUMN email_verified_at DATETIME NULL DEFAULT NULL
-                    """
-                )
+                cursor.execute("ALTER TABLE user ADD COLUMN email_verified_at DATETIME NULL DEFAULT NULL")
+
+            # 2. PlantDiary 表相關 (解決 500 錯誤的關鍵)
+            if not _column_exists(cursor, "plant_diary", "user_corrected_status"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN user_corrected_status VARCHAR(100) NULL DEFAULT NULL")
+
+            # 3. Token 表相關
             if not _table_exists(cursor, "user_one_time_tokens"):
                 cursor.execute(
                     """
