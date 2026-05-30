@@ -4,3 +4,9 @@ __pycache__/
 *.pyc
 venv/
 .idea/
+
+# 排除上傳的測試圖片與暫存檔
+static/tmp/*
+static/uploads/*
+!static/tmp/.gitkeep
+!static/uploads/.gitkeep

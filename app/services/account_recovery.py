@@ -17,25 +17,22 @@ PASSWORD_RESET_PURPOSE = "password_reset"
 
 
 def ensure_auth_schema() -> None:
-    """補齊忘記密碼與信箱驗證所需的欄位與資料表。"""
+    """補齊忘記密碼與信箱驗證所需的欄位與資料表，以及 PlantDiary 缺少的欄位。"""
 
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
+            # 1. User 表相關
             if not _column_exists(cursor, "user", "is_email_verified"):
-                cursor.execute(
-                    """
-                    ALTER TABLE user
-                    ADD COLUMN is_email_verified TINYINT(1) NOT NULL DEFAULT 1
-                    """
-                )
+                cursor.execute("ALTER TABLE user ADD COLUMN is_email_verified TINYINT(1) NOT NULL DEFAULT 1")
             if not _column_exists(cursor, "user", "email_verified_at"):
-                cursor.execute(
-                    """
-                    ALTER TABLE user
-                    ADD COLUMN email_verified_at DATETIME NULL DEFAULT NULL
-                    """
-                )
+                cursor.execute("ALTER TABLE user ADD COLUMN email_verified_at DATETIME NULL DEFAULT NULL")
+
+            # 2. PlantDiary 表相關 (解決 500 錯誤的關鍵)
+            if not _column_exists(cursor, "plant_diary", "user_corrected_status"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN user_corrected_status VARCHAR(100) NULL DEFAULT NULL")
+
+            # 3. Token 表相關
             if not _table_exists(cursor, "user_one_time_tokens"):
                 cursor.execute(
                     """
@@ -101,23 +98,28 @@ def send_password_reset_email(
         expires_in_minutes=settings.PASSWORD_RESET_EXPIRE_MINUTES,
         db=db,
     )
-    reset_url = _build_url(settings.FRONTEND_BASE_URL, settings.PASSWORD_RESET_PATH, token)
+    # 將連結指向新的中介網頁 /reset-password-web
+    reset_url = _build_url(settings.FRONTEND_BASE_URL, "/reset-password-web", token)
     send_email(
         to_email=email,
         subject="Plant 重設密碼通知",
         text_body=(
-            f"{username} 您好：\n\n"
-            f"請使用以下一次性重設連結：\n{reset_url}\n\n"
-            f"若前端需要直接使用 token，也可以使用下列一次性 token：\n{token}\n\n"
+            f"{username} 您好：\\n\\n"
+            f"請複製並貼上以下完整連結以重設您的密碼：\\n{reset_url}\\n\\n"
+            f"若前端需要直接使用 token，也可以使用下列一次性 token：\\n{token}\\n\\n"
             f"此連結將於 {expires_at.isoformat()} UTC 失效。"
         ),
         html_body=(
             f"<p>{username} 您好：</p>"
-            f"<p>請使用以下一次性重設連結：</p>"
-            f'<p><a href="{reset_url}">{reset_url}</a></p>'
+            f"<p>請點擊以下連結以重設您的密碼：</p>"
+            f'<p><a href="{reset_url}">點此重設密碼</a></p>'
+            f"<hr>"
+            f"<p>若您的郵件客戶端不支援點擊，請複製以下完整連結：</p>"
+            f"<p>{reset_url}</p>"
             f"<p>若前端需要直接使用 token，也可以使用下列一次性 token：</p>"
             f"<p><code>{token}</code></p>"
-            f"<p>此連結將於 {expires_at.isoformat()} UTC 失效。</p>"
+            f"<hr>"
+            f"<p><small>此連結將於 {expires_at.isoformat()} UTC 失效。</small></p>"
         ),
     )
     return expires_at

@@ -1,7 +1,7 @@
 from pathlib import Path
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -18,9 +18,7 @@ templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 def create_app() -> FastAPI:
     """建立 FastAPI 應用程式。"""
-
     app = FastAPI(title=settings.API_TITLE)
-
 
     # 讓 router 可以透過 app.state 取得 Jinja2 templates。
     app.state.templates = templates
@@ -32,16 +30,16 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    if not STATIC_PATH.exists():
-        STATIC_PATH.mkdir(parents=True, exist_ok=True)
-
-    app.mount("/static", StaticFiles(directory=str(STATIC_PATH)), name="static")
-
     # 掛載上傳檔案的目錄 /uploads
     UPLOAD_DIR = settings.UPLOAD_DIR
     if not UPLOAD_DIR.exists():
         UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
+
+    @app.get("/reset-password-web", response_class=FileResponse)
+    async def get_reset_password_web_page():
+        """提供重設密碼的 HTML 中介頁。"""
+        return str(STATIC_PATH / "pages/reset_password.html")
 
     @app.on_event("startup")
     async def startup_event() -> None:
@@ -55,7 +53,7 @@ def create_app() -> FastAPI:
 
     # 其他 API
     app.include_router(prediction.router, prefix="/api/v1")
-    app.include_router(diaries.router, prefix="/api/v1")
+    app.include_router(diaries.router, prefix="/api/v1/diaries", tags=["Diaries"])
     app.include_router(knowledge.router, prefix="/api/v1")
 
     # Admin router (通常有自己的根路徑，不放在 /api/v1 內)

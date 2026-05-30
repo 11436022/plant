@@ -109,6 +109,9 @@ interface PlantApiService {
     @POST("auth/user/verify-email/request")
     fun requestEmailVerification(@Body request: EmailVerificationRequest): Call<GenericResponse>
 
+    @POST("auth/user/reset-password")
+    fun resetPassword(@Body request: ResetPasswordRequest): Call<GenericResponse>
+
     // 【診斷日誌相關】 (注意：這些會自動由 Interceptor 加上 Token)
 
     // @Multipart
@@ -157,7 +160,7 @@ interface PlantApiService {
     // --- 3. Retrofit 實例產生器 ---
     companion object {
         // 模擬器連線本機電腦後端的專用 IP，並包含 API 版本
-        private const val BASE_URL = "http://輸入你的IP:8000/api/v1/"
+        private const val BASE_URL = "http://192.168.56.1:8000/api/v1/"
 
         fun create(token: String? = null): PlantApiService {
 

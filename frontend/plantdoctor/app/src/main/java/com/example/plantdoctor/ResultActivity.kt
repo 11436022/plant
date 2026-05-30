@@ -150,7 +150,7 @@ class ResultActivity : AppCompatActivity() {
 
             val fullAdvice = StringBuilder().apply {
                 append("【專家建議】\n${data.suggestion ?: "尚無建議"}\n\n")
-                //append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
+                append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
             }.toString()
             tvAdvice.text = fullAdvice
         } catch (e: Exception) {
