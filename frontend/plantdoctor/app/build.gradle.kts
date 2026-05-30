@@ -1,6 +1,15 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+}
+
+// 讀取 local.properties 檔案
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -15,6 +24,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // 從 local.properties 讀取 WIFI_HOST，並加到 BuildConfig
+        buildConfigField("String", "WIFI_HOST", "\"${localProperties.getProperty("WIFI_HOST") ?: ""}\"")
     }
 
     buildTypes {
