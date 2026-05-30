@@ -71,8 +71,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="plantdoctor"
-                    android:host="reset"
-                    android:path="/reset-password" />
+                    android:host="reset-password" />
             </intent-filter>
         </activity>
         <activity

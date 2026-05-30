@@ -38,9 +38,11 @@ async def predict_plant_status(file: UploadFile = File(...), db: Session = Depen
     """
     start_time = time.time()
     try:
-        # 1. 將圖片儲存到臨時位置
-        # temp_file_path = save_upload_file(file, TEMP_DIR) # <-- 移除舊的、不存在的函式呼叫
-        temp_file_path = TEMP_DIR / (file.filename or f"{uuid.uuid4()}.jpg")
+        # 1. 產生一個安全的、唯一的檔名，並儲存到臨時位置
+        suffix = Path(file.filename).suffix if file.filename else ".jpg"
+        safe_filename = f"{uuid.uuid4()}{suffix}"
+        temp_file_path = TEMP_DIR / safe_filename
+        
         with open(temp_file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 

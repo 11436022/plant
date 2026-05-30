@@ -98,8 +98,12 @@ def send_password_reset_email(
         expires_in_minutes=settings.PASSWORD_RESET_EXPIRE_MINUTES,
         db=db,
     )
-    # 將連結指向新的中介網頁 /reset-password-web
-    reset_url = _build_url(settings.FRONTEND_BASE_URL, "/reset-password-web", token)
+    # 產生指向 /app-redirect 中轉站的 URL
+    params = {
+        "target": "plantdoctor://reset-password",
+        "token": token,
+    }
+    reset_url = f"{settings.PUBLIC_BASE_URL}/api/v1/auth/app-redirect?{urlencode(params)}"
     send_email(
         to_email=email,
         subject="Plant 重設密碼通知",

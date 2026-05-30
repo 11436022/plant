@@ -176,6 +176,7 @@
                         android:textSize="16sp"
                         android:layout_marginBottom="24dp" />
 
+
                     <LinearLayout
                         android:id="@+id/layout_note_display"
                         android:layout_width="match_parent"
