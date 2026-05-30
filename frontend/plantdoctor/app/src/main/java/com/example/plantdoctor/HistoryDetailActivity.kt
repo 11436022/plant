@@ -407,8 +407,8 @@ class HistoryDetailActivity : AppCompatActivity() {
                     }
 
                     val fullAdvice = StringBuilder().apply {
-                        append("【專家建議】\n${data.suggestion ?: "尚無建議"}\n\n")
-                        //append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
+                        append("【病症狀態】\n${data.suggestion ?: "病症狀態"}\n\n")
+                        append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
                         append("【過往筆記】")
                     }.toString()
                     tvAdvice.text = fullAdvice

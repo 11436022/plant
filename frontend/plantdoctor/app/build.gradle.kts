@@ -26,7 +26,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // 從 local.properties 讀取 WIFI_HOST，並加到 BuildConfig
-        buildConfigField("String", "WIFI_HOST", "\"${localProperties.getProperty("WIFI_HOST") ?: ""}\"")
+        val wifiHost = localProperties.getProperty("WIFI_HOST", "").trim().removeSurrounding("\"")
+        buildConfigField("String", "WIFI_HOST", "\"$wifiHost\"")
     }
 
     buildTypes {
@@ -44,6 +45,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
+        buildConfig = true
         compose = true
         viewBinding = true
     }

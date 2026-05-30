@@ -29,10 +29,6 @@ data class RegisterRequest(
 )
 
 data class ForgotPasswordRequest(val email: String)
-data class ResetPasswordRequest(val token: String, val new_password: String)
-
-data class ResetPasswordRequest(val token: String, val new_password: String)
-
 
 data class EmailVerificationRequest(
     val email: String

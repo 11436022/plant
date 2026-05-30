@@ -39,7 +39,7 @@ def create_app() -> FastAPI:
     @app.get("/reset-password-web", response_class=FileResponse)
     async def get_reset_password_web_page():
         """提供重設密碼的 HTML 中介頁。"""
-        return str(STATIC_PATH / "pages/reset_password.html")
+        return str(STATIC_PATH / "reset_password.html")
 
     @app.on_event("startup")
     async def startup_event() -> None:
