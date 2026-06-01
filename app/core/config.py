@@ -19,9 +19,10 @@ class Settings(BaseSettings):
     API_TITLE: str = "Plant API"
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
+    WIFI_HOST_IP: str = "127.0.0.1"
 
     # 對外網址設定
-    FRONTEND_BASE_URL: str = "http://192.168.56.1:8000"
+    FRONTEND_BASE_URL: str = f"http://{WIFI_HOST_IP}:8000"
     PUBLIC_BASE_URL: str = FRONTEND_BASE_URL
     EMAIL_VERIFY_PATH: str = "/api/v1/auth/user/verify-email"
     PASSWORD_RESET_PATH: str = "/reset-password"

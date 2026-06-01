@@ -51,12 +51,7 @@ async def get_all_history(current_user: models.User = Depends(get_current_user))
                 if row.get("image_url"):
                     row["image_url"] = build_public_image_url(row["image_url"])
             
-            # --- 偵錯用：印出最終要回傳給 App 的資料 ---
-            print("----------- API Response for Diaries -----------")
-            import json
-            # 使用 json.dumps 確保能處理 datetime 等特殊型別，並進行美化輸出
-            print(json.dumps(rows, default=str, indent=2, ensure_ascii=False))
-            print("----------------------------------------------")
+            
 
             return {"status": "success", "count": len(rows), "data": rows}
     except Exception as exc:

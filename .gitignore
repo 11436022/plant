@@ -1,3 +1,6 @@
+# Android
+/frontend/plantdoctor/local.properties
+
 .env
 __pycache__/
 .vscode/

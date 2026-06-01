@@ -2,16 +2,21 @@ version: "3.8"
 
 services:
   web:
+    # 使用當前目錄的 Dockerfile 來建構映像檔
     build: .
+    # 為建構出來的映像檔命名
     image: plant-backend
+    # 容器的名稱
     container_name: plant_app_container
+    # 將主機的 8000 port 映射到容器的 8000 port
     ports:
       - "8000:8000"
+    # 讀取 .env 檔案中的環境變數
     env_file:
       - .env
+    # 掛載 volumes，讓資料持久化
     volumes:
-      # --- 關鍵：持久化掛載 ---
-      # [主機路徑]:[容器內路徑]
-      # . 代表當前資料夾，這會把電腦的 static/uploads 同步到容器裡
+      # 將主機的 uploads 目錄同步到容器中，確保上傳的檔案不會因容器重啟而消失
       - ./static/uploads:/app/static/uploads
+    # 設定容器總是自動重啟
     restart: always
