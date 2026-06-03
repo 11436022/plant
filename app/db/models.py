@@ -59,7 +59,7 @@ class User(Base):
     role = Column(String(20), nullable=False, default="user")
     # 新註冊帳號需要先驗證信箱；既有資料庫則由 migration 與啟動修補補齊欄位。
     is_email_verified = Column(Boolean, nullable=False, default=True)
-    email_verified_at = Column(DateTime(timezone=True), nullable=True)
+    email_verified_at = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     plant_diary = relationship("PlantDiary", back_populates="user")
