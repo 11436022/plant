@@ -43,8 +43,9 @@
 
         <!-- 導覽列 -->
         <div class="nav">
-            <a href="/admin/">診斷紀錄管理</a>
-            <a href="/admin/users/" class="active">使用者管理</a>
+            <a href="/admin/" class="{% if 'users' not in request.url.path and 'feedback' not in request.url.path %}active{% endif %}">診斷紀錄管理</a>
+            <a href="/admin/users/" class="{% if 'users' in request.url.path %}active{% endif %}">使用者管理</a>
+            <a href="/admin/feedback/">使用者回饋</a>
         </div>
 
         <!-- 搜尋功能 -->

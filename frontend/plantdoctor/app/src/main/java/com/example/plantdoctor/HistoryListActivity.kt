@@ -25,10 +25,6 @@ import androidx.constraintlayout.widget.ConstraintLayout // 🌟 新增
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
-// 移除了有歧義的 'DataSource' import，將在函式簽名中直接使用完整路徑
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import retrofit2.Call
@@ -210,30 +206,10 @@ class HistoryAdapter(
         holder.tvDate.text = item.created_at
         holder.tvStatus.text = item.status_name
 
-        Glide.with(holder.itemView.context)
-            .load(item.image_url)
-            .listener(object : RequestListener<android.graphics.drawable.Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<android.graphics.drawable.Drawable>,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    Log.e("Glide", "圖片載入失敗: " + model?.toString() + ", 原因: " + e?.toString())
-                    return false // 返回 false，讓 Glide 繼續處理錯誤圖示
-                }
+        val finalUrl = fixImageUrl(item.image_url)
 
-                override fun onResourceReady(
-                    resource: android.graphics.drawable.Drawable,
-                    model: Any,
-                    target: Target<android.graphics.drawable.Drawable>,
-                    dataSource: com.bumptech.glide.load.DataSource,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    Log.d("Glide", "圖片載入成功: " + model.toString())
-                    return false // 返回 false，讓 Glide 繼續將圖片設定到 ImageView
-                }
-            })
+        Glide.with(holder.itemView.context)
+            .load(finalUrl)
             .placeholder(android.R.drawable.ic_menu_gallery)
             .error(android.R.drawable.ic_dialog_alert)
             .into(holder.imgHistory)
@@ -257,4 +233,41 @@ class HistoryAdapter(
     }
 
     override fun getItemCount() = historyList.size
+
+    private fun fixImageUrl(rawUrl: String): String {
+        // 1. 安全防禦：如果是測試環境儲存的本地 Uri 路徑，直接回傳
+        if (rawUrl.startsWith("content://") || rawUrl.startsWith("file://")) {
+            return rawUrl
+        }
+
+        // 2. 🌟 核心進化：直接跟 API 拿目前已經探路成功的正確 IP，零延遲、不阻塞！
+        val resolvedIp = com.example.plantdoctor.PlantApiService.currentRunningIp
+
+        // 3. 把後端傳來的 127.0.0.1 或 localhost，通通置換成當前可通的 IP
+        var url = rawUrl.replace("127.0.0.1", resolvedIp)
+            .replace("localhost", resolvedIp)
+
+        // 4. 基本相對路徑防禦
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            val safePath = if (url.startsWith("/")) url else "/$url"
+            url = "http://$resolvedIp:8000$safePath"
+        }
+
+        // 5. static/ 路由防禦
+        val keywordStatic = "static/"
+        if (url.contains(keywordStatic)) {
+            val startIndex = url.indexOf(keywordStatic)
+            url = "http://$resolvedIp:8000/$keywordStatic" + url.substring(startIndex + keywordStatic.length)
+        }
+
+        // 6. uploads/ 路由防禦
+        val keywordUploads = "uploads/"
+        if (url.contains(keywordUploads)) {
+            val startIndex = url.indexOf(keywordUploads)
+            url = "http://$resolvedIp:8000/$keywordUploads" + url.substring(startIndex + keywordUploads.length)
+        }
+
+        android.util.Log.d("FixImageUrl", "🖼️ 圖片網址最終修復為: $url")
+        return url
+    }
 }

@@ -62,7 +62,6 @@ async def admin_dashboard(request: Request, search: str = None, page: int = Quer
             # 4. 圖片縮圖顯示 (URL 處理)
             for row in rows:
                 if row.get("image_url"):
-                    # 確保即使圖片 URL 不存在也能正常運作
                     row["image_url"] = build_public_image_url(row["image_url"])
 
             templates_engine = request.app.state.templates
@@ -85,6 +84,56 @@ async def admin_dashboard(request: Request, search: str = None, page: int = Quer
                     "total_pages": total_pages,
                     "total_items": total_items,
                     "base_url": str(request.url_for("admin_dashboard")), # 讓模板可以產生分頁連結
+                }
+            })
+            
+            return HTMLResponse(content=content)
+    finally:
+        conn.close()
+
+@router.get("/feedback/", response_class=HTMLResponse)
+async def admin_feedback_list(request: Request, page: int = Query(1, ge=1)):
+    """【查詢】功能：顯示、搜尋和分頁所有使用者回饋"""
+    conn = get_db_connection()
+    try:
+        with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+            # 取得總筆數，用於計算分頁
+            cursor.execute("SELECT COUNT(id) as count FROM diagnosis_feedback")
+            total_items = cursor.fetchone()['count']
+            total_pages = (total_items + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
+
+            # 取得當前頁面的資料
+            offset = (page - 1) * ITEMS_PER_PAGE
+            sql = """
+                SELECT 
+                    f.id, f.image_url, f.original_plant_name, f.original_disease_name, 
+                    f.is_plant_error, f.is_disease_error, f.corrected_plant_name, 
+                    f.corrected_disease_name, f.created_at,
+                    u.username
+                FROM diagnosis_feedback f
+                LEFT JOIN user u ON f.user_id = u.user_id
+                ORDER BY f.created_at DESC
+                LIMIT %s OFFSET %s
+            """
+            cursor.execute(sql, (ITEMS_PER_PAGE, offset))
+            feedbacks = cursor.fetchall()
+
+            # 將圖片路徑轉換為可公開存取的 URL
+            for feedback in feedbacks:
+                if feedback.get("image_url"):
+                    feedback["image_url"] = build_public_image_url(feedback["image_url"])
+
+            templates_engine = request.app.state.templates
+            template = templates_engine.get_template("feedback.html")
+            content = template.render({
+                "request": request,
+                "title": "使用者回饋 - 管理者後台",
+                "feedbacks": feedbacks,
+                "pagination": {
+                    "current_page": page,
+                    "total_pages": total_pages,
+                    "total_items": total_items,
+                    "base_url": str(request.url_for("admin_feedback_list")),
                 }
             })
             

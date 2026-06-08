@@ -88,10 +88,17 @@ class RegisterActivity : AppCompatActivity() {
                         showVerificationDialog(email)
 
                     } else {
-                        // 嘗試解析後端傳回的錯誤訊息 (例如：Username already exists)
+                        // 註冊失敗，顯示詳細錯誤
                         val errorBody = response.errorBody()?.string()
-                        Log.e("RegisterActivity", "Error: $errorBody")
-                        Toast.makeText(this@RegisterActivity, "註冊失敗：帳號或 Email 已被使用", Toast.LENGTH_LONG).show()
+                        Log.e("RegisterActivity", "Registration failed with code ${response.code()}, body: $errorBody")
+                        try {
+                            // 嘗試解析後端回傳的 JSON
+                            val errorJson = org.json.JSONObject(errorBody ?: "{}")
+                            val detail = errorJson.optString("detail", "註冊失敗，請檢查您輸入的資料。")
+                            Toast.makeText(this@RegisterActivity, detail, Toast.LENGTH_LONG).show()
+                        } catch (e: Exception) {
+                            Toast.makeText(this@RegisterActivity, "註冊失敗，請稍後再試。", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
 

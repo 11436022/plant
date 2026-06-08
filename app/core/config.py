@@ -13,7 +13,8 @@ class Settings(BaseSettings):
     # 專案根目錄與靜態資源路徑
     BASE_DIR: Path = Path(__file__).resolve().parents[2]
     STATIC_DIR: Path = BASE_DIR / "static"
-    UPLOAD_DIR: Path = STATIC_DIR / "uploads"
+    UPLOAD_DIR: Path = STATIC_DIR / "uploads" # 使用者日記圖片
+    FEEDBACK_UPLOAD_DIR: Path = STATIC_DIR / "feedback_uploads" # 診斷回饋圖片
 
     # API 基本設定
     API_TITLE: str = "Plant API"
@@ -22,8 +23,16 @@ class Settings(BaseSettings):
     WIFI_HOST_IP: str = "127.0.0.1"
 
     # 對外網址設定
-    FRONTEND_BASE_URL: str = f"http://{WIFI_HOST_IP}:8000"
-    PUBLIC_BASE_URL: str = FRONTEND_BASE_URL
+    @property
+    def FRONTEND_BASE_URL(self) -> str:
+        """基於 WIFI_HOST_IP 動態計算前端基礎 URL。"""
+        return f"http://{self.WIFI_HOST_IP}:8000"
+
+    @property
+    def PUBLIC_BASE_URL(self) -> str:
+        """公開可訪問的基礎 URL，通常與前端 URL 相同。"""
+        return self.FRONTEND_BASE_URL
+
     EMAIL_VERIFY_PATH: str = "/api/v1/auth/user/verify-email"
     PASSWORD_RESET_PATH: str = "/reset-password"
 
@@ -50,6 +59,8 @@ class Settings(BaseSettings):
         super().__init__(**values)
         # 確保上傳目錄存在
         self.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+        self.FEEDBACK_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
         # 如果沒有設定 FROM_EMAIL，預設使用 USERNAME
         if self.SMTP_USERNAME and not self.SMTP_FROM_EMAIL:
             self.SMTP_FROM_EMAIL = self.SMTP_USERNAME

@@ -32,12 +32,12 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     // 🌟 全域宣告需要動態換色的 UI 元件
-    private lateinit var rootLayout: ConstraintLayout
+    private lateinit var rootLayout: android.widget.RelativeLayout
     private lateinit var tvSettingsTitle: TextView
     private lateinit var tvColorSelect: TextView
     private lateinit var tvForgotPassword: TextView
+    private lateinit var tvVolumeMixer: TextView
     private lateinit var btnBack: android.widget.ImageButton
-    private lateinit var btnVolumeMixer: android.widget.ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,53 +48,43 @@ class SettingsActivity : AppCompatActivity() {
         val savedUsername = sharedPref.getString("username", "尚未登錄")
         val savedEmail = sharedPref.getString("email", "尚未設定 Email")
 
-        // --- 2. 綁定 UI 並顯示資料 ---
+        // --- 2. 綁定 UI ---
         rootLayout = findViewById(R.id.settings_root_layout)
         tvSettingsTitle = findViewById(R.id.tv_settings_title)
         tvColorSelect = findViewById(R.id.tv_color_select)
-        btnBack = findViewById(R.id.btn_back_home)
-        btnVolumeMixer = findViewById(R.id.btn_volume_mixer)
-
-
-        val etUsername = findViewById<EditText>(R.id.et_username)
-        val etGmail = findViewById<EditText>(R.id.et_gmail)
         tvForgotPassword = findViewById(R.id.tv_forgot_password)
+        tvVolumeMixer = findViewById(R.id.tv_volume_mixer)
+        btnBack = findViewById(R.id.btn_back_home)
         val btnLogout = findViewById<Button>(R.id.btn_logout)
 
-        etUsername.setText(savedUsername)
-        etGmail.setText(savedEmail)
+        // --- 3. 從 API 取得最新使用者資料 ---
+        fetchUserProfile()
 
-        // 🌟 核心新增：一開機就套用上次使用者選好的主題顏色
-        val savedTheme = sharedPref.getInt("THEME_COLOR_ID", 0) // 預設 0 是經典綠
+        // --- 4. 套用主題顏色 ---
+        val savedTheme = sharedPref.getInt("THEME_COLOR_ID", 0)
         applyThemeSettings(savedTheme)
 
-        // --- 3. 點擊事件處理 ---
-
-        // 點擊「獨立的喇叭按鈕」彈出四軌音量調音台
-        btnVolumeMixer.setOnClickListener {
-            SoundManager.playBubblePop()
-            showVolumeMixerDialog()
-        }
-
-        // 返回上一頁
+        // --- 5. 點擊事件處理 ---
         btnBack.setOnClickListener {
             SoundManager.playBubblePop()
             finish()
         }
 
-        // 忘記密碼 / 更改密碼
         tvForgotPassword.setOnClickListener {
             SoundManager.playBubblePop()
             showForgotPasswordDialog(savedEmail ?: "")
         }
 
-        // 🌟 核心修改：點擊背景顏色選擇，彈出高對比選單
         tvColorSelect.setOnClickListener {
             SoundManager.playBubblePop()
             showColorSelectDialog()
         }
 
-        // --- 4. 登出按鈕邏輯 ---
+        tvVolumeMixer.setOnClickListener {
+            SoundManager.playBubblePop()
+            showVolumeMixerDialog()
+        }
+
         btnLogout.setOnClickListener {
             SoundManager.playBubblePop()
             with(sharedPref.edit()) {
@@ -216,13 +206,11 @@ class SettingsActivity : AppCompatActivity() {
      * 🌟 核心新增：負責全套 UI 主題色抽換的大總管
      */
     private fun applyThemeSettings(themeId: Int) {
-        // 🌟 直接呼叫大總管，把設定頁的元件傳進去，打完收工！
         ThemeManager.applyTheme(
             context = this,
             rootLayout = rootLayout,
-            titles = listOf(tvSettingsTitle, tvColorSelect,tvForgotPassword),
-            imageButtons = listOf(btnBack, btnVolumeMixer)
-            // 💡 登出按鈕和照片按鈕因為你想維持特殊色（紅色/橘黃），這裡就故意不傳進去，它們就不會被動到！
+            titles = listOf(tvSettingsTitle, tvColorSelect, tvForgotPassword, tvVolumeMixer),
+            imageButtons = listOf(btnBack)
         )
     }
 
@@ -384,6 +372,52 @@ class SettingsActivity : AppCompatActivity() {
             SoundManager.playBubblePop()
         }
         builder.show()
+    }
+
+    /**
+     * 🌟 核心新增：從後端 API 取得最新的使用者資料並更新 UI
+     */
+    private fun fetchUserProfile() {
+        val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+        val token = sharedPref.getString("token", null)
+
+        // 🌟 綁定 UI 元件
+        val tvUsername = findViewById<TextView>(R.id.tv_username)
+        val tvGmail = findViewById<TextView>(R.id.tv_gmail)
+
+        // 先用 SharedPreferences 的快取資料填充，避免 API 回來前畫面空白
+        tvUsername.text = sharedPref.getString("username", "尚未登錄")
+        tvGmail.text = sharedPref.getString("email", "尚未設定 Email")
+
+        if (token == null) {
+            return // 沒有 token，不需執行 API 呼叫
+        }
+
+        val apiService = PlantApiService.create(token)
+        apiService.getUserProfile().enqueue(object : Callback<UserProfileResponse> {
+            override fun onResponse(call: Call<UserProfileResponse>, response: Response<UserProfileResponse>) {
+                if (response.isSuccessful) {
+                    val userProfile = response.body()?.data
+                    if (userProfile != null) {
+                        tvUsername.text = userProfile.username
+                        tvGmail.text = userProfile.email ?: "尚未設定 Email"
+
+                        // 更新 SharedPreferences 快取
+                        with(sharedPref.edit()) {
+                            putString("username", userProfile.username)
+                            putString("email", userProfile.email)
+                            apply()
+                        }
+                    }
+                } else {
+                    Toast.makeText(this@SettingsActivity, "無法獲取最新使用者資料", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<UserProfileResponse>, t: Throwable) {
+                Toast.makeText(this@SettingsActivity, "網路連線失敗", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     /**

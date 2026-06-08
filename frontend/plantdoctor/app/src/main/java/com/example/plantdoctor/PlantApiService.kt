@@ -1,5 +1,6 @@
 package com.example.plantdoctor
 
+import android.content.Context
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
@@ -11,7 +12,6 @@ import java.util.concurrent.TimeUnit
 
 // --- 1. Data Models (對應後端 JSON 結構) ---
 
-// 登入與註冊
 data class LoginRequest(val username: String, val password: String)
 data class LoginResponse(
     val status: String,
@@ -28,17 +28,12 @@ data class RegisterRequest(
     val full_name: String
 )
 
-// 忘記密碼
 data class ForgotPasswordRequest(val email: String)
 
 data class EmailVerificationRequest(
     val email: String
 )
 
-// 診斷紀錄相關 (共用 HistoryItem)
-// data class UploadResponse(val status: String, val data: HistoryItem) // <--- 舊的上傳回傳，將被取代
-
-// 【新流程】兩階段提交的資料模型
 data class PredictionResponse(
     val prediction_id: String,
     val analysis_result: AnalysisResult
@@ -53,19 +48,16 @@ data class AnalysisResult(
 )
 data class ConfirmRequest(val user_note: String)
 
-// 【新流程】前端送往後端，用來確認日記的資料模型
 data class DiaryConfirmRequest(
     val user_note: String?,
     val disease_name: String,
     val gemini_advice: String
 )
 
-// 用於 PATCH 的請求模型
 data class PatchDiaryRequest(
     val user_corrected_status: String? = null,
     val user_note: String? = null
 )
-
 
 data class HistoryResponse(
     val status: String,
@@ -75,15 +67,41 @@ data class HistoryResponse(
 
 data class DetailDetailResponse(val status: String, val data: HistoryItem)
 
-// 通用回傳 (用於註冊成功、刪除成功、忘記密碼成功等)
 data class GenericResponse(val status: String, val message: String)
 
-// 【知識庫相關】
 data class DiagnosisItem(val name: String, val category: String)
 data class DiagnosesResponse(
     val status: String,
     val count: Int,
     val data: List<DiagnosisItem>
+)
+
+
+// --- User Profile ---
+data class UserProfileData(
+    val username: String,
+    val email: String?,
+    val created_at: String
+)
+
+data class UserProfileResponse(
+    val status: String,
+    val data: UserProfileData
+)
+
+
+// --- Diagnosis Feedback ---
+data class DiagnosisFeedbackRequest(
+    val prediction_id: String, // <-- 改為傳送 prediction_id
+    val original_plant_name: String?,
+    val original_disease_name: String?,
+    val is_plant_error: Boolean,
+    val is_disease_error: Boolean
+)
+
+data class DiagnosisFeedbackResponse(
+    val id: Int,
+    val message: String
 )
 
 
@@ -105,38 +123,25 @@ interface PlantApiService {
     @POST("auth/user/forgot-password")
     fun forgotPassword(@Body request: ForgotPasswordRequest): Call<GenericResponse>
 
-    // 🌟 補寄驗證信：
     @POST("auth/user/verify-email/request")
     fun requestEmailVerification(@Body request: EmailVerificationRequest): Call<GenericResponse>
 
     @POST("auth/user/reset-password")
     fun resetPassword(@Body request: ResetPasswordRequest): Call<GenericResponse>
 
-    // 【診斷日誌相關】 (注意：這些會自動由 Interceptor 加上 Token)
-
-    // @Multipart
-    // @POST("diaries/upload")
-    // fun uploadImage(
-    //     @Part("user_note") userNote: RequestBody,
-    //     @Part image: MultipartBody.Part
-    // ): Call<UploadResponse>
-
     // --- 新的兩階段提交流程 ---
 
-    // 1. 預測 API
     @Multipart
-    @POST("predict/") // 注意路徑變為 /api/v1/predict/
+    @POST("predict/")
     fun predictImage(
         @Part image: MultipartBody.Part
     ): Call<PredictionResponse>
 
-    // 2. 確認儲存 API
     @POST("diaries/confirm/{prediction_id}")
     fun confirmDiary(
         @Path("prediction_id") predictionId: String,
-        @Body request: DiaryConfirmRequest // <-- 使用新的 Request Body
-    ): Call<GenericResponse> // 假設成功只回傳通用訊息
-
+        @Body request: DiaryConfirmRequest
+    ): Call<GenericResponse>
 
     @GET("diaries")
     fun getAllHistory(): Call<HistoryResponse>
@@ -156,23 +161,71 @@ interface PlantApiService {
     @GET("knowledge/diagnoses")
     fun getDiagnoses(): Call<DiagnosesResponse>
 
+    @GET("auth/user/me")
+    fun getUserProfile(): Call<UserProfileResponse>
+
+    @POST("feedback/diagnosis")
+    fun sendDiagnosisFeedback(@Body feedbackRequest: DiagnosisFeedbackRequest): Call<DiagnosisFeedbackResponse>
+
 
     // --- 3. Retrofit 實例產生器 ---
     companion object {
-        // 模擬器連線本機電腦後端的專用 IP，並包含 API 版本
-        private const val BASE_URL = "http://192.168.56.1:8000/api/v1/"
+        private const val WIFI_HOST = BuildConfig.WIFI_HOST
+
+        // 🌟 新增這個全域變數，用來即時同步目前能通的 IP 門牌
+        var currentRunningIp: String = WIFI_HOST
+
+        private fun getSmartBaseUrl(): String {
+            val isEmulator = android.os.Build.FINGERPRINT.startsWith("generic")
+                    || android.os.Build.MODEL.contains("google_sdk")
+                    || android.os.Build.HARDWARE.contains("goldfish")
+                    || android.os.Build.HARDWARE.contains("ranchu")
+
+            if (isEmulator) {
+                currentRunningIp = "10.0.2.2" // 🤖 模擬器
+                return "http://10.0.2.2:8000/api/v1/"
+            }
+
+            return try {
+                var isUsbConnected = false
+                val thread = Thread {
+                    try {
+                        val socket = java.net.Socket()
+                        socket.connect(java.net.InetSocketAddress("127.0.0.1", 8000), 200)
+                        socket.close()
+                        isUsbConnected = true
+                    } catch (e: Exception) {
+                        isUsbConnected = false
+                    }
+                }
+                thread.start()
+                thread.join(250)
+
+                if (isUsbConnected) {
+                    currentRunningIp = "127.0.0.1" // 🔌 有線插線
+                    "http://127.0.0.1:8000/api/v1/"
+                } else {
+                    currentRunningIp = WIFI_HOST // 📱 無線區網
+                    "http://$WIFI_HOST:8000/api/v1/"
+                }
+            } catch (e: Exception) {
+                currentRunningIp = WIFI_HOST
+                "http://$WIFI_HOST:8000/api/v1/"
+            }
+        }
 
         fun create(token: String? = null): PlantApiService {
+            val dynamicBaseUrl = getSmartBaseUrl()
+            android.util.Log.d("PlantApi", "🚀 目前連線通道與 IP 鎖定: $dynamicBaseUrl, 圖片對齊 IP: $currentRunningIp")
 
-            // 建立 OkHttpClient，配置自動蓋章攔截器與超時設定
             val okHttpClient = OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS) // 連線超時
-                .readTimeout(60, TimeUnit.SECONDS)    // 讀取超時 (給 AI 診斷留時間)
-                .addInterceptor(AuthInterceptor(token)) // 注入攔截器
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .addInterceptor(AuthInterceptor(token))
                 .build()
 
             return Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(dynamicBaseUrl)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()

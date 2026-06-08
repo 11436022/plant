@@ -105,3 +105,28 @@ class PlantDiary(Base):
     crop = relationship("Crop")
     disease = relationship("Disease")
     pest = relationship("Pest")
+
+
+class DiagnosisFeedback(Base):
+    """用於儲存使用者診斷回饋的資料表。"""
+
+    __tablename__ = "diagnosis_feedback"
+
+    id = Column(Integer, primary_key=True, index=True)
+    prediction_id = Column(String(64), nullable=True, index=True, comment="關聯的預測 ID")
+    user_id = Column(Integer, ForeignKey("user.user_id"), nullable=True)  # 允許匿名回饋
+
+    image_url = Column(String(255), nullable=False)
+
+    original_plant_name = Column(String(100))
+    original_disease_name = Column(String(100))
+
+    is_plant_error = Column(Boolean, default=False)
+    is_disease_error = Column(Boolean, default=False)
+
+    corrected_plant_name = Column(String(100))
+    corrected_disease_name = Column(String(100))
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User")

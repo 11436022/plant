@@ -138,18 +138,6 @@
                             app:autoSizeTextType="uniform"
                             app:autoSizeMinTextSize="16sp"/>
 
-                        <TextView
-                            android:id="@+id/tv_feedback_link"
-                            android:layout_width="wrap_content"
-                            android:layout_height="48dp"
-                            android:text="結果有誤？"
-                            android:textColor="#007AFF"
-                            android:textSize="16sp"
-                            android:gravity="center"
-                            android:paddingHorizontal="8dp"
-                            android:background="?attr/selectableItemBackground"
-                            android:visibility="gone"
-                            tools:visibility="visible"/>
                     </LinearLayout>
 
                     <View
@@ -183,7 +171,8 @@
                         android:textColor="#666666"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:layout_marginTop="24dp"/>
+                        android:layout_marginTop="24dp"
+                        android:visibility="gone"/>
 
                     <EditText
                         android:id="@+id/et_user_note"
@@ -195,7 +184,39 @@
                         android:minLines="2"
                         android:textSize="16sp"
                         android:textColor="#333333"
-                        android:background="@android:drawable/edit_text"/>
+                        android:background="@android:drawable/edit_text"
+                        android:visibility="gone"/>
+
+                    <!-- 新的按鈕區域 -->
+                    <LinearLayout
+                        android:id="@+id/ll_action_buttons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="24dp">
+
+                        <Button
+                            android:id="@+id/btn_discard"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="結果有誤"
+                            android:textColor="#D32F2F"
+                            app:strokeColor="#D32F2F"
+                            android:layout_marginEnd="8dp"/>
+
+                        <Button
+                            android:id="@+id/btn_save"
+                            style="@style/Widget.MaterialComponents.Button"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="儲存至日記"
+                            android:backgroundTint="#2E7D32"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+
 
                     <Button
                         android:id="@+id/btn_save_report"
@@ -208,7 +229,8 @@
                         android:textSize="22sp"
                         android:textColor="#FFFFFF"
                         android:textStyle="bold"
-                        app:cornerRadius="15dp" />
+                        app:cornerRadius="15dp"
+                        android:visibility="gone"/>
 
                     <View
                         android:layout_width="match_parent"

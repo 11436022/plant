@@ -1,8 +1,32 @@
 from sqlalchemy.orm import Session
 
+from app.db import models
 from app.db.session import SessionLocal
 from app.db.models import Crop, User
 from app.api_fetch import fetch_crop_data
+from app.schemas.feedback import DiagnosisFeedbackCreate
+
+
+def create_diagnosis_feedback(db: Session, feedback_data: DiagnosisFeedbackCreate, user_id: int) -> models.DiagnosisFeedback:
+    """
+    將使用者的診斷回饋寫入資料庫。
+    採用手動欄位對應，以確保 Pydantic 模型和 SQLAlchemy 模型之間的解耦。
+    """
+    db_feedback = models.DiagnosisFeedback(
+        prediction_id=feedback_data.prediction_id, # <-- 補上遺漏的這一行
+        user_id=user_id,
+        image_url=feedback_data.image_url,
+        original_plant_name=feedback_data.original_plant_name,
+        original_disease_name=feedback_data.original_disease_name,
+        is_plant_error=feedback_data.is_plant_error,
+        is_disease_error=feedback_data.is_disease_error,
+        corrected_plant_name=feedback_data.corrected_plant_name,
+        corrected_disease_name=feedback_data.corrected_disease_name
+    )
+    db.add(db_feedback)
+    db.commit()
+    db.refresh(db_feedback)
+    return db_feedback
 
 
 def get_user_by_username(db: Session, username: str) -> User | None:

@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.core.config import settings
-from app.routers import admin, auth, diaries, health, prediction, knowledge
+from app.routers import admin, auth, diaries, health, prediction, knowledge, feedback
 from app.services.account_recovery import ensure_auth_schema
 
 # 取得專案根目錄，供 template 與 static 掛載使用。
@@ -30,16 +30,14 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # 掛載上傳檔案的目錄 /uploads
-    UPLOAD_DIR = settings.UPLOAD_DIR
-    if not UPLOAD_DIR.exists():
-        UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
+    # 掛載上傳檔案的目錄
+    app.mount("/uploads", StaticFiles(directory=str(settings.UPLOAD_DIR)), name="uploads")
+    app.mount("/feedback_uploads", StaticFiles(directory=str(settings.FEEDBACK_UPLOAD_DIR)), name="feedback_uploads")
 
-    # @app.get("/reset-password-web", response_class=FileResponse)
-    # async def get_reset_password_web_page():
-    #     """提供重設密碼的 HTML 中介頁。"""
-    #     return str(STATIC_PATH / "pages/reset_password.html")
+    @app.get("/reset-password-web", response_class=FileResponse)
+    async def get_reset_password_web_page():
+        """提供重設密碼的 HTML 中介頁。"""
+        return str(STATIC_PATH / "reset_password.html")
 
     @app.on_event("startup")
     async def startup_event() -> None:
@@ -55,6 +53,7 @@ def create_app() -> FastAPI:
     app.include_router(prediction.router, prefix="/api/v1")
     app.include_router(diaries.router, prefix="/api/v1/diaries", tags=["Diaries"])
     app.include_router(knowledge.router, prefix="/api/v1")
+    app.include_router(feedback.router, prefix="/api/v1/feedback", tags=["Feedback"])
 
     # Admin router (通常有自己的根路徑，不放在 /api/v1 內)
     app.include_router(admin.router)

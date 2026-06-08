@@ -407,12 +407,12 @@ class HistoryDetailActivity : AppCompatActivity() {
                     }
 
                     val fullAdvice = StringBuilder().apply {
-                        append("【病例描述】\n${data.suggestion ?: "尚無病例描述"}\n\n")
-                        append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}\n\n")
+                        append("【病症狀態】\n${data.suggestion ?: "病症狀態"}\n\n")
+                        append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
                         append("【過往筆記】")
                     }.toString()
                     tvAdvice.text = fullAdvice
-                    currentImageUrl = data.image_url ?: ""
+                    currentImageUrl = fixImageUrl(data.image_url ?: "")
 
                     Glide.with(this@HistoryDetailActivity).load(currentImageUrl).placeholder(android.R.drawable.ic_menu_gallery).into(imgPlant)
                     Glide.with(this@HistoryDetailActivity).load(currentImageUrl).placeholder(android.R.drawable.ic_menu_gallery).into(imgPipPlant)
@@ -427,6 +427,43 @@ class HistoryDetailActivity : AppCompatActivity() {
                 Toast.makeText(this@HistoryDetailActivity, "載入失敗", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun fixImageUrl(rawUrl: String): String {
+        // 1. 安全防禦：如果是測試環境儲存的本地 Uri 路徑，直接回傳
+        if (rawUrl.startsWith("content://") || rawUrl.startsWith("file://")) {
+            return rawUrl
+        }
+
+        // 2. 🌟 核心進化：直接跟 API 拿目前已經探路成功的正確 IP，零延遲、不阻塞！
+        val resolvedIp = com.example.plantdoctor.PlantApiService.currentRunningIp
+
+        // 3. 把後端傳來的 127.0.0.1 或 localhost，通通置換成當前可通的 IP
+        var url = rawUrl.replace("127.0.0.1", resolvedIp)
+            .replace("localhost", resolvedIp)
+
+        // 4. 基本相對路徑防禦
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            val safePath = if (url.startsWith("/")) url else "/$url"
+            url = "http://$resolvedIp:8000$safePath"
+        }
+
+        // 5. static/ 路由防禦
+        val keywordStatic = "static/"
+        if (url.contains(keywordStatic)) {
+            val startIndex = url.indexOf(keywordStatic)
+            url = "http://$resolvedIp:8000/$keywordStatic" + url.substring(startIndex + keywordStatic.length)
+        }
+
+        // 6. uploads/ 路由防禦
+        val keywordUploads = "uploads/"
+        if (url.contains(keywordUploads)) {
+            val startIndex = url.indexOf(keywordUploads)
+            url = "http://$resolvedIp:8000/$keywordUploads" + url.substring(startIndex + keywordUploads.length)
+        }
+
+        android.util.Log.d("FixImageUrl", "🖼️ 圖片網址最終修復為: $url")
+        return url
     }
 
     private fun executeDelete() {
