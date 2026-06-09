@@ -14,6 +14,7 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -395,6 +396,9 @@ class SettingsActivity : AppCompatActivity() {
 
         apiService.forgotPassword(request).enqueue(object : Callback<GenericResponse> {
             override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
+                // [DEBUG] 將從後端收到的原始回應印出，方便在 Logcat 中查看
+                Log.d("SettingsActivity", "API Response: ${response.body().toString()}")
+
                 if (response.isSuccessful) {
                     Toast.makeText(this@SettingsActivity, "重設郵件已發送，請檢查您的信箱", Toast.LENGTH_LONG).show()
                 } else {
