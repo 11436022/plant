@@ -120,6 +120,7 @@ async def login_user(
         "message": "Login successful.",
         "access_token": token,
         "token_type": "bearer",
+        "email": db_user.email,
     }
 
 
