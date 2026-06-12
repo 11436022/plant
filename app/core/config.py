@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     API_PORT: int = 8000
 
     # 對外網址設定
-    FRONTEND_BASE_URL: str = "http://192.168.56.1:8000"
+    FRONTEND_BASE_URL: str = "http://localhost:8000"
     PUBLIC_BASE_URL: str = FRONTEND_BASE_URL
     EMAIL_VERIFY_PATH: str = "/user/verify-email"
     PASSWORD_RESET_PATH: str = "/reset-password"
