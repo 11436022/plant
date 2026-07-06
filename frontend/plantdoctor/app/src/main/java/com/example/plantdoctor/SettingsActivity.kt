@@ -14,6 +14,7 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -21,6 +22,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import android.view.View
+import com.example.plantdoctor.R
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -36,6 +38,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var tvSettingsTitle: TextView
     private lateinit var tvColorSelect: TextView
     private lateinit var tvForgotPassword: TextView
+    private lateinit var etUsername: EditText
+    private lateinit var etGmail: EditText
     private lateinit var btnBack: android.widget.ImageButton
     private lateinit var btnVolumeMixer: android.widget.ImageButton
 
@@ -48,17 +52,15 @@ class SettingsActivity : AppCompatActivity() {
         val savedUsername = sharedPref.getString("username", "尚未登錄")
         val savedEmail = sharedPref.getString("email", "尚未設定 Email")
 
-        // --- 2. 綁定 UI 並顯示資料 ---
+        // --- 2. 綁定 UI ---
         rootLayout = findViewById(R.id.settings_root_layout)
         tvSettingsTitle = findViewById(R.id.tv_settings_title)
         tvColorSelect = findViewById(R.id.tv_color_select)
-        btnBack = findViewById(R.id.btn_back_home)
-        btnVolumeMixer = findViewById(R.id.btn_volume_mixer)
-
-
-        val etUsername = findViewById<EditText>(R.id.et_username)
-        val etGmail = findViewById<EditText>(R.id.et_gmail)
         tvForgotPassword = findViewById(R.id.tv_forgot_password)
+        etUsername = findViewById(R.id.et_username)
+        etGmail = findViewById(R.id.et_gmail)
+        btnVolumeMixer = findViewById(R.id.btn_volume_mixer)
+        btnBack = findViewById(R.id.btn_back_home)
         val btnLogout = findViewById<Button>(R.id.btn_logout)
 
         etUsername.setText(savedUsername)
@@ -395,6 +397,9 @@ class SettingsActivity : AppCompatActivity() {
 
         apiService.forgotPassword(request).enqueue(object : Callback<GenericResponse> {
             override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
+                // [DEBUG] 將從後端收到的原始回應印出，方便在 Logcat 中查看
+                Log.d("SettingsActivity", "API Response: ${response.body().toString()}")
+
                 if (response.isSuccessful) {
                     Toast.makeText(this@SettingsActivity, "重設郵件已發送，請檢查您的信箱", Toast.LENGTH_LONG).show()
                 } else {
