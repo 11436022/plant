@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.db import models
 from app.db.session import SessionLocal
+from app.services import rag
 from app.services.knowledge import get_or_complete_knowledge
 
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
@@ -47,8 +48,28 @@ def diagnostic_plant(image_path, crops=None, diseases=None, pests=None):
     pest_list_str = ", ".join(pests) if pests else "unknown"
     img = Image.open(image_path)
 
+    # --- RAG 整合開始 ---
+    # 1. 初步分析圖片，產生搜尋查詢
+    preliminary_prompt = "You are an agricultural expert. Briefly describe the main subject and any visible symptoms in this image in a few keywords (e.g., 'tomato, leaf spots, yellowing'). This will be used to search a knowledge base. Respond in Traditional Chinese."
+    try:
+        preliminary_response = client.models.generate_content(model="gemini-2.5-flash", contents=[preliminary_prompt, img])
+        search_query = (preliminary_response.text or "").strip()
+        print(f" RAG: 初步分析關鍵詞: '{search_query}'")
+    except Exception as e:
+        print(f" RAG: 初步分析失敗: {e}")
+        search_query = "植物病徵" # 使用通用關鍵詞作為備用
+
+    # 2. 搜尋知識庫
+    retrieved_context = rag.search_knowledge_base(search_query, k=3)
+    # --- RAG 整合結束 ---
+
+
     prompt = f"""
-    Analyze the provided image and respond in valid JSON format, using Traditional Chinese for all user-facing text.
+    You are a top-tier plant pathologist. Analyze the provided image and context from our knowledge base to provide a professional diagnosis. Respond in valid JSON format, using Traditional Chinese for all user-facing text.
+
+    --- Knowledge Base Context ---
+    {retrieved_context if retrieved_context else "No specific context found."}
+    ---
 
     Reference Lists (for name standardization):
     - Known crops: {crop_list_str}

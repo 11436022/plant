@@ -8,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 from app.core.config import settings
 from app.routers import admin, auth, diaries, health, prediction, knowledge
 from app.services.account_recovery import ensure_auth_schema
+from app.services import rag
 
 # 取得專案根目錄，供 template 與 static 掛載使用。
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,6 +46,8 @@ def create_app() -> FastAPI:
     async def startup_event() -> None:
         # 啟動時主動補齊驗證信與忘記密碼所需的 schema，避免舊資料庫缺欄位。
         ensure_auth_schema()
+        # 載入 RAG 知識庫
+        rag.load_knowledge_base()
 
     # API routers (v1)
     # ----------------
