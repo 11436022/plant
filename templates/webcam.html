@@ -53,9 +53,15 @@
         .header-actions { display: flex; align-items: center; gap: 10px; }
 
         .shell { width: min(1440px, 100%); margin: 0 auto; padding: 20px 24px 36px; }
-        .login-shell { min-height: calc(100vh - 64px); display: grid; place-items: center; }
+        .login-shell {
+            min-height: calc(100vh - 64px);
+            display: grid;
+            grid-template-columns: minmax(0, 420px);
+            place-content: center;
+        }
         .login-panel {
-            width: min(420px, 100%);
+            width: 100%;
+            min-width: 0;
             padding: 28px;
             background: var(--surface);
             border: 1px solid var(--line);
