@@ -28,6 +28,9 @@ class Disease(Base):
     disease_name = Column(String(100))
     description = Column(Text)
     treatment = Column(Text)
+    source_name = Column(String(100))
+    source_url = Column(String(2048))
+    source_record_id = Column(String(128))
 
     crop = relationship("Crop", back_populates="diseases")
 
@@ -42,6 +45,9 @@ class Pest(Base):
     pest_name = Column(String(100), nullable=False)
     description = Column(Text)
     treatment = Column(Text)
+    source_name = Column(String(100))
+    source_url = Column(String(2048))
+    source_record_id = Column(String(128))
 
     crop = relationship("Crop", back_populates="pests")
 
