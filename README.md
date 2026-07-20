@@ -75,6 +75,16 @@ python seed.py
 python build_knowledge_base.py
 ```
 
+更新已存在的診斷回傳資料庫：
+
+```powershell
+git pull --rebase origin main
+python -m alembic upgrade head
+python seed.py
+```
+
+`seed.py` 會依「作物 + 病害／蟲害名稱」更新或新增資料，不會清空帳號、日記、歷史診斷與 webcam 警報。需要重新取得農業部最新公開資料時，先執行 `python update_reference_data.py`，確認輸出筆數後再執行 migration 與 seed。
+
 啟動 FastAPI：
 
 ```powershell
@@ -120,9 +130,13 @@ Docker 連接主機 MySQL 時，將 `.env` 的 `DB_HOST` 改為 `host.docker.int
 4. 病蟲害必須確實隸屬於辨識出的作物。
 5. 信心值不足時回傳「無法判定」，不提供施藥指示。
 6. 症狀與處置內容由資料庫覆蓋 Gemini 生成文字。
-7. Webcam 必須連續多張影格得到相同結果才觸發警報。
+7. 可自動採用的病蟲害資料必須包含來源名稱、網址與來源紀錄 ID。
+8. 沒有可追溯來源的舊資料會標記 `requires_review=true`，不觸發 webcam 自動警報。
+9. Webcam 必須連續多張影格得到相同結果才觸發警報。
 
 這些機制能降低幻覺與誤報，但影像 AI 不能保證 100% 正確。高風險處置、農藥選擇與劑量仍應由農業專業人員確認。
+
+目前診斷資料以農業部重要農業害蟲診斷圖鑑及樹木病蟲害診斷案例為主要官方來源。樹木案例只採用「病害／蟲害」且經樣本檢驗或現地診察的紀錄；含歷史藥劑濃度、稀釋倍數或施用方式的建議不直接回傳，以免過期用法被誤認為現行核准處方。API 診斷結果會包含 `reference_source`、`reference_url` 與 `reference_record_id` 供前端或人工查核。
 
 ## Android 設定
 
@@ -139,7 +153,7 @@ Android 模擬器會自動使用 `10.0.2.2:8000`；實體裝置與後端需位�
 執行防幻覺與 webcam 安全測試：
 
 ```powershell
-python -m pytest test/test_ai_validation.py test/test_webcam.py -q
+python -m pytest test/test_ai_validation.py test/test_reference_data.py test/test_seed.py test/test_webcam.py -q
 ```
 
 檢查 Alembic migration：
@@ -149,4 +163,4 @@ python -m alembic heads
 python -m alembic upgrade head
 ```
 
-目前 migration head 為 `a11e7c4d9f20`。
+目前 migration head 為 `c37f8e92a411`。
