@@ -16,6 +16,8 @@ client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 UNKNOWN_CROP_NAME = "未知作物"
 UNKNOWN_STATUS_NAME = "無法判定"
 HEALTHY_STATUS_NAME = "健康"
+MIN_DIAGNOSIS_CONFIDENCE = 0.65
+MIN_HEALTHY_CONFIDENCE = 0.85
 
 
 def _normalize_name(value: str | None) -> str:
@@ -64,6 +66,8 @@ def _uncertain_diagnosis(crop_name: str | None = None, confidence: float = 0.0) 
         "confidence": min(confidence, 0.5),
         "suggestion": "- 影像特徵不足，無法與目前資料庫中的作物或病蟲害安全對應\n- 建議重新拍攝清晰葉面、莖部與受害區域",
         "treatment": "1. 暫時隔離疑似受害植株並持續觀察。\n2. 補拍清晰照片後重新診斷。\n3. 若症狀持續擴大，請諮詢農業專家或更新知識庫。",
+        "grounding_source": "safety_fallback",
+        "requires_review": True,
     }
 
 
@@ -80,6 +84,8 @@ def validate_diagnosis_result(data, crops: list[str], diseases: list[str], pests
 
     category = str(data.get("category", "")).strip().lower()
     if category == "healthy":
+        if confidence < MIN_HEALTHY_CONFIDENCE:
+            return _uncertain_diagnosis(crop_name, confidence)
         return {
             "crop_name": crop_name,
             "category": "healthy",
@@ -93,7 +99,12 @@ def validate_diagnosis_result(data, crops: list[str], diseases: list[str], pests
                 data.get("treatment"),
                 "1. 維持目前照護方式。\n2. 定期觀察葉片正反面是否出現新斑點或蟲害。",
             ),
+            "grounding_source": "model_pending_database_check",
+            "requires_review": False,
         }
+
+    if confidence < MIN_DIAGNOSIS_CONFIDENCE:
+        return _uncertain_diagnosis(crop_name, confidence)
 
     if category == "disease":
         status_name = _match_known_name(data.get("status_name"), diseases)
@@ -112,6 +123,62 @@ def validate_diagnosis_result(data, crops: list[str], diseases: list[str], pests
         "confidence": confidence,
         "suggestion": _safe_text(data.get("suggestion"), "- 已比對到資料庫中的病蟲害名稱，請搭配症狀持續觀察。"),
         "treatment": _safe_text(data.get("treatment"), "1. 依資料庫建議處理。\n2. 若症狀擴大，請重新拍攝並再次診斷。"),
+        "grounding_source": "model_pending_database_check",
+        "requires_review": False,
+    }
+
+
+def ground_diagnosis_in_database(data: dict, db: Session) -> dict:
+    """Cross-check crop ownership and replace generated advice with database facts."""
+
+    crop_name = data.get("crop_name")
+    confidence = _coerce_confidence(data.get("confidence"))
+    crop = db.query(models.Crop).filter(models.Crop.crop_name == crop_name).first()
+    if not crop:
+        return _uncertain_diagnosis(confidence=confidence)
+
+    category = str(data.get("category", "")).strip().lower()
+    if category == "unknown":
+        return _uncertain_diagnosis(crop.crop_name, confidence)
+
+    if category == "healthy":
+        if confidence < MIN_HEALTHY_CONFIDENCE:
+            return _uncertain_diagnosis(crop.crop_name, confidence)
+        return {
+            "crop_name": crop.crop_name,
+            "category": "healthy",
+            "status_name": HEALTHY_STATUS_NAME,
+            "confidence": confidence,
+            "suggestion": "- 目前影像未見資料庫已知病蟲害的明顯特徵",
+            "treatment": "1. 維持正常照護\n2. 定期從相同角度拍攝並比較變化",
+            "grounding_source": "crop_database",
+            "requires_review": False,
+        }
+
+    model_class = models.Disease if category == "disease" else models.Pest if category == "pest" else None
+    name_column = models.Disease.disease_name if category == "disease" else models.Pest.pest_name if category == "pest" else None
+    if model_class is None or name_column is None:
+        return _uncertain_diagnosis(crop.crop_name, confidence)
+
+    record = (
+        db.query(model_class)
+        .filter(name_column == data.get("status_name"), model_class.crop_id == crop.crop_id)
+        .first()
+    )
+    if not record:
+        return _uncertain_diagnosis(crop.crop_name, confidence)
+
+    description = str(record.description or "").strip()
+    treatment = str(record.treatment or "").strip()
+    return {
+        "crop_name": crop.crop_name,
+        "category": category,
+        "status_name": getattr(record, "disease_name" if category == "disease" else "pest_name"),
+        "confidence": confidence,
+        "suggestion": description or "- 已比對到此作物資料庫中的病蟲害紀錄",
+        "treatment": treatment or "1. 資料庫尚無核准處置內容，請諮詢農業專業人員",
+        "grounding_source": "disease_database" if category == "disease" else "pest_database",
+        "requires_review": not bool(description and treatment),
     }
 
 
