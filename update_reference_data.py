@@ -28,6 +28,37 @@ CHEMICAL_INSTRUCTION_MARKERS = (
     "施藥",
     "噴灑",
 )
+INVALID_CROP_NAME_MARKERS = (
+    "不知",
+    "不明",
+    "未知",
+    "不詳",
+    "一種",
+    "某種",
+    "還有",
+    "或是",
+    "小苗",
+    "大苗",
+    "種子苗",
+    "葉部",
+    "保護樹",
+    "老樹",
+    "行政",
+)
+INVALID_CROP_NAMES = {
+    "小",
+    "多種",
+    "植栽",
+    "雜木區",
+    "肖楠紅檜扁柏",
+    "榕橡合抱樹",
+    "相思樹等",
+    "樟樹等",
+    "楓類",
+    "龍柏類",
+    "楓樹林",
+}
+INVALID_SOURCE_CROP_SUFFIXES = ("等", "類", "區", "林")
 HARM_FIELDS = (
     ("Harm_Root", "根部"),
     ("Harm_Stem", "莖部"),
@@ -45,13 +76,26 @@ def _clean(value: Any, limit: int | None = None) -> str:
     return text
 
 
+def _is_usable_crop_name(name: str, source_value: bool = False) -> bool:
+    name_pattern = r"[\u3400-\u9fff]+" if source_value else r"[\u3400-\u9fff_]+"
+    return bool(
+        name
+        and len(name) <= 30
+        and re.fullmatch(name_pattern, name)
+        and name not in INVALID_CROP_NAMES
+        and not any(marker in name for marker in INVALID_CROP_NAME_MARKERS)
+        and not (source_value and name.endswith(INVALID_SOURCE_CROP_SUFFIXES))
+    )
+
+
 def _crop_names(value: Any) -> list[str]:
     raw_name = _clean(value)
-    names = {
-        _clean(name, 100)
-        for name in re.split(r"[、，,./／;；]+", raw_name)
-        if _clean(name) not in {"", "不明", "不詳", "未知"}
-    }
+    names = set()
+    for value_part in re.split(r"[、，,./／;；]+", raw_name):
+        name = _clean(value_part)
+        if not _is_usable_crop_name(name, source_value=True):
+            continue
+        names.add(name)
     return sorted(names)
 
 
@@ -190,7 +234,11 @@ def build_reference_data(
     diseases = _merge_records(existing.get("diseases", []), official_diseases, "disease_name")
     pests = _merge_records(existing.get("pests", []), official_pests, "pest_name")
 
-    crops = list(existing.get("crops", []))
+    crops = [
+        crop
+        for crop in existing.get("crops", [])
+        if _is_usable_crop_name(_clean(crop.get("crop_name")))
+    ]
     crop_names = {_clean(crop.get("crop_name")) for crop in crops}
     referenced_crop_names = {
         _clean(row.get("crop_name"))
