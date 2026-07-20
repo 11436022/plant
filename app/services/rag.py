@@ -1,19 +1,22 @@
 import json
+import os
 from pathlib import Path
 
 import faiss
 import numpy as np
-import google.generativeai as genai
-from google.generativeai import embed_content
+from google import genai
+from google.genai import types
 
 # --- 設定 ---
 FAISS_INDEX_PATH = Path("knowledge_base.faiss")
 CONTENT_PATH = Path("knowledge_content.json")
-EMBEDDING_MODEL = "models/text-embedding-004"
+EMBEDDING_MODEL = "gemini-embedding-001"
+EMBEDDING_DIMENSION = 768
 
 # --- 全域變數，儲存載入的知識庫 ---
 faiss_index = None
 knowledge_content = []
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
 def load_knowledge_base():
@@ -35,6 +38,14 @@ def load_knowledge_base():
         faiss_index = faiss.read_index(str(FAISS_INDEX_PATH))
         with open(CONTENT_PATH, "r", encoding="utf-8") as f:
             knowledge_content = json.load(f)
+        if (
+            faiss_index.d != EMBEDDING_DIMENSION
+            or faiss_index.metric_type != faiss.METRIC_INNER_PRODUCT
+        ):
+            print("⚠️ RAG 索引版本不相容，請重新執行 build_knowledge_base.py。")
+            faiss_index = None
+            knowledge_content = []
+            return
         print(f"✅ 知識庫載入成功！索引中有 {faiss_index.ntotal} 個向量。")
     except Exception as e:
         print(f"❌ 載入知識庫時發生錯誤：{e}")
@@ -56,16 +67,22 @@ def search_knowledge_base(query: str, k: int = 3) -> str:
 
     try:
         # 1. 為查詢產生向量
-        response = embed_content(
+        response = client.models.embed_content(
             model=EMBEDDING_MODEL,
-            content=query,
-            task_type="retrieval_query",
-            title="植物診斷查詢",
+            contents=query,
+            config=types.EmbedContentConfig(
+                task_type="RETRIEVAL_QUERY",
+                output_dimensionality=EMBEDDING_DIMENSION,
+            ),
         )
-        query_embedding = response["embedding"]
+        query_embedding = np.asarray([response.embeddings[0].values], dtype=np.float32)
+        faiss.normalize_L2(query_embedding)
 
         # 2. 在 FAISS 中搜尋最相似的 k 個向量
-        distances, indices = faiss_index.search(np.array([query_embedding], dtype=np.float32), k)
+        result_count = min(k, faiss_index.ntotal)
+        if result_count == 0:
+            return ""
+        _scores, indices = faiss_index.search(query_embedding, result_count)
 
         # 3. 組合上下文
         context = []
