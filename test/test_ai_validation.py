@@ -128,6 +128,9 @@ def test_database_grounding_replaces_generated_advice():
         disease_name="晚疫病",
         description="資料庫症狀說明",
         treatment="資料庫核准處置",
+        source_name="農業部測試資料",
+        source_url="https://data.moa.gov.tw/example",
+        source_record_id="official-123",
     )
     db = _FakeDb([crop, disease])
 
@@ -146,7 +149,37 @@ def test_database_grounding_replaces_generated_advice():
     assert result["suggestion"] == "資料庫症狀說明"
     assert result["treatment"] == "資料庫核准處置"
     assert result["grounding_source"] == "disease_database"
+    assert result["reference_source"] == "農業部測試資料"
+    assert result["reference_url"] == "https://data.moa.gov.tw/example"
+    assert result["reference_record_id"] == "official-123"
     assert result["requires_review"] is False
+
+
+def test_database_grounding_marks_unverified_legacy_advice_for_review():
+    crop = SimpleNamespace(crop_id=3, crop_name="番茄")
+    disease = SimpleNamespace(
+        disease_name="晚疫病",
+        description="舊資料庫症狀說明",
+        treatment="舊資料庫處置",
+        source_name=None,
+        source_url=None,
+        source_record_id=None,
+    )
+    db = _FakeDb([crop, disease])
+
+    result = ground_diagnosis_in_database(
+        {
+            "crop_name": "番茄",
+            "category": "disease",
+            "status_name": "晚疫病",
+            "confidence": 0.9,
+        },
+        db,
+    )
+
+    assert result["suggestion"] == "舊資料庫症狀說明"
+    assert result["reference_source"] is None
+    assert result["requires_review"] is True
 
 
 def test_database_grounding_rejects_disease_from_another_crop():
