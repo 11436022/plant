@@ -6,8 +6,8 @@ import docx
 import faiss
 import numpy as np
 from dotenv import load_dotenv
-import google.generativeai as genai
-from google.generativeai import embed_content
+from google import genai
+from google.genai import types
 
 # --- 設定 ---
 # 知識庫來源目錄
@@ -17,7 +17,9 @@ FAISS_INDEX_PATH = "knowledge_base.faiss"
 # 內容儲存路徑
 CONTENT_PATH = "knowledge_content.json"
 # Google Embedding 模型
-EMBEDDING_MODEL = "models/text-embedding-004"
+EMBEDDING_MODEL = "gemini-embedding-001"
+EMBEDDING_DIMENSION = 768
+EMBEDDING_BATCH_SIZE = 100
 
 
 def load_documents():
@@ -60,22 +62,32 @@ def build_and_save_knowledge_base(paragraphs: list[str]):
     print(f"   (這可能需要一些時間，取決於文件數量和網路速度)")
 
     try:
-        # 使用 Google 的 embedding 模型
-        response = embed_content(
-            model=EMBEDDING_MODEL,
-            content=paragraphs,
-            task_type="retrieval_document",
-            title="植物知識庫文件",
-        )
-        embeddings = response["embedding"]
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+        embeddings = []
+        for start in range(0, len(paragraphs), EMBEDDING_BATCH_SIZE):
+            batch = paragraphs[start:start + EMBEDDING_BATCH_SIZE]
+            response = client.models.embed_content(
+                model=EMBEDDING_MODEL,
+                contents=batch,
+                config=types.EmbedContentConfig(
+                    task_type="RETRIEVAL_DOCUMENT",
+                    title="植物知識庫文件",
+                    output_dimensionality=EMBEDDING_DIMENSION,
+                ),
+            )
+            embeddings.extend(item.values for item in response.embeddings)
+
+        if len(embeddings) != len(paragraphs):
+            raise RuntimeError("Embedding count does not match the number of document paragraphs.")
         print("✅ 向量產生完成！")
 
         # 建立 FAISS 索引
         print("\n🔄 開始建立 FAISS 向量索引...")
-        dimension = len(embeddings[0])
-        index = faiss.IndexFlatL2(dimension)  # 使用 L2 距離計算相似度
-        index.add(np.array(embeddings, dtype=np.float32))
-        print(f"   - 索引維度: {dimension}")
+        vectors = np.asarray(embeddings, dtype=np.float32)
+        faiss.normalize_L2(vectors)
+        index = faiss.IndexFlatIP(EMBEDDING_DIMENSION)
+        index.add(vectors)
+        print(f"   - 索引維度: {EMBEDDING_DIMENSION}")
         print(f"   - 索引中的向量總數: {index.ntotal}")
 
         # 儲存索引和內容
