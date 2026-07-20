@@ -63,6 +63,7 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     plant_diary = relationship("PlantDiary", back_populates="user")
+    webcam_alerts = relationship("WebcamAlert", back_populates="user")
 
 
 class UserOneTimeToken(Base):
@@ -105,3 +106,24 @@ class PlantDiary(Base):
     crop = relationship("Crop")
     disease = relationship("Disease")
     pest = relationship("Pest")
+
+
+class WebcamAlert(Base):
+    """A confirmed webcam anomaly produced after repeated matching frames."""
+
+    __tablename__ = "webcam_alert"
+
+    id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("user.user_id"), nullable=False, index=True)
+    crop_id = Column(Integer, ForeignKey("crop.crop_id"), nullable=True)
+    category = Column(String(20), nullable=False)
+    status_name = Column(String(100), nullable=False)
+    confidence = Column(Float, nullable=False)
+    consecutive_matches = Column(Integer, nullable=False)
+    image_url = Column(String(2048), nullable=False)
+    email_sent = Column(Boolean, nullable=False, default=False)
+    acknowledged_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    user = relationship("User", back_populates="webcam_alerts")
+    crop = relationship("Crop")
