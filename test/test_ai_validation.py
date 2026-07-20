@@ -2,6 +2,7 @@ import os
 import sys
 import types
 from pathlib import Path
+from types import SimpleNamespace
 
 ROOT_DIR = Path(__file__).parent.parent
 sys.path.append(str(ROOT_DIR))
@@ -16,7 +17,30 @@ fake_rag = types.ModuleType("app.services.rag")
 fake_rag.search_knowledge_base = lambda *args, **kwargs: ""
 sys.modules.setdefault("app.services.rag", fake_rag)
 
-from app.services.ai import UNKNOWN_STATUS_NAME, validate_diagnosis_result
+from app.services.ai import (
+    UNKNOWN_STATUS_NAME,
+    ground_diagnosis_in_database,
+    validate_diagnosis_result,
+)
+
+
+class _FakeQuery:
+    def __init__(self, result):
+        self.result = result
+
+    def filter(self, *args):
+        return self
+
+    def first(self):
+        return self.result
+
+
+class _FakeDb:
+    def __init__(self, results):
+        self.results = iter(results)
+
+    def query(self, model):
+        return _FakeQuery(next(self.results))
 
 
 def test_validate_diagnosis_accepts_database_backed_crop_and_disease():
@@ -79,3 +103,66 @@ def test_validate_diagnosis_rejects_hallucinated_disease_name():
     assert result["category"] == "unknown"
     assert result["status_name"] == UNKNOWN_STATUS_NAME
     assert result["confidence"] <= 0.5
+
+
+def test_validate_diagnosis_rejects_low_confidence_known_name():
+    result = validate_diagnosis_result(
+        {
+            "crop_name": "番茄",
+            "category": "disease",
+            "status_name": "晚疫病",
+            "confidence": 0.4,
+        },
+        crops=["番茄"],
+        diseases=["晚疫病"],
+        pests=[],
+    )
+
+    assert result["category"] == "unknown"
+    assert result["requires_review"] is True
+
+
+def test_database_grounding_replaces_generated_advice():
+    crop = SimpleNamespace(crop_id=3, crop_name="番茄")
+    disease = SimpleNamespace(
+        disease_name="晚疫病",
+        description="資料庫症狀說明",
+        treatment="資料庫核准處置",
+    )
+    db = _FakeDb([crop, disease])
+
+    result = ground_diagnosis_in_database(
+        {
+            "crop_name": "番茄",
+            "category": "disease",
+            "status_name": "晚疫病",
+            "confidence": 0.9,
+            "suggestion": "模型自行編造的症狀",
+            "treatment": "使用不存在的火星藥劑",
+        },
+        db,
+    )
+
+    assert result["suggestion"] == "資料庫症狀說明"
+    assert result["treatment"] == "資料庫核准處置"
+    assert result["grounding_source"] == "disease_database"
+    assert result["requires_review"] is False
+
+
+def test_database_grounding_rejects_disease_from_another_crop():
+    crop = SimpleNamespace(crop_id=3, crop_name="番茄")
+    db = _FakeDb([crop, None])
+
+    result = ground_diagnosis_in_database(
+        {
+            "crop_name": "番茄",
+            "category": "disease",
+            "status_name": "水稻稻熱病",
+            "confidence": 0.93,
+        },
+        db,
+    )
+
+    assert result["crop_name"] == "番茄"
+    assert result["category"] == "unknown"
+    assert result["status_name"] == UNKNOWN_STATUS_NAME
