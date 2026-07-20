@@ -20,6 +20,15 @@ class Settings(BaseSettings):
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
 
+    # Webcam monitoring defaults. Values can be overridden from .env.
+    WEBCAM_MAX_IMAGE_BYTES: int = 8 * 1024 * 1024
+    WEBCAM_MIN_IMAGE_WIDTH: int = 320
+    WEBCAM_MIN_IMAGE_HEIGHT: int = 240
+    WEBCAM_SAMPLE_INTERVAL_SECONDS: int = 30
+    WEBCAM_ALERT_CONFIDENCE: float = 0.8
+    WEBCAM_ALERT_CONSECUTIVE_MATCHES: int = 3
+    WEBCAM_ALERT_COOLDOWN_SECONDS: int = 900
+
     # 對外網址設定
     FRONTEND_BASE_URL: str = "http://192.168.56.1:8000"
     PUBLIC_BASE_URL: str = FRONTEND_BASE_URL
