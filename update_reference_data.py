@@ -221,6 +221,28 @@ def build_reference_data(
     return result, summary
 
 
+def serialize_reference_data(data: dict[str, Any]) -> str:
+    """Keep list records on one line so sync diffs remain reviewable."""
+
+    lines = ["{"]
+    items = list(data.items())
+    for item_index, (key, value) in enumerate(items):
+        suffix = "," if item_index < len(items) - 1 else ""
+        encoded_key = json.dumps(key, ensure_ascii=False)
+        if isinstance(value, list):
+            lines.append(f"  {encoded_key}: [")
+            for row_index, row in enumerate(value):
+                row_suffix = "," if row_index < len(value) - 1 else ""
+                encoded_row = json.dumps(row, ensure_ascii=False)
+                lines.append(f"    {encoded_row}{row_suffix}")
+            lines.append(f"  ]{suffix}")
+        else:
+            encoded_value = json.dumps(value, ensure_ascii=False)
+            lines.append(f"  {encoded_key}: {encoded_value}{suffix}")
+    lines.append("}")
+    return "\n".join(lines) + "\n"
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Update diagnosis reference data from official MOA APIs")
     parser.add_argument("--input", type=Path, default=Path("data.json"))
@@ -236,10 +258,7 @@ def main() -> None:
         fetch_pest_diagnostics(),
         fetch_tree_pest_info(),
     )
-    args.output.write_text(
-        json.dumps(updated, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    args.output.write_text(serialize_reference_data(updated), encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
 
 
