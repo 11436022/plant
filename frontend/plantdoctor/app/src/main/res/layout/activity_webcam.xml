@@ -18,11 +18,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 🌟 自訂繪圖層（用來繪製單植物/多植物目標框） -->
-    <View
+    <!-- 🌟 自訂繪圖層（繪製多植物選取框與名稱標籤） -->
+    <com.example.plantdoctor.InteractiveBoxView
         android:id="@+id/overlayCanvas"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="gone"
+        tools:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,7 +37,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="8dp"
+        android:padding="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -129,14 +131,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="連續命中數：0"
+            android:text="本次偵測次數：0"
             android:textSize="12sp" />
 
         <View
             android:id="@+id/dividerLine"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginVertical="8dp" />
+            android:layout_marginVertical="8dp"
+            android:background="#33FFFFFF" />
 
         <!-- 🌟【單植物控制區域】：拖動條 + 秒數輸入框 -->
         <LinearLayout
@@ -160,7 +163,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:max="600"
-                android:min="10"
+                android:min="30"
                 android:progress="120" />
 
             <EditText
@@ -168,6 +171,7 @@
                 android:layout_width="55dp"
                 android:layout_height="36dp"
                 android:gravity="center"
+                android:importantForAutofill="no"
                 android:inputType="number"
                 android:maxLength="4"
                 android:text="120"
@@ -182,22 +186,46 @@
                 android:textSize="13sp" />
         </LinearLayout>
 
-        <!-- 🌟【多植物控制區域】：列表清單 -->
+        <!-- 🌟【多植物控制區域】：列表清單 + 旁邊放置組別選擇按鈕 -->
         <LinearLayout
             android:id="@+id/layoutMultiControl"
             android:layout_width="match_parent"
             android:layout_height="140dp"
             android:orientation="vertical"
             android:visibility="gone"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
-            <TextView
-                android:id="@+id/tvMultiListTitle"
-                android:layout_width="wrap_content"
+            <!-- 標題欄：左邊標題，右邊點擊選組別按鈕 -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:text="監控區域排程列表："
-                android:textSize="12sp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:id="@+id/tvMultiListTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="監控區域排程列表"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btnSelectSession"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@android:drawable/editbox_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="3dp"
+                    android:text="[ 陽台花草組 ▼ ]"
+                    android:textColor="#1976D2"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvMultiRegions"
@@ -214,7 +242,7 @@
             android:text="開始即時監控" />
     </LinearLayout>
 
-    <!-- 4. 🌟 全黑省電覆蓋層 (只有這個寫死純黑 #FF000000 確保 OLED 省電) -->
+    <!-- 4. 全黑省電覆蓋層 (確保 OLED 省電) -->
     <FrameLayout
         android:id="@+id/layoutPowerSaveOverlay"
         android:layout_width="0dp"

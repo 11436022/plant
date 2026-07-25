@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.YuvImage
 import android.os.Handler
 import android.os.Looper
@@ -30,6 +31,20 @@ class SinglePlantMonitorStrategy(private val activity: WebcamActivity) {
     private val alertCooldownMillis = 3_600_000L
 
     private val mainHandler = Handler(Looper.getMainLooper())
+
+    /**
+     * 🌟 顯示單植物「正中心 1:1 方框」於畫面上
+     * 歸一化座標：left=0.15, top=0.25, right=0.85, bottom=0.75 (大致為正中心區域)
+     */
+    fun showCenterCropZone(boxOverlay: InteractiveBoxView) {
+        val centerZone = CropZone(
+            id = 999,
+            name = "單植物目標區 (正中心)",
+            rectNorm = RectF(0.15f, 0.25f, 0.85f, 0.75f),
+            intervalMinutes = 0
+        )
+        boxOverlay.updateZones(listOf(centerZone))
+    }
 
     /**
      * 🌟 處理相機影格抽樣與時間控制 (30秒~600秒)
@@ -79,7 +94,7 @@ class SinglePlantMonitorStrategy(private val activity: WebcamActivity) {
             val rawBytes = outStream.toByteArray()
             val originalBitmap = BitmapFactory.decodeByteArray(rawBytes, 0, rawBytes.size) ?: return null
 
-            // 裁切正中心 1:1 正方形區域
+            // 🌟 核心：確定裁切正中心 1:1 正方形區域
             val cropSize = min(originalBitmap.width, originalBitmap.height)
             val cropX = (originalBitmap.width - cropSize) / 2
             val cropY = (originalBitmap.height - cropSize) / 2
