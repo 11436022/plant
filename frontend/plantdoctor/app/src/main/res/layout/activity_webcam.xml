@@ -6,6 +6,7 @@
     android:id="@+id/webcam_root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".WebcamActivity">
 
     <!-- 1. 相機即時預覽畫面 -->
@@ -30,118 +31,142 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 2. 頂部控制工具列 (模式切換、省電、新增方框) -->
+    <!-- 2. 頂部控制工具列 (返回按鈕、模式切換、省電、新增區域) -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="12dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:padding="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- 模式切換鈕 -->
+        <!-- 🌟 返回主頁按鈕 -->
+        <ImageButton
+            android:id="@+id/btn_back_home"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="返回主頁"
+            android:padding="6dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_back"
+            app:tint="@android:color/white" />
+
+        <!-- 模式切換 RadioGroup -->
         <RadioGroup
             android:id="@+id/rgMode"
             android:layout_width="0dp"
-            android:layout_height="36dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:checkedButton="@id/rbSingleMode"
-            android:orientation="horizontal"
-            android:padding="2dp">
+            android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/rbSingleMode"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="36dp"
                 android:layout_weight="1"
+                android:background="@android:color/transparent"
                 android:button="@null"
                 android:gravity="center"
                 android:text="單植物"
-                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <RadioButton
                 android:id="@+id/rbMultiMode"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="36dp"
                 android:layout_weight="1"
+                android:background="@android:color/transparent"
                 android:button="@null"
                 android:gravity="center"
-                android:text="多植物(方案B)"
-                android:textSize="13sp"
+                android:text="多植物分區"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
                 android:textStyle="bold" />
         </RadioGroup>
 
-        <!-- 新增方框按鈕 (僅多植物模式顯示) -->
+        <!-- 新增區域按鈕 (多植物模式) -->
         <Button
             android:id="@+id/btnAddRegion"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
-            android:layout_marginStart="8dp"
-            android:paddingHorizontal="12dp"
+            android:layout_marginStart="6dp"
+            android:paddingHorizontal="10dp"
             android:text="+ 新增區域"
             android:textSize="12sp"
             android:visibility="gone"
             tools:visibility="visible" />
 
-        <!-- 手動省電按鈕 -->
+        <!-- 省電按鈕 -->
         <ImageButton
             android:id="@+id/btnPowerSave"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="6dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="進入省電模式"
+            android:padding="6dp"
+            android:scaleType="fitCenter"
             android:src="@android:drawable/ic_menu_compass" />
     </LinearLayout>
 
-    <!-- 3. 下方半透明分析與控制懸浮面板 -->
+    <!-- 3. 下方懸浮診斷控制面板 -->
     <LinearLayout
         android:id="@+id/bottomPanel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:elevation="6dp"
         android:orientation="vertical"
-        android:padding="12dp"
+        android:padding="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- 狀態與資訊列 -->
+        <!-- 狀態資訊 -->
         <TextView
             android:id="@+id/tvStatus"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="狀態：已暫停"
+            android:textColor="@android:color/white"
             android:textSize="15sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvDiagnosis"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
             android:text="最新診斷：等待拍攝..."
+            android:textColor="#E0E0E0"
             android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tvStreak"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="本次偵測次數：0"
-            android:textSize="12sp" />
+            android:text="本次偵測次數：0 次"
+            android:textColor="#B0BEC5"
+            android:textSize="13sp" />
 
         <View
             android:id="@+id/dividerLine"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="8dp"
-            android:background="#33FFFFFF" />
+            android:background="#40FFFFFF" />
 
-        <!-- 🌟【單植物控制區域】：拖動條 + 秒數輸入框 -->
+        <!-- 🌟【單植物控制區域】 -->
         <LinearLayout
             android:id="@+id/layoutSingleControl"
             android:layout_width="match_parent"
@@ -155,6 +180,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="採樣間隔："
+                android:textColor="@android:color/white"
                 android:textSize="13sp" />
 
             <SeekBar
@@ -170,11 +196,13 @@
                 android:id="@+id/etSingleInterval"
                 android:layout_width="55dp"
                 android:layout_height="36dp"
+                android:background="@android:drawable/editbox_background"
                 android:gravity="center"
                 android:importantForAutofill="no"
                 android:inputType="number"
                 android:maxLength="4"
                 android:text="120"
+                android:textColor="#000000"
                 android:textSize="13sp" />
 
             <TextView
@@ -183,66 +211,73 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:text="秒"
+                android:textColor="@android:color/white"
                 android:textSize="13sp" />
         </LinearLayout>
 
-        <!-- 🌟【多植物控制區域】：列表清單 + 旁邊放置組別選擇按鈕 -->
+        <!-- 🌟【多植物控制區域】 -->
         <LinearLayout
             android:id="@+id/layoutMultiControl"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="gone"
             tools:visibility="visible">
 
-            <!-- 標題欄：左邊標題，右邊點擊選組別按鈕 -->
+            <!-- 標題與選組別按鈕 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="4dp">
+                android:layout_marginBottom="6dp">
 
                 <TextView
                     android:id="@+id/tvMultiListTitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="監控區域排程列表"
-                    android:textSize="12sp" />
+                    android:layout_weight="1"
+                    android:text="區域排程列表"
+                    android:textColor="@android:color/white"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
 
+                <!-- 🌟 組別切換晶片按鈕 -->
                 <TextView
                     android:id="@+id/btnSelectSession"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@android:drawable/editbox_background"
                     android:clickable="true"
                     android:focusable="true"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="3dp"
-                    android:text="[ 陽台花草組 ▼ ]"
-                    android:textColor="#1976D2"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="5dp"
+                    android:text="陽台花草組 ▼"
                     android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:textColor="#2E7D32" />
 
             </LinearLayout>
 
+            <!-- 列表高動態約束：最高 130dp，支援小螢幕自動滾動 -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvMultiRegions"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="120dp"
                 android:scrollbars="vertical" />
         </LinearLayout>
 
+        <!-- 開始/停止監控按鈕 -->
         <Button
             android:id="@+id/btnToggleMonitor"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_marginTop="8dp"
-            android:text="開始即時監控" />
+            android:text="開始即時監控"
+            android:textSize="16sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- 4. 全黑省電覆蓋層 (確保 OLED 省電) -->
+    <!-- 4. 省電全黑覆蓋層 -->
     <FrameLayout
         android:id="@+id/layoutPowerSaveOverlay"
         android:layout_width="0dp"

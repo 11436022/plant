@@ -20,7 +20,7 @@
         android:id="@+id/tv_home_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="0dp"
         android:gravity="center"
         android:text="植葉神醫"
         android:textColor="#2E7D32"

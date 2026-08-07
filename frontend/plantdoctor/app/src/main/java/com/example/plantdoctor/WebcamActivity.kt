@@ -119,6 +119,7 @@ class WebcamActivity : AppCompatActivity() {
 
     // 📸 紀錄本次開啟監測後的總拍照/分析次數
     private var totalCaptureCount = 0
+    private lateinit var btnBackHome: ImageButton
 
     // 權限請求處理
     private val requestPermissionLauncher = registerForActivityResult(
@@ -175,6 +176,15 @@ class WebcamActivity : AppCompatActivity() {
         layoutMultiControl = findViewById(R.id.layoutMultiControl)
         rvMultiRegions = findViewById(R.id.rvMultiRegions)
         layoutPowerSaveOverlay = findViewById(R.id.layoutPowerSaveOverlay)
+
+        // 在 bindViews() 裡面：
+        btnBackHome = findViewById(R.id.btn_back_home)
+
+        // 點擊事件：播放音效並結束當前頁面返回主頁
+        btnBackHome.setOnClickListener {
+            SoundManager.playBubblePop()
+            finish()
+        }
     }
 
     private fun setupMultiRecyclerView() {
@@ -368,7 +378,9 @@ class WebcamActivity : AppCompatActivity() {
 
     private fun showZoneOptionDialog(zone: CropZone) {
         val options = arrayOf("修改名稱與採樣時間", "刪除此區域")
-        AlertDialog.Builder(this)
+        val mainColor = getThemeMainColor()
+
+        val dialog = AlertDialog.Builder(this)
             .setTitle("管理區域：${zone.name}")
             .setItems(options) { _, which ->
                 when (which) {
@@ -377,7 +389,14 @@ class WebcamActivity : AppCompatActivity() {
                 }
             }
             .setNegativeButton("取消", null)
-            .show()
+            .create()
+
+        dialog.show()
+
+        // 🌟 注入主題深色圓角背景
+        applyDialogTheme(dialog)
+
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(mainColor)
     }
 
     private fun showEditZoneDialog(zone: CropZone) {
@@ -385,6 +404,16 @@ class WebcamActivity : AppCompatActivity() {
         val etName = dialogView.findViewById<EditText>(R.id.etZoneName)
         val sbInterval = dialogView.findViewById<SeekBar>(R.id.sbDialogInterval)
         val etInterval = dialogView.findViewById<EditText>(R.id.etDialogInterval)
+
+        // 🌟 確保輸入框文字在深色主題底色下清晰可見
+        etName.setTextColor(android.graphics.Color.WHITE)
+        etInterval.setTextColor(android.graphics.Color.WHITE)
+
+        // 🌟 注入當前主題色至 Dialog 內的 SeekBar
+        val mainColor = getThemeMainColor()
+        val colorStateList = android.content.res.ColorStateList.valueOf(mainColor)
+        sbInterval.thumbTintList = colorStateList
+        sbInterval.progressTintList = colorStateList
 
         etName.setText(zone.name)
         val currentSec: Int = zone.intervalMinutes.toInt().coerceIn(30, 600)
@@ -414,7 +443,7 @@ class WebcamActivity : AppCompatActivity() {
             }
         })
 
-        AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this)
             .setTitle("設定：${zone.name}")
             .setView(dialogView)
             .setPositiveButton("儲存") { _, _ ->
@@ -430,7 +459,16 @@ class WebcamActivity : AppCompatActivity() {
                 Toast.makeText(this, "已更新設定！", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("取消", null)
-            .show()
+            .create()
+
+        dialog.show()
+
+        // 🌟 注入主題深色圓角背景
+        applyDialogTheme(dialog)
+
+        // 🌟 按鈕字體顏色強制跟隨主題色
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(mainColor)
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(mainColor)
     }
 
     private fun deleteCropZone(zone: CropZone) {
@@ -735,10 +773,7 @@ class WebcamActivity : AppCompatActivity() {
         return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
     }
 
-    fun updateDiagnosisUI(diagnosisName: String, streak: Int) {
-        tvDiagnosis.text = "最新診斷：$diagnosisName"
-        tvStreak.text = "本次偵測次數：$streak "
-    }
+
 
     fun sendAlertNotification(diagnosisName: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -774,7 +809,7 @@ class WebcamActivity : AppCompatActivity() {
     }
 
     /**
-     * 🌟 當 InteractiveBoxView 手動拖移或縮放方框結束時由 View 觸發
+     * 🌟 當 InupdateteractiveBoxView 手動拖移或縮放方框結束時由 View 觸發
      */
     fun onCropZonesChanged() {
         saveSessionsToStorage()
@@ -784,12 +819,28 @@ class WebcamActivity : AppCompatActivity() {
         super.onResume()
         resetAutoPowerSaveTimer()
 
+        // 🌟 1. 基礎主題套用 (按鈕與基本元素)
         ThemeManager.applyTheme(
             context = this,
             rootLayout = webcamRoot,
             mainButtons = listOf(btnToggleMonitor, btnAddRegion),
-            titles = listOf(tvStatus, tvDiagnosis),
-            imageButtons = listOf(btnPowerSave)
+            imageButtons = listOf(btnPowerSave,btnBackHome)
+
+        )
+
+        // 🌟 2. Webcam 專屬主題套用 (控制面板、組別選取按鈕、SeekBar、RadioGroup)
+        val bottomPanel = findViewById<LinearLayout>(R.id.bottomPanel)
+        val sbSingleInterval = findViewById<SeekBar>(R.id.sbSingleInterval)
+        val etSingleInterval = findViewById<EditText>(R.id.etSingleInterval)
+
+        ThemeManager.applyThemeToWebcam(
+            context = this,
+            btnSelectSession = btnSelectSession,
+            rbSingleMode = rbSingleMode,
+            rbMultiMode = rbMultiMode,
+            seekBar = sbSingleInterval,
+            etInterval = etSingleInterval,
+            panelBackground = bottomPanel
         )
 
         if (layoutPowerSaveOverlay.visibility != View.VISIBLE) {
@@ -888,7 +939,45 @@ class WebcamActivity : AppCompatActivity() {
 
     private fun updateSessionButtonText() {
         val name = currentSession?.name ?: "未選擇組別"
-        btnSelectSession.text = "[ $name ▼ ]"
+        btnSelectSession.text = "$name ▼"
+    }
+
+    /**
+     * 🌟 取得主題對應的主色調
+     */
+    private fun getThemeMainColor(): Int {
+        val sharedPref = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
+        val themeId = sharedPref.getInt("THEME_COLOR_ID", 0)
+        val colorStr = when (themeId) {
+            1 -> "#64B5F6" // 藍
+            2 -> "#FFCC80" // 棕
+            3 -> "#F48FB1" // 粉
+            else -> "#2E7D32" // 綠
+        }
+        return android.graphics.Color.parseColor(colorStr)
+    }
+
+    /**
+     * 🌟 動態套用深色圓角背景與文字主題 (零改動原架構魔法)
+     */
+    private fun applyDialogTheme(dialog: AlertDialog) {
+        val sharedPref = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
+        val themeId = sharedPref.getInt("THEME_COLOR_ID", 0)
+
+        val bgColorStr = when (themeId) {
+            1 -> "#1A237E" // 深藍底
+            2 -> "#3E2723" // 深可可底
+            3 -> "#4A0033" // 深莓紅底
+            else -> "#FFFFFF" // 白底
+        }
+
+        dialog.window?.let { window ->
+            val background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(android.graphics.Color.parseColor(bgColorStr))
+                cornerRadius = 32f
+            }
+            window.setBackgroundDrawable(background)
+        }
     }
 
     private fun showSessionSelectionDialog() {
@@ -901,7 +990,7 @@ class WebcamActivity : AppCompatActivity() {
 
         options.add("➕ 管理/增刪改組別")
 
-        AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(this)
             .setTitle("選擇植物組別")
             .setItems(options.toTypedArray()) { _, which ->
                 if (which == options.size - 1) {
@@ -914,12 +1003,16 @@ class WebcamActivity : AppCompatActivity() {
                 }
             }
             .setNegativeButton("取消", null)
-            .show()
+
+        val dialog = builder.create()
+        dialog.show()
+        applyDialogTheme(dialog)
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(getThemeMainColor())
     }
 
     private fun showManageSessionDialog() {
         val manageOptions = arrayOf("新增新組別", "修改當前組別名稱", "刪除當前組別")
-        AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(this)
             .setTitle("管理組別：${currentSession?.name}")
             .setItems(manageOptions) { _, which ->
                 when (which) {
@@ -929,14 +1022,27 @@ class WebcamActivity : AppCompatActivity() {
                 }
             }
             .setNegativeButton("返回", null)
-            .show()
+
+        val dialog = builder.create()
+        dialog.show()
+        applyDialogTheme(dialog)
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(getThemeMainColor())
     }
 
     private fun showAddSessionDialog() {
-        val etInput = EditText(this).apply { hint = "例如：陽台花草組" }
-        AlertDialog.Builder(this)
+        val container = FrameLayout(this).apply {
+            setPadding(50, 30, 50, 10)
+        }
+        val etInput = EditText(this).apply {
+            hint = "例如：陽台花草組"
+            setTextColor(android.graphics.Color.WHITE)
+            setHintTextColor(android.graphics.Color.GRAY)
+        }
+        container.addView(etInput)
+
+        val builder = AlertDialog.Builder(this)
             .setTitle("新增植物組別")
-            .setView(etInput)
+            .setView(container)
             .setPositiveButton("建立") { _, _ ->
                 val name = etInput.text.toString().trim()
                 if (name.isNotEmpty()) {
@@ -950,16 +1056,30 @@ class WebcamActivity : AppCompatActivity() {
                 }
             }
             .setNegativeButton("取消", null)
-            .show()
+
+        val dialog = builder.create()
+        dialog.show()
+        applyDialogTheme(dialog)
+
+        val mainColor = getThemeMainColor()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(mainColor)
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(mainColor)
     }
 
     private fun showRenameSessionDialog() {
         val session = currentSession ?: return
-        val etInput = EditText(this).apply { setText(session.name) }
+        val container = FrameLayout(this).apply {
+            setPadding(50, 30, 50, 10)
+        }
+        val etInput = EditText(this).apply {
+            setText(session.name)
+            setTextColor(android.graphics.Color.WHITE)
+        }
+        container.addView(etInput)
 
-        AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(this)
             .setTitle("修改組別名稱")
-            .setView(etInput)
+            .setView(container)
             .setPositiveButton("確定") { _, _ ->
                 val name = etInput.text.toString().trim()
                 if (name.isNotEmpty()) {
@@ -970,7 +1090,14 @@ class WebcamActivity : AppCompatActivity() {
                 }
             }
             .setNegativeButton("取消", null)
-            .show()
+
+        val dialog = builder.create()
+        dialog.show()
+        applyDialogTheme(dialog)
+
+        val mainColor = getThemeMainColor()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(mainColor)
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(mainColor)
     }
 
     private fun deleteCurrentSession() {
@@ -981,7 +1108,7 @@ class WebcamActivity : AppCompatActivity() {
             return
         }
 
-        AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(this)
             .setTitle("刪除組別")
             .setMessage("確定要刪除【${session.name}】及其內部所有區域設定嗎？")
             .setPositiveButton("刪除") { _, _ ->
@@ -993,7 +1120,14 @@ class WebcamActivity : AppCompatActivity() {
                 Toast.makeText(this, "已刪除該組別", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("取消", null)
-            .show()
+
+        val dialog = builder.create()
+        dialog.show()
+        applyDialogTheme(dialog)
+
+        val mainColor = getThemeMainColor()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(android.graphics.Color.RED)
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(mainColor)
     }
 
     /**
@@ -1054,4 +1188,17 @@ class WebcamActivity : AppCompatActivity() {
 
         return token
     }
+
+    /**
+     * 🌟 診斷結果與偵測次數 UI 更新函式
+     */
+    fun updateDiagnosisUI(statusText: String, captureCount: Int) {
+        runOnUiThread {
+            tvStatus.text = if (isMonitoring) "狀態：監控中..." else "狀態：已暫停"
+            tvDiagnosis.text = "最新診斷：$statusText"
+            tvStreak.text = "本次偵測次數：$captureCount 次"
+        }
+    }
+
 }
+

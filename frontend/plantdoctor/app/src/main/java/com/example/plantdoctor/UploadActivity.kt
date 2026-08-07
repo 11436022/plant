@@ -12,14 +12,14 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
-import android.view.MotionEvent
 import android.provider.MediaStore
 import android.util.Log
+import android.view.MotionEvent
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.Toast
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -38,13 +38,15 @@ class UploadActivity : AppCompatActivity() {
     private lateinit var imgPreview: ImageView
     private var photoFile: File? = null
 
-    // 🌟 建立風聲延遲計時器與任務
+    private lateinit var uploadRoot: ConstraintLayout
+
+    // 🌟 1. 建立風聲延遲計時器與任務
     private val windHandler = Handler(Looper.getMainLooper())
     private val windRunnable = Runnable {
         SoundManager.startWind()
     }
 
-    // --- 1. 相權限請求處理 ---
+    // --- 1. 相機權限請求處理 ---
     private val requestCameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
             openCamera()
@@ -79,13 +81,16 @@ class UploadActivity : AppCompatActivity() {
         setContentView(R.layout.activity_upload)
 
         // --- 2. 綁定 UI 元件 ---
-        val uploadRoot = findViewById<ConstraintLayout>(R.id.upload_root_layout)
+        uploadRoot = findViewById(R.id.upload_root_layout)
         imgPreview = findViewById(R.id.img_preview)
         val btnBack = findViewById<ImageButton>(R.id.btn_back_home)
         val btnCamera = findViewById<Button>(R.id.btn_camera)
         val btnAlbum = findViewById<Button>(R.id.btn_album)
         val btnAnalyze = findViewById<Button>(R.id.btn_analyze)
         val tvUploadTitle = findViewById<TextView>(R.id.tv_upload_title)
+
+        // 🌟 初始化音效管理器 (與 LoginActivity 對齊)
+        SoundManager.init(this)
 
         // 召喚大總管聯動主題
         ThemeManager.applyTheme(
@@ -130,7 +135,6 @@ class UploadActivity : AppCompatActivity() {
                     return@setOnClickListener
                 }
 
-                // 這裡傳出去的 selectedImageUri 已經是縮小過後的精華小檔案囉！
                 val intent = Intent(this, DiagnoseProgressActivity::class.java)
                 intent.putExtra("IMAGE_URI", selectedImageUri.toString())
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -141,24 +145,61 @@ class UploadActivity : AppCompatActivity() {
         }
     }
 
-    // 🌟 新增這個方法：把 content:// 權限容易過期的 Uri 複製一份到 App 的私有快取夾，變成永久可讀的絕對路徑！
-    private fun getCachePathFromUri(context: android.content.Context, uri: android.net.Uri): String {
+    override fun onResume() {
+        super.onResume()
+        // 🌟 每次回到頁面時，重新刷新主題色彩與啟動背景音樂 (對齊 LoginActivity 邏輯)
+        if (::uploadRoot.isInitialized) {
+            val btnBack = findViewById<ImageButton>(R.id.btn_back_home)
+            val btnCamera = findViewById<Button>(R.id.btn_camera)
+            val btnAlbum = findViewById<Button>(R.id.btn_album)
+            val btnAnalyze = findViewById<Button>(R.id.btn_analyze)
+            val tvUploadTitle = findViewById<TextView>(R.id.tv_upload_title)
+
+            ThemeManager.applyTheme(
+                context = this,
+                rootLayout = uploadRoot,
+                mainButtons = listOf(btnCamera, btnAlbum, btnAnalyze),
+                titles = listOf(tvUploadTitle),
+                imageButtons = listOf(btnBack)
+            )
+        }
+        SoundManager.startBGM()
+    }
+
+    /**
+     * 🌟 核心關鍵突破：搶在 ScrollView 吃掉事件之前分發 Touch 事件！
+     * 無論頁面是否有 NestedScrollView 滾動，按住畫面 0.5 秒依然會吹起風聲。
+     */
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev != null) {
+            when (ev.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    windHandler.postDelayed(windRunnable, 500)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    windHandler.removeCallbacks(windRunnable)
+                    SoundManager.stopWind()
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
+    private fun getCachePathFromUri(context: Context, uri: Uri): String {
         return try {
             val inputStream = context.contentResolver.openInputStream(uri)
-            // 在 App 的私有快取資料夾建立一個臨時圖檔
-            val tempFile = java.io.File(context.cacheDir, "temp_mock_plant_image.jpg")
-            val outputStream = java.io.FileOutputStream(tempFile)
+            val tempFile = File(context.cacheDir, "temp_mock_plant_image.jpg")
+            val outputStream = FileOutputStream(tempFile)
 
             inputStream?.use { input ->
                 outputStream.use { output ->
                     input.copyTo(output)
                 }
             }
-            // 回傳這個私有檔案的絕對路徑
             tempFile.absolutePath
         } catch (e: Exception) {
             e.printStackTrace()
-            uri.toString() // 如果失敗才退回原本的字串
+            uri.toString()
         }
     }
 
@@ -206,8 +247,6 @@ class UploadActivity : AppCompatActivity() {
         return File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
     }
 
-    // 🌟 核心增強：在預覽與指派 Uri 前，先在背景進行高效壓縮
-    // 🌟 請找到 UploadActivity.kt 裡的 updateImagePreview 方法，將 runOnUiThread 內修改如下：
     private fun updateImagePreview(uri: Uri) {
         Thread {
             val compressedFile = compressImage(this, uri)
@@ -216,10 +255,6 @@ class UploadActivity : AppCompatActivity() {
 
                 runOnUiThread {
                     selectedImageUri = compressedUri
-
-                    // 🌟 【就是這裡！】壓縮成功後，順手把這個絕對路徑塞給假 API 的小倉庫！
-                    // 這樣等一下 confirmDiary 儲存時，才能百分之百抓到這張剛拍好的圖！
-                    //PlantApiService.latestMockImageUri = compressedFile.absolutePath
 
                     Glide.with(this)
                         .load(compressedUri)
@@ -230,9 +265,6 @@ class UploadActivity : AppCompatActivity() {
                 runOnUiThread {
                     selectedImageUri = uri
 
-                    // 🌟 【安全防禦】如果壓縮失敗退回原 Uri，也同步把原本的字串塞給假 API
-                    //PlantApiService.latestMockImageUri = uri.toString()
-
                     Glide.with(this)
                         .load(uri)
                         .centerCrop()
@@ -242,11 +274,9 @@ class UploadActivity : AppCompatActivity() {
         }.start()
     }
 
-    // 🌟 核心新增：等比例縮放 + JPEG 80% 壓縮演算法
     private fun compressImage(context: Context, imageUri: Uri): File? {
         var inputStream: InputStream? = null
         try {
-            // 1. 先讀取圖片尺寸（不載入整張圖，避免 OOM 記憶體溢出）
             val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             inputStream = context.contentResolver.openInputStream(imageUri)
             BitmapFactory.decodeStream(inputStream, null, options)
@@ -256,7 +286,6 @@ class UploadActivity : AppCompatActivity() {
             val originalHeight = options.outHeight
             if (originalWidth <= 0 || originalHeight <= 0) return null
 
-            // 2. 計算等比例縮小的比例（設定上限最大邊 1080 像素）
             val maxSide = 1080
             var sampleSize = 1
             if (originalWidth > maxSide || originalHeight > maxSide) {
@@ -267,7 +296,6 @@ class UploadActivity : AppCompatActivity() {
                 }
             }
 
-            // 3. 真正解碼載入縮小後的縮圖
             val decodeOptions = BitmapFactory.Options().apply { inSampleSize = sampleSize }
             inputStream = context.contentResolver.openInputStream(imageUri)
             val scaledBitmap = BitmapFactory.decodeStream(inputStream, null, decodeOptions)
@@ -275,17 +303,14 @@ class UploadActivity : AppCompatActivity() {
 
             if (scaledBitmap == null) return null
 
-            // 4. 創造一個專屬的內部壓縮快取檔
             val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
             val cacheFile = File(context.cacheDir, "mini_${timeStamp}.jpg")
 
-            // 5. 壓進去！設定 JPEG 與 80% 高清品質
             val fileOutputStream = FileOutputStream(cacheFile)
             scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream)
             fileOutputStream.flush()
             fileOutputStream.close()
 
-            // 資源釋放
             scaledBitmap.recycle()
 
             Log.d("IMAGE_COMPRESS", "壓縮成功！新檔案大小：${cacheFile.length() / 1024} KB")
@@ -297,22 +322,6 @@ class UploadActivity : AppCompatActivity() {
         } finally {
             inputStream?.close()
         }
-    }
-
-    // 🌟 全螢幕長按雷達吹風
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event != null) {
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    windHandler.postDelayed(windRunnable, 500)
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    windHandler.removeCallbacks(windRunnable)
-                    SoundManager.stopWind()
-                }
-            }
-        }
-        return super.onTouchEvent(event)
     }
 
     override fun onStop() {
