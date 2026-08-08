@@ -8,7 +8,18 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
 
-    <!-- 🌟 百分比 Guideline：將畫面分為 頂部(10%)、圖片區(10%~60%)、進度區(60%~85%) -->
+    <!-- 🌟 0. 後方背景落葉層 (在醫生圖片後方) -->
+    <com.example.plantdoctor.FallingLeavesView
+        android:id="@+id/falling_leaves_back"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 百分比 Guideline -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_top"
         android:layout_width="wrap_content"
@@ -23,7 +34,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.75" />
 
-    <!-- 1. 醫生診斷插圖：彈性縮放，依畫面寬高百分比自動適應 -->
+    <!-- 1. 醫生診斷插圖 (夾在前後落葉中間) -->
     <ImageView
         android:id="@+id/img_diagnosing_icon"
         android:layout_width="0dp"
@@ -37,6 +48,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/guideline_top" />
 
+    <!-- 🌟 1.5 前方前景落葉層 (蓋在醫生圖片前方) -->
+    <com.example.plantdoctor.FallingLeavesView
+        android:id="@+id/falling_leaves_front"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <!-- 2. 狀態標題與百分比容器 -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_status_container"
@@ -48,7 +70,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guideline_bottom_img">
 
-        <!-- 狀態標題：自動自動調控字體大小，避免換行 -->
         <TextView
             android:id="@+id/tv_progress_status"
             android:layout_width="0dp"
@@ -68,7 +89,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- 進度百分比數字 -->
         <TextView
             android:id="@+id/tv_percent"
             android:layout_width="wrap_content"
@@ -84,7 +104,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 3. 水平進度條：相鄰於狀態文字下方，保持兩側邊距 -->
+    <!-- 3. 水平進度條 -->
     <ProgressBar
         android:id="@+id/progressBar_horizontal"
         style="?android:attr/progressBarStyleHorizontal"
