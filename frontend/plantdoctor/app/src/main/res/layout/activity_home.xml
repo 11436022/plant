@@ -200,4 +200,69 @@
 
     </LinearLayout>
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/weather_card"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_menu_container">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tv_weather_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="今日天氣與照護建議"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/app_main_text"/>
+
+            <TextView
+                android:id="@+id/tv_weather_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="地點：載入中..." />
+
+            <TextView
+                android:id="@+id/tv_weather_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="天氣：載入中..." />
+
+            <TextView
+                android:id="@+id/tv_watering_advice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="澆水建議：載入中..." />
+
+            <TextView
+                android:id="@+id/tv_disease_advice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="病害預防：載入中..." />
+
+            <TextView
+                android:id="@+id/tv_general_care"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="一般照護：載入中..." />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

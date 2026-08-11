@@ -55,7 +55,6 @@ data class DiaryConfirmRequest(
 )
 
 data class PatchDiaryRequest(
-    val user_corrected_status: String? = null,
     val user_note: String? = null
 )
 
@@ -102,6 +101,23 @@ data class DiagnosisFeedbackRequest(
 data class DiagnosisFeedbackResponse(
     val id: Int,
     val message: String
+)
+
+// --- 天氣相關 Data Models ---
+data class WeatherData(
+    val location: String,
+    val weather: String,
+    val temperature: String,
+    val rain_probability: String,
+    val update_time: String
+)
+
+data class PlantCareAdvice(
+    val location: String,
+    val current_weather: WeatherData,
+    val watering_advice: String,
+    val disease_prevention_advice: String,
+    val general_care: String
 )
 
 
@@ -166,6 +182,17 @@ interface PlantApiService {
 
     @POST("feedback/diagnosis")
     fun sendDiagnosisFeedback(@Body feedbackRequest: DiagnosisFeedbackRequest): Call<DiagnosisFeedbackResponse>
+
+
+    // --- 天氣相關API ---
+    @GET("weather/cities")
+    fun getTaiwanCities(): Call<List<String>>
+
+    @GET("weather/current")
+    fun getCurrentWeather(@Query("city") city: String): Call<WeatherData>
+
+    @GET("weather/plant-care-advice")
+    fun getPlantCareAdvice(@Query("city") city: String): Call<PlantCareAdvice>
 
 
     // --- 3. Retrofit 實例產生器 ---

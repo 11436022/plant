@@ -63,6 +63,9 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
+    // --- 新增：Google 定位服務 ---
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
     // --- 新增：圖片載入套件 (Glide) ---
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.androidx.navigation.fragment.ktx)

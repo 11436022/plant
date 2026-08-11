@@ -14,7 +14,7 @@ from app.services.files import (
     ensure_image_upload,
 )
 from app.services.knowledge import get_or_complete_knowledge
-from app.schemas.patch import DiaryUpdate, DiaryConfirm
+from app.schemas.diaries import  DiaryConfirm, DiaryNoteUpdate
 
 # 從 prediction 路由器引入暫存區
 from app.routers.prediction import prediction_cache
@@ -83,15 +83,14 @@ async def get_diary_detail(diary_id: int, current_user: models.User = Depends(ge
     finally:
         conn.close()
 
-
 @router.patch("/{diary_id}")
-async def patch_diary(
+async def patch_diary_note(
     diary_id: int,
-    update_data: DiaryUpdate,
+    update_data: DiaryNoteUpdate,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """更新日誌內容。"""
+    """更新日記的使用者筆記。"""
 
     user_id = current_user.user_id
     is_admin = current_user.role == "admin"
@@ -100,48 +99,12 @@ async def patch_diary(
     if not db_entry or (not is_admin and db_entry.user_id != user_id):
         raise HTTPException(status_code=404, detail="Diary not found.")
 
-    new_crop_name = update_data.crop_name
-    new_status = update_data.status_name
-
-    if new_crop_name:
-        crop_info = await get_or_complete_knowledge("crop", new_crop_name, db)
-        db_entry.crop_id = crop_info["id"]
-
-    if new_status and new_status not in ["string", ""] and new_status != db_entry.status_name:
-        category = await classify_agriculture_term(new_status)
-        if category == "invalid":
-            raise HTTPException(status_code=400, detail="Status must be a disease or pest.")
-
-        # 呼叫知識庫服務，主要目的是為了拿到新診斷的 ID，並確保它存在於知識庫中
-        knowledge = await get_or_complete_knowledge(category, new_status, db)
-        
-        # 更新日記的狀態名稱
-        db_entry.status_name = new_status
-        
-        # 根據分類，更新對應的關聯 ID，並清除另一個
-        if category == "disease":
-            db_entry.disease_id = knowledge["id"]
-            db_entry.pest_id = None
-        elif category == "pest":
-            db_entry.pest_id = knowledge["id"]
-            db_entry.disease_id = None
-        
-        # 關鍵：不再用知識庫的通用 description 和 treatment 覆蓋 AI 的原始分析結果
-        # db_entry.suggestion = knowledge["suggestion"]
-        # db_entry.treatment = knowledge["treatment"]
-
-    optional_fields = ["user_note"]
-    for field in optional_fields:
-        value = getattr(update_data, field)
-        if value is not None:
-            setattr(db_entry, field, value)
-    
-    # 處理使用者修正的狀態
-    if update_data.user_corrected_status is not None:
-        db_entry.user_corrected_status = update_data.user_corrected_status
+    # 只允許更新 user_note 欄位
+    if update_data.user_note is not None:
+        db_entry.user_note = update_data.user_note
 
     db.commit()
-    return {"status": "success", "message": "Diary updated successfully."}
+    return {"status": "success", "message": "Diary note updated successfully."}
 
 
 @router.delete("/{diary_id}")

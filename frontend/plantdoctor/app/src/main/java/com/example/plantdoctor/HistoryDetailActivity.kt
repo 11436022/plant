@@ -39,7 +39,6 @@ class HistoryDetailActivity : AppCompatActivity() {
     private lateinit var tvAdvice: TextView
     private lateinit var btnAction: Button
     private lateinit var btnBack: ImageButton
-    private lateinit var tvFeedbackLink: TextView
     private lateinit var tvMainTitle: TextView
 
     private lateinit var historyRoot: CoordinatorLayout
@@ -90,7 +89,7 @@ class HistoryDetailActivity : AppCompatActivity() {
         tvAdvice = findViewById(R.id.tv_advice)
         btnAction = findViewById(R.id.btn_save_report)
         btnBack = findViewById(R.id.btn_back_home)
-        tvFeedbackLink = findViewById(R.id.tv_feedback_link)
+        
 
         cvImageContainer = findViewById(R.id.cv_image_container)
         cvPipContainer = findViewById(R.id.cv_pip_container)
@@ -168,10 +167,7 @@ class HistoryDetailActivity : AppCompatActivity() {
         imgPlant.setOnClickListener { openImagePreview() }
         cvPipContainer.setOnClickListener { openImagePreview() }
 
-        tvFeedbackLink.setOnClickListener {
-            SoundManager.playBubblePop()
-            showDiagnosesSelectionDialog()
-        }
+        
 
         ivEditNote.setOnClickListener { switchToEditMode() }
         btnSaveNote.setOnClickListener { handleSaveNote() }
@@ -399,11 +395,11 @@ class HistoryDetailActivity : AppCompatActivity() {
                     if (!data.user_corrected_status.isNullOrEmpty()) {
                         tvDiseaseName.text = "診斷：${data.user_corrected_status}"
                         tvDiseaseName.setTextColor(Color.parseColor("#2E7D32"))
-                        tvFeedbackLink.visibility = View.GONE
+
                     } else {
                         tvDiseaseName.text = "診斷：${data.status_name ?: "未知"}"
                         tvDiseaseName.setTextColor(Color.RED)
-                        tvFeedbackLink.visibility = View.VISIBLE
+
                     }
 
                     val fullAdvice = StringBuilder().apply {
@@ -527,21 +523,11 @@ class HistoryDetailActivity : AppCompatActivity() {
 
                     AlertDialog.Builder(this@HistoryDetailActivity)
                         .setTitle("回報診斷結果")
-                        .setItems(items) { dialog, which ->
+                        .setItems(items) { dialog, which ->12
                             val selectedDiagnosis = items[which]
-                            val request = PatchDiaryRequest(user_corrected_status = selectedDiagnosis)
 
-                            PlantApiService.create(token).patchDiary(diaryId, request).enqueue(object : Callback<GenericResponse> {
-                                override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
-                                    if (response.isSuccessful) {
-                                        Toast.makeText(this@HistoryDetailActivity, "回饋已提交！", Toast.LENGTH_LONG).show()
-                                        tvDiseaseName.text = "診斷：$selectedDiagnosis"
-                                        tvDiseaseName.setTextColor(Color.parseColor("#2E7D32"))
-                                        tvFeedbackLink.visibility = View.GONE
-                                    }
-                                }
-                                override fun onFailure(call: Call<GenericResponse>, t: Throwable) {}
-                            })
+
+
                         }.setNegativeButton("取消", null).show()
                 }
             }

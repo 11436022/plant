@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: Optional[str] = None
     SMTP_FROM_EMAIL: Optional[str] = None
     SMTP_FROM_NAME: str = API_TITLE
+
+    # 中央氣象署開放資料API金鑰
+    CWB_API_KEY: Optional[str] = None
     SMTP_USE_TLS: bool = True
     SMTP_USE_SSL: bool = False
 
