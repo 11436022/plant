@@ -34,6 +34,12 @@ def get_user_by_username(db: Session, username: str) -> User | None:
     return db.query(User).filter(User.username == username).first()
 
 
+def get_user_by_id(db: Session, user_id: int) -> User | None:
+    """根據使用者 ID 查詢使用者。"""
+    return db.query(User).filter(User.user_id == user_id).first()
+
+
+
 def save_main_crops():
     """將外部 API 回傳的主要作物資料寫入資料庫。"""
 

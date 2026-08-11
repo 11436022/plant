@@ -201,4 +201,12 @@ object SoundManager : DefaultLifecycleObserver {
         isSoundPoolLoaded = false
         isFirstLaunch = true
     }
+
+    fun stopBGM() {
+        bgmPlayer?.let {
+            if (it.isPlaying) {
+                it.pause() // 或使用 it.stop()
+            }
+        }
+    }
 }

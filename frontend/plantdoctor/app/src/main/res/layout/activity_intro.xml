@@ -3,41 +3,61 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/intro_root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background"
     tools:context=".IntroActivity">
 
+    <!-- 🌟 百分比 Guideline：將畫面 82% 以下劃分為底部操作區 -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bottom_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.80" />
+
+    <!-- 1. ViewPager2 內容區：佔據頂部至操作區上方，避免滑動卡片被按鈕擋住 -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager_intro"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/layout_indicators"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- 2. 分頁指示器 (Dots Indicator) -->
     <LinearLayout
         android:id="@+id/layout_indicators"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginBottom="16dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/btn_start"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- 3. 下一頁 / 開始體驗按鈕 (寬度彈性適應，文字自動調控) -->
     <Button
         android:id="@+id/btn_start"
-        android:layout_width="220dp"
-        android:layout_height="65dp"
-        android:text="下一頁"
-        android:textSize="30sp"
-        android:textColor="#FFFFFF"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginHorizontal="48dp"
         android:backgroundTint="#2E7D32"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:elevation="4dp"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="下一頁"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:autoSizeMaxTextSize="24sp"
+        app:autoSizeMinTextSize="14sp"
+        app:autoSizeTextType="uniform"
+        app:cornerRadius="28dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.80" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideline_bottom_action" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,87 +1,166 @@
-## 精準農業：植物病害診斷系統 - 後端設定指南
-本專案使用 Python (SQLAlchemy) 與 MySQL 進行開發。為了確保所有組員的開發環境一致，請按照以下步驟進行設定。
+# Plant Doctor 植物病蟲害診斷系統
 
-### 1. 複製專案與安裝環境
-首先，請將專案從 GitHub 下載到你的電腦，並安裝必要的 Python 套件：
+Plant Doctor 是一套以 Android App 與瀏覽器 webcam 為前端、FastAPI 為後端、MySQL 為資料庫，並使用 Google Gemini 與本地知識庫協助辨識的植物病蟲害系統。
 
-# 下載專案 
-git clone <https://github.com/11436022/plant.git>
+## 已完成功能
 
+- 帳號註冊、Email 驗證、登入、JWT 驗證與忘記密碼
+- Android 拍照／相簿上傳、診斷確認、歷史紀錄、備註與使用者修正
+- 作物、病害、蟲害資料庫及後台管理
+- RAG 知識庫檢索與 Gemini 圖片分析
+- AI 作物／病蟲害名稱白名單、信心門檻與作物關聯校驗
+- AI 建議改由資料庫症狀與處置內容提供
+- Webcam 定時掃描、連續影格共識、聲音／瀏覽器／Email 警報
+- Webcam 警報紀錄、確認與刪除
 
-# 安裝必要套件
-pip install -r requirements.txt
+## 系統架構
 
-### 2. 設定個人環境變數 (.env)
-為了保護每個人的資料庫密碼，我們不將密碼寫在程式碼中。請在專案根目錄手動建立一個 .env 檔案，並填入你自己的資料庫資訊：
+```text
+Android App ─────────────┐
+                        ├── HTTP/JWT ── FastAPI ── MySQL
+Browser Webcam Console ─┘                 │
+                                         ├── Gemini Image Analysis
+                                         ├── FAISS RAG Knowledge Base
+                                         └── SMTP Alert Email
+```
 
-# .env 內容範例
-DB_USER=你的MySQL帳號 (例如 root)
-DB_PASSWORD=你的MySQL密碼
-DB_HOST=host.docker.internal
-DB_HOST=127.0.0.1 
+主要入口：
+
+| 功能 | 網址 |
+| --- | --- |
+| API 文件 | `http://localhost:8000/docs` |
+| Webcam 自動警報 | `http://localhost:8000/webcam` |
+| 管理後台 | `http://localhost:8000/admin/` |
+| 健康檢查 | `http://localhost:8000/` |
+
+## 環境需求
+
+- Python 3.10 以上
+- MySQL 8
+- Gemini API Key
+- Chrome、Edge 或其他支援 `getUserMedia` 的瀏覽器
+- Android Studio（需要建置 Android App 時）
+
+瀏覽器只允許在 `localhost` 或 HTTPS 安全來源使用 webcam。跨電腦部署時，請使用 HTTPS 反向代理開啟 `/webcam`。
+
+## 後端安裝
+
+```powershell
+git clone https://github.com/11436022/plant.git
+cd plant
+python -m pip install -r requirements.txt
+Copy-Item .env.example .env
+```
+
+編輯 `.env`，至少設定：
+
+```dotenv
+GEMINI_API_KEY=your_gemini_api_key
+DB_HOST=127.0.0.1
+DB_USER=root
+DB_PASSWORD=your_mysql_password
 DB_NAME=plant_db
-# local.properties.example
-要把WIFI_HOST 改成你自己的IP位址
-### 3. 建立本地資料庫
-請開啟 MySQL，手動執行以下指令建立資料庫：
-init_db.sql可以直接複製到mysql去建立
-### (2026/4/28更新)現在請直接跑以下步驟(打開terminal)：
-git pull origin main
+JWT_SECRET_KEY=replace_with_a_long_random_secret
+FRONTEND_BASE_URL=http://127.0.0.1:8000
+PUBLIC_BASE_URL=http://127.0.0.1:8000
+```
+
+Email 警報需要再設定 `SMTP_HOST`、`SMTP_USERNAME`、`SMTP_PASSWORD` 與 `SMTP_FROM_EMAIL`。未設定 SMTP 時，畫面與資料庫警報仍會正常運作，紀錄會顯示 Email 未寄送。
+
+建立資料庫後執行 migration 與基礎資料匯入：
+
+```powershell
 python -m alembic upgrade head
 python seed.py
-
-### 📂 檔案結構說明
-以下是專案主要的檔案與目錄結構：
-
-```
-.
-├── alembic/              # 資料庫遷移腳本 (Alembic)
-├── app/                  # 主要後端應用程式目錄
-│   ├── core/             # 核心設定
-│   │   └── config.py     # 應用程式設定檔，會讀取 .env 的變數
-│   ├── db/               # 資料庫相關模組
-│   │   ├── models.py     # SQLAlchemy 的 ORM 模型定義
-│   │   └── session.py    # 資料庫連線 Session 管理
-│   ├── routers/          # API 路由定義 (FastAPI Routers)
-│   ├── schemas/          # Pydantic 資料驗證模型
-│   ├── services/         # 核心商業邏輯服務 (如 AI, 認證, Email)
-│   ├── crud.py           # 負責基本資料庫的 CRUD 操作
-│   └── main.py           # FastAPI 應用程式啟動進入點
-├── frontend/             # 前端 Android 應用程式
-│   └── plantdoctor/
-│       ├── local.properties          # Android 的本地環境設定 (如 SDK 路徑, WIFI_HOST)，不受版本控制
-│       └── local.properties.example  # local.properties 的設定範本
-├── static/               # 靜態檔案
-│   └── uploads/          # 使用者上傳的檔案存放處
-├── .env                  # 本地環境變數設定 (如資料庫密碼)，不受版本控制
-├── .env.example          # .env 的設定範本
-├── alembic.ini           # Alembic 的設定檔
-├── docker-compose.yml    # Docker Compose 設定檔
-├── dockerfile            # 後端應用程式的 Dockerfile
-├── requirements.txt      # Python 套件依賴列表
-└── seed.py               # 資料庫初始資料填充腳本
+python build_knowledge_base.py
 ```
 
-# 如果有更改資料庫要去alembic,才能同步
+更新已存在的診斷回傳資料庫：
 
-
-# docker
-### 一樣要先建好 資料庫 還有下載docker desktop
-### 要改成 DB_HOST=host.docker.internal
-## 1. 先建立映像檔 (只需要做一次)
-docker build -t plant-app-final .
-
-## 2. 啟動容器 (每次要跑程式時執行這行)
-docker run --gpus all -it -p 8000:8000 -v ${PWD}:/app plant-app-final bash -c "cd /app && python3 main.py"
-
-## 如果網頁跑不出來網址改成  http://localhost:8000/docs
-
-### Alembic (資料庫同步)
-## Alembic 用法
-pip install alembic pymysql python-dotenv
-python -m alembic current
+```powershell
+git pull --rebase origin main
 python -m alembic upgrade head
+python seed.py
+```
 
-## Alembic 抓法
-git pull origin main
+`seed.py` 會依「作物 + 病害／蟲害名稱」更新或新增資料，不會清空帳號、日記、歷史診斷與 webcam 警報。需要重新取得農業部最新公開資料時，先執行 `python update_reference_data.py`，確認輸出筆數後再執行 migration 與 seed。
+
+啟動 FastAPI：
+
+```powershell
+python main.py
+```
+
+Docker 啟動：
+
+```powershell
+docker compose up --build
+```
+
+Docker 連接主機 MySQL 時，將 `.env` 的 `DB_HOST` 改為 `host.docker.internal`。
+
+## Webcam 自動警報
+
+1. 開啟 `http://localhost:8000/webcam` 並使用既有帳號登入。
+2. 選擇攝影機，按「開啟」，再按「監控」。
+3. 系統依設定間隔擷取影格並送到受 JWT 保護的 API。
+4. 相同且已由資料庫校驗的病蟲害連續達門檻後，才建立警報。
+5. 警報會保存影像與時間，並嘗試發出聲音、瀏覽器通知及 Email。
+
+預設警報條件：
+
+| 設定 | 預設值 |
+| --- | ---: |
+| 掃描間隔 | 30 秒 |
+| 最低信心值 | 80% |
+| 連續一致影格 | 3 次 |
+| 相同警報冷卻 | 900 秒 |
+| 最低影像尺寸 | 320 x 240 |
+| 最大影像大小 | 8 MiB |
+
+以上設定可在 `.env` 以 `WEBCAM_*` 變數調整。瀏覽器可改掃描間隔，但信心、連續次數與冷卻門檻由後端控制，避免前端繞過安全規則。
+
+## 防止 AI 幻覺
+
+系統不把 Gemini 回傳內容直接視為事實，診斷必須依序通過：
+
+1. 圖片格式、容量、解析度與基本畫面資訊檢查。
+2. 作物名稱必須完全符合資料庫白名單。
+3. 病害或蟲害名稱必須完全符合資料庫白名單。
+4. 病蟲害必須確實隸屬於辨識出的作物。
+5. 信心值不足時回傳「無法判定」，不提供施藥指示。
+6. 症狀與處置內容由資料庫覆蓋 Gemini 生成文字。
+7. 可自動採用的病蟲害資料必須包含來源名稱、網址與來源紀錄 ID。
+8. 沒有可追溯來源的舊資料會標記 `requires_review=true`，不觸發 webcam 自動警報。
+9. Webcam 必須連續多張影格得到相同結果才觸發警報。
+
+這些機制能降低幻覺與誤報，但影像 AI 不能保證 100% 正確。高風險處置、農藥選擇與劑量仍應由農業專業人員確認。
+
+目前診斷資料以農業部重要農業害蟲診斷圖鑑及樹木病蟲害診斷案例為主要官方來源。樹木案例只採用「病害／蟲害」且經樣本檢驗或現地診察的紀錄；含歷史藥劑濃度、稀釋倍數或施用方式的建議不直接回傳，以免過期用法被誤認為現行核准處方。API 診斷結果會包含 `reference_source`、`reference_url` 與 `reference_record_id` 供前端或人工查核。
+
+## Android 設定
+
+在 `frontend/plantdoctor/local.properties` 設定後端主機：
+
+```properties
+WIFI_HOST=192.168.1.100
+```
+
+Android 模擬器會自動使用 `10.0.2.2:8000`；實體裝置與後端需位於可互通的網路。API Base URL 為 `/api/v1/`。
+
+## 測試
+
+執行防幻覺與 webcam 安全測試：
+
+```powershell
+python -m pytest test/test_ai_validation.py test/test_reference_data.py test/test_seed.py test/test_webcam.py -q
+```
+
+檢查 Alembic migration：
+
+```powershell
+python -m alembic heads
 python -m alembic upgrade head
+```
+
+目前 migration head 為 `c37f8e92a411`。

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission
@@ -25,6 +25,9 @@
         android:theme="@style/Theme.PlantDoctor"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
+        <activity
+            android:name=".WebcamActivity"
+            android:exported="false" />
         <activity
             android:name=".HistoryDetailActivity"
             android:exported="false"
@@ -64,14 +67,18 @@
             android:name=".ResetPasswordActivity"
             android:exported="true"
             android:theme="@style/Theme.PlantDoctor.NoActionBar">
+
             <!-- Deep Link Intent Filter -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="plantdoctor"
-                    android:host="reset-password" />
+                    android:host="reset"
+                    android:path="/reset-password"
+                    android:scheme="plantdoctor" />
             </intent-filter>
         </activity>
         <activity
@@ -83,11 +90,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ImagePreviewActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
-
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -93,4 +93,9 @@ dependencies {
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
     // 🌟 新手功能引導氣泡對話框庫
     implementation("com.getkeepsafe.taptargetview:taptargetview:1.13.3")
+    implementation("androidx.camera:camera-core:1.3.1")
+    implementation("androidx.camera:camera-camera2:1.3.1")
+    implementation("androidx.camera:camera-lifecycle:1.3.1")
+    implementation("androidx.camera:camera-view:1.3.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 }

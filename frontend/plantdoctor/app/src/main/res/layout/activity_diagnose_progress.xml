@@ -3,62 +3,120 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/progress_root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/progress_root_layout"
     android:background="@drawable/gradient_background">
 
-    <ImageView
-        android:id="@+id/img_diagnosing_icon"
-        android:layout_width="341dp"
-        android:layout_height="443dp"
-        android:src="@drawable/doctor_check"
+    <!-- 🌟 0. 後方背景落葉層 (在醫生圖片後方) -->
+    <com.example.plantdoctor.FallingLeavesView
+        android:id="@+id/falling_leaves_back"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.25" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tv_progress_status"
+    <!-- 百分比 Guideline -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_top"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="526dp"
-        android:text="AI 專家診斷中..."
-        android:textColor="#2E7D32"
-        android:textSize="36sp"
-        android:textStyle="bold"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.12" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bottom_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.75" />
+
+    <!-- 1. 醫生診斷插圖 (夾在前後落葉中間) -->
+    <ImageView
+        android:id="@+id/img_diagnosing_icon"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="32dp"
+        android:contentDescription="AI診斷中"
+        android:scaleType="fitCenter"
+        android:src="@drawable/doctor_check"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_img"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.322"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideline_top" />
+
+    <!-- 🌟 1.5 前方前景落葉層 (蓋在醫生圖片前方) -->
+    <com.example.plantdoctor.FallingLeavesView
+        android:id="@+id/falling_leaves_front"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tv_percent"
-        android:layout_width="wrap_content"
+    <!-- 2. 狀態標題與百分比容器 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_status_container"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="552dp"
-        android:layout_marginEnd="48dp"
-        android:text="0%"
-        android:textColor="#2E7D32"
-        android:textSize="20sp"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="24dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline_bottom_img">
 
+        <TextView
+            android:id="@+id/tv_progress_status"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:gravity="start|center_vertical"
+            android:maxLines="1"
+            android:text="AI 專家診斷中..."
+            android:textColor="#2E7D32"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:autoSizeMaxTextSize="32sp"
+            app:autoSizeMinTextSize="18sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_percent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_percent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end|center_vertical"
+            android:text="0%"
+            android:textColor="#2E7D32"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 3. 水平進度條 -->
     <ProgressBar
         android:id="@+id/progressBar_horizontal"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="0dp"
-        android:layout_height="24dp"
-        android:layout_marginHorizontal="50dp"
-        android:layout_marginTop="596dp"
+        android:layout_height="22dp"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="16dp"
         android:max="100"
         android:progress="0"
         android:progressDrawable="@drawable/custom_progress_bar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.838"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toBottomOf="@id/layout_status_container" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

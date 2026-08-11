@@ -28,6 +28,9 @@ class Disease(Base):
     disease_name = Column(String(100))
     description = Column(Text)
     treatment = Column(Text)
+    source_name = Column(String(100))
+    source_url = Column(String(2048))
+    source_record_id = Column(String(128))
 
     crop = relationship("Crop", back_populates="diseases")
 
@@ -42,6 +45,9 @@ class Pest(Base):
     pest_name = Column(String(100), nullable=False)
     description = Column(Text)
     treatment = Column(Text)
+    source_name = Column(String(100))
+    source_url = Column(String(2048))
+    source_record_id = Column(String(128))
 
     crop = relationship("Crop", back_populates="pests")
 
@@ -59,10 +65,11 @@ class User(Base):
     role = Column(String(20), nullable=False, default="user")
     # 新註冊帳號需要先驗證信箱；既有資料庫則由 migration 與啟動修補補齊欄位。
     is_email_verified = Column(Boolean, nullable=False, default=True)
-    email_verified_at = Column(DateTime(timezone=True), nullable=True)
+    email_verified_at = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     plant_diary = relationship("PlantDiary", back_populates="user")
+    webcam_alerts = relationship("WebcamAlert", back_populates="user")
 
 
 class UserOneTimeToken(Base):
@@ -130,3 +137,22 @@ class DiagnosisFeedback(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User")
+class WebcamAlert(Base):
+    """A confirmed webcam anomaly produced after repeated matching frames."""
+
+    __tablename__ = "webcam_alert"
+
+    id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("user.user_id"), nullable=False, index=True)
+    crop_id = Column(Integer, ForeignKey("crop.crop_id"), nullable=True)
+    category = Column(String(20), nullable=False)
+    status_name = Column(String(100), nullable=False)
+    confidence = Column(Float, nullable=False)
+    consecutive_matches = Column(Integer, nullable=False)
+    image_url = Column(String(2048), nullable=False)
+    email_sent = Column(Boolean, nullable=False, default=False)
+    acknowledged_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    user = relationship("User", back_populates="webcam_alerts")
+    crop = relationship("Crop")

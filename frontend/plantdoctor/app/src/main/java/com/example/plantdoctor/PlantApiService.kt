@@ -1,18 +1,21 @@
 package com.example.plantdoctor
 
 import android.content.Context
+import com.google.gson.annotations.SerializedName
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 import java.util.concurrent.TimeUnit
 
-// --- 1. Data Models (對應後端 JSON 結構) ---
+// ==========================================
+// 1. Data Models (完全相容你原本 Activity 的欄位命名)
+// ==========================================
 
 data class LoginRequest(val username: String, val password: String)
+// --- Auth & Account ---
 data class LoginResponse(
     val status: String,
     val message: String,
@@ -25,37 +28,64 @@ data class RegisterRequest(
     val username: String,
     val password: String,
     val email: String,
-    val full_name: String
+    val full_name: String? = null
 )
 
 data class ForgotPasswordRequest(val email: String)
+data class EmailVerificationRequest(val email: String)
 
-data class EmailVerificationRequest(
-    val email: String
+data class GenericResponse(
+    val status: String,
+    val message: String?
 )
 
+// --- Predict (第一階段預測) ---
 data class PredictionResponse(
     val prediction_id: String,
-    val analysis_result: AnalysisResult
+    val analysis_result: AnalysisResult,
+    val metadata: Map<String, Any>? = null
 )
+
 data class AnalysisResult(
     val crop_name: String?,
-    val category: String?,
     val status_name: String?,
+    val category: String? = null,
     val confidence: Double?,
     val suggestion: String?,
     val treatment: String?
 )
-data class ConfirmRequest(val user_note: String)
 
+// --- Confirm (第二階段確認寫入日記) ---
+// 相容你原本 ResultActivity 傳入的 disease_name 與 gemini_advice，後端忽略即可
 data class DiaryConfirmRequest(
-    val user_note: String?,
-    val disease_name: String,
-    val gemini_advice: String
+    val user_note: String? = null,
+    val disease_name: String? = null,
+    val gemini_advice: String? = null
 )
 
+
+data class DiaryConfirmData(
+    val id: Int,
+    val crop_name: String,
+    val status_name: String,
+    val confidence: Double?,
+    val image_url: String,
+    val suggestion: String?,
+    val treatment: String?
+)
+
+data class DiaryConfirmResponse(
+    val status: String,
+    val message: String,
+    val data: DiaryConfirmData?
+)
+
+// --- History & Diary (修改日記) ---
 data class PatchDiaryRequest(
-    val user_note: String? = null
+    val crop_name: String? = null,
+    val status_name: String? = null,
+    val user_note: String? = null,
+    val user_corrected_status: String? = null
 )
 
 data class HistoryResponse(
@@ -64,17 +94,34 @@ data class HistoryResponse(
     val data: List<HistoryItem>
 )
 
-data class DetailDetailResponse(val status: String, val data: HistoryItem)
+data class DetailDetailResponse(
+    val status: String,
+    val data: HistoryItem
+)
 
 data class GenericResponse(val status: String, val message: String)
 
-data class DiagnosisItem(val name: String, val category: String)
+
+// --- Knowledge (知識庫) ---
+data class DiagnosisItem(
+    val name: String,
+    val category: String
+)
+
 data class DiagnosesResponse(
     val status: String,
     val count: Int,
     val data: List<DiagnosisItem>
 )
 
+// --- Webcam (即時監控與警報) ---
+data class WebcamSettingsResponse(
+    val sample_interval_seconds: Int,
+    val alert_confidence: Double,
+    val required_matches: Int,
+    val cooldown_seconds: Int,
+    val max_image_bytes: Long
+)
 
 // --- User Profile ---
 data class UserProfileData(
@@ -122,10 +169,46 @@ data class PlantCareAdvice(
 
 
 // --- 2. API 接口定義 ---
+data class WebcamMonitoringState(
+    val streak: Int,
+    val triggered: Boolean,
+    val status: String
+)
+
+data class WebcamAlertItem(
+    val id: Int,
+    val user_id: Int,
+    val crop_name: String?,
+    val status_name: String?,
+    val confidence: Double?,
+    val image_url: String,
+    val consecutive_matches: Int,
+    val created_at: String,
+    val acknowledged_at: String?
+)
+
+data class WebcamAnalyzeResponse(
+    val status: String,
+    val diagnosis: AnalysisResult,
+    val monitoring: WebcamMonitoringState,
+    val alert: WebcamAlertItem?
+)
+
+data class WebcamAlertListResponse(
+    val status: String,
+    val count: Int,
+    val data: List<WebcamAlertItem>
+)
+
+
+// ==========================================
+// 2. API 接口定義
+// ==========================================
 
 interface PlantApiService {
 
-    // 【帳戶相關】
+    // --- 【帳戶相關】 ---
+
     @POST("auth/users/register")
     fun register(@Body request: RegisterRequest): Call<GenericResponse>
 
@@ -145,19 +228,20 @@ interface PlantApiService {
     @POST("auth/user/reset-password")
     fun resetPassword(@Body request: ResetPasswordRequest): Call<GenericResponse>
 
-    // --- 新的兩階段提交流程 ---
+
+    // --- 【兩階段診斷與日記】 ---
 
     @Multipart
     @POST("predict/")
     fun predictImage(
-        @Part image: MultipartBody.Part
+        @Part file: MultipartBody.Part
     ): Call<PredictionResponse>
 
     @POST("diaries/confirm/{prediction_id}")
     fun confirmDiary(
         @Path("prediction_id") predictionId: String,
-        @Body request: DiaryConfirmRequest
-    ): Call<GenericResponse>
+        @Body request: DiaryConfirmRequest = DiaryConfirmRequest()
+    ): Call<DiaryConfirmResponse>
 
     @GET("diaries")
     fun getAllHistory(): Call<HistoryResponse>
@@ -195,11 +279,39 @@ interface PlantApiService {
     fun getPlantCareAdvice(@Query("city") city: String): Call<PlantCareAdvice>
 
 
+    // --- 【Webcam 即時監控與警報】 ---
+
+    @GET("webcam/settings")
+    fun getWebcamSettings(): Call<WebcamSettingsResponse>
+
+    @Multipart
+    @POST("webcam/analyze")
+    fun analyzeWebcamFrame(
+        @Part file: MultipartBody.Part
+    ): Call<WebcamAnalyzeResponse>
+
+    @GET("webcam/alerts")
+    fun getWebcamAlerts(
+        @Query("limit") limit: Int = 50,
+        @Query("unacknowledged_only") unacknowledgedOnly: Boolean = false
+    ): Call<WebcamAlertListResponse>
+
+    @PATCH("webcam/alerts/{alert_id}/acknowledge")
+    fun acknowledgeWebcamAlert(
+        @Path("alert_id") alertId: Int
+    ): Call<GenericResponse>
+
+    @DELETE("webcam/alerts/{alert_id}")
+    fun deleteWebcamAlert(
+        @Path("alert_id") alertId: Int
+    ): Call<GenericResponse>
+
+
     // --- 3. Retrofit 實例產生器 ---
     companion object {
-        private const val WIFI_HOST = BuildConfig.WIFI_HOST
+        private val WIFI_HOST = BuildConfig.WIFI_HOST
 
-        // 🌟 新增這個全域變數，用來即時同步目前能通的 IP 門牌
+        // 🌟 全域變數，用來即時同步目前能通的 IP 門牌
         var currentRunningIp: String = WIFI_HOST
 
         private fun getSmartBaseUrl(): String {
@@ -243,7 +355,10 @@ interface PlantApiService {
 
         fun create(token: String? = null): PlantApiService {
             val dynamicBaseUrl = getSmartBaseUrl()
-            android.util.Log.d("PlantApi", "🚀 目前連線通道與 IP 鎖定: $dynamicBaseUrl, 圖片對齊 IP: $currentRunningIp")
+            android.util.Log.d(
+                "PlantApi",
+                "🚀 目前連線通道與 IP 鎖定: $dynamicBaseUrl, 圖片對齊 IP: $currentRunningIp"
+            )
 
             val okHttpClient = OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)

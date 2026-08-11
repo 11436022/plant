@@ -10,6 +10,10 @@ venv/
 
 # 排除上傳的測試圖片與暫存檔
 static/tmp/*
-static/uploads/*
 !static/tmp/.gitkeep
+
+# 忽略 uploads 資料夾中的所有內容
+static/uploads/*
+
+# 但保留 .gitkeep，以便 Git 追蹤這個空目錄
 !static/uploads/.gitkeep

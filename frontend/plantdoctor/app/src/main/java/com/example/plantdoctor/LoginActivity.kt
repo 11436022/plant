@@ -13,18 +13,20 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout // 🌟 新增
+import androidx.constraintlayout.widget.ConstraintLayout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
 
-    // 🌟 1. 建立風聲延遲計時器與任務（放在 onCreate 外面）
+    // 🌟 1. 建立風聲延遲計時器與任務
     private val windHandler = Handler(Looper.getMainLooper())
     private val windRunnable = Runnable {
         SoundManager.startWind() // 當按住滿 0.5 秒，正式吹起風聲
     }
+
+    private lateinit var loginRoot: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +44,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         // --- 2. 綁定 UI 元件 ---
-        val loginRoot = findViewById<ConstraintLayout>(R.id.login_root_layout) // 🌟 核心新增：最外層佈局
+        loginRoot = findViewById(R.id.login_root_layout) // 🌟 最外層佈局
         val etUsername = findViewById<EditText>(R.id.et_username)
         val etPassword = findViewById<EditText>(R.id.et_password)
         val btnLogin = findViewById<Button>(R.id.btn_login_submit)
@@ -50,17 +52,19 @@ class LoginActivity : AppCompatActivity() {
         val tvForgotPassword = findViewById<TextView>(R.id.tv_forgot_password)
         val tvLoginTitle = findViewById<TextView>(R.id.tv_login_title)
 
-        // 🌟 核心新增：召喚大總管！將最外層背景、按鈕、可點擊文字通通交給它換色
+        // 🌟 初始化音效管理器
+        SoundManager.init(this)
+
+        // 🌟 召喚大總管！將最外層背景、按鈕、可點擊文字通通交給它換色
         ThemeManager.applyTheme(
             context = this,
             rootLayout = loginRoot,
-            titles = listOf(tvRegister, tvForgotPassword,tvLoginTitle), // 讓「去註冊」和「忘記密碼」變成漂亮的深色主題字
-            mainButtons = listOf(btnLogin) // 讓「登入按鈕」變成對齊主題的質感主按鈕
+            titles = listOf(tvRegister, tvForgotPassword, tvLoginTitle),
+            mainButtons = listOf(btnLogin)
         )
 
         // --- 3. 登入按鈕邏輯 ---
         btnLogin.setOnClickListener {
-            // 點擊登入按鈕播放泡泡聲
             SoundManager.playBubblePop()
 
             val username = etUsername.text.toString().trim()
@@ -81,7 +85,6 @@ class LoginActivity : AppCompatActivity() {
                         val email = body?.email
 
                         if (token != null) {
-                            // 儲存登入狀態與資料
                             with(sharedPref.edit()) {
                                 putBoolean("is_logged_in", true)
                                 putString("token", token)
@@ -94,13 +97,8 @@ class LoginActivity : AppCompatActivity() {
                         }
                     } else {
                         when (response.code()) {
-                            // 🌟 修改這裡：把使用者輸入的帳號/Email (username變數) 傳進去
                             403 -> {
-                                // 🌟 核心改動：從 SharedPreferences 撈出剛剛註冊存好的 Email
-                                val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
                                 val savedEmail = sharedPref.getString("registered_email", "") ?: ""
-
-                                // 把撈出來的 Email (可能是正確的信箱，也可能是空字串) 丟給彈窗
                                 showErrorDialog("驗證提示", "您的信箱尚未驗證，請先至信箱點擊驗證連結。", savedEmail)
                             }
                             400 -> Toast.makeText(this@LoginActivity, "帳號或密碼錯誤", Toast.LENGTH_SHORT).show()
@@ -118,27 +116,61 @@ class LoginActivity : AppCompatActivity() {
 
         // --- 4. 註冊跳轉 ---
         tvRegister.setOnClickListener {
-            // 點擊去註冊播放泡泡聲
             SoundManager.playBubblePop()
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 
         // --- 5. 忘記密碼跳轉 ---
         tvForgotPassword.setOnClickListener {
-            // 點擊忘記密碼播放泡泡聲
             SoundManager.playBubblePop()
             showForgotPasswordDialog()
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // 🌟 每次回到登入頁時，重新刷新主題色彩與啟動背景音樂
+        if (::loginRoot.isInitialized) {
+            val tvRegister = findViewById<TextView>(R.id.tv_go_to_register)
+            val tvForgotPassword = findViewById<TextView>(R.id.tv_forgot_password)
+            val tvLoginTitle = findViewById<TextView>(R.id.tv_login_title)
+            val btnLogin = findViewById<Button>(R.id.btn_login_submit)
+
+            ThemeManager.applyTheme(
+                context = this,
+                rootLayout = loginRoot,
+                titles = listOf(tvRegister, tvForgotPassword, tvLoginTitle),
+                mainButtons = listOf(btnLogin)
+            )
+        }
+        SoundManager.startBGM()
+    }
+
+    /**
+     * 🌟 核心關鍵突破：搶在 ScrollView 吃掉事件之前分發 Touch 事件！
+     * 無論頁面是否有 NestedScrollView 滾動，按住畫面 0.5 秒依然會吹起風聲。
+     */
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev != null) {
+            when (ev.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    windHandler.postDelayed(windRunnable, 500)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    windHandler.removeCallbacks(windRunnable)
+                    SoundManager.stopWind()
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
     private fun sendVerificationEmail(email: String) {
         val apiService = PlantApiService.create(null)
-        // 包裝成後端要的 JSON Payload，例如 {"email": "xxx"}
         val request = EmailVerificationRequest(email)
 
         apiService.requestEmailVerification(request).enqueue(object : Callback<GenericResponse> {
             override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
-                // 因為後端做了安全防禦，不論信箱是否存在，固定回傳 200 success，所以這裡統一提示成功
                 Toast.makeText(this@LoginActivity, "若 Email 正確且未驗證，驗證信已補寄完成！", Toast.LENGTH_LONG).show()
             }
 
@@ -155,30 +187,97 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun showForgotPasswordDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("忘記密碼")
-        builder.setMessage("請輸入您的註冊 Email，系統將寄送重設密碼連結：")
+        val sharedPref = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
+        val currentTheme = sharedPref.getInt("THEME_COLOR_ID", 0)
 
-        val input = EditText(this)
-        input.hint = "example@gmail.com"
-        input.setPadding(50, 40, 50, 40)
-        builder.setView(input)
+        val bgColorStr = when (currentTheme) {
+            1 -> "#1A237E"
+            2 -> "#3E2723"
+            3 -> "#4A0033"
+            else -> "#FFFFFF"
+        }
 
-        builder.setPositiveButton("送出") { _, _ ->
-            // 點擊忘記密碼彈窗的「送出」播放泡泡聲
-            SoundManager.playBubblePop()
-            val email = input.text.toString().trim()
-            if (email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                sendResetEmail(email)
-            } else {
-                Toast.makeText(this, "請輸入有效的 Email 地址", Toast.LENGTH_SHORT).show()
+        val titleColor = when (currentTheme) {
+            1, 2, 3 -> android.graphics.Color.WHITE
+            else -> android.graphics.Color.parseColor("#2E7D32")
+        }
+
+        val textColor = when (currentTheme) {
+            1, 2, 3 -> android.graphics.Color.WHITE
+            else -> android.graphics.Color.parseColor("#333333")
+        }
+
+        val themeMainColorStr = when (currentTheme) {
+            1 -> "#64B5F6"
+            2 -> "#FFCC80"
+            3 -> "#F48FB1"
+            else -> "#2E7D32"
+        }
+        val themeMainColor = android.graphics.Color.parseColor(themeMainColorStr)
+
+        val context = this
+        val dialogLayout = android.widget.LinearLayout(context).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(60, 50, 60, 40)
+        }
+
+        val tvTitle = android.widget.TextView(context).apply {
+            text = "忘記密碼"
+            textSize = 20f
+            typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
+            setTextColor(titleColor)
+            setPadding(0, 10, 0, 10)
+        }
+        dialogLayout.addView(tvTitle)
+
+        val tvMsg = android.widget.TextView(context).apply {
+            text = "請輸入您的註冊 Email，系統將寄送重設密碼連結："
+            textSize = 14f
+            setTextColor(textColor)
+            setPadding(0, 0, 0, 20)
+        }
+        dialogLayout.addView(tvMsg)
+
+        val input = android.widget.EditText(context).apply {
+            hint = "example@gmail.com"
+            setHintTextColor(android.graphics.Color.GRAY)
+            setTextColor(textColor)
+            background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(android.graphics.Color.parseColor("#22FFFFFF"))
+                setStroke(2, themeMainColor)
+                cornerRadius = 16f
             }
+            setPadding(30, 20, 30, 20)
         }
-        builder.setNegativeButton("取消") { _, _ ->
-            // 點擊忘記密碼彈窗的「取消」播放泡泡聲
-            SoundManager.playBubblePop()
+        dialogLayout.addView(input)
+
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setView(dialogLayout)
+            .setPositiveButton("送出") { _, _ ->
+                SoundManager.playBubblePop()
+                val email = input.text.toString().trim()
+                if (email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    sendResetEmail(email)
+                } else {
+                    Toast.makeText(this, "請輸入有效的 Email 地址", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("取消") { _, _ ->
+                SoundManager.playBubblePop()
+            }
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        alertDialog.window?.let { window ->
+            val background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(android.graphics.Color.parseColor(bgColorStr))
+                cornerRadius = 32f
+            }
+            window.setBackgroundDrawable(background)
+            alertDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.setTextColor(titleColor)
+            alertDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)?.setTextColor(titleColor)
         }
-        builder.show()
     }
 
     private fun sendResetEmail(email: String) {
@@ -194,7 +293,7 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
             override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
-                Toast.makeText(this@LoginActivity, "網路連線失敗", Toast.LENGTH_SHORT).show() // 修正原專案的小手誤：改為 this@LoginActivity
+                Toast.makeText(this@LoginActivity, "網路連線失敗", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -231,23 +330,20 @@ class LoginActivity : AppCompatActivity() {
             text = message
             textSize = 16f
             setTextColor(textColor)
-            setPadding(0, 10, 0, 30) // 留一點間距給底下的輸入框
+            setPadding(0, 10, 0, 30)
         }
 
         dialogLayout.addView(tvTitle)
         dialogLayout.addView(tvMessage)
 
-        // 🌟 1. 檢查傳進來的 Email 格式是否有效
         val isEmailValid = defaultEmail.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(defaultEmail).matches()
 
-        // 🌟 2. 建立輸入框（這次不論如何都保持顯示！）
         val etEmailInput = android.widget.EditText(context).apply {
             hint = "請輸入您的註冊 Email"
             setTextColor(textColor)
             setHintTextColor(android.graphics.Color.GRAY)
-            visibility = android.view.View.VISIBLE // 👈 情況一：保持輸入框可見！
+            visibility = android.view.View.VISIBLE
 
-            // 🌟 如果手機裡有存到正確的 Email，直接自動幫使用者填入
             if (isEmailValid) {
                 setText(defaultEmail)
             }
@@ -259,11 +355,9 @@ class LoginActivity : AppCompatActivity() {
             .setPositiveButton("補寄驗證信") { _, _ ->
                 SoundManager.playBubblePop()
 
-                // 🌟 3. 永遠以「使用者在輸入框裡看到的文字」為準（方便他們修改打錯的字）
                 val finalEmail = etEmailInput.text.toString().trim()
 
                 if (finalEmail.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(finalEmail).matches()) {
-                    // 🚀 執行發送至後端
                     sendVerificationEmail(finalEmail)
                 } else {
                     Toast.makeText(context, "請輸入正確的 Email 格式", Toast.LENGTH_SHORT).show()
@@ -286,22 +380,6 @@ class LoginActivity : AppCompatActivity() {
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(textColor)
             alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(textColor)
         }
-    }
-
-    // 🌟 2. 全螢幕長按雷達，判定長按 0.5 秒才吹風
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event != null) {
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    windHandler.postDelayed(windRunnable, 500)
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    windHandler.removeCallbacks(windRunnable)
-                    SoundManager.stopWind()
-                }
-            }
-        }
-        return super.onTouchEvent(event)
     }
 
     override fun onStop() {

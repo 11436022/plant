@@ -168,22 +168,8 @@ async def confirm_and_create_diary(
     formal_path = create_safe_upload_path(temp_path.name)
     shutil.move(str(temp_path), formal_path)
 
-    # ================= 核心修改 =================
-    # 4. 直接使用前端傳來的資料，不再進行複雜的字串拆分解析
-    try:
-        ai_result["status_name"] = payload.disease_name.replace("診斷：", "").strip()
-        ai_result["suggestion"] = payload.gemini_advice
-        ai_result["treatment"] = "" # 或是從 advice 中嘗試拆分，但失敗也不要崩潰
-
-        if "【治療方法】" in payload.gemini_advice:
-            parts = payload.gemini_advice.split("【治療方法】")
-            ai_result["suggestion"] = parts[0].replace("【專家建議】", "").strip()
-            ai_result["treatment"] = parts[1].strip()
-    except Exception as e:
-        print(f"解析建議文字出錯，將儲存原始文字: {e}")
-        ai_result["suggestion"] = payload.gemini_advice
-        ai_result["treatment"] = ""
-
+    # 4. 儲存後端快取中的診斷結果，不使用前端傳回的文字覆蓋作物、病蟲害或建議。
+    #    predict API 已在後端完成資料庫清單校驗；confirm 只負責使用者確認與備註。
 
     try:
         # 5. 呼叫既有的 save_to_db 服務，將資料寫入資料庫

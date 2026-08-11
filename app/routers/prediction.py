@@ -1,4 +1,3 @@
-import shutil
 import time
 import uuid
 from pathlib import Path
@@ -6,9 +5,11 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.db.session import get_db
 from app.schemas.prediction import PredictionResponse
-from app.services.ai import diagnostic_plant, get_reference_lists
+from app.services.ai import diagnostic_plant, get_reference_lists, ground_diagnosis_in_database
+from app.services.files import ensure_image_upload
 
 # 暫存區：使用一個簡單的 Python 字典來模擬 Redis
 # 格式: { "prediction_id": { "result": ai_json_result, "temp_path": "path/to/temp/image.jpg" } }
@@ -37,14 +38,19 @@ async def predict_plant_status(file: UploadFile = File(...), db: Session = Depen
     5. 回傳 prediction_id 和分析結果給客戶端。
     """
     start_time = time.time()
+    temp_file_path = None
     try:
-        # 1. 產生一個安全的、唯一的檔名，並儲存到臨時位置
-        suffix = Path(file.filename).suffix if file.filename else ".jpg"
-        safe_filename = f"{uuid.uuid4()}{suffix}"
-        temp_file_path = TEMP_DIR / safe_filename
-        
+        # 1. Only accept bounded images and never trust the client filename.
+        ensure_image_upload(file)
+        suffix = Path(file.filename or "").suffix.lower() or ".jpg"
+        temp_file_path = TEMP_DIR / f"{uuid.uuid4().hex}{suffix}"
+        total_bytes = 0
         with open(temp_file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            while chunk := file.file.read(1024 * 1024):
+                total_bytes += len(chunk)
+                if total_bytes > settings.WEBCAM_MAX_IMAGE_BYTES:
+                    raise HTTPException(status_code=413, detail="Image exceeds the upload size limit.")
+                buffer.write(chunk)
 
         # 2. 呼叫 AI 進行診斷
         crops, diseases, pests = get_reference_lists(db)
@@ -52,6 +58,7 @@ async def predict_plant_status(file: UploadFile = File(...), db: Session = Depen
 
         if not ai_result:
             raise HTTPException(status_code=502, detail="AI analysis service failed.")
+        ai_result = ground_diagnosis_in_database(ai_result, db)
 
         # 3. 產生唯一的 ID
         prediction_id = str(uuid.uuid4())
@@ -74,8 +81,13 @@ async def predict_plant_status(file: UploadFile = File(...), db: Session = Depen
 
         return response_data
 
+    except HTTPException:
+        if temp_file_path and temp_file_path.exists():
+            temp_file_path.unlink()
+        raise
     except Exception as e:
-        # 捕捉所有可能的錯誤
+        if temp_file_path and temp_file_path.exists():
+            temp_file_path.unlink()
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
     finally:
         # 暫存的圖片不由 predict API 刪除，而是由 confirm API 或過期機制處理

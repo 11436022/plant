@@ -14,6 +14,7 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -21,7 +22,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import android.view.View
-
+import com.example.plantdoctor.R
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -36,7 +37,12 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var tvSettingsTitle: TextView
     private lateinit var tvColorSelect: TextView
     private lateinit var tvForgotPassword: TextView
+<<<<<<< HEAD
     private lateinit var tvVolumeMixer: TextView
+=======
+    private lateinit var etUsername: EditText
+    private lateinit var etGmail: EditText
+>>>>>>> origin/main
     private lateinit var btnBack: android.widget.ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,15 +59,20 @@ class SettingsActivity : AppCompatActivity() {
         tvSettingsTitle = findViewById(R.id.tv_settings_title)
         tvColorSelect = findViewById(R.id.tv_color_select)
         tvForgotPassword = findViewById(R.id.tv_forgot_password)
-        tvVolumeMixer = findViewById(R.id.tv_volume_mixer)
+        etUsername = findViewById(R.id.et_username)
+        etGmail = findViewById(R.id.et_gmail)
+        btnVolumeMixer = findViewById(R.id.btn_volume_mixer)
         btnBack = findViewById(R.id.btn_back_home)
         val btnLogout = findViewById<Button>(R.id.btn_logout)
 
         // --- 3. 從 API 取得最新使用者資料 ---
         fetchUserProfile()
 
-        // --- 4. 套用主題顏色 ---
-        val savedTheme = sharedPref.getInt("THEME_COLOR_ID", 0)
+        // 🌟 初始化音效管理器 (與 HomeActivity 對齊)
+        SoundManager.init(this)
+
+        // 🌟 核心新增：一開機就套用上次使用者選好的主題顏色
+        val savedTheme = sharedPref.getInt("THEME_COLOR_ID", 0) // 預設 0 是經典綠
         applyThemeSettings(savedTheme)
 
         // --- 5. 點擊事件處理 ---
@@ -100,6 +111,32 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 🌟 回到頁面時，強迫大總管重新載入最新主題背景與標題顏色，並重新播放背景音效
+        applyThemeSettings(getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE).getInt("THEME_COLOR_ID", 0))
+        SoundManager.startBGM()
+    }
+
+    /**
+     * 🌟 核心關鍵突破：搶在 ScrollView 吃掉事件之前分發 Touch 事件！
+     * 無論頁面有沒有滾動條，按住畫面 0.5 秒依然會完美發出風聲。
+     */
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev != null) {
+            when (ev.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    windHandler.postDelayed(windRunnable, 500)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    windHandler.removeCallbacks(windRunnable)
+                    SoundManager.stopWind()
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     /**
@@ -166,7 +203,7 @@ class SettingsActivity : AppCompatActivity() {
         }
         dialogLayout.addView(radioGroup)
 
-        // 6. 用這個 100% 自訂的佈局建立對話框，不使用原生 setTitle 和 setSingleChoiceItems 了！
+        // 6. 用這個 100% 自訂的佈局建立對話框
         val builder = AlertDialog.Builder(this)
             .setView(dialogLayout)
             .setPositiveButton("確定") { _, _ ->
@@ -203,14 +240,14 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * 🌟 核心新增：負責全套 UI 主題色抽換的大總管
+     * 🌟 負責全套 UI 主題色抽換的大總管
      */
     private fun applyThemeSettings(themeId: Int) {
         ThemeManager.applyTheme(
             context = this,
             rootLayout = rootLayout,
-            titles = listOf(tvSettingsTitle, tvColorSelect, tvForgotPassword, tvVolumeMixer),
-            imageButtons = listOf(btnBack)
+            titles = listOf(tvSettingsTitle, tvColorSelect, tvForgotPassword),
+            imageButtons = listOf(btnBack, btnVolumeMixer)
         )
     }
 
@@ -229,7 +266,6 @@ class SettingsActivity : AppCompatActivity() {
         }
         val themeColor = Color.parseColor(themeColorStr)
 
-        // 根據主題決定對話框的底色與最上方大標題文字顏色
         val dialogBgColorStr = when (currentTheme) {
             1 -> "#1A237E" // 深藍底
             2 -> "#3E2723" // 深可可底
@@ -237,28 +273,26 @@ class SettingsActivity : AppCompatActivity() {
             else -> "#FFFFFF" // 清爽白底
         }
         val mainTitleColor = when (currentTheme) {
-            1, 2, 3 -> Color.WHITE // 暗色系背景時，大標題用白色才突兀、好看
-            else -> Color.parseColor("#2E7D32") // 綠色主題白底時，大標題用深綠色
+            1, 2, 3 -> Color.WHITE
+            else -> Color.parseColor("#2E7D32")
         }
 
         val context = this
         val dialogLayout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(60, 50, 60, 50) // 稍微加寬間距，排版更美
+            setPadding(60, 50, 60, 50)
         }
 
-        // 🌟 修正點：直接把「大標題」自己用 TextView 刻出來並塞進佈局最上方！100% 聽話不受系統劫持
         val tvDialogTitle = TextView(context).apply {
             text = "進階音量控制調音台"
             textSize = 20f
             typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
-            setTextColor(mainTitleColor) // 🌟 精準控制大標題顏色！
+            setTextColor(mainTitleColor)
             setPadding(0, 10, 0, 30)
         }
         dialogLayout.addView(tvDialogTitle)
 
         fun createVolumeRow(label: String, currentProgress: Int, onRelease: (Int) -> Unit): SeekBar {
-            // 這裡的文字顏色，如果是暗色底就給白色，白底就給主題色，確保字字清晰
             val rowTextColor = when (currentTheme) {
                 1, 2, 3 -> Color.WHITE
                 else -> themeColor
@@ -267,7 +301,7 @@ class SettingsActivity : AppCompatActivity() {
             val tv = TextView(context).apply {
                 text = "$label ($currentProgress%)"
                 textSize = 16f
-                setTextColor(rowTextColor) // 同步換色：對齊內部項目字體色
+                setTextColor(rowTextColor)
                 setPadding(0, 20, 0, 10)
             }
             val seekBar = SeekBar(context).apply {
@@ -324,7 +358,6 @@ class SettingsActivity : AppCompatActivity() {
             Handler(Looper.getMainLooper()).postDelayed({ SoundManager.stopWind() }, 600)
         }
 
-        // 🌟 修正點：在這裡不要呼叫 .setTitle() 了，因為上面已經自己加了 tvDialogTitle
         val builder = AlertDialog.Builder(this)
             .setView(dialogLayout)
             .setPositiveButton("完成設定") { _, _ -> SoundManager.playBubblePop() }
@@ -333,14 +366,11 @@ class SettingsActivity : AppCompatActivity() {
         alertDialog.show()
 
         alertDialog.window?.let { window ->
-            // 建立帶圓角的純色背景，完全覆蓋掉原本系統的灰色背景
             val background = android.graphics.drawable.GradientDrawable().apply {
                 setColor(Color.parseColor(dialogBgColorStr))
                 cornerRadius = 32f
             }
             window.setBackgroundDrawable(background)
-
-            // 順手把右下角「完成設定」按鈕文字也改成對應的主題色
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(mainTitleColor)
         }
     }
@@ -349,29 +379,98 @@ class SettingsActivity : AppCompatActivity() {
      * 顯示忘記密碼彈窗
      */
     private fun showForgotPasswordDialog(currentEmail: String) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("重設密碼")
-        builder.setMessage("系統將寄送重設連結至您的 Email：")
+        val sharedPref = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
+        val currentTheme = sharedPref.getInt("THEME_COLOR_ID", 0)
 
-        val input = EditText(this)
-        input.hint = "請輸入 Email"
-        input.setText(currentEmail)
-        input.setPadding(50, 40, 50, 40)
-        builder.setView(input)
+        val bgColorStr = when (currentTheme) {
+            1 -> "#1A237E"
+            2 -> "#3E2723"
+            3 -> "#4A0033"
+            else -> "#FFFFFF"
+        }
 
-        builder.setPositiveButton("送出") { _, _ ->
-            SoundManager.playBubblePop()
-            val email = input.text.toString().trim()
-            if (email.isNotEmpty()) {
-                sendResetEmail(email)
-            } else {
-                Toast.makeText(this, "Email 不能為空", Toast.LENGTH_SHORT).show()
+        val titleColor = when (currentTheme) {
+            1, 2, 3 -> Color.WHITE
+            else -> Color.parseColor("#2E7D32")
+        }
+
+        val textColor = when (currentTheme) {
+            1, 2, 3 -> Color.WHITE
+            else -> Color.parseColor("#333333")
+        }
+
+        val themeMainColorStr = when (currentTheme) {
+            1 -> "#64B5F6"
+            2 -> "#FFCC80"
+            3 -> "#F48FB1"
+            else -> "#2E7D32"
+        }
+        val themeMainColor = Color.parseColor(themeMainColorStr)
+
+        val context = this
+        val dialogLayout = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(60, 50, 60, 40)
+        }
+
+        val tvTitle = TextView(context).apply {
+            text = "重設密碼"
+            textSize = 20f
+            typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
+            setTextColor(titleColor)
+            setPadding(0, 10, 0, 10)
+        }
+        dialogLayout.addView(tvTitle)
+
+        val tvMsg = TextView(context).apply {
+            text = "系統將寄送重設連結至您的 Email："
+            textSize = 14f
+            setTextColor(textColor)
+            setPadding(0, 0, 0, 20)
+        }
+        dialogLayout.addView(tvMsg)
+
+        val input = EditText(context).apply {
+            hint = "請輸入 Email"
+            setText(currentEmail)
+            setHintTextColor(Color.GRAY)
+            setTextColor(textColor)
+            background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(Color.parseColor("#22FFFFFF"))
+                setStroke(2, themeMainColor)
+                cornerRadius = 16f
             }
+            setPadding(30, 20, 30, 20)
         }
-        builder.setNegativeButton("取消") { _, _ ->
-            SoundManager.playBubblePop()
+        dialogLayout.addView(input)
+
+        val builder = AlertDialog.Builder(this)
+            .setView(dialogLayout)
+            .setPositiveButton("送出") { _, _ ->
+                SoundManager.playBubblePop()
+                val email = input.text.toString().trim()
+                if (email.isNotEmpty()) {
+                    sendResetEmail(email)
+                } else {
+                    Toast.makeText(this, "Email 不能為空", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("取消") { _, _ ->
+                SoundManager.playBubblePop()
+            }
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        alertDialog.window?.let { window ->
+            val background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(Color.parseColor(bgColorStr))
+                cornerRadius = 32f
+            }
+            window.setBackgroundDrawable(background)
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(titleColor)
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(titleColor)
         }
-        builder.show()
     }
 
     /**
@@ -429,6 +528,8 @@ class SettingsActivity : AppCompatActivity() {
 
         apiService.forgotPassword(request).enqueue(object : Callback<GenericResponse> {
             override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
+                Log.d("SettingsActivity", "API Response: ${response.body().toString()}")
+
                 if (response.isSuccessful) {
                     Toast.makeText(this@SettingsActivity, "重設郵件已發送，請檢查您的信箱", Toast.LENGTH_LONG).show()
                 } else {
@@ -439,21 +540,6 @@ class SettingsActivity : AppCompatActivity() {
                 Toast.makeText(this@SettingsActivity, "網路連線失敗", Toast.LENGTH_SHORT).show()
             }
         })
-    }
-
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event != null) {
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    windHandler.postDelayed(windRunnable, 500)
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    windHandler.removeCallbacks(windRunnable)
-                    SoundManager.stopWind()
-                }
-            }
-        }
-        return super.onTouchEvent(event)
     }
 
     override fun onStop() {
