@@ -99,9 +99,6 @@ data class DetailDetailResponse(
     val data: HistoryItem
 )
 
-data class GenericResponse(val status: String, val message: String)
-
-
 // --- Knowledge (知識庫) ---
 data class DiagnosisItem(
     val name: String,
@@ -268,17 +265,6 @@ interface PlantApiService {
     fun sendDiagnosisFeedback(@Body feedbackRequest: DiagnosisFeedbackRequest): Call<DiagnosisFeedbackResponse>
 
 
-    // --- 天氣相關API ---
-    @GET("weather/cities")
-    fun getTaiwanCities(): Call<List<String>>
-
-    @GET("weather/current")
-    fun getCurrentWeather(@Query("city") city: String): Call<WeatherData>
-
-    @GET("weather/plant-care-advice")
-    fun getPlantCareAdvice(@Query("city") city: String): Call<PlantCareAdvice>
-
-
     // --- 【Webcam 即時監控與警報】 ---
 
     @GET("webcam/settings")
@@ -305,6 +291,17 @@ interface PlantApiService {
     fun deleteWebcamAlert(
         @Path("alert_id") alertId: Int
     ): Call<GenericResponse>
+
+
+    // --- 天氣相關API ---
+    @GET("weather/cities")
+    fun getTaiwanCities(): Call<List<String>>
+
+    @GET("weather/current")
+    fun getCurrentWeather(@Query("city") city: String): Call<WeatherData>
+
+    @GET("weather/plant-care-advice")
+    fun getPlantCareAdvice(@Query("city") city: String): Call<PlantCareAdvice>
 
 
     // --- 3. Retrofit 實例產生器 ---

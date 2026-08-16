@@ -173,12 +173,6 @@ class HomeActivity : AppCompatActivity() {
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 LOCATION_PERMISSION_REQUEST_CODE
             )
-        // 檢查是否需要顯示主頁新手指引
-        val sharedPref = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
-        val isFirstTime = sharedPref.getBoolean("IS_FIRST_TIME_HOME", true)
-
-        if (isFirstTime) {
-            showTutorial()
         }
     }
 
@@ -225,12 +219,12 @@ class HomeActivity : AppCompatActivity() {
 
     // 設定 10 秒超時任務
     locationTimeoutRunnable = Runnable {
-        Log.w("LocationDebug", "Location request timed out after 10 seconds.")
+        Log.w("LocationDebug", "Location request timed out after 50 seconds.")
         stopLocationUpdates() // 停止正在進行的請求
         loadWeatherForCity("臺北市") // 使用預設城市
         isLocationLoaded = true // 標記為已處理，避免重試
     }
-    locationTimeoutHandler.postDelayed(locationTimeoutRunnable!!, 30000) // 10秒
+    locationTimeoutHandler.postDelayed(locationTimeoutRunnable!!, 50000) // 50秒
 
     // 建立一個只請求一次的位置請求
     val locationRequest = LocationRequest.create().apply {
@@ -361,137 +355,38 @@ private fun stopLocationUpdates() {
                 tvGeneralCare.text = "一般照護：請給予充足陽光"
             }
         })
-        // 每次回到主頁時，強迫大總管重新載入最新主題背景與標題顏色！
-        ThemeManager.applyTheme(this, homeRoot, titles = listOf(tvhomeTitle))
-
-        // 重新載入音效設定
-        SoundManager.startBGM()
     }
 
     private fun showTutorial() {
         val targetColorRes = android.R.color.holo_green_dark
         val sharedPref = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
 
-        val guideHandler = Handler(Looper.getMainLooper())
-        var targetView1: com.getkeepsafe.taptargetview.TapTargetView? = null
-        var targetView2: com.getkeepsafe.taptargetview.TapTargetView? = null
-        var targetView3: com.getkeepsafe.taptargetview.TapTargetView? = null
-        var targetView4: com.getkeepsafe.taptargetview.TapTargetView? = null
-
-        var currentStep = 1
-
-        val jumpToStep2Runnable = Runnable { targetView1?.dismiss(true) }
-        val jumpToStep3Runnable = Runnable { targetView2?.dismiss(true) }
-        val jumpToStep4Runnable = Runnable { targetView3?.dismiss(true) }
-        val finishGuideRunnable = Runnable { targetView4?.dismiss(true) }
-
-        // 4️⃣ 第四步：設定
-        val startStep4 = {
-            if (currentStep == 4) {
-                SoundManager.playBubblePop()
-                targetView4 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
-                    com.getkeepsafe.taptargetview.TapTarget.forView(cardSettings, "設定", "調整應用程式設定")
-                        .outerCircleColor(targetColorRes)
-                        .targetCircleColor(android.R.color.white)
-                        .titleTextColor(android.R.color.white)
-                        .descriptionTextColor(android.R.color.white)
-                        .cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
-                    object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
-                        override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
-                            super.onTargetClick(view)
-                            guideHandler.removeCallbacks(finishGuideRunnable)
-                        }
-                        override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
-                            super.onTargetDismissed(view, userInitiated)
-                            sharedPref.edit().putBoolean("IS_FIRST_TIME_HOME", false).apply()
-                        }
-                    }
-                )
-                guideHandler.postDelayed(finishGuideRunnable, 3000)
-            }
-        }
-
-        // 3️⃣ 第三步：歷史紀錄
-        val startStep3 = {
-            if (currentStep == 3) {
-                SoundManager.playBubblePop()
-                targetView3 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
-                    com.getkeepsafe.taptargetview.TapTarget.forView(cardHistory, "歷史紀錄", "查看過去的辨識結果")
-                        .outerCircleColor(targetColorRes)
-                        .targetCircleColor(android.R.color.white)
-                        .titleTextColor(android.R.color.white)
-                        .descriptionTextColor(android.R.color.white)
-                        .cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
-                    object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
-                        override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
-                            super.onTargetClick(view)
-                            guideHandler.removeCallbacks(jumpToStep4Runnable)
-                        }
-                        override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
-                            super.onTargetDismissed(view, userInitiated)
-                            if (currentStep == 3) {
-                                currentStep = 4
-                                startStep4()
-                            }
-                        }
-                    }
-                )
-                guideHandler.postDelayed(jumpToStep4Runnable, 3000)
-            }
-        }
-
-        // 2️⃣ 第二步：即時攝影監控 (🌟 新增這步)
-        val startStep2 = {
-            if (currentStep == 2) {
-                SoundManager.playBubblePop()
-                targetView2 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
-                    com.getkeepsafe.taptargetview.TapTarget.forView(cardWebcam, "即時診斷監控", "開啟相機進行定時自動即時偵測診斷")
-                        .outerCircleColor(targetColorRes)
-                        .targetCircleColor(android.R.color.white)
-                        .titleTextColor(android.R.color.white)
-                        .descriptionTextColor(android.R.color.white)
-                        .cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
-                    object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
-                        override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
-                            super.onTargetClick(view)
-                            guideHandler.removeCallbacks(jumpToStep3Runnable)
-                        }
-                        override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
-                            super.onTargetDismissed(view, userInitiated)
-                            if (currentStep == 2) {
-                                currentStep = 3
-                                startStep3()
-                            }
-                        }
-                    }
-                )
-                guideHandler.postDelayed(jumpToStep3Runnable, 3000)
-            }
-        }
-
-        // 1️⃣ 第一步：植物診斷
-        targetView1 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
-            com.getkeepsafe.taptargetview.TapTarget.forView(cardDiagnose, "植物診斷", "點擊這裡開始辨識您的植物")
-                .outerCircleColor(targetColorRes)
-                .targetCircleColor(android.R.color.white)
-                .titleTextColor(android.R.color.white)
-                .descriptionTextColor(android.R.color.white)
-                .cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
-            object : com.getkeepsafe.taptargetview.TapTargetView.Listener() {
-                override fun onTargetClick(view: com.getkeepsafe.taptargetview.TapTargetView?) {
-                    super.onTargetClick(view)
-                    guideHandler.removeCallbacks(jumpToStep2Runnable)
+        val sequence = TapTargetSequence(this)
+            .targets(
+                TapTarget.forView(cardDiagnose, "植物診斷", "點擊這裡開始辨識您的植物")
+                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
+                TapTarget.forView(cardWebcam, "即時診斷監控", "開啟相機進行定時自動即時偵測診斷")
+                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
+                TapTarget.forView(cardHistory, "歷史紀錄", "查看過去的辨識結果")
+                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
+                TapTarget.forView(cardSettings, "設定", "調整應用程式設定")
+                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true)
+            )
+            .listener(object : TapTargetSequence.Listener {
+                override fun onSequenceFinish() {
+                    sharedPref.edit().putBoolean("IS_FIRST_TIME_HOME", false).apply()
                 }
-                override fun onTargetDismissed(view: com.getkeepsafe.taptargetview.TapTargetView?, userInitiated: Boolean) {
-                    super.onTargetDismissed(view, userInitiated)
-                    if (currentStep == 1) {
-                        currentStep = 2
-                        startStep2()
-                    }
+
+                override fun onSequenceStep(lastTarget: TapTarget?, targetClicked: Boolean) {
+                    SoundManager.playBubblePop()
                 }
-            }
-        )
-        guideHandler.postDelayed(jumpToStep2Runnable, 3000)
+
+                override fun onSequenceCanceled(lastTarget: TapTarget?) {
+                    // 如果用戶取消，也標記為已完成，避免下次再跳出
+                    sharedPref.edit().putBoolean("IS_FIRST_TIME_HOME", false).apply()
+                }
+            })
+        sequence.start()
     }
 
     override fun onStop() {

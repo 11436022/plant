@@ -4,7 +4,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
 
-router = APIRouter(prefix="/api/v1/weather", tags=["Weather"])
+router = APIRouter(tags=["Weather"])
 
 # 台灣縣市列表
 TAIWAN_CITIES = [

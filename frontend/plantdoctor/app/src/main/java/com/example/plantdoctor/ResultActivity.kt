@@ -10,9 +10,13 @@ import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import com.bumptech.glide.Glide
 import com.example.plantdoctor.databinding.ActivityResultBinding
 import com.example.plantdoctor.databinding.DialogFeedbackBinding
@@ -138,116 +142,8 @@ class ResultActivity : AppCompatActivity() {
             confirmAndSaveDiary(predictionId)
         }
 
-        // 這個是舊的、隱藏的按鈕，可以保留或移除，但主要功能由 btn_save 取代
-        binding.btnSaveReport.setOnClickListener {
-            SoundManager.playBubblePop()
-            confirmAndSaveDiary(predictionId)
-        }
-
         // 5. 啟動音效
         windHandler.postDelayed(windRunnable, 500)
-    }
-
-    
-    // 🌟 核心新增：彈出式對話框，具備三個功能按鈕且顏色自適應
-    // 🌟 全新客製化對話框：具備左上角叉叉、固定顏色（不隨深色模式改變）
-    private fun showSaveConfirmationDialog(predictionId: String?) {
-        val sharedPref = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
-        val dialogView = layoutInflater.inflate(R.layout.dialog_save_confirm, null)
-
-        val builder = AlertDialog.Builder(this)
-        builder.setView(dialogView)
-        builder.setCancelable(true)
-
-        val alertDialog = builder.create()
-        alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        alertDialog.show()
-
-        // 1. 綁定元件
-        val cardRoot = dialogView.findViewById<CardView>(R.id.dialog_card_root)
-        val btnClose = dialogView.findViewById<ImageButton>(R.id.dialog_btn_close)
-        val tvTitle = dialogView.findViewById<TextView>(R.id.dialog_title)
-        val tvMessage = dialogView.findViewById<TextView>(R.id.dialog_message)
-        val btnSaveReport = dialogView.findViewById<Button>(R.id.dialog_btn_save)
-        val btnDontSave = dialogView.findViewById<Button>(R.id.dialog_btn_dont_save)
-
-        // 🌟 2. 核心改動：直接呼叫專屬 Dialog 換色器，讓小視窗完美融入當前的 KT 風格！
-        ThemeManager.applyThemeToDialog(
-            context = this,
-            cardRoot = cardRoot,
-            btnClose = btnClose,
-            tvTitle = tvTitle,
-            tvMessage = tvMessage
-        )
-
-        // 3. 按鈕點擊監聽
-        btnClose.setOnClickListener {
-            SoundManager.playBubblePop()
-            alertDialog.dismiss()
-        }
-
-        btnSaveReport.setOnClickListener {
-            alertDialog.dismiss()
-            executeSaveLogic(predictionId, sharedPref)
-        }
-
-        btnDontSave.setOnClickListener {
-            alertDialog.dismiss()
-            SoundManager.playBubblePop()
-            Toast.makeText(this, "已取消儲存", Toast.LENGTH_SHORT).show()
-
-            val intent = Intent(this, HomeActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-            finish()
-        }
-    }
-
-    // 🌟 將原本的網路儲存邏輯抽離出來供 Dialog 呼叫
-    private fun executeSaveLogic(predictionId: String?, sharedPref: android.content.SharedPreferences) {
-        val diseaseName = tvDiseaseName.text.toString().removePrefix("診斷：")
-        val adviceText = tvAdvice.text.toString()
-        val userNote = etUserNote.text.toString()
-
-        val token = sharedPref.getString("token", null)
-        if (token == null) {
-            Toast.makeText(this, "請先登入", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        btnSave.isEnabled = false
-        btnSave.text = "儲存中..."
-
-        val request = DiaryConfirmRequest(
-            user_note = userNote,
-            disease_name = diseaseName,
-            gemini_advice = adviceText
-        )
-
-        val apiService = PlantApiService.create(token)
-        apiService.confirmDiary(predictionId!!, request).enqueue(object : retrofit2.Callback<DiaryConfirmResponse> {
-            override fun onResponse(call: retrofit2.Call<DiaryConfirmResponse>, response: retrofit2.Response<DiaryConfirmResponse>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(this@ResultActivity, "紀錄已成功儲存！", Toast.LENGTH_SHORT).show()
-                    btnSave.text = "已儲存"
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        val intent = Intent(this@ResultActivity, HomeActivity::class.java)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                        startActivity(intent)
-                        finish()
-                    }, 500)
-                } else {
-                    Toast.makeText(this@ResultActivity, "儲存失敗: ${response.code()}", Toast.LENGTH_SHORT).show()
-                    btnSave.isEnabled = true
-                    btnSave.text = "儲存至歷史病例"
-                }
-            }
-            override fun onFailure(call: retrofit2.Call<DiaryConfirmResponse>, t: Throwable) {
-                Toast.makeText(this@ResultActivity, "網路連線失敗", Toast.LENGTH_SHORT).show()
-                btnSave.isEnabled = true
-                btnSave.text = "儲存至歷史病例"
-            }
-        })
     }
 
     override fun onResume() {
@@ -356,8 +252,8 @@ class ResultActivity : AppCompatActivity() {
             return
         }
 
-        binding.btnSaveReport.isEnabled = false
-        binding.btnSaveReport.text = "儲存中..."
+        binding.btnSave.isEnabled = false
+        binding.btnSave.text = "儲存中..."
 
         val request = DiaryConfirmRequest(
             user_note = userNote,
@@ -366,11 +262,11 @@ class ResultActivity : AppCompatActivity() {
         )
 
         val apiService = PlantApiService.create(token)
-        apiService.confirmDiary(predictionId, request).enqueue(object : Callback<GenericResponse> {
-            override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
+        apiService.confirmDiary(predictionId, request).enqueue(object : Callback<DiaryConfirmResponse> {
+            override fun onResponse(call: Call<DiaryConfirmResponse>, response: Response<DiaryConfirmResponse>) {
                 if (response.isSuccessful) {
                     Toast.makeText(this@ResultActivity, "紀錄已成功儲存！", Toast.LENGTH_SHORT).show()
-                    binding.btnSaveReport.text = "已儲存"
+                    binding.btnSave.text = "已儲存"
                     Handler(Looper.getMainLooper()).postDelayed({
                         val intent = Intent(this@ResultActivity, HomeActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -379,15 +275,15 @@ class ResultActivity : AppCompatActivity() {
                     }, 1000)
                 } else {
                     Toast.makeText(this@ResultActivity, "儲存失敗: ${response.errorBody()?.string()}", Toast.LENGTH_LONG).show()
-                    binding.btnSaveReport.isEnabled = true
-                    binding.btnSaveReport.text = "儲存至日記"
+                    binding.btnSave.isEnabled = true
+                    binding.btnSave.text = "儲存至日記"
                 }
             }
 
-            override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
+            override fun onFailure(call: Call<DiaryConfirmResponse>, t: Throwable) {
                 Toast.makeText(this@ResultActivity, "網路錯誤: ${t.message}", Toast.LENGTH_LONG).show()
-                binding.btnSaveReport.isEnabled = true
-                binding.btnSaveReport.text = "儲存至日記"
+                binding.btnSave.isEnabled = true
+                binding.btnSave.text = "儲存至日記"
             }
         })
     }

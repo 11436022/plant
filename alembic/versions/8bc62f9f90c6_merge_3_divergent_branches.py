@@ -1,8 +1,8 @@
-"""Merge feature and main migration branches
+"""Merge 3 divergent branches
 
-Revision ID: e3b759302308
-Revises: 8766043b40ed
-Create Date: 2026-06-03 15:34:03.575114
+Revision ID: 8bc62f9f90c6
+Revises: c37f8e92a411, c503f6c775cd, dca0981cea69
+Create Date: 2026-08-16 16:06:31.169431
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'e3b759302308'
-down_revision: Union[str, Sequence[str], None] = '8766043b40ed'
+revision: str = '8bc62f9f90c6'
+down_revision: Union[str, Sequence[str], None] = ('c37f8e92a411', 'c503f6c775cd', 'dca0981cea69')
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

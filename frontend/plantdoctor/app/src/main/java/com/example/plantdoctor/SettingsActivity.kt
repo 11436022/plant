@@ -33,18 +33,16 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     // 🌟 全域宣告需要動態換色的 UI 元件
-    private lateinit var rootLayout: android.widget.RelativeLayout
+    private lateinit var rootLayout: ConstraintLayout
     private lateinit var tvSettingsTitle: TextView
     private lateinit var tvColorSelect: TextView
     private lateinit var tvForgotPassword: TextView
-<<<<<<< HEAD
-    private lateinit var tvVolumeMixer: TextView
-=======
+
     private lateinit var etUsername: EditText
     private lateinit var etGmail: EditText
->>>>>>> origin/main
-    private lateinit var btnBack: android.widget.ImageButton
 
+    private lateinit var btnBack: android.widget.ImageButton
+    private lateinit var btnVolumeMixer: android.widget.ImageButton
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -89,11 +87,6 @@ class SettingsActivity : AppCompatActivity() {
         tvColorSelect.setOnClickListener {
             SoundManager.playBubblePop()
             showColorSelectDialog()
-        }
-
-        tvVolumeMixer.setOnClickListener {
-            SoundManager.playBubblePop()
-            showVolumeMixerDialog()
         }
 
         btnLogout.setOnClickListener {
@@ -480,13 +473,11 @@ class SettingsActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
         val token = sharedPref.getString("token", null)
 
-        // 🌟 綁定 UI 元件
-        val tvUsername = findViewById<TextView>(R.id.tv_username)
-        val tvGmail = findViewById<TextView>(R.id.tv_gmail)
+        
 
         // 先用 SharedPreferences 的快取資料填充，避免 API 回來前畫面空白
-        tvUsername.text = sharedPref.getString("username", "尚未登錄")
-        tvGmail.text = sharedPref.getString("email", "尚未設定 Email")
+        etUsername.setText(sharedPref.getString("username", "尚未登錄"))
+        etGmail.setText(sharedPref.getString("email", "尚未設定 Email"))
 
         if (token == null) {
             return // 沒有 token，不需執行 API 呼叫
@@ -498,8 +489,8 @@ class SettingsActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val userProfile = response.body()?.data
                     if (userProfile != null) {
-                        tvUsername.text = userProfile.username
-                        tvGmail.text = userProfile.email ?: "尚未設定 Email"
+                        etUsername.setText(userProfile.username)
+                        etGmail.setText(userProfile.email)
 
                         // 更新 SharedPreferences 快取
                         with(sharedPref.edit()) {
