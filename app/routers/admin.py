@@ -91,6 +91,34 @@ async def admin_dashboard(request: Request, search: str = None, page: int = Quer
     finally:
         conn.close()
 
+
+@router.post("/feedback/annotate/{feedback_id}", response_class=RedirectResponse)
+async def admin_feedback_annotate(
+    request: Request,
+    feedback_id: int,
+    plant_name: str = Form(None),
+    disease_name: str = Form(None)
+):
+    """【更新】功能：儲存管理者對使用者回饋的標註"""
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            sql = """
+                UPDATE diagnosis_feedback
+                SET manager_corrected_plant_name = %s,
+                    manager_corrected_disease_name = %s
+                WHERE id = %s
+            """
+            # 如果表單欄位是空的，會收到空字串，將其轉為 None 存入資料庫
+            cursor.execute(sql, (plant_name or None, disease_name or None, feedback_id))
+        conn.commit()
+    finally:
+        conn.close()
+
+    # 操作完成後，重定向回使用者回饋列表頁面，以查看更新結果
+    # 使用 303 See Other 狀態碼是 POST-Redirect-GET 模式的標準做法
+    return RedirectResponse(url=request.url_for("admin_feedback_list"), status_code=303)
+
 @router.get("/feedback/", response_class=HTMLResponse)
 async def admin_feedback_list(request: Request, page: int = Query(1, ge=1)):
     """【查詢】功能：顯示、搜尋和分頁所有使用者回饋"""
@@ -109,6 +137,7 @@ async def admin_feedback_list(request: Request, page: int = Query(1, ge=1)):
                     f.id, f.image_url, f.original_plant_name, f.original_disease_name, 
                     f.is_plant_error, f.is_disease_error, f.corrected_plant_name, 
                     f.corrected_disease_name, f.created_at,
+                    f.manager_corrected_plant_name, f.manager_corrected_disease_name,
                     u.username
                 FROM diagnosis_feedback f
                 LEFT JOIN user u ON f.user_id = u.user_id

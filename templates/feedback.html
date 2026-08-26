@@ -26,6 +26,9 @@
         .table td { vertical-align: middle; }
         .error-true { color: #dc3545; font-weight: bold; }
         .error-false { color: #6c757d; }
+        .annotation-form { display: flex; gap: 10px; align-items: center; }
+        .annotation-form input { width: 120px; }
+        .annotation-text { font-weight: bold; color: #28a745; }
     </style>
 </head>
 <body>
@@ -62,17 +65,16 @@
                             <th>修正植物</th>
                             <th>修正病名</th>
                             <th>回報時間</th>
+                            <th>管理者標註</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for feedback in feedbacks %}
                         <tr>
                             <td>
-                                {% if feedback.image_url %}
                                 <a href="{{ feedback.image_url }}" target="_blank">
                                     <img src="{{ feedback.image_url }}" alt="Feedback Image" style="width: 75px; height: 75px; object-fit: cover;">
                                 </a>
-                                {% endif %}
                             </td>
                             <td>{{ feedback.username or '匿名' }}</td>
                             <td>{{ feedback.original_plant_name }} - {{ feedback.original_disease_name }}</td>
@@ -85,6 +87,20 @@
                             <td>{{ feedback.corrected_plant_name or '-' }}</td>
                             <td>{{ feedback.corrected_disease_name or '-' }}</td>
                             <td>{{ feedback.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if feedback.manager_corrected_plant_name or feedback.manager_corrected_disease_name %}
+                                    <div class="annotation-text">
+                                        植物: {{ feedback.manager_corrected_plant_name or '未變更' }}<br>
+                                        病名: {{ feedback.manager_corrected_disease_name or '未變更' }}
+                                    </div>
+                                {% else %}
+                                    <form action="/admin/feedback/annotate/{{ feedback.id }}" method="post" class="annotation-form">
+                                        <input type="text" name="plant_name" class="form-control form-control-sm" placeholder="正確植物名">
+                                        <input type="text" name="disease_name" class="form-control form-control-sm" placeholder="正確病名">
+                                        <button type="submit" class="btn btn-success btn-sm">儲存</button>
+                                    </form>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
