@@ -112,8 +112,7 @@
                     <th>圖片</th>
                     <th>ID</th>
                     <th>使用者</th>
-                    <th>AI 診斷 (可修改)</th>
-                    <th>使用者回饋</th>
+                    <th>AI 診斷</th>
                     <th>診斷時間</th>
                     <th>管理操作</th>
                 </tr>
@@ -130,19 +129,7 @@
                     </td>
                     <td>{{ diary.id }}</td>
                     <td>{{ diary.username or 'N/A' }}</td>
-                    <td>
-                        <form action="/admin/update/{{ diary.id }}" method="post" class="edit-group">
-                            <input type="text" name="status_name" value="{{ diary.status_name }}" class="status-badge ai-status" style="width: 150px; background: white;">
-                            <button type="submit" class="btn-save">💾 儲存</button>
-                        </form>
-                    </td>
-                    <td>
-                        {% if diary.user_corrected_status %}
-                        <span class="status-badge user-corrected-status">{{ diary.user_corrected_status }}</span>
-                        {% else %}
-                        <span style="color: #999;">-</span>
-                        {% endif %}
-                    </td>
+                    <td><span class="status-badge ai-status">{{ diary.status_name }}</span></td>
                     <td>{{ diary.created_at.strftime('%Y-%m-%d %H:%M') if diary.created_at else '' }}</td>
                     <td>
                         <form action="/admin/delete/{{ diary.id }}" method="post" onsubmit="return confirm('警告：確定要永久刪除這筆紀錄嗎？');">

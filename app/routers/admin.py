@@ -105,8 +105,8 @@ async def admin_feedback_annotate(
         with conn.cursor() as cursor:
             sql = """
                 UPDATE diagnosis_feedback
-                SET manager_corrected_plant_name = %s,
-                    manager_corrected_disease_name = %s
+                SET corrected_plant_name = %s,
+                    corrected_disease_name = %s
                 WHERE id = %s
             """
             # 如果表單欄位是空的，會收到空字串，將其轉為 None 存入資料庫
@@ -163,9 +163,12 @@ async def admin_feedback_list(request: Request, page: int = Query(1, ge=1)):
             sql = """
                 SELECT 
                     f.id, f.image_url, f.original_plant_name, f.original_disease_name, 
-                    f.is_plant_error, f.is_disease_error, f.corrected_plant_name, 
-                    f.corrected_disease_name, f.created_at,
-                    f.manager_corrected_plant_name, f.manager_corrected_disease_name,
+                    f.is_plant_error, f.is_disease_error, 
+                    f.corrected_plant_name, 
+                    f.corrected_disease_name, 
+                    f.created_at,
+                    f.corrected_plant_name AS manager_corrected_plant_name, 
+                    f.corrected_disease_name AS manager_corrected_disease_name,
                     u.username
                 FROM diagnosis_feedback f
                 LEFT JOIN user u ON f.user_id = u.user_id
@@ -211,18 +214,7 @@ async def admin_add_diary(status_name: str = Form(...)):
     finally:
         conn.close()
 
-@router.post("/update/{diary_id}")
-async def admin_update_diary(diary_id: int, status_name: str = Form(...)):
-    """【修改】功能：更新特定紀錄的診斷結果"""
-    conn = get_db_connection()
-    try:
-        with conn.cursor() as cursor:
-            sql = "UPDATE plant_diary SET status_name = %s WHERE id = %s"
-            cursor.execute(sql, (status_name, diary_id))
-        conn.commit()
-        return RedirectResponse(url="/admin/", status_code=303)
-    finally:
-        conn.close()
+
 
 @router.post("/delete/{diary_id}")
 async def admin_delete_diary(diary_id: int):
