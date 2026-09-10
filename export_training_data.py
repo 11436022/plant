@@ -11,7 +11,7 @@ DB_HOST = os.getenv("DB_HOST")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_NAME = os.getenv("DB_NAME")
-IMAGE_PUBLIC_URL_BASE = os.getenv("IMAGE_PUBLIC_URL_BASE", "http://127.0.0.1:8000")
+GCS_BUCKET_NAME = os.getenv("GCS_BUCKET_NAME", "plant-doctor-training-data-chm")
 OUTPUT_FILE = "training_data.jsonl"
 
 def get_db_connection():
@@ -28,12 +28,6 @@ def get_db_connection():
     except pymysql.MySQLError as e:
         print(f"資料庫連線失敗: {e}")
         return None
-
-def build_public_image_url(relative_path: str) -> str:
-    """將相對路徑轉換為完整的公開 URL"""
-    if relative_path.startswith('http'):
-        return relative_path
-    return f"{IMAGE_PUBLIC_URL_BASE.rstrip('/')}/{relative_path.lstrip('/')}"
 
 def export_data():
     """從資料庫匯出已標註的資料到 JSONL 檔案"""
@@ -73,15 +67,22 @@ def export_data():
 
                 label = f"{plant_name}-{disease_name}"
                 
-                # 建立完整的圖片 URL
-                image_url = build_public_image_url(feedback["image_url"])
+                # 從 image_url (e.g., 'static/feedback_uploads/feedback_abc.jpg') 提取檔案名稱
+                filename = feedback["image_url"].split('/')[-1]
 
-                # 建立 JSON 物件並寫入檔案
-                record = {
-                    "image_url": image_url,
-                    "correct_label": label
+                # 建立 Vertex AI 需要的 GCS 路徑
+                gcs_uri = f"gs://{GCS_BUCKET_NAME}/{filename}"
+
+                # 建立符合 Vertex AI 格式的資料結構
+                vertex_ai_format = {
+                    "imageGcsUri": gcs_uri,
+                    "classificationAnnotation": {
+                        "displayName": label
+                    }
                 }
-                f.write(json.dumps(record, ensure_ascii=False) + '\n')
+                
+                # 將字典轉換為 JSON 字串並寫入檔案
+                f.write(json.dumps(vertex_ai_format, ensure_ascii=False) + '\n')
                 count += 1
 
         print(f"成功匯出 {count} 筆訓練資料到 {OUTPUT_FILE}")

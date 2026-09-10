@@ -1,3 +1,3 @@
-{"image_url": "gs://plant-doctor-training-data-chm/feedback_34f78926bbd44b79adb59e26b395e0a5.jpg", "correct_label": "扁蒲-健康"}
-{"image_url": "gs://plant-doctor-training-data-chm/feedback_991ffa391b17497287bc97161ec1a2e8.jpg", "correct_label": "扁蒲-健康"}
-{"image_url": "gs://plant-doctor-training-data-chm/feedback_ee43997d55ef4c39838e67255d25815f.jpg", "correct_label": "扁蒲-健康"}
+{"imageGcsUri": "gs://plant-doctor-training-data-chm/feedback_34f78926bbd44b79adb59e26b395e0a5.jpg", "classificationAnnotation": {"displayName": "扁蒲-健康"}}
+{"imageGcsUri": "gs://plant-doctor-training-data-chm/feedback_991ffa391b17497287bc97161ec1a2e8.jpg", "classificationAnnotation": {"displayName": "扁蒲-健康"}}
+{"imageGcsUri": "gs://plant-doctor-training-data-chm/feedback_ee43997d55ef4c39838e67255d25815f.jpg", "classificationAnnotation": {"displayName": "扁蒲-健康"}}
