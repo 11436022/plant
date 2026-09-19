@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.core.config import settings
-from app.routers import admin, auth, diaries, health, knowledge, prediction, webcam, weather
+from app.routers import admin, auth, diaries, feedback, health, knowledge, prediction, webcam, weather
 from app.services.account_recovery import ensure_auth_schema
 from app.services import rag
 
@@ -55,6 +55,7 @@ def create_app() -> FastAPI:
     # 其他 API
     app.include_router(prediction.router, prefix="/api/v1")
     app.include_router(diaries.router, prefix="/api/v1/diaries", tags=["Diaries"])
+    app.include_router(feedback.router, prefix="/api/v1/feedback")
     app.include_router(knowledge.router, prefix="/api/v1")
     app.include_router(webcam.router, prefix="/api/v1")
     app.include_router(weather.router, prefix="/api/v1/weather")

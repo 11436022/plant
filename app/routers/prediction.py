@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.db.session import get_db
 from app.schemas.prediction import PredictionResponse
-from app.services.ai import diagnostic_plant, get_reference_lists, ground_diagnosis_in_database
+from app.services.ai import diagnostic_plant, process_and_update_diagnosis
 from app.services.files import ensure_image_upload
 
 # 暫存區：使用一個簡單的 Python 字典來模擬 Redis
@@ -52,27 +52,39 @@ async def predict_plant_status(file: UploadFile = File(...), db: Session = Depen
                     raise HTTPException(status_code=413, detail="Image exceeds the upload size limit.")
                 buffer.write(chunk)
 
-        # 2. 呼叫 AI 進行診斷
-        crops, diseases, pests = get_reference_lists(db)
-        ai_result = diagnostic_plant(str(temp_file_path), crops, diseases, pests)
+        # 2. 呼叫 AI 進行診斷 (V3.1 新流程)
+        # 步驟 1: 取得 AI 原始、未經驗證的診斷結果
+        raw_ai_result = diagnostic_plant(str(temp_file_path))
 
-        if not ai_result:
-            raise HTTPException(status_code=502, detail="AI analysis service failed.")
-        ai_result = ground_diagnosis_in_database(ai_result, db)
+        # --- DEBUG: 印出 AI 原始預測結果 ---
+        if raw_ai_result:
+            print("="*50)
+            print(f"✅ AI Raw Prediction: {raw_ai_result.get('crop_name', 'N/A')} - {raw_ai_result.get('status_name', 'N/A')}")
+            print(f"📊 AI Raw Confidence: {raw_ai_result.get('confidence', 0.0):.4f}")
+            print("="*50)
+        else:
+            print("="*50)
+            print("⚠️ AI did not return any prediction.")
+            print("="*50)
+            raise HTTPException(status_code=502, detail="AI analysis service failed to provide a result.")
+        # --- END DEBUG ---
+
+        # 步驟 2: 處理原始結果，與資料庫同步並取得最終可信的診斷
+        final_diagnosis = process_and_update_diagnosis(raw_ai_result, db)
 
         # 3. 產生唯一的 ID
         prediction_id = str(uuid.uuid4())
 
-        # 4. 將完整的 AI 結果和臨時路徑存入暫存區
+        # 4. 將完整的最終結果和臨時路徑存入暫存區
         prediction_cache[prediction_id] = {
-            "result": ai_result,
+            "result": final_diagnosis,
             "temp_path": str(temp_file_path)
         }
         
         # 5. 組合回傳給 App 的資料
         response_data = {
             "prediction_id": prediction_id,
-            "analysis_result": ai_result,
+            "analysis_result": final_diagnosis,
             "metadata": {
                 "filename": Path(file.filename or temp_file_path.name).name,
                 "process_time": f"{time.time() - start_time:.4f}s",

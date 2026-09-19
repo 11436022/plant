@@ -20,25 +20,6 @@ MIN_DIAGNOSIS_CONFIDENCE = 0.65
 MIN_HEALTHY_CONFIDENCE = 0.85
 
 
-def _normalize_name(value: str | None) -> str:
-    """Normalize names for exact matching without trusting model wording."""
-
-    return "".join(str(value or "").strip().lower().split())
-
-
-def _match_known_name(value: str | None, known_names: list[str]) -> str | None:
-    """Return the canonical database name only when the AI output matches it."""
-
-    normalized_value = _normalize_name(value)
-    if not normalized_value:
-        return None
-
-    for known_name in known_names:
-        if _normalize_name(known_name) == normalized_value:
-            return known_name
-    return None
-
-
 def _coerce_confidence(value) -> float:
     """Keep confidence in a predictable 0.0-1.0 range."""
 
@@ -47,13 +28,6 @@ def _coerce_confidence(value) -> float:
     except (TypeError, ValueError):
         return 0.0
     return max(0.0, min(1.0, confidence))
-
-
-def _safe_text(value: str | None, fallback: str) -> str:
-    """Use fallback text when model output is missing."""
-
-    text = str(value or "").strip()
-    return text if text else fallback
 
 
 def _uncertain_diagnosis(crop_name: str | None = None, confidence: float = 0.0) -> dict:
@@ -71,141 +45,197 @@ def _uncertain_diagnosis(crop_name: str | None = None, confidence: float = 0.0) 
     }
 
 
-def validate_diagnosis_result(data, crops: list[str], diseases: list[str], pests: list[str]) -> dict:
-    """Constrain AI diagnosis to database-backed crop and disease/pest names."""
+def diagnostic_plant(image_path):
+    """
+    分析圖片並回傳 AI 模型最原始的、未經驗證的結構化 JSON。
+    這個函式現在只專注於與 AI 溝通。
+    """
+    img = Image.open(image_path)
 
-    if not isinstance(data, dict):
+    # --- RAG 整合開始 ---
+    # 1. 初步分析圖片，產生搜尋查詢
+    preliminary_prompt = "You are an agricultural expert. Briefly describe the main subject and any visible symptoms in this image in a few keywords (e.g., 'tomato, leaf spots, yellowing'). This will be used to search a knowledge base. Respond in Traditional Chinese."
+    try:
+        preliminary_response = client.models.generate_content(model="gemini-2.5-flash", contents=[preliminary_prompt, img])
+        search_query = (preliminary_response.text or "").strip()
+        print(f"🔍 RAG: 初步分析關鍵詞: '{search_query}'")
+    except Exception as e:
+        print(f"⚠️ RAG: 初步分析失敗: {e}")
+        search_query = "植物病徵" # 使用通用關鍵詞作為備用
+
+    # 2. 搜尋知識庫
+    retrieved_context = rag.search_knowledge_base(search_query, k=3)
+    # --- RAG 整合結束 ---
+
+    prompt = f"""
+    You are a top-tier plant pathologist. Analyze the provided image and context from our knowledge base to provide a professional diagnosis.
+
+    --- Knowledge Base Context ---
+    {retrieved_context if retrieved_context else "No specific context found."}
+    ---
+
+    Your primary goal is to identify the plant and its condition (disease, pest, or healthy).
+    Then, provide a detailed description (suggestion) and actionable treatment steps.
+    Finally, classify the issue as 'disease', 'pest', or 'healthy'.
+
+    IMPORTANT:
+    - All text MUST be in Traditional Chinese.
+    - Standardize the crop and issue names to their most common and correct form.
+    - Respond in a valid, non-nested, single-level JSON format.
+
+    JSON Output Structure:
+    {{
+      "crop_name": "string (標準化的作物名稱)",
+      "status_name": "string (標準化的病害/害蟲名稱，或 '健康')",
+      "category": "string (One of 'disease', 'pest', 'healthy')",
+      "confidence": "float (A value between 0.0 and 1.0)",
+      "suggestion": "string (A bulleted list of 2-3 key visual symptoms, using '-' for each point and '\\n' for new lines. Example: '- 葉片有黃斑\\n- 葉緣焦枯')",
+      "treatment": "string (A numbered list of actionable steps using '1.', '2.', etc., and '\\n' for new lines. Example: '1. 移除受感染的葉片\\n2. 增加通風')"
+    }}
+    """
+    try:
+        response = client.models.generate_content(model="gemini-2.5-flash", contents=[prompt, img])
+        clean_text = (response.text or "").replace("```json", "").replace("```", "").strip()
+        return json.loads(clean_text)
+    except (json.JSONDecodeError, Exception) as e:
+        print(f"❌ AI 診斷或 JSON 解析失敗: {str(e)}")
+        return None
+
+
+def _get_standardized_name(new_name: str, existing_names: list[str]) -> str:
+    """使用 AI 的語意理解能力來解析同義詞，並回傳一個標準化的名稱。"""
+    if not existing_names or new_name in existing_names:
+        return new_name
+
+    # 將現有名稱格式化成一個易於閱讀的列表
+    existing_names_str = ", ".join([f"'{name}'" for name in existing_names])
+
+    prompt = f"""
+    You are a database administrator specializing in agriculture.
+    A new diagnosis term is '{new_name}'.
+    For this crop, the database already contains the following terms: {existing_names_str}.
+
+    Task: Determine if '{new_name}' is a synonym for one of the existing terms.
+    - If it IS a synonym, respond with the EXISTING term from the list.
+    - If it is NOT a synonym and represents a genuinely new condition, respond with the NEW term '{new_name}'.
+
+    Your response must be ONLY ONE of the terms.
+    """
+    try:
+        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        standardized_name = (response.text or "").strip()
+        
+        # 安全性檢查：確保 AI 的回應是有效的選項之一
+        valid_options = existing_names + [new_name]
+        if standardized_name in valid_options:
+            if standardized_name != new_name:
+                print(f"🔬 名稱標準化: '{new_name}' -> '{standardized_name}'")
+            return standardized_name
+        else:
+            # 如果 AI 回應了意外的內容，則退回使用新名稱
+            print(f"⚠️ 標準化回退: AI 回應 '{standardized_name}' 無效，使用原名稱 '{new_name}'")
+            return new_name
+            
+    except Exception as e:
+        print(f"❌ 標準化失敗: {e}，將使用原名稱 '{new_name}'")
+        return new_name
+
+
+def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
+    """
+    新流程的核心：接收原始 AI 結果，與資料庫交叉比對，然後更新或新增記錄。
+    最終永遠以 AI 的最新建議為準。
+    """
+    if not isinstance(raw_ai_data, dict):
         return _uncertain_diagnosis()
 
-    confidence = _coerce_confidence(data.get("confidence"))
-    crop_name = _match_known_name(data.get("crop_name"), crops)
-    if not crop_name:
+    # 從原始 AI 資料中提取資訊
+    crop_name = raw_ai_data.get("crop_name")
+    status_name = raw_ai_data.get("status_name")
+    category = str(raw_ai_data.get("category", "")).lower()
+    confidence = _coerce_confidence(raw_ai_data.get("confidence"))
+    ai_suggestion = raw_ai_data.get("suggestion", "AI 未提供建議。")
+    ai_treatment = raw_ai_data.get("treatment", "AI 未提供處理方法。")
+
+    # 基本的合理性檢查
+    if not all([crop_name, status_name, category]):
         return _uncertain_diagnosis(confidence=confidence)
 
-    category = str(data.get("category", "")).strip().lower()
+    # 如果是健康的，直接回傳 AI 結果，不寫入病蟲害資料庫
     if category == "healthy":
-        if confidence < MIN_HEALTHY_CONFIDENCE:
-            return _uncertain_diagnosis(crop_name, confidence)
         return {
             "crop_name": crop_name,
             "category": "healthy",
             "status_name": HEALTHY_STATUS_NAME,
             "confidence": confidence,
-            "suggestion": _safe_text(
-                data.get("suggestion"),
-                "- 目前未觀察到明顯病蟲害特徵\n- 建議維持通風、光照與適當澆水",
-            ),
-            "treatment": _safe_text(
-                data.get("treatment"),
-                "1. 維持目前照護方式。\n2. 定期觀察葉片正反面是否出現新斑點或蟲害。",
-            ),
-            "grounding_source": "model_pending_database_check",
+            "suggestion": ai_suggestion,
+            "treatment": ai_treatment,
+            "grounding_source": "ai_direct_result",
             "requires_review": False,
         }
 
-    if confidence < MIN_DIAGNOSIS_CONFIDENCE:
-        return _uncertain_diagnosis(crop_name, confidence)
-
+    # 確定要操作的資料庫模型和欄位
     if category == "disease":
-        status_name = _match_known_name(data.get("status_name"), diseases)
+        model_class = models.Disease
+        name_column = models.Disease.disease_name
+        crop_relation = models.Disease.crop
     elif category == "pest":
-        status_name = _match_known_name(data.get("status_name"), pests)
+        model_class = models.Pest
+        name_column = models.Pest.pest_name
+        crop_relation = models.Pest.crop
     else:
         return _uncertain_diagnosis(crop_name, confidence)
 
-    if not status_name:
-        return _uncertain_diagnosis(crop_name, confidence)
-
-    return {
-        "crop_name": crop_name,
-        "category": category,
-        "status_name": status_name,
-        "confidence": confidence,
-        "suggestion": _safe_text(data.get("suggestion"), "- 已比對到資料庫中的病蟲害名稱，請搭配症狀持續觀察。"),
-        "treatment": _safe_text(data.get("treatment"), "1. 依資料庫建議處理。\n2. 若症狀擴大，請重新拍攝並再次診斷。"),
-        "grounding_source": "model_pending_database_check",
-        "requires_review": False,
-    }
-
-
-def ground_diagnosis_in_database(data: dict, db: Session) -> dict:
-    """Cross-check crop ownership and replace generated advice with database facts."""
-
-    crop_name = data.get("crop_name")
-    confidence = _coerce_confidence(data.get("confidence"))
+    # 尋找對應的作物 ID
     crop = db.query(models.Crop).filter(models.Crop.crop_name == crop_name).first()
     if not crop:
-        return _uncertain_diagnosis(confidence=confidence)
+        # 如果作物不存在，我們可以選擇在這裡新增它，或回傳不確定
+        # 為了簡單起見，我們先回傳不確定
+        return _uncertain_diagnosis(crop_name, confidence)
 
-    category = str(data.get("category", "")).strip().lower()
-    if category == "unknown":
-        return _uncertain_diagnosis(crop.crop_name, confidence)
+    # --- 名稱標準化流程 ---
+    # 1. 取得該作物所有已知的病害/害蟲名稱
+    existing_records = db.query(name_column).filter(model_class.crop_id == crop.crop_id).all()
+    existing_names = [record[0] for record in existing_records]
 
-    if category == "healthy":
-        if confidence < MIN_HEALTHY_CONFIDENCE:
-            return _uncertain_diagnosis(crop.crop_name, confidence)
-        return {
-            "crop_name": crop.crop_name,
-            "category": "healthy",
-            "status_name": HEALTHY_STATUS_NAME,
-            "confidence": confidence,
-            "suggestion": "- 目前影像未見資料庫已知病蟲害的明顯特徵",
-            "treatment": "1. 維持正常照護\n2. 定期從相同角度拍攝並比較變化",
-            "grounding_source": "crop_database",
-            "requires_review": False,
-        }
+    # 2. 呼叫 AI 進行同義詞比對，取得標準化名稱
+    standardized_status_name = _get_standardized_name(status_name, existing_names)
+    # --- 標準化結束 ---
 
-    model_class = models.Disease if category == "disease" else models.Pest if category == "pest" else None
-    name_column = models.Disease.disease_name if category == "disease" else models.Pest.pest_name if category == "pest" else None
-    if model_class is None or name_column is None:
-        return _uncertain_diagnosis(crop.crop_name, confidence)
+    # 在對應的病蟲害資料表中查詢記錄 (使用標準化後的名稱)
+    record = db.query(model_class).filter(name_column == standardized_status_name, model_class.crop_id == crop.crop_id).first()
 
-    record = (
-        db.query(model_class)
-        .filter(name_column == data.get("status_name"), model_class.crop_id == crop.crop_id)
-        .first()
-    )
-    if not record:
-        return _uncertain_diagnosis(crop.crop_name, confidence)
+    if record:
+        # 情況 A：找到了！更新記錄
+        print(f"🔄 更新資料庫記錄: {crop_name} - {standardized_status_name}")
+        record.description = ai_suggestion
+        record.treatment = ai_treatment
+        db.commit()
+    else:
+        # 情況 B：沒找到！新增記錄 (使用標準化後的名稱)
+        print(f"✨ 新增資料庫記錄: {crop_name} - {standardized_status_name}")
+        new_record = model_class(
+            crop_id=crop.crop_id,
+            description=ai_suggestion,
+            treatment=ai_treatment
+        )
+        # 動態設定名稱欄位
+        setattr(new_record, name_column.name, standardized_status_name)
+        db.add(new_record)
+        db.commit()
 
-    description = str(record.description or "").strip()
-    treatment = str(record.treatment or "").strip()
-    has_source_fields = all(
-        hasattr(record, field)
-        for field in ("source_name", "source_url", "source_record_id")
-    )
-    source_name = getattr(record, "source_name", None)
-    source_url = getattr(record, "source_url", None)
-    source_record_id = getattr(record, "source_record_id", None)
-    has_verified_source = not has_source_fields or bool(
-        source_name and source_url and source_record_id
-    )
-    return {
-        "crop_name": crop.crop_name,
+    # 無論更新或新增，都回傳以 AI 最新內容為準的結果
+    final_result = {
+        "crop_name": crop_name,
         "category": category,
-        "status_name": getattr(record, "disease_name" if category == "disease" else "pest_name"),
+        "status_name": standardized_status_name, # 回傳標準化後的名稱
         "confidence": confidence,
-        "suggestion": description or "- 已比對到此作物資料庫中的病蟲害紀錄",
-        "treatment": treatment or "1. 資料庫尚無核准處置內容，請諮詢農業專業人員",
-        "grounding_source": "disease_database" if category == "disease" else "pest_database",
-        "reference_source": source_name,
-        "reference_url": source_url,
-        "reference_record_id": source_record_id,
-        "requires_review": not bool(description and treatment and has_verified_source),
+        "suggestion": ai_suggestion,
+        "treatment": ai_treatment,
+        "grounding_source": "ai_updated_database" if record else "ai_created_database",
+        "requires_review": False, # 我們信任 AI 的結果
     }
-
-
-def get_standard_names():
-    """讀取資料庫中現有的作物、病害與蟲害名稱。"""
-
-    db = SessionLocal()
-    try:
-        crops = [c.crop_name for c in db.query(models.Crop).all()]
-        diseases = [d.disease_name for d in db.query(models.Disease).all()]
-        pests = [p.pest_name for p in db.query(models.Pest).all()]
-        return crops, diseases, pests
-    finally:
-        db.close()
+    return final_result
 
 
 def get_reference_lists(db: Session) -> tuple[list[str], list[str], list[str]]:
@@ -216,75 +246,6 @@ def get_reference_lists(db: Session) -> tuple[list[str], list[str], list[str]]:
     pests = [p.pest_name for p in db.query(models.Pest).all()]
     return crops, diseases, pests
 
-
-def diagnostic_plant(image_path, crops=None, diseases=None, pests=None):
-    """分析圖片並回傳結構化 JSON。"""
-
-    if crops is None or diseases is None or pests is None:
-        crops, diseases, pests = get_standard_names()
-
-    crop_list_str = ", ".join(crops) if crops else "unknown"
-    disease_list_str = ", ".join(diseases) if diseases else "unknown"
-    pest_list_str = ", ".join(pests) if pests else "unknown"
-    img = Image.open(image_path)
-
-    # --- RAG 整合開始 ---
-    # 1. 初步分析圖片，產生搜尋查詢
-    preliminary_prompt = "You are an agricultural expert. Briefly describe the main subject and any visible symptoms in this image in a few keywords (e.g., 'tomato, leaf spots, yellowing'). This will be used to search a knowledge base. Respond in Traditional Chinese."
-    try:
-        preliminary_response = client.models.generate_content(model="gemini-2.5-flash", contents=[preliminary_prompt, img])
-        search_query = (preliminary_response.text or "").strip()
-        print(f" RAG: 初步分析關鍵詞: '{search_query}'")
-    except Exception as e:
-        print(f" RAG: 初步分析失敗: {e}")
-        search_query = "植物病徵" # 使用通用關鍵詞作為備用
-
-    # 2. 搜尋知識庫
-    retrieved_context = rag.search_knowledge_base(search_query, k=3)
-    # --- RAG 整合結束 ---
-
-
-    prompt = f"""
-    You are a top-tier plant pathologist. Analyze the provided image and context from our knowledge base to provide a professional diagnosis. Respond in valid JSON format, using Traditional Chinese for all user-facing text.
-
-    --- Knowledge Base Context ---
-    {retrieved_context if retrieved_context else "No specific context found."}
-    ---
-
-    Reference Lists (for name standardization):
-    - Known crops: {crop_list_str}
-    - Known diseases: {disease_list_str}
-    - Known pests: {pest_list_str}
-
-    Anti-hallucination rules:
-    - crop_name must exactly match one item from Known crops. If uncertain, use "未知作物".
-    - For category "disease", status_name must exactly match one item from Known diseases.
-    - For category "pest", status_name must exactly match one item from Known pests.
-    - If the image is unclear, confidence is low, or no exact crop/disease/pest match exists, use category "unknown" and status_name "無法判定".
-    - Do not invent crop names, disease names, pest names, pesticide names, dosages, or treatment steps.
-
-    JSON Output Structure:
-    {{
-      "crop_name": "string (The crop's name in Traditional Chinese)",
-      "category": "string (One of 'disease', 'pest', 'healthy', or 'unknown')",
-      "status_name": "string (A name from the matching reference list. If healthy, use '健康'. If unknown, use '無法判定')",
-      "confidence": "float (A value between 0.0 and 1.0)",
-      "suggestion": "string (A bulleted list of 2-3 key visual symptoms, using '-' for each point and '\\n' for new lines. Example: '- 葉片有黃斑\\n- 葉緣焦枯')",
-      "treatment": "string (If not healthy, provide a numbered list of actionable steps using '1.', '2.', etc., and '\\n' for new lines. If healthy, provide a positive confirmation like '繼續保持良好照顧。')"
-    }}
-    """
-    try:
-        response = client.models.generate_content(model="gemini-2.5-flash", contents=[prompt, img])
-        clean_text = (response.text or "").replace("```json", "").replace("```", "").strip()
-        return validate_diagnosis_result(json.loads(clean_text), crops, diseases, pests)
-    except json.JSONDecodeError as e:
-        # 當 AI 回應的不是有效的 JSON 時
-        print(f"❌ AI 回應格式錯誤: 無法解析 JSON。原始回應: '{clean_text}'. 錯誤: {str(e)}")
-        return None
-    except Exception as e:
-        # 捕捉所有其他錯誤，例如網路問題、API 金鑰問題等
-        print(f"❌ AI 診斷服務發生未知錯誤: {str(e)}")
-        return None
 
 
 async def classify_agriculture_term(name: str) -> str:

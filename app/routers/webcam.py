@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.core.config import settings
 from app.db import models
 from app.db.session import get_db
-from app.services.ai import diagnostic_plant, get_reference_lists, ground_diagnosis_in_database
+from app.services.ai import diagnostic_plant, process_and_update_diagnosis
 from app.services.auth import get_current_user
 from app.services.webcam import (
     alert_consensus,
@@ -60,12 +60,12 @@ async def analyze_webcam_frame(
 
     saved_alert_path = None
     try:
-        crops, diseases, pests = get_reference_lists(db)
-        model_result = diagnostic_plant(str(temp_path), crops, diseases, pests)
-        if not model_result:
+        # 使用 V3.1 新流程
+        raw_ai_result = diagnostic_plant(str(temp_path))
+        if not raw_ai_result:
             raise HTTPException(status_code=502, detail="AI analysis service failed.")
 
-        diagnosis = ground_diagnosis_in_database(model_result, db)
+        diagnosis = process_and_update_diagnosis(raw_ai_result, db)
         monitoring = alert_consensus.evaluate(current_user.user_id, diagnosis)
         alert_data = None
 
