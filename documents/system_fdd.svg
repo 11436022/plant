@@ -29,7 +29,7 @@
 
     <rect x="46" y="260" width="240" height="68" rx="8" class="module-box"/>
     <text x="166" y="288" text-anchor="middle" class="code">F1</text>
-    <text x="166" y="315" text-anchor="middle" class="module">帳號與權限管理</text>
+    <text x="166" y="315" text-anchor="middle" class="module">帳號與身分驗證</text>
 
     <rect x="300" y="260" width="240" height="68" rx="8" class="module-box"/>
     <text x="420" y="288" text-anchor="middle" class="code">F2</text>
@@ -62,7 +62,7 @@
     <rect x="54" y="472" width="224" height="48" rx="6" class="item-box"/>
     <text x="166" y="502" text-anchor="middle" class="item">忘記與重設密碼</text>
     <rect x="54" y="532" width="224" height="48" rx="6" class="item-box"/>
-    <text x="166" y="562" text-anchor="middle" class="item">JWT 與角色權限</text>
+    <text x="166" y="562" text-anchor="middle" class="item">JWT 身分驗證</text>
   </g>
 
   <g>
