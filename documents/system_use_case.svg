@@ -38,7 +38,7 @@
   </g>
 
   <!-- User-facing cases -->
-  <text x="380" y="195" text-anchor="middle" class="group">F1 帳號與權限管理</text>
+  <text x="380" y="195" text-anchor="middle" class="group">F1 帳號與身分驗證</text>
   <ellipse cx="380" cy="240" rx="145" ry="36" class="case"/>
   <text x="380" y="246" text-anchor="middle" class="uc">UC-01 註冊、登入與登出</text>
   <ellipse cx="380" cy="326" rx="145" ry="36" class="case"/>
