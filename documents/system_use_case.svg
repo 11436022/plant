@@ -1,16 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
   <defs>
     <style>
-      .title { font: 700 44px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
-      .subtitle { font: 400 20px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665f; }
-      .group { font: 700 19px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #315942; }
-      .uc { font: 400 17px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2f3d35; }
-      .actor { font: 700 19px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
-      .small { font: 400 15px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665f; }
+      .title { font: 700 42px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
+      .subtitle { font: 400 19px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665f; }
+      .group { font: 700 18px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #315942; }
+      .uc { font: 400 16px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2f3d35; }
+      .actor { font: 700 18px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
+      .small { font: 400 14px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665f; }
       .boundary { fill: #f8fbf8; stroke: #52745d; stroke-width: 2.5; }
       .case { fill: #ffffff; stroke: #82a284; stroke-width: 2; }
-      .support { fill: #fff7e6; stroke: #d1a154; stroke-width: 1.5; stroke-dasharray: 7 5; }
-      .line { stroke: #66786c; stroke-width: 2; fill: none; }
+      .shared { fill: #f2f7f0; stroke: #63856d; stroke-width: 2; }
+      .support { fill: #fff7e6; stroke: #d1a154; stroke-width: 1.7; stroke-dasharray: 7 5; }
+      .line { stroke: #829087; stroke-width: 1.8; fill: none; }
+      .actor-line { stroke: #3f5548; stroke-width: 3; fill: none; }
       .include { stroke: #9b7a3e; stroke-width: 1.6; stroke-dasharray: 7 5; fill: none; }
     </style>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
@@ -19,77 +21,87 @@
   </defs>
 
   <rect width="1600" height="900" fill="#ffffff"/>
-  <text x="60" y="60" class="title">使用個案圖</text>
-  <text x="60" y="92" class="subtitle">使用個案編號與 FDD 的 F1-F6 功能域一致</text>
+  <text x="60" y="58" class="title">使用個案圖</text>
+  <text x="60" y="91" class="subtitle">UC-01～UC-12 與手冊使用個案描述、FDD 的 F1～F6 功能域一致</text>
 
-  <rect x="210" y="118" width="1180" height="720" rx="8" class="boundary"/>
-  <text x="800" y="153" text-anchor="middle" class="group">植葉神醫 Plant Doctor</text>
+  <rect x="210" y="112" width="1180" height="730" rx="8" class="boundary"/>
+  <text x="800" y="147" text-anchor="middle" class="group">植葉神醫 Plant Doctor</text>
 
   <!-- Actors -->
-  <g transform="translate(95,360)">
-    <circle cx="0" cy="0" r="24" fill="#ffffff" stroke="#3f5548" stroke-width="3"/>
-    <path d="M0 24 V98 M-42 50 H42 M0 98 L-36 148 M0 98 L36 148" class="line" stroke-width="3"/>
-    <text x="0" y="184" text-anchor="middle" class="actor">一般使用者</text>
+  <g transform="translate(95,350)">
+    <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#3f5548" stroke-width="3"/>
+    <path d="M0 23 V94 M-40 49 H40 M0 94 L-34 141 M0 94 L34 141" class="actor-line"/>
+    <text x="0" y="176" text-anchor="middle" class="actor">一般使用者</text>
   </g>
-  <g transform="translate(1505,360)">
-    <circle cx="0" cy="0" r="24" fill="#ffffff" stroke="#3f5548" stroke-width="3"/>
-    <path d="M0 24 V98 M-42 50 H42 M0 98 L-36 148 M0 98 L36 148" class="line" stroke-width="3"/>
-    <text x="0" y="184" text-anchor="middle" class="actor">管理員</text>
+  <g transform="translate(1505,350)">
+    <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#3f5548" stroke-width="3"/>
+    <path d="M0 23 V94 M-40 49 H40 M0 94 L-34 141 M0 94 L34 141" class="actor-line"/>
+    <text x="0" y="176" text-anchor="middle" class="actor">管理員</text>
   </g>
 
-  <!-- User-facing cases -->
-  <text x="380" y="195" text-anchor="middle" class="group">F1 帳號與身分驗證</text>
-  <ellipse cx="380" cy="240" rx="145" ry="36" class="case"/>
-  <text x="380" y="246" text-anchor="middle" class="uc">UC-01 註冊、登入與登出</text>
-  <ellipse cx="380" cy="326" rx="145" ry="36" class="case"/>
-  <text x="380" y="321" text-anchor="middle" class="uc">UC-02 信箱驗證</text>
-  <text x="380" y="343" text-anchor="middle" class="uc">與重設密碼</text>
+  <!-- Associations are drawn behind the use cases -->
+  <path d="M136 383 C175 300 200 225 230 225 M136 394 C180 350 205 300 230 300 M136 405 C180 400 205 375 230 375" class="line"/>
+  <path d="M136 410 C270 300 430 225 620 225 M136 420 C390 330 715 225 1000 225 M136 430 C410 390 720 310 1000 310" class="line"/>
+  <path d="M136 438 C175 485 205 515 220 515 M136 447 C175 535 205 595 220 595" class="line"/>
+  <path d="M136 456 C310 500 465 525 640 525 M136 466 C315 555 475 610 640 610" class="line"/>
+  <path d="M1464 405 C1415 455 1375 525 1330 525 M1464 420 C1415 530 1375 610 1330 610" class="line"/>
+  <path d="M1464 435 C1300 500 1115 525 960 525 M1464 450 C1300 570 1125 610 960 610" class="line"/>
 
-  <text x="760" y="195" text-anchor="middle" class="group">F2 植物影像診斷</text>
-  <ellipse cx="760" cy="240" rx="160" ry="36" class="case"/>
-  <text x="760" y="246" text-anchor="middle" class="uc">UC-03 上傳圖片取得診斷</text>
-  <ellipse cx="760" cy="326" rx="160" ry="36" class="support"/>
-  <text x="760" y="321" text-anchor="middle" class="uc">資料庫校驗、信心門檻</text>
-  <text x="760" y="343" text-anchor="middle" class="uc">與來源回傳</text>
+  <!-- F1 -->
+  <text x="380" y="180" text-anchor="middle" class="group">F1 帳號與身分驗證</text>
+  <ellipse cx="380" cy="225" rx="150" ry="30" class="case"/>
+  <text x="380" y="231" text-anchor="middle" class="uc">UC-01 使用者註冊</text>
+  <ellipse cx="380" cy="300" rx="150" ry="30" class="case"/>
+  <text x="380" y="306" text-anchor="middle" class="uc">UC-02 Gmail 信箱驗證</text>
+  <ellipse cx="380" cy="375" rx="150" ry="30" class="case"/>
+  <text x="380" y="381" text-anchor="middle" class="uc">UC-03 使用者登入</text>
 
-  <text x="1120" y="195" text-anchor="middle" class="group">F3 診斷紀錄管理</text>
-  <ellipse cx="1120" cy="240" rx="160" ry="36" class="case"/>
-  <text x="1120" y="246" text-anchor="middle" class="uc">UC-04 確認並儲存診斷</text>
-  <ellipse cx="1120" cy="326" rx="160" ry="36" class="case"/>
-  <text x="1120" y="321" text-anchor="middle" class="uc">UC-05 查詢、備註、修正</text>
-  <text x="1120" y="343" text-anchor="middle" class="uc">與刪除個人紀錄</text>
+  <!-- F2 and F5 support -->
+  <text x="790" y="180" text-anchor="middle" class="group">F2 植物影像診斷</text>
+  <ellipse cx="790" cy="225" rx="170" ry="32" class="case"/>
+  <text x="790" y="231" text-anchor="middle" class="uc">UC-04 上傳圖片並取得分析結果</text>
+  <ellipse cx="790" cy="310" rx="170" ry="35" class="support"/>
+  <text x="790" y="305" text-anchor="middle" class="uc">F5 資料庫校驗、信心門檻</text>
+  <text x="790" y="327" text-anchor="middle" class="uc">來源回傳與人工覆核標記</text>
+  <path d="M790 257 V273" class="include" marker-end="url(#arrow)"/>
+  <text x="812" y="274" class="small">&lt;&lt;include&gt;&gt;</text>
 
-  <text x="490" y="458" text-anchor="middle" class="group">F4 Webcam 監控警報</text>
-  <ellipse cx="490" cy="510" rx="175" ry="38" class="case"/>
-  <text x="490" y="505" text-anchor="middle" class="uc">UC-06 啟動單株或</text>
-  <text x="490" y="528" text-anchor="middle" class="uc">多區域 Webcam 監控</text>
-  <ellipse cx="490" cy="606" rx="175" ry="38" class="case"/>
-  <text x="490" y="601" text-anchor="middle" class="uc">UC-07 接收、確認</text>
-  <text x="490" y="624" text-anchor="middle" class="uc">與刪除警報</text>
-  <ellipse cx="760" cy="510" rx="120" ry="38" class="support"/>
-  <text x="760" y="505" text-anchor="middle" class="uc">連續影格一致</text>
-  <text x="760" y="528" text-anchor="middle" class="uc">且通過資料覆核</text>
+  <!-- F3 -->
+  <text x="1170" y="180" text-anchor="middle" class="group">F3 診斷紀錄管理</text>
+  <ellipse cx="1170" cy="225" rx="170" ry="30" class="case"/>
+  <text x="1170" y="231" text-anchor="middle" class="uc">UC-05 儲存診斷紀錄</text>
+  <ellipse cx="1170" cy="310" rx="170" ry="30" class="case"/>
+  <text x="1170" y="316" text-anchor="middle" class="uc">UC-06 查看歷史紀錄</text>
 
-  <!-- Admin cases -->
-  <text x="1110" y="458" text-anchor="middle" class="group">F6 管理後台</text>
-  <ellipse cx="1110" cy="510" rx="160" ry="36" class="case"/>
-  <text x="1110" y="516" text-anchor="middle" class="uc">UC-08 檢視統計儀表板</text>
-  <ellipse cx="1110" cy="606" rx="160" ry="36" class="case"/>
-  <text x="1110" y="601" text-anchor="middle" class="uc">UC-09 搜尋、修改</text>
-  <text x="1110" y="624" text-anchor="middle" class="uc">與刪除診斷紀錄</text>
-  <ellipse cx="1110" cy="702" rx="160" ry="36" class="case"/>
-  <text x="1110" y="708" text-anchor="middle" class="uc">UC-10 查詢使用者列表</text>
+  <!-- F4 -->
+  <text x="385" y="470" text-anchor="middle" class="group">F4 Webcam 監控警報</text>
+  <ellipse cx="385" cy="515" rx="165" ry="32" class="case"/>
+  <text x="385" y="510" text-anchor="middle" class="uc">UC-10 Webcam 監控</text>
+  <text x="385" y="531" text-anchor="middle" class="uc">與自動警報</text>
+  <ellipse cx="385" cy="595" rx="165" ry="30" class="case"/>
+  <text x="385" y="601" text-anchor="middle" class="uc">UC-11 管理 Webcam 警報</text>
+  <ellipse cx="385" cy="675" rx="165" ry="32" class="support"/>
+  <text x="385" y="670" text-anchor="middle" class="uc">連續影格結果一致</text>
+  <text x="385" y="691" text-anchor="middle" class="uc">且通過 F5 資料覆核</text>
+  <path d="M550 515 H575 V675 H550" class="include" marker-end="url(#arrow)"/>
+  <text x="583" y="642" class="small">&lt;&lt;include&gt;&gt;</text>
 
-  <!-- Associations -->
-  <path d="M137 390 L247 250 M137 415 L235 326 M137 445 L600 246 M137 472 L960 250 M137 500 L315 510 M137 520 L315 606" class="line"/>
-  <path d="M1463 405 L1270 510 M1463 445 L1270 606 M1463 485 L1270 702" class="line"/>
+  <!-- Shared record maintenance -->
+  <text x="800" y="470" text-anchor="middle" class="group">F3 / F6 共用紀錄維護</text>
+  <ellipse cx="800" cy="525" rx="160" ry="30" class="shared"/>
+  <text x="800" y="531" text-anchor="middle" class="uc">UC-08 修改診斷紀錄</text>
+  <ellipse cx="800" cy="610" rx="160" ry="30" class="shared"/>
+  <text x="800" y="616" text-anchor="middle" class="uc">UC-09 刪除診斷紀錄</text>
+  <text x="800" y="662" text-anchor="middle" class="small">使用者限自己的紀錄；管理員透過後台維護</text>
 
-  <!-- Include relations -->
-  <path d="M760 276 V286" class="include" marker-end="url(#arrow)"/>
-  <text x="778" y="287" class="small">&lt;&lt;include&gt;&gt;</text>
-  <path d="M665 510 H628" class="include" marker-end="url(#arrow)"/>
-  <text x="642" y="496" text-anchor="middle" class="small">&lt;&lt;include&gt;&gt;</text>
+  <!-- F6 -->
+  <text x="1180" y="470" text-anchor="middle" class="group">F6 管理後台</text>
+  <ellipse cx="1180" cy="525" rx="150" ry="32" class="case"/>
+  <text x="1180" y="520" text-anchor="middle" class="uc">UC-07 檢視儀表板</text>
+  <text x="1180" y="541" text-anchor="middle" class="uc">與診斷紀錄</text>
+  <ellipse cx="1180" cy="610" rx="150" ry="30" class="case"/>
+  <text x="1180" y="616" text-anchor="middle" class="uc">UC-12 查詢使用者列表</text>
 
-  <rect x="278" y="770" width="1044" height="44" rx="6" fill="#eef5ee" stroke="#b2c6b3"/>
-  <text x="800" y="798" text-anchor="middle" class="small">F5 知識資料管理是 F2 與 F4 的共用支援功能：同步官方資料、執行 RAG 檢索並保留可追溯來源。</text>
+  <rect x="278" y="772" width="1044" height="44" rx="6" fill="#eef5ee" stroke="#b2c6b3"/>
+  <text x="800" y="800" text-anchor="middle" class="small">F5 是 F2 與 F4 的共用支援功能：同步官方資料、執行資料庫覆核與 RAG 檢索，並保留可追溯來源。</text>
 </svg>
