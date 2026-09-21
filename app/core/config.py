@@ -67,6 +67,14 @@ class Settings(BaseSettings):
     EMAIL_VERIFICATION_EXPIRE_MINUTES: int = 1440
     PASSWORD_RESET_EXPIRE_MINUTES: int = 30
 
+    # Google Cloud Vertex AI 客製化模型設定
+    VERTEX_PROJECT_ID: Optional[str] = None
+    VERTEX_ENDPOINT_ID: Optional[str] = None
+    VERTEX_LOCATION: str = "asia-east1"
+    CUSTOM_MODEL_MIN_CONFIDENCE: float = 0.80
+    CUSTOM_MODEL_RESCUE_CONFIDENCE: float = 0.85
+    CUSTOM_MODEL_DEFAULT_LABELS: list[str] = ["扶桑-缺鐵症", "扁蒲-健康", "樺木-葉斑病", "樟木-葉斑病"]
+
     def __init__(self, **values):
         super().__init__(**values)
         # 確保上傳目錄存在
