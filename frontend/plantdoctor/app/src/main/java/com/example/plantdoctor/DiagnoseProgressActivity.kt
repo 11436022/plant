@@ -28,6 +28,7 @@ import java.io.FileOutputStream
 class DiagnoseProgressActivity : AppCompatActivity() {
 
     private lateinit var imageUriString: String
+    private var selectedCropName: String = "未知"
     private lateinit var progressRoot: ConstraintLayout
 
     // 🌟 核心修復 1：宣告前後景兩層落葉 View 變數
@@ -103,6 +104,7 @@ class DiagnoseProgressActivity : AppCompatActivity() {
         progressBar.progressTintList = ColorStateList.valueOf(Color.parseColor(progressColorStr))
 
         imageUriString = intent.getStringExtra("IMAGE_URI") ?: ""
+        selectedCropName = intent.getStringExtra("CROP_NAME") ?: "未知"
 
         if (imageUriString.isEmpty()) {
             Toast.makeText(this, "找不到圖片資料", Toast.LENGTH_SHORT).show()
@@ -143,9 +145,15 @@ class DiagnoseProgressActivity : AppCompatActivity() {
         val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
         val imagePart = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
+        val cropPart = if (selectedCropName.isNotEmpty() && selectedCropName != "未知") {
+            MultipartBody.Part.createFormData("crop_name", selectedCropName)
+        } else {
+            null
+        }
+
         val apiService = PlantApiService.create(token)
 
-        apiService.predictImage(imagePart).enqueue(object : Callback<PredictionResponse> {
+        apiService.predictImage(imagePart, cropPart).enqueue(object : Callback<PredictionResponse> {
             override fun onResponse(call: Call<PredictionResponse>, response: Response<PredictionResponse>) {
                 isApiFinished = true
                 progressHandler.removeCallbacks(progressRunnable)

@@ -1,8 +1,9 @@
 import time
 import uuid
 from pathlib import Path
+from typing import Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -26,7 +27,11 @@ TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
 @router.post("/", status_code=200)
-async def predict_plant_status(file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def predict_plant_status(
+    file: UploadFile = File(...),
+    crop_name: Optional[str] = Form(None),
+    db: Session = Depends(get_db),
+):
     """
     接收圖片，執行 AI 分析，並將結果暫存。
 
@@ -52,9 +57,9 @@ async def predict_plant_status(file: UploadFile = File(...), db: Session = Depen
                     raise HTTPException(status_code=413, detail="Image exceeds the upload size limit.")
                 buffer.write(chunk)
 
-        # 2. 呼叫 AI 進行診斷 (V3.1 新流程)
-        # 步驟 1: 取得 AI 原始、未經驗證的診斷結果
-        raw_ai_result = diagnostic_plant(str(temp_file_path))
+        # 2. 呼叫 AI 進行診斷 (三層瀑布流階層式架構)
+        # 步驟 1-3: ConvNeXt快篩 -> Gemini兜底 -> 精準處方
+        raw_ai_result = diagnostic_plant(str(temp_file_path), crop_hint=crop_name, db=db)
 
         # --- DEBUG: 印出 AI 原始預測結果 ---
         if raw_ai_result:

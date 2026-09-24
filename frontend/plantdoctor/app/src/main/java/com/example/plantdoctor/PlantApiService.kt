@@ -111,6 +111,12 @@ data class DiagnosesResponse(
     val data: List<DiagnosisItem>
 )
 
+data class CropsResponse(
+    val status: String,
+    val count: Int,
+    val data: List<String>
+)
+
 // --- Webcam (即時監控與警報) ---
 data class WebcamSettingsResponse(
     val sample_interval_seconds: Int,
@@ -231,7 +237,8 @@ interface PlantApiService {
     @Multipart
     @POST("predict/")
     fun predictImage(
-        @Part file: MultipartBody.Part
+        @Part file: MultipartBody.Part,
+        @Part crop_name: MultipartBody.Part? = null
     ): Call<PredictionResponse>
 
     @POST("diaries/confirm/{prediction_id}")
@@ -258,6 +265,9 @@ interface PlantApiService {
     @GET("knowledge/diagnoses")
     fun getDiagnoses(): Call<DiagnosesResponse>
 
+    @GET("knowledge/crops")
+    fun getCrops(): Call<CropsResponse>
+
     @GET("auth/user/me")
     fun getUserProfile(): Call<UserProfileResponse>
 
@@ -273,7 +283,8 @@ interface PlantApiService {
     @Multipart
     @POST("webcam/analyze")
     fun analyzeWebcamFrame(
-        @Part file: MultipartBody.Part
+        @Part file: MultipartBody.Part,
+        @Part crop_name: MultipartBody.Part? = null
     ): Call<WebcamAnalyzeResponse>
 
     @GET("webcam/alerts")

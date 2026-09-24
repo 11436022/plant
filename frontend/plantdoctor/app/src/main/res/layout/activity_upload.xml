@@ -59,19 +59,68 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/guideline_top" />
 
-        <!-- 3. 照片預覽區域：緊貼標題下方，高度適度、小螢幕安全自適應 -->
+        <!-- 2.5 植物種類下拉選單 -->
+        <LinearLayout
+            android:id="@+id/layout_crop_selector"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_crop_dropdown"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_upload_title">
+
+            <TextView
+                android:id="@+id/tv_crop_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🌱 作物種類："
+                android:textColor="#2E7D32"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_selected_crop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="未知"
+                android:textColor="#333333"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/iv_crop_dropdown_arrow"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="下拉選單"
+                android:src="@drawable/ic_arrow_drop_down"
+                app:tint="#2E7D32" />
+        </LinearLayout>
+
+        <!-- 3. 照片預覽區域：緊貼作物選單下方，高度適度、小螢幕安全自適應 -->
         <ImageView
             android:id="@+id/img_preview"
             android:layout_width="0dp"
-            android:layout_height="320dp"
+            android:layout_height="280dp"
             android:layout_marginHorizontal="40dp"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/bg_upload_box"
             android:scaleType="centerInside"
             android:src="@android:drawable/ic_menu_camera"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_upload_title" />
+            app:layout_constraintTop_toBottomOf="@id/layout_crop_selector" />
 
         <!-- 4. 開啟相機與相簿選擇按鈕列：平分兩側、緊貼照片框 -->
         <LinearLayout

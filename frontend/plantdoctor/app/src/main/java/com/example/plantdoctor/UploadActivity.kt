@@ -32,6 +32,18 @@ import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.text.Editable
+import android.text.TextWatcher
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.ListView
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
 class UploadActivity : AppCompatActivity() {
 
     private var selectedImageUri: Uri? = null
@@ -39,6 +51,14 @@ class UploadActivity : AppCompatActivity() {
     private var photoFile: File? = null
 
     private lateinit var uploadRoot: ConstraintLayout
+
+    // 🌟 作物下拉選單相關
+    private var selectedCropName: String = "未知"
+    private val cropList: MutableList<String> = mutableListOf("未知")
+    private lateinit var layoutCropSelector: LinearLayout
+    private lateinit var tvCropLabel: TextView
+    private lateinit var tvSelectedCrop: TextView
+    private lateinit var ivCropDropdownArrow: ImageView
 
     // 🌟 1. 建立風聲延遲計時器與任務
     private val windHandler = Handler(Looper.getMainLooper())
@@ -89,6 +109,12 @@ class UploadActivity : AppCompatActivity() {
         val btnAnalyze = findViewById<Button>(R.id.btn_analyze)
         val tvUploadTitle = findViewById<TextView>(R.id.tv_upload_title)
 
+        // 作物下拉選單元件綁定
+        layoutCropSelector = findViewById(R.id.layout_crop_selector)
+        tvCropLabel = findViewById(R.id.tv_crop_label)
+        tvSelectedCrop = findViewById(R.id.tv_selected_crop)
+        ivCropDropdownArrow = findViewById(R.id.iv_crop_dropdown_arrow)
+
         // 🌟 初始化音效管理器 (與 LoginActivity 對齊)
         SoundManager.init(this)
 
@@ -100,6 +126,14 @@ class UploadActivity : AppCompatActivity() {
             titles = listOf(tvUploadTitle),
             imageButtons = listOf(btnBack)
         )
+        applyCropTheme()
+
+        layoutCropSelector.setOnClickListener {
+            SoundManager.playBubblePop()
+            showCropSelectionDialog()
+        }
+
+        fetchCropsList()
 
         imgPreview.setOnClickListener {
             SoundManager.playBubblePop()
@@ -137,6 +171,7 @@ class UploadActivity : AppCompatActivity() {
 
                 val intent = Intent(this, DiagnoseProgressActivity::class.java)
                 intent.putExtra("IMAGE_URI", selectedImageUri.toString())
+                intent.putExtra("CROP_NAME", selectedCropName)
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 startActivity(intent)
             } else {
@@ -162,8 +197,155 @@ class UploadActivity : AppCompatActivity() {
                 titles = listOf(tvUploadTitle),
                 imageButtons = listOf(btnBack)
             )
+            applyCropTheme()
         }
         SoundManager.startBGM()
+    }
+
+    private fun getThemeMainColor(): Int {
+        val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+        val themeId = sharedPref.getInt("THEME_COLOR_ID", 0)
+        val colorStr = when (themeId) {
+            1 -> "#1565C0"
+            2 -> "#D84315"
+            3 -> "#AD1457"
+            else -> "#2E7D32"
+        }
+        return Color.parseColor(colorStr)
+    }
+
+    private fun applyCropTheme() {
+        val mainColor = getThemeMainColor()
+        if (::tvCropLabel.isInitialized) {
+            tvCropLabel.setTextColor(mainColor)
+        }
+        if (::ivCropDropdownArrow.isInitialized) {
+            ivCropDropdownArrow.imageTintList = ColorStateList.valueOf(mainColor)
+        }
+        if (::layoutCropSelector.isInitialized) {
+            val selectorBg = GradientDrawable().apply {
+                setColor(Color.WHITE)
+                cornerRadius = 16f * resources.displayMetrics.density
+                setStroke((2 * resources.displayMetrics.density).toInt(), mainColor)
+            }
+            layoutCropSelector.background = selectorBg
+        }
+    }
+
+    private fun fetchCropsList() {
+        val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+        val token = sharedPref.getString("token", null)
+        val apiService = PlantApiService.create(token)
+
+        apiService.getCrops().enqueue(object : Callback<CropsResponse> {
+            override fun onResponse(call: Call<CropsResponse>, response: Response<CropsResponse>) {
+                if (response.isSuccessful) {
+                    val rawCrops = response.body()?.data
+                    if (!rawCrops.isNullOrEmpty()) {
+                        cropList.clear()
+                        val filtered = rawCrops.toMutableList()
+                        if (filtered.remove("未知")) {
+                            cropList.add("未知")
+                        } else {
+                            cropList.add("未知")
+                        }
+                        cropList.addAll(filtered)
+                        Log.d("UPLOAD_CROP", "成功自後端載入 ${cropList.size} 種作物！")
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<CropsResponse>, t: Throwable) {
+                Log.w("UPLOAD_CROP", "載入作物清單失敗，將使用預設設定: ${t.message}")
+            }
+        })
+    }
+
+    private fun showCropSelectionDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_select_crop, null)
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val tvDialogTitle = dialogView.findViewById<TextView>(R.id.tv_dialog_title)
+        val btnClose = dialogView.findViewById<ImageButton>(R.id.btn_dialog_close)
+        val etSearch = dialogView.findViewById<EditText>(R.id.et_crop_search)
+        val btnClear = dialogView.findViewById<ImageButton>(R.id.btn_clear_search)
+        val lvCrops = dialogView.findViewById<ListView>(R.id.lv_crops)
+
+        val themeColor = getThemeMainColor()
+        tvDialogTitle.setTextColor(themeColor)
+
+        val displayList = ArrayList(cropList)
+        val adapter = object : android.widget.ArrayAdapter<String>(this, R.layout.item_crop_dialog, R.id.tv_crop_item_name, displayList) {
+            override fun getView(position: Int, convertView: android.view.View?, parent: android.view.ViewGroup): android.view.View {
+                val view = super.getView(position, convertView, parent)
+                val item = getItem(position) ?: ""
+                val tvName = view.findViewById<TextView>(R.id.tv_crop_item_name)
+                val tvTag = view.findViewById<TextView>(R.id.tv_crop_item_tag)
+
+                tvName.text = item
+                if (item == "未知") {
+                    tvTag.visibility = android.view.View.VISIBLE
+                    tvTag.text = "預設 (AI自動識別)"
+                    tvTag.setTextColor(themeColor)
+                } else {
+                    tvTag.visibility = android.view.View.GONE
+                }
+
+                if (item == selectedCropName) {
+                    tvName.setTextColor(themeColor)
+                    tvName.typeface = android.graphics.Typeface.DEFAULT_BOLD
+                } else {
+                    tvName.setTextColor(Color.parseColor("#333333"))
+                    tvName.typeface = android.graphics.Typeface.DEFAULT
+                }
+                return view
+            }
+        }
+        lvCrops.adapter = adapter
+
+        lvCrops.setOnItemClickListener { _, _, position, _ ->
+            val chosen = adapter.getItem(position) ?: "未知"
+            selectedCropName = chosen
+            tvSelectedCrop.text = chosen
+            SoundManager.playBubblePop()
+            dialog.dismiss()
+        }
+
+        etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s?.toString()?.trim() ?: ""
+                btnClear.visibility = if (query.isNotEmpty()) android.view.View.VISIBLE else android.view.View.GONE
+
+                displayList.clear()
+                if (query.isEmpty()) {
+                    displayList.addAll(cropList)
+                } else {
+                    for (crop in cropList) {
+                        if (crop.contains(query, ignoreCase = true)) {
+                            displayList.add(crop)
+                        }
+                    }
+                }
+                adapter.notifyDataSetChanged()
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        btnClear.setOnClickListener {
+            etSearch.setText("")
+        }
+
+        btnClose.setOnClickListener {
+            SoundManager.playBubblePop()
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     /**

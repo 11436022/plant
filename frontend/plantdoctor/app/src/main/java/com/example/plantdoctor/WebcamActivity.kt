@@ -7,6 +7,9 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.graphics.RectF
@@ -78,6 +81,14 @@ class WebcamActivity : AppCompatActivity() {
     private lateinit var tvDiagnosis: TextView
     private lateinit var tvStreak: TextView
     private lateinit var btnToggleMonitor: Button
+
+    // 🌟 作物下拉選單相關元件
+    private var selectedCropName: String = "未知"
+    private val cropList: MutableList<String> = mutableListOf("未知")
+    private lateinit var layoutCropSelector: LinearLayout
+    private lateinit var tvCropLabel: TextView
+    private lateinit var tvSelectedCrop: TextView
+    private lateinit var ivCropArrow: ImageView
 
     // 單植物控制元件
     private lateinit var layoutSingleControl: LinearLayout
@@ -151,6 +162,7 @@ class WebcamActivity : AppCompatActivity() {
         boxOverlay.visibility = View.VISIBLE
         singleStrategy.showCenterCropZone(boxOverlay)
         setupSessionControls()
+        fetchCropsList()
     }
 
     private fun bindViews() {
@@ -168,6 +180,12 @@ class WebcamActivity : AppCompatActivity() {
         tvDiagnosis = findViewById(R.id.tvDiagnosis)
         tvStreak = findViewById(R.id.tvStreak)
         btnToggleMonitor = findViewById(R.id.btnToggleMonitor)
+
+        // 🌟 作物選單元件綁定
+        layoutCropSelector = findViewById(R.id.layout_webcam_crop_selector)
+        tvCropLabel = findViewById(R.id.tv_webcam_crop_label)
+        tvSelectedCrop = findViewById(R.id.tv_webcam_selected_crop)
+        ivCropArrow = findViewById(R.id.iv_webcam_crop_arrow)
 
         layoutSingleControl = findViewById(R.id.layoutSingleControl)
         sbSingleInterval = findViewById(R.id.sbSingleInterval)
@@ -197,6 +215,11 @@ class WebcamActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
+        layoutCropSelector.setOnClickListener {
+            SoundManager.playBubblePop()
+            showCropSelectionDialog()
+        }
+
         btnToggleMonitor.setOnClickListener {
             SoundManager.playBubblePop()
             resetAutoPowerSaveTimer()
@@ -354,7 +377,7 @@ class WebcamActivity : AppCompatActivity() {
         val croppedFile = cropBitmapToTempFile(bitmap, centerRect, 0)
 
         if (croppedFile != null && croppedFile.exists()) {
-            uploadCropZoneImageToBackend(croppedFile, fileName)
+            uploadCropZoneImageToBackend(croppedFile, fileName, selectedCropName)
         }
     }
 
@@ -409,11 +432,20 @@ class WebcamActivity : AppCompatActivity() {
         etName.setTextColor(android.graphics.Color.WHITE)
         etInterval.setTextColor(android.graphics.Color.WHITE)
 
-        // 🌟 注入當前主題色至 Dialog 內的 SeekBar
+        // 🌟 注入當前主題色至 Dialog 內的 SeekBar 與選作物按鈕
         val mainColor = getThemeMainColor()
         val colorStateList = android.content.res.ColorStateList.valueOf(mainColor)
         sbInterval.thumbTintList = colorStateList
         sbInterval.progressTintList = colorStateList
+
+        val btnPickCrop = dialogView.findViewById<Button>(R.id.btnPickCropForZone)
+        btnPickCrop?.backgroundTintList = colorStateList
+        btnPickCrop?.setOnClickListener {
+            SoundManager.playBubblePop()
+            showCropSelectionDialog { chosenCrop ->
+                etName.setText(chosenCrop)
+            }
+        }
 
         etName.setText(zone.name)
         val currentSec: Int = zone.intervalMinutes.toInt().coerceIn(30, 600)
@@ -492,13 +524,14 @@ class WebcamActivity : AppCompatActivity() {
         val plantStr = "plant%02d".format(zone.id)
         val customFileName = "${username}_${sessionName}_${timeStamp}_${plantStr}.jpg"
 
-        uploadCropZoneImageToBackend(croppedFile, customFileName)
+        val cropHint = if (cropList.contains(zone.name)) zone.name else if (selectedCropName != "未知") selectedCropName else null
+        uploadCropZoneImageToBackend(croppedFile, customFileName, cropHint)
     }
 
     /**
      * 🚀 正式上線：將照片發送給 PlantApiService analyzeWebcamFrame
      */
-    private fun uploadCropZoneImageToBackend(file: File, customFileName: String) {
+    private fun uploadCropZoneImageToBackend(file: File, customFileName: String, cropName: String? = null) {
         // 1. 🔒 即時讀取並驗證 Token
         val token = getValidSavedToken()
 
@@ -515,14 +548,17 @@ class WebcamActivity : AppCompatActivity() {
             return
         }
 
-
-
         // 2. 打包圖片與建立 ApiService
         val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData("file", customFileName, requestFile)
+        val cropPart = if (!cropName.isNullOrEmpty() && cropName != "未知") {
+            MultipartBody.Part.createFormData("crop_name", cropName)
+        } else {
+            null
+        }
         val apiService = PlantApiService.create(token)
 
-        Log.d("WEBCAM_PROD", "📡 [第 $totalCaptureCount 次發送] 開始上傳照片至後端：$customFileName (大小: ${file.length() / 1024} KB)")
+        Log.d("WEBCAM_PROD", "📡 [第 $totalCaptureCount 次發送] 開始上傳照片至後端：$customFileName (大小: ${file.length() / 1024} KB, 作物: ${cropName ?: "未知"})")
         // 🌟 關鍵一：不論單植物、多植物或手動拍照，只要開始上傳，總次數立刻 +1！
         totalCaptureCount++
 
@@ -530,7 +566,7 @@ class WebcamActivity : AppCompatActivity() {
         updateDiagnosisUI("分析中...", totalCaptureCount)
 
         // 3. 發送 API Request
-        apiService.analyzeWebcamFrame(body).enqueue(object : Callback<WebcamAnalyzeResponse> {
+        apiService.analyzeWebcamFrame(body, cropPart).enqueue(object : Callback<WebcamAnalyzeResponse> {
             override fun onResponse(
                 call: Call<WebcamAnalyzeResponse>,
                 response: Response<WebcamAnalyzeResponse>
@@ -842,6 +878,8 @@ class WebcamActivity : AppCompatActivity() {
             etInterval = etSingleInterval,
             panelBackground = bottomPanel
         )
+
+        applyCropSelectorTheme()
 
         if (layoutPowerSaveOverlay.visibility != View.VISIBLE) {
             SoundManager.startBGM()
@@ -1198,6 +1236,145 @@ class WebcamActivity : AppCompatActivity() {
             tvDiagnosis.text = "最新診斷：$statusText"
             tvStreak.text = "本次偵測次數：$captureCount 次"
         }
+    }
+
+    private fun applyCropSelectorTheme() {
+        val mainColor = getThemeMainColor()
+        if (::tvCropLabel.isInitialized) {
+            tvCropLabel.setTextColor(mainColor)
+        }
+        if (::ivCropArrow.isInitialized) {
+            ivCropArrow.imageTintList = ColorStateList.valueOf(mainColor)
+        }
+        if (::layoutCropSelector.isInitialized) {
+            val selectorBg = GradientDrawable().apply {
+                setColor(Color.parseColor("#26FFFFFF"))
+                cornerRadius = 12f * resources.displayMetrics.density
+                setStroke((1.5f * resources.displayMetrics.density).toInt(), mainColor)
+            }
+            layoutCropSelector.background = selectorBg
+        }
+    }
+
+    private fun fetchCropsList() {
+        val token = getValidSavedToken()
+        val apiService = PlantApiService.create(token)
+
+        apiService.getCrops().enqueue(object : Callback<CropsResponse> {
+            override fun onResponse(call: Call<CropsResponse>, response: Response<CropsResponse>) {
+                if (response.isSuccessful) {
+                    val rawCrops = response.body()?.data
+                    if (!rawCrops.isNullOrEmpty()) {
+                        cropList.clear()
+                        val filtered = rawCrops.toMutableList()
+                        if (filtered.remove("未知")) {
+                            cropList.add("未知")
+                        } else {
+                            cropList.add("未知")
+                        }
+                        cropList.addAll(filtered)
+                        Log.d("WEBCAM_CROP", "成功自後端載入 ${cropList.size} 種作物！")
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<CropsResponse>, t: Throwable) {
+                Log.w("WEBCAM_CROP", "載入作物清單失敗，將使用預設設定: ${t.message}")
+            }
+        })
+    }
+
+    private fun showCropSelectionDialog(onCropSelected: ((String) -> Unit)? = null) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_select_crop, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val tvDialogTitle = dialogView.findViewById<TextView>(R.id.tv_dialog_title)
+        val btnClose = dialogView.findViewById<ImageButton>(R.id.btn_dialog_close)
+        val etSearch = dialogView.findViewById<EditText>(R.id.et_crop_search)
+        val btnClear = dialogView.findViewById<ImageButton>(R.id.btn_clear_search)
+        val lvCrops = dialogView.findViewById<ListView>(R.id.lv_crops)
+
+        val themeColor = getThemeMainColor()
+        tvDialogTitle.setTextColor(themeColor)
+
+        val displayList = ArrayList(cropList)
+        val adapter = object : android.widget.ArrayAdapter<String>(this, R.layout.item_crop_dialog, R.id.tv_crop_item_name, displayList) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent)
+                val item = getItem(position) ?: ""
+                val tvName = view.findViewById<TextView>(R.id.tv_crop_item_name)
+                val tvTag = view.findViewById<TextView>(R.id.tv_crop_item_tag)
+
+                tvName.text = item
+                if (item == "未知") {
+                    tvTag.visibility = View.VISIBLE
+                    tvTag.text = "預設 (AI自動識別)"
+                    tvTag.setTextColor(themeColor)
+                } else {
+                    tvTag.visibility = View.GONE
+                }
+
+                val currentTarget = if (onCropSelected == null) selectedCropName else ""
+                if (item == currentTarget) {
+                    tvName.setTextColor(themeColor)
+                    tvName.typeface = android.graphics.Typeface.DEFAULT_BOLD
+                } else {
+                    tvName.setTextColor(Color.parseColor("#333333"))
+                    tvName.typeface = android.graphics.Typeface.DEFAULT
+                }
+                return view
+            }
+        }
+        lvCrops.adapter = adapter
+
+        lvCrops.setOnItemClickListener { _, _, position, _ ->
+            val chosen = adapter.getItem(position) ?: "未知"
+            if (onCropSelected != null) {
+                onCropSelected(chosen)
+            } else {
+                selectedCropName = chosen
+                tvSelectedCrop.text = chosen
+                Toast.makeText(this, "目標植物已設為：$chosen", Toast.LENGTH_SHORT).show()
+            }
+            SoundManager.playBubblePop()
+            dialog.dismiss()
+        }
+
+        etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s?.toString()?.trim() ?: ""
+                btnClear.visibility = if (query.isNotEmpty()) View.VISIBLE else View.GONE
+
+                displayList.clear()
+                if (query.isEmpty()) {
+                    displayList.addAll(cropList)
+                } else {
+                    for (crop in cropList) {
+                        if (crop.contains(query, ignoreCase = true)) {
+                            displayList.add(crop)
+                        }
+                    }
+                }
+                adapter.notifyDataSetChanged()
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        btnClear.setOnClickListener {
+            etSearch.setText("")
+        }
+
+        btnClose.setOnClickListener {
+            SoundManager.playBubblePop()
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
 }

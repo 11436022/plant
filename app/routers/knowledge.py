@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends,HTTPException
 from sqlalchemy.orm import Session
 
+from app.db import models
 from app.db.session import get_db
 from app.services.ai import get_reference_lists
 
@@ -42,3 +43,30 @@ async def get_all_diagnoses(db: Session = Depends(get_db)):
     except Exception as e:
         # 捕捉所有可能的錯誤
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
+
+
+@router.get("/crops", status_code=200)
+async def get_all_crops(db: Session = Depends(get_db)):
+    """
+    獲取資料庫中所有作物的完整參考列表，供使用者拍照前或 Webcam 執行前下拉選取。
+    第一項固定為「未知」，隨後包含資料庫中全部 1,000+ 種作物名稱。
+    """
+    try:
+        crop_records = (
+            db.query(models.Crop.crop_name)
+            .filter(models.Crop.crop_name.isnot(None), models.Crop.crop_name != "")
+            .distinct()
+            .all()
+        )
+        db_crops = sorted(list({c[0].strip() for c in crop_records if c[0] and c[0].strip()}))
+        if "未知" in db_crops:
+            db_crops.remove("未知")
+
+        full_crops = ["未知"] + db_crops
+        return {
+            "status": "success",
+            "count": len(full_crops),
+            "data": full_crops,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch crops: {str(e)}")

@@ -1,8 +1,9 @@
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 import uuid
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session, joinedload
 
@@ -49,6 +50,7 @@ async def get_webcam_settings(current_user: models.User = Depends(get_current_us
 @router.post("/analyze")
 async def analyze_webcam_frame(
     file: UploadFile = File(...),
+    crop_name: Optional[str] = Form(None),
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -60,8 +62,8 @@ async def analyze_webcam_frame(
 
     saved_alert_path = None
     try:
-        # 使用 V3.1 新流程
-        raw_ai_result = diagnostic_plant(str(temp_path))
+        # 使用階層式診斷
+        raw_ai_result = diagnostic_plant(str(temp_path), crop_hint=crop_name, db=db)
         if not raw_ai_result:
             raise HTTPException(status_code=502, detail="AI analysis service failed.")
 

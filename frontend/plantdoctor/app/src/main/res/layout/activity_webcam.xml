@@ -166,6 +166,51 @@
             android:layout_marginVertical="8dp"
             android:background="#40FFFFFF" />
 
+        <!-- 🌟 目標植物種類下拉選單 -->
+        <LinearLayout
+            android:id="@+id/layout_webcam_crop_selector"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_webcam_crop_dropdown"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp">
+
+            <TextView
+                android:id="@+id/tv_webcam_crop_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🌱 目標植物："
+                android:textColor="#81C784"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_webcam_selected_crop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="未知"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/iv_webcam_crop_arrow"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:contentDescription="下拉選單"
+                android:src="@drawable/ic_arrow_drop_down"
+                app:tint="#81C784" />
+        </LinearLayout>
+
         <!-- 🌟【單植物控制區域】 -->
         <LinearLayout
             android:id="@+id/layoutSingleControl"

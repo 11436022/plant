@@ -60,6 +60,8 @@ class Settings(BaseSettings):
 
     # 中央氣象署開放資料API金鑰
     CWB_API_KEY: Optional[str] = None
+    # Google Gemini API 金鑰
+    GEMINI_API_KEY: Optional[str] = None
     SMTP_USE_TLS: bool = True
     SMTP_USE_SSL: bool = False
 
@@ -67,13 +69,11 @@ class Settings(BaseSettings):
     EMAIL_VERIFICATION_EXPIRE_MINUTES: int = 1440
     PASSWORD_RESET_EXPIRE_MINUTES: int = 30
 
-    # Google Cloud Vertex AI 客製化模型設定
-    VERTEX_PROJECT_ID: Optional[str] = None
-    VERTEX_ENDPOINT_ID: Optional[str] = None
-    VERTEX_LOCATION: str = "asia-east1"
-    CUSTOM_MODEL_MIN_CONFIDENCE: float = 0.80
-    CUSTOM_MODEL_RESCUE_CONFIDENCE: float = 0.85
-    CUSTOM_MODEL_DEFAULT_LABELS: list[str] = ["扶桑-缺鐵症", "扁蒲-健康", "樺木-葉斑病", "樟木-葉斑病"]
+    # 本地 ConvNeXt 輕量快篩模型設定
+    CONVNEXT_MODEL_PATH: str = "convnext_plant_best.pth"
+    CONVNEXT_CLASS_INDEX_PATH: str = "idx_to_class.json"
+    CONVNEXT_MIN_CONFIDENCE: float = 0.75
+    CONVNEXT_OVERWHELMING_CONFIDENCE: float = 0.85
 
     def __init__(self, **values):
         super().__init__(**values)

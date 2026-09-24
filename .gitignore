@@ -8,6 +8,10 @@ __pycache__/
 venv/
 .idea/
 
+# 模型權重檔（超過 GitHub 100MB 限制，請於 GitHub Releases 下載）
+*.pth
+*.pt
+
 # 排除上傳的測試圖片與暫存檔
 static/tmp/*
 !static/tmp/.gitkeep

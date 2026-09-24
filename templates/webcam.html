@@ -140,7 +140,7 @@
         .camera-empty svg { width: 44px; height: 44px; margin-bottom: 8px; }
         .camera-toolbar {
             display: grid;
-            grid-template-columns: minmax(180px, 1fr) 120px auto;
+            grid-template-columns: minmax(140px, 1fr) minmax(160px, 1.2fr) 95px auto;
             align-items: end;
             gap: 12px;
             padding: 14px;
@@ -251,6 +251,12 @@
                         <select id="cameraSelect"><option value="">預設攝影機</option></select>
                     </div>
                     <div class="field">
+                        <label for="cropSelect">監控作物目標</label>
+                        <select id="cropSelect">
+                            <option value="">未知 / 自動辨識 (全部作物)</option>
+                        </select>
+                    </div>
+                    <div class="field">
                         <label for="intervalInput">間隔（秒）</label>
                         <input id="intervalInput" type="number" min="10" max="600" step="5" value="30">
                     </div>
@@ -271,7 +277,10 @@
             <aside class="diagnosis-panel">
                 <div class="panel-heading">
                     <h2>即時診斷</h2>
-                    <span id="diagnosisBadge" class="badge neutral">等待影格</span>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <span id="sourceBadge" class="badge neutral" title="命中層級">待命</span>
+                        <span id="diagnosisBadge" class="badge neutral">等待影格</span>
+                    </div>
                 </div>
                 <div class="diagnosis-grid">
                     <div class="metric"><label>作物</label><strong id="cropName">--</strong></div>
@@ -358,7 +367,33 @@
             byId("intervalInput").value = state.settings.sample_interval_seconds;
             byId("intervalSummary").textContent = `每 ${state.settings.sample_interval_seconds} 秒`;
             byId("thresholdSummary").textContent = `≥ ${Math.round(state.settings.alert_confidence * 100)}%，連續 ${state.settings.required_matches} 次`;
+            await loadCrops();
             await loadAlerts();
+        }
+
+        async function loadCrops() {
+            try {
+                const res = await api("/knowledge/crops");
+                const select = byId("cropSelect");
+                const currentVal = select.value;
+                select.replaceChildren();
+                const defaultOpt = document.createElement("option");
+                defaultOpt.value = "";
+                defaultOpt.textContent = "未知 / 自動辨識 (全部作物)";
+                select.appendChild(defaultOpt);
+                if (res && res.data) {
+                    res.data.forEach((c) => {
+                        if (c === "未知") return;
+                        const opt = document.createElement("option");
+                        opt.value = c;
+                        opt.textContent = `限定作物：${c}`;
+                        if (c === currentVal) opt.selected = true;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.warn("無法載入作物列表:", err);
+            }
         }
 
         byId("loginForm").addEventListener("submit", async (event) => {
@@ -454,6 +489,10 @@
                 if (!blob) throw new Error("無法擷取攝影機影格。");
                 const form = new FormData();
                 form.append("file", blob, "webcam-frame.jpg");
+                const selectedCrop = byId("cropSelect") ? byId("cropSelect").value : "";
+                if (selectedCrop) {
+                    form.append("crop_name", selectedCrop);
+                }
                 const payload = await api("/webcam/analyze", { method: "POST", body: form });
                 renderDiagnosis(payload);
                 byId("lastScan").textContent = new Date().toLocaleTimeString("zh-TW", { hour12: false });
@@ -486,6 +525,20 @@
             const badge = byId("diagnosisBadge");
             badge.textContent = diagnosis.category === "healthy" ? "健康" : diagnosis.category === "unknown" ? "待確認" : "異常";
             badge.className = `badge ${diagnosis.category === "healthy" ? "good" : diagnosis.category === "unknown" ? "warning" : "danger"}`;
+
+            const sourceBadge = byId("sourceBadge");
+            if (sourceBadge) {
+                const sourceMap = {
+                    "local_convnext_fast_screen": { text: "ConvNeXt快篩", cls: "good" },
+                    "local_yolo_fast_screen": { text: "本地快篩", cls: "good" },
+                    "gemini_multimodal_fallback": { text: "Gemini兜底", cls: "neutral" },
+                    "safety_fallback": { text: "安全煞車", cls: "danger" }
+                };
+                const sInfo = sourceMap[diagnosis.grounding_source] || { text: diagnosis.grounding_source || "AI診斷", cls: "neutral" };
+                sourceBadge.textContent = sInfo.text;
+                sourceBadge.className = `badge ${sInfo.cls}`;
+                sourceBadge.title = `診斷命中層級: ${diagnosis.grounding_source}`;
+            }
         }
 
         async function startMonitoring() {

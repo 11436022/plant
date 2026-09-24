@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>植物神醫 | 拍照診斷</title>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f3f6f4;
+            --surface: #ffffff;
+            --surface-muted: #eef3f0;
+            --line: #d2ddd6;
+            --text: #19241d;
+            --muted: #5e6d64;
+            --primary: #197046;
+            --primary-hover: #125534;
+            --warning: #a55d05;
+            --danger: #b42318;
+            --shadow: 0 8px 24px rgba(25, 36, 29, 0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+        .header {
+            background: #14251c;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 3px solid #4fa36f;
+        }
+        .header h1 { font-size: 19px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .header span { font-size: 13px; color: #a4beae; }
+        .container {
+            max-width: 580px;
+            margin: 20px auto;
+            padding: 0 16px;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        .step-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        select, input[type="text"] {
+            width: 100%;
+            height: 44px;
+            padding: 0 12px;
+            font-size: 15px;
+            border: 1.5px solid var(--line);
+            border-radius: 8px;
+            background: white;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        select:focus {
+            border-color: var(--primary);
+        }
+        .select-desc {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 5px;
+        }
+        .upload-area {
+            border: 2px dashed #a8c1b2;
+            background: #f7faf8;
+            border-radius: 10px;
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: #f0f7f3;
+        }
+        .upload-area svg {
+            width: 44px;
+            height: 44px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .upload-area p {
+            font-size: 14px;
+            color: var(--muted);
+        }
+        .upload-area strong {
+            color: var(--primary);
+        }
+        #photoInput {
+            display: none;
+        }
+        .preview-box {
+            position: relative;
+            margin-top: 14px;
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+            border: 1px solid var(--line);
+        }
+        .preview-box img {
+            width: 100%;
+            max-height: 360px;
+            object-fit: contain;
+            display: block;
+            background: #111;
+        }
+        .btn-submit {
+            width: 100%;
+            height: 48px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 14px;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover {
+            background: var(--primary-hover);
+        }
+        .btn-submit:disabled {
+            background: #8ea89a;
+            cursor: not-allowed;
+        }
+        .result-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--line);
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .badge.convnext { background: #dff4e8; color: #0e623d; }
+        .badge.gemini { background: #e0f2fe; color: #0369a1; }
+        .badge.fallback { background: #fee2e2; color: #991b1b; }
+        .metric-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .metric-card {
+            background: var(--surface-muted);
+            padding: 12px 14px;
+            border-radius: 8px;
+        }
+        .metric-card span {
+            font-size: 12px;
+            color: var(--muted);
+            display: block;
+            margin-bottom: 4px;
+        }
+        .metric-card strong {
+            font-size: 18px;
+            color: var(--text);
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 16px 0 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .content-box {
+            background: #fafcfb;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-line;
+            color: #2c3a32;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <i data-lucide="leaf"></i>
+        <div>
+            <h1>植物神醫</h1>
+            <span>智慧植物病害快篩與處方診斷</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 診斷操作卡片 -->
+        <div class="card">
+            <!-- 步驟 1：拍照前選擇植物 -->
+            <div class="form-group">
+                <div class="step-label"><i data-lucide="list-filter"></i> 步驟 1：拍照前選取植物</div>
+                <label for="cropSelect">請問這是哪種植物？</label>
+                <select id="cropSelect">
+                    <option value="未知" selected>未知 / 不確定 (交由 AI 自動識別)</option>
+                </select>
+                <div class="select-desc">
+                    💡 提示：若您知道是「番茄」、「草莓」等作物，選取後可加速本地 ConvNeXt 毫秒級快篩，若不確定請保留「未知」。
+                </div>
+            </div>
+
+            <!-- 步驟 2：拍照或選擇照片 -->
+            <div class="form-group">
+                <div class="step-label"><i data-lucide="camera"></i> 步驟 2：拍攝或上傳照片</div>
+                <div class="upload-area" id="dropZone" onclick="document.getElementById('photoInput').click()">
+                    <i data-lucide="camera"></i>
+                    <p>點擊<strong>開啟相機拍照</strong> 或 選擇照片</p>
+                </div>
+                <input type="file" id="photoInput" accept="image/*" capture="environment">
+                
+                <div class="preview-box" id="previewBox">
+                    <img id="previewImg" alt="預覽照片">
+                </div>
+            </div>
+
+            <button class="btn-submit" id="submitBtn" disabled onclick="startDiagnosis()">
+                <i data-lucide="sparkles"></i>
+                <span id="btnText">開始 AI 診斷</span>
+            </button>
+        </div>
+
+        <!-- 診斷結果卡片 -->
+        <div class="card result-panel" id="resultPanel">
+            <div class="result-header">
+                <h2 style="font-size: 18px; font-weight: 700;">診斷結果</h2>
+                <span id="sourceBadge" class="badge convnext">
+                    <i data-lucide="zap"></i> 本地 ConvNeXt 快篩
+                </span>
+            </div>
+
+            <div class="metric-row">
+                <div class="metric-card">
+                    <span>確診植物</span>
+                    <strong id="resCropName">--</strong>
+                </div>
+                <div class="metric-card">
+                    <span>健康狀態 / 病害</span>
+                    <strong id="resStatusName" style="color: #b42318;">--</strong>
+                </div>
+            </div>
+
+            <div class="metric-card" style="margin-bottom: 14px;">
+                <span>診斷把握度 (Confidence)</span>
+                <strong id="resConfidence" style="font-size: 16px;">--</strong>
+            </div>
+
+            <div class="section-title"><i data-lucide="eye"></i> 視覺病徵分析</div>
+            <div class="content-box" id="resSuggestion">--</div>
+
+            <div class="section-title"><i data-lucide="stethoscope"></i> 專家處方與防治處置</div>
+            <div class="content-box" id="resTreatment">--</div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let selectedFile = null;
+
+        // 載入作物選單 (從 API 動態抓取)
+        async function loadCrops() {
+            try {
+                const res = await fetch('/api/v1/knowledge/crops');
+                const data = await res.json();
+                if (data.status === 'success' && Array.isArray(data.data)) {
+                    const sel = document.getElementById('cropSelect');
+                    sel.innerHTML = '';
+                    data.data.forEach(crop => {
+                        const opt = document.createElement('option');
+                        opt.value = crop;
+                        opt.textContent = crop === '未知' ? '未知 / 不確定 (交由 AI 自動識別)' : crop;
+                        if (crop === '未知') opt.selected = true;
+                        sel.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.warn('載入作物清單失敗，使用預設選單', err);
+            }
+        }
+        loadCrops();
+
+        // 監聽照片選擇
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                selectedFile = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    document.getElementById('previewImg').src = evt.target.result;
+                    document.getElementById('previewBox').style.display = 'block';
+                    document.getElementById('submitBtn').disabled = false;
+                };
+                reader.readAsDataURL(selectedFile);
+            }
+        });
+
+        // 執行診斷
+        async function startDiagnosis() {
+            if (!selectedFile) return;
+
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const cropName = document.getElementById('cropSelect').value;
+
+            submitBtn.disabled = true;
+            btnText.innerHTML = '<span class="loading-spinner"></span> 診斷分析中...';
+            document.getElementById('resultPanel').style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            if (cropName && cropName !== '未知') {
+                formData.append('crop_name', cropName);
+            }
+
+            try {
+                const res = await fetch('/api/v1/predict/', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (!res.ok) throw new Error('伺服器分析失敗 (' + res.status + ')');
+                const data = await res.json();
+                const result = data.analysis_result || {};
+
+                // 填入結果
+                document.getElementById('resCropName').textContent = result.crop_name || '未知';
+                document.getElementById('resStatusName').textContent = result.status_name || '無法判定';
+                document.getElementById('resConfidence').textContent = ((result.confidence || 0) * 100).toFixed(1) + '%';
+                document.getElementById('resSuggestion').textContent = result.suggestion || '無詳細病徵描述';
+                document.getElementById('resTreatment').textContent = result.treatment || '請密切觀察並保持良好環境';
+
+                // 標籤樣式
+                const sourceBadge = document.getElementById('sourceBadge');
+                const source = result.grounding_source || '';
+                if (source.includes('convnext')) {
+                    sourceBadge.className = 'badge convnext';
+                    sourceBadge.innerHTML = '<i data-lucide="zap"></i> 本地 ConvNeXt 快篩 (0延遲)';
+                } else if (source.includes('gemini')) {
+                    sourceBadge.className = 'badge gemini';
+                    sourceBadge.innerHTML = '<i data-lucide="sparkles"></i> Gemini 多模態看圖兜底';
+                } else {
+                    sourceBadge.className = 'badge fallback';
+                    sourceBadge.innerHTML = '<i data-lucide="shield-alert"></i> 安全防護兜底';
+                }
+                lucide.createIcons();
+
+                document.getElementById('resultPanel').style.display = 'block';
+                document.getElementById('resultPanel').scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                alert('診斷發生錯誤：' + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                btnText.textContent = '重新診斷 / 更換照片';
+            }
+        }
+    </script>
+</body>
+</html>
+

@@ -7,6 +7,8 @@ import numpy as np
 from google import genai
 from google.genai import types
 
+from app.core.config import settings
+
 # --- 設定 ---
 FAISS_INDEX_PATH = Path("knowledge_base.faiss")
 CONTENT_PATH = Path("knowledge_content.json")
@@ -16,7 +18,17 @@ EMBEDDING_DIMENSION = 768
 # --- 全域變數，儲存載入的知識庫 ---
 faiss_index = None
 knowledge_content = []
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+_client = None
+
+
+def get_gemini_client():
+    global _client
+    if _client is not None:
+        return _client
+    api_key = getattr(settings, "GEMINI_API_KEY", None) or os.getenv("GEMINI_API_KEY")
+    if api_key:
+        _client = genai.Client(api_key=api_key)
+    return _client
 
 
 def load_knowledge_base():
@@ -53,16 +65,22 @@ def load_knowledge_base():
         knowledge_content = []
 
 
-def search_knowledge_base(query: str, k: int = 3) -> str:
+def search_knowledge_base(query: str, k: int = 3, min_score: float = 0.68) -> str:
     """
-    根據查詢字串搜尋知識庫，並回傳最相關的內容。
+    根據查詢字串搜尋知識庫，並回傳最相關且有實質意義的內容。
+    若知識庫未載入、無實質條目或相似度不足，回傳空字串。
 
     :param query: 使用者的查詢或圖片的初步描述。
     :param k: 要回傳的相關片段數量。
-    :return: 組合好的上下文文字，如果知識庫未載入則為空字串。
+    :param min_score: 最低向量內積相似度門檻。
+    :return: 組合好的上下文文字，若無高相關內容則回傳空字串。
     """
     if faiss_index is None or not knowledge_content:
-        print(" RAG Search: 知識庫未載入，跳過搜尋。")
+        return ""
+
+    client = get_gemini_client()
+    if client is None:
+        print("⚠️ RAG Search: 未設定 GEMINI_API_KEY，跳過向量搜尋。")
         return ""
 
     try:
@@ -82,15 +100,31 @@ def search_knowledge_base(query: str, k: int = 3) -> str:
         result_count = min(k, faiss_index.ntotal)
         if result_count == 0:
             return ""
-        _scores, indices = faiss_index.search(query_embedding, result_count)
+        scores, indices = faiss_index.search(query_embedding, result_count)
 
-        # 3. 組合上下文
+        # 3. 組合實質上下文並過濾無效雜訊
         context = []
-        print(f" RAG Search: 找到 {len(indices[0])} 個相關片段。")
-        for i in indices[0]:
-            if 0 <= i < len(knowledge_content):
-                context.append(knowledge_content[i])
+        query_tokens = [tok.strip() for tok in query.split() if len(tok.strip()) >= 2]
 
+        for score, i in zip(scores[0], indices[0]):
+            if 0 <= i < len(knowledge_content):
+                item = knowledge_content[i].strip()
+                # 排除過短片段（< 40 字元）或純表格目錄標題等無效雜訊
+                if len(item) < 40:
+                    continue
+                if item.startswith("表 ") or "資料表-" in item or "專題設計" in item or "專題報告" in item:
+                    continue
+
+                # 必須有足夠相似度，或者命中關鍵詞
+                has_keyword = any(tok in item for tok in query_tokens)
+                if score >= min_score or (has_keyword and score >= 0.55):
+                    context.append(item)
+
+        if not context:
+            print(f"ℹ️ RAG Search: 查詢 '{query}' 檢索結果無實質農業關聯內容，視為未命中。")
+            return ""
+
+        print(f"✅ RAG Search: 找到 {len(context)} 個高相關實質片段。")
         return "\n\n".join(context)
 
     except Exception as e:
