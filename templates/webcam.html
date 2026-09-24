@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Plant Doctor | Webcam 自動警報</title>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f4f6f5;
+            --surface: #ffffff;
+            --surface-muted: #edf1ef;
+            --line: #d5ddd8;
+            --text: #17211b;
+            --muted: #647169;
+            --primary: #176b43;
+            --primary-hover: #105535;
+            --warning: #a55d05;
+            --danger: #b42318;
+            --info: #1769aa;
+            --shadow: 0 8px 24px rgba(23, 33, 27, 0.09);
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-width: 320px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+            letter-spacing: 0;
+        }
+        button, input, select { font: inherit; }
+        button { cursor: pointer; }
+        button:disabled { cursor: not-allowed; opacity: 0.5; }
+        [hidden] { display: none !important; }
+
+        .topbar {
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 0 24px;
+            background: #14251c;
+            color: white;
+            border-bottom: 3px solid #4fa36f;
+        }
+        .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .brand strong { font-size: 18px; white-space: nowrap; }
+        .brand span { color: #b8c9bf; font-size: 14px; white-space: nowrap; }
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+
+        .shell { width: min(1440px, 100%); margin: 0 auto; padding: 20px 24px 36px; }
+        .login-shell {
+            min-height: calc(100vh - 64px);
+            display: grid;
+            grid-template-columns: minmax(0, 420px);
+            place-content: center;
+        }
+        .login-panel {
+            width: 100%;
+            min-width: 0;
+            padding: 28px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        .login-panel h1 { margin: 0 0 22px; font-size: 24px; }
+        .field { display: grid; gap: 7px; margin-bottom: 15px; }
+        .field label { font-size: 13px; font-weight: 700; color: var(--muted); }
+        input, select {
+            width: 100%;
+            min-height: 42px;
+            padding: 9px 11px;
+            color: var(--text);
+            background: white;
+            border: 1px solid #b9c4bd;
+            border-radius: 6px;
+        }
+        input:focus, select:focus { outline: 3px solid rgba(23, 105, 170, 0.18); border-color: var(--info); }
+
+        .button {
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+        .button svg { width: 18px; height: 18px; }
+        .button.primary { color: white; background: var(--primary); }
+        .button.primary:hover { background: var(--primary-hover); }
+        .button.secondary { color: var(--text); background: white; border-color: var(--line); }
+        .button.secondary:hover { background: var(--surface-muted); }
+        .button.danger { color: var(--danger); background: white; border-color: #edb5b0; }
+        .button.icon-only { width: 40px; padding: 0; }
+        .button.full { width: 100%; }
+
+        .status-strip {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 18px;
+            min-height: 48px;
+            margin-bottom: 18px;
+            padding: 10px 14px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+        }
+        .status-item { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 13px; }
+        .status-dot { width: 9px; height: 9px; border-radius: 50%; background: #8d9991; }
+        .status-dot.live { background: #20a464; box-shadow: 0 0 0 4px rgba(32, 164, 100, 0.13); }
+        .status-dot.alert { background: var(--danger); box-shadow: 0 0 0 4px rgba(180, 35, 24, 0.13); }
+
+        .workspace { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(320px, 0.9fr); gap: 18px; }
+        .camera-panel, .diagnosis-panel, .history-band {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+        .camera-panel { overflow: hidden; }
+        .camera-stage { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #101713; }
+        video { width: 100%; height: 100%; display: block; object-fit: contain; }
+        canvas { display: none; }
+        .camera-empty {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            color: #aab8af;
+            text-align: center;
+        }
+        .camera-empty svg { width: 44px; height: 44px; margin-bottom: 8px; }
+        .camera-toolbar {
+            display: grid;
+            grid-template-columns: minmax(180px, 1fr) 120px auto;
+            align-items: end;
+            gap: 12px;
+            padding: 14px;
+            border-top: 1px solid var(--line);
+        }
+        .camera-toolbar .field { margin: 0; }
+        .button-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .diagnosis-panel { padding: 18px; }
+        .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+        .panel-heading h2 { margin: 0; font-size: 18px; }
+        .badge { display: inline-flex; align-items: center; min-height: 26px; padding: 4px 9px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+        .badge.neutral { color: #536158; background: #e8eeea; }
+        .badge.good { color: #0f6540; background: #dff4e8; }
+        .badge.warning { color: #854b04; background: #fff0d5; }
+        .badge.danger { color: #991b12; background: #fee4e2; }
+        .diagnosis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+        .metric { min-width: 0; padding: 14px; background: white; }
+        .metric label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 12px; font-weight: 700; }
+        .metric strong { display: block; overflow-wrap: anywhere; font-size: 18px; }
+        .progress { height: 7px; margin-top: 9px; overflow: hidden; background: #dfe6e2; border-radius: 4px; }
+        .progress span { display: block; width: 0; height: 100%; background: var(--primary); transition: width 0.2s ease; }
+        .advice { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+        .advice h3 { margin: 0 0 7px; font-size: 13px; color: var(--muted); }
+        .advice p { margin: 0; white-space: pre-line; line-height: 1.55; font-size: 14px; }
+        .error-text { min-height: 20px; margin: 12px 0 0; color: var(--danger); font-size: 13px; }
+
+        .history-band { margin-top: 18px; overflow: hidden; }
+        .history-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+        .history-header h2 { margin: 0; font-size: 18px; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; min-width: 820px; border-collapse: collapse; }
+        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e4e9e6; font-size: 13px; vertical-align: middle; }
+        th { color: var(--muted); background: #f8faf9; font-size: 12px; }
+        tbody tr:last-child td { border-bottom: 0; }
+        tbody tr.unread { background: #fff9ed; }
+        .alert-image { width: 72px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 5px; background: #e8eeea; }
+        .row-actions { display: flex; gap: 6px; }
+        .empty-row { padding: 32px; color: var(--muted); text-align: center; }
+
+        @media (max-width: 900px) {
+            .workspace { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            .topbar { height: auto; min-height: 64px; padding: 12px 16px; }
+            .brand span { display: none; }
+            .shell { padding: 14px 12px 28px; }
+            .camera-toolbar { grid-template-columns: 1fr 110px; }
+            .button-group { grid-column: 1 / -1; }
+            .button-group .button { flex: 1; }
+            .diagnosis-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <i data-lucide="sprout"></i>
+            <strong>Plant Doctor</strong>
+            <span>Webcam 自動警報</span>
+        </div>
+        <div class="header-actions">
+            <span id="accountName"></span>
+            <button id="logoutButton" class="button secondary" type="button" hidden>
+                <i data-lucide="log-out"></i><span>登出</span>
+            </button>
+        </div>
+    </header>
+
+    <main id="loginView" class="shell login-shell">
+        <form id="loginForm" class="login-panel">
+            <h1>監控登入</h1>
+            <div class="field">
+                <label for="username">帳號</label>
+                <input id="username" name="username" autocomplete="username" required>
+            </div>
+            <div class="field">
+                <label for="password">密碼</label>
+                <input id="password" name="password" type="password" autocomplete="current-password" required>
+            </div>
+            <button class="button primary full" type="submit">
+                <i data-lucide="log-in"></i><span>登入</span>
+            </button>
+            <p id="loginError" class="error-text" role="alert"></p>
+        </form>
+    </main>
+
+    <main id="monitorView" class="shell" hidden>
+        <section class="status-strip" aria-live="polite">
+            <span class="status-item"><span id="statusDot" class="status-dot"></span><strong id="monitorStatus">未啟動</strong></span>
+            <span class="status-item"><i data-lucide="timer"></i><span id="intervalSummary">--</span></span>
+            <span class="status-item"><i data-lucide="shield-check"></i><span id="thresholdSummary">--</span></span>
+            <span class="status-item"><i data-lucide="clock-3"></i><span id="lastScan">尚未掃描</span></span>
+        </section>
+
+        <section class="workspace">
+            <div class="camera-panel">
+                <div class="camera-stage">
+                    <video id="cameraVideo" autoplay playsinline muted></video>
+                    <canvas id="captureCanvas"></canvas>
+                    <div id="cameraEmpty" class="camera-empty">
+                        <div><i data-lucide="camera-off"></i><br>攝影機未開啟</div>
+                    </div>
+                </div>
+                <div class="camera-toolbar">
+                    <div class="field">
+                        <label for="cameraSelect">攝影機</label>
+                        <select id="cameraSelect"><option value="">預設攝影機</option></select>
+                    </div>
+                    <div class="field">
+                        <label for="intervalInput">間隔（秒）</label>
+                        <input id="intervalInput" type="number" min="10" max="600" step="5" value="30">
+                    </div>
+                    <div class="button-group">
+                        <button id="cameraButton" class="button secondary" type="button">
+                            <i data-lucide="camera"></i><span>開啟</span>
+                        </button>
+                        <button id="monitorButton" class="button primary" type="button" disabled>
+                            <i data-lucide="play"></i><span>監控</span>
+                        </button>
+                        <button id="stopButton" class="button danger" type="button" disabled>
+                            <i data-lucide="square"></i><span>停止</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="diagnosis-panel">
+                <div class="panel-heading">
+                    <h2>即時診斷</h2>
+                    <span id="diagnosisBadge" class="badge neutral">等待影格</span>
+                </div>
+                <div class="diagnosis-grid">
+                    <div class="metric"><label>作物</label><strong id="cropName">--</strong></div>
+                    <div class="metric"><label>狀態</label><strong id="statusName">--</strong></div>
+                    <div class="metric">
+                        <label>信心值</label><strong id="confidence">--</strong>
+                        <div class="progress"><span id="confidenceBar"></span></div>
+                    </div>
+                    <div class="metric">
+                        <label>連續命中</label><strong id="streak">0 / --</strong>
+                        <div class="progress"><span id="streakBar"></span></div>
+                    </div>
+                </div>
+                <div class="advice"><h3>症狀依據</h3><p id="suggestion">--</p></div>
+                <div class="advice"><h3>資料庫處置</h3><p id="treatment">--</p></div>
+                <p id="monitorError" class="error-text" role="alert"></p>
+            </aside>
+        </section>
+
+        <section class="history-band">
+            <div class="history-header">
+                <h2>警報紀錄</h2>
+                <button id="refreshAlerts" class="button secondary icon-only" type="button" title="重新整理" aria-label="重新整理">
+                    <i data-lucide="refresh-cw"></i>
+                </button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>影像</th><th>時間</th><th>作物</th><th>病蟲害</th><th>信心值</th><th>Email</th><th>狀態</th><th>操作</th></tr>
+                    </thead>
+                    <tbody id="alertRows"><tr><td class="empty-row" colspan="8">尚無警報</td></tr></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const apiBase = "/api/v1";
+        const state = {
+            token: localStorage.getItem("plantDoctorToken"),
+            username: localStorage.getItem("plantDoctorUsername") || "",
+            stream: null,
+            timer: null,
+            analyzing: false,
+            settings: null
+        };
+
+        const byId = (id) => document.getElementById(id);
+        const loginView = byId("loginView");
+        const monitorView = byId("monitorView");
+        const video = byId("cameraVideo");
+        const canvas = byId("captureCanvas");
+
+        function refreshIcons() {
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        async function api(path, options = {}) {
+            const headers = new Headers(options.headers || {});
+            if (state.token) headers.set("Authorization", `Bearer ${state.token}`);
+            const response = await fetch(`${apiBase}${path}`, { ...options, headers });
+            let payload = {};
+            try { payload = await response.json(); } catch (_) {}
+            if (response.status === 401) {
+                logout();
+                throw new Error("登入已失效，請重新登入。");
+            }
+            if (!response.ok) throw new Error(payload.detail || "伺服器處理失敗。");
+            return payload;
+        }
+
+        function showAuthenticated(authenticated) {
+            loginView.hidden = authenticated;
+            monitorView.hidden = !authenticated;
+            byId("logoutButton").hidden = !authenticated;
+            byId("accountName").textContent = authenticated ? state.username : "";
+            refreshIcons();
+        }
+
+        async function initializeMonitor() {
+            showAuthenticated(true);
+            state.settings = await api("/webcam/settings");
+            byId("intervalInput").value = state.settings.sample_interval_seconds;
+            byId("intervalSummary").textContent = `每 ${state.settings.sample_interval_seconds} 秒`;
+            byId("thresholdSummary").textContent = `≥ ${Math.round(state.settings.alert_confidence * 100)}%，連續 ${state.settings.required_matches} 次`;
+            await loadAlerts();
+        }
+
+        byId("loginForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            byId("loginError").textContent = "";
+            const form = new URLSearchParams();
+            form.set("username", byId("username").value.trim());
+            form.set("password", byId("password").value);
+            try {
+                const response = await fetch(`${apiBase}/auth/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: form
+                });
+                const payload = await response.json();
+                if (!response.ok) throw new Error(payload.detail || "登入失敗。");
+                state.token = payload.access_token;
+                state.username = byId("username").value.trim();
+                localStorage.setItem("plantDoctorToken", state.token);
+                localStorage.setItem("plantDoctorUsername", state.username);
+                await initializeMonitor();
+            } catch (error) {
+                byId("loginError").textContent = error.message;
+            }
+        });
+
+        function logout() {
+            stopMonitoring();
+            stopCamera();
+            state.token = null;
+            state.username = "";
+            localStorage.removeItem("plantDoctorToken");
+            localStorage.removeItem("plantDoctorUsername");
+            showAuthenticated(false);
+        }
+
+        async function openCamera(deviceId = "") {
+            stopCamera();
+            const videoConstraints = deviceId
+                ? { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+                : { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } };
+            try {
+                state.stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: false });
+                video.srcObject = state.stream;
+                await video.play();
+                byId("cameraEmpty").hidden = true;
+                byId("monitorButton").disabled = false;
+                byId("stopButton").disabled = false;
+                await loadCameras();
+                setMonitorStatus("攝影機已開啟", "live");
+            } catch (error) {
+                byId("monitorError").textContent = `無法開啟攝影機：${error.message}`;
+            }
+        }
+
+        async function loadCameras() {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const cameras = devices.filter((device) => device.kind === "videoinput");
+            const selected = byId("cameraSelect").value;
+            byId("cameraSelect").replaceChildren(...cameras.map((camera, index) => {
+                const option = document.createElement("option");
+                option.value = camera.deviceId;
+                option.textContent = camera.label || `攝影機 ${index + 1}`;
+                option.selected = camera.deviceId === selected;
+                return option;
+            }));
+        }
+
+        function stopCamera() {
+            if (state.stream) state.stream.getTracks().forEach((track) => track.stop());
+            state.stream = null;
+            video.srcObject = null;
+            byId("cameraEmpty").hidden = false;
+            byId("monitorButton").disabled = true;
+        }
+
+        function setMonitorStatus(text, mode = "") {
+            byId("monitorStatus").textContent = text;
+            byId("statusDot").className = `status-dot ${mode}`.trim();
+        }
+
+        async function captureFrame() {
+            if (!state.stream || state.analyzing || video.videoWidth === 0) return;
+            state.analyzing = true;
+            byId("monitorError").textContent = "";
+            setMonitorStatus("分析中", "live");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext("2d", { alpha: false }).drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            try {
+                const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.86));
+                if (!blob) throw new Error("無法擷取攝影機影格。");
+                const form = new FormData();
+                form.append("file", blob, "webcam-frame.jpg");
+                const payload = await api("/webcam/analyze", { method: "POST", body: form });
+                renderDiagnosis(payload);
+                byId("lastScan").textContent = new Date().toLocaleTimeString("zh-TW", { hour12: false });
+                if (payload.alert) {
+                    fireAlarm(payload.alert);
+                    await loadAlerts();
+                }
+                setMonitorStatus(state.timer ? "監控中" : "攝影機已開啟", payload.alert ? "alert" : "live");
+            } catch (error) {
+                byId("monitorError").textContent = error.message;
+                setMonitorStatus(state.timer ? "等待下次掃描" : "攝影機已開啟", "live");
+            } finally {
+                state.analyzing = false;
+            }
+        }
+
+        function renderDiagnosis(payload) {
+            const diagnosis = payload.diagnosis;
+            const monitoring = payload.monitoring;
+            const confidence = Math.round((diagnosis.confidence || 0) * 100);
+            byId("cropName").textContent = diagnosis.crop_name || "--";
+            byId("statusName").textContent = diagnosis.status_name || "--";
+            byId("confidence").textContent = `${confidence}%`;
+            byId("confidenceBar").style.width = `${confidence}%`;
+            byId("streak").textContent = `${monitoring.streak} / ${monitoring.required_matches}`;
+            byId("streakBar").style.width = `${Math.min(100, monitoring.streak / monitoring.required_matches * 100)}%`;
+            byId("suggestion").textContent = diagnosis.suggestion || "--";
+            byId("treatment").textContent = diagnosis.treatment || "--";
+
+            const badge = byId("diagnosisBadge");
+            badge.textContent = diagnosis.category === "healthy" ? "健康" : diagnosis.category === "unknown" ? "待確認" : "異常";
+            badge.className = `badge ${diagnosis.category === "healthy" ? "good" : diagnosis.category === "unknown" ? "warning" : "danger"}`;
+        }
+
+        async function startMonitoring() {
+            const interval = Math.max(10, Math.min(600, Number(byId("intervalInput").value) || 30));
+            byId("intervalInput").value = interval;
+            byId("intervalSummary").textContent = `每 ${interval} 秒`;
+            if ("Notification" in window && Notification.permission === "default") await Notification.requestPermission();
+            await captureFrame();
+            state.timer = window.setInterval(captureFrame, interval * 1000);
+            byId("monitorButton").disabled = true;
+            byId("cameraButton").disabled = true;
+            setMonitorStatus("監控中", "live");
+        }
+
+        function stopMonitoring() {
+            if (state.timer) window.clearInterval(state.timer);
+            state.timer = null;
+            byId("cameraButton").disabled = false;
+            byId("monitorButton").disabled = !state.stream;
+            byId("stopButton").disabled = !state.stream;
+            if (state.stream) setMonitorStatus("攝影機已開啟", "live");
+        }
+
+        function fireAlarm(alert) {
+            const audio = new (window.AudioContext || window.webkitAudioContext)();
+            [0, 0.25, 0.5].forEach((delay) => {
+                const oscillator = audio.createOscillator();
+                const gain = audio.createGain();
+                oscillator.frequency.value = 880;
+                gain.gain.setValueAtTime(0.12, audio.currentTime + delay);
+                gain.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + delay + 0.18);
+                oscillator.connect(gain).connect(audio.destination);
+                oscillator.start(audio.currentTime + delay);
+                oscillator.stop(audio.currentTime + delay + 0.2);
+            });
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(`Plant Doctor：${alert.status_name}`, {
+                    body: `${alert.crop_name || "作物"}，信心值 ${Math.round(alert.confidence * 100)}%`,
+                    icon: alert.image_url
+                });
+            }
+        }
+
+        const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (char) => ({
+            "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", "\"": "&quot;"
+        })[char]);
+
+        async function loadAlerts() {
+            const payload = await api("/webcam/alerts");
+            const rows = byId("alertRows");
+            if (!payload.data.length) {
+                rows.innerHTML = '<tr><td class="empty-row" colspan="8">尚無警報</td></tr>';
+                return;
+            }
+            rows.innerHTML = payload.data.map((alert) => {
+                const acknowledged = Boolean(alert.acknowledged_at);
+                return `<tr class="${acknowledged ? "" : "unread"}">
+                    <td><img class="alert-image" src="${escapeHtml(alert.image_url)}" alt="警報影像"></td>
+                    <td>${escapeHtml(new Date(alert.created_at).toLocaleString("zh-TW", { hour12: false }))}</td>
+                    <td>${escapeHtml(alert.crop_name || "--")}</td>
+                    <td><strong>${escapeHtml(alert.status_name)}</strong></td>
+                    <td>${Math.round(alert.confidence * 100)}%</td>
+                    <td>${alert.email_sent ? "已寄送" : "未寄送"}</td>
+                    <td><span class="badge ${acknowledged ? "neutral" : "warning"}">${acknowledged ? "已確認" : "未確認"}</span></td>
+                    <td><div class="row-actions">
+                        <button class="button secondary icon-only acknowledge" data-id="${alert.id}" title="確認警報" aria-label="確認警報" ${acknowledged ? "disabled" : ""}><i data-lucide="check"></i></button>
+                        <button class="button danger icon-only delete" data-id="${alert.id}" title="刪除警報" aria-label="刪除警報"><i data-lucide="trash-2"></i></button>
+                    </div></td>
+                </tr>`;
+            }).join("");
+            refreshIcons();
+        }
+
+        byId("alertRows").addEventListener("click", async (event) => {
+            const button = event.target.closest("button[data-id]");
+            if (!button) return;
+            const id = button.dataset.id;
+            try {
+                if (button.classList.contains("acknowledge")) {
+                    await api(`/webcam/alerts/${id}/acknowledge`, { method: "PATCH" });
+                } else if (button.classList.contains("delete") && window.confirm("確定刪除此警報？")) {
+                    await api(`/webcam/alerts/${id}`, { method: "DELETE" });
+                }
+                await loadAlerts();
+            } catch (error) {
+                byId("monitorError").textContent = error.message;
+            }
+        });
+
+        byId("cameraButton").addEventListener("click", () => openCamera(byId("cameraSelect").value));
+        byId("cameraSelect").addEventListener("change", (event) => openCamera(event.target.value));
+        byId("monitorButton").addEventListener("click", startMonitoring);
+        byId("stopButton").addEventListener("click", stopMonitoring);
+        byId("refreshAlerts").addEventListener("click", () => loadAlerts().catch((error) => byId("monitorError").textContent = error.message));
+        byId("logoutButton").addEventListener("click", logout);
+        window.addEventListener("beforeunload", stopCamera);
+
+        refreshIcons();
+        if (state.token) {
+            initializeMonitor().catch(() => logout());
+        } else {
+            showAuthenticated(false);
+        }
+    </script>
+</body>
+</html>

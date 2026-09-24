@@ -2,19 +2,19 @@ package com.example.plantdoctor
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList // 🌟 新增
-import android.graphics.Color // 🌟 新增
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.MotionEvent
 import android.util.Log
+import android.view.MotionEvent
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout // 🌟 新增
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -28,37 +28,77 @@ import java.io.FileOutputStream
 class DiagnoseProgressActivity : AppCompatActivity() {
 
     private lateinit var imageUriString: String
+    private lateinit var progressRoot: ConstraintLayout
 
-    // 🌟 1. 建立風聲延遲計時器與任務（放在 onCreate 外面）
+    // 🌟 核心修復 1：宣告前後景兩層落葉 View 變數
+    private lateinit var leavesBack: FallingLeavesView
+    private lateinit var leavesFront: FallingLeavesView
+
+    private lateinit var progressBar: ProgressBar
+    private lateinit var tvPercent: TextView
+    private lateinit var tvStatus: TextView
+
+    // 風聲計時器
     private val windHandler = Handler(Looper.getMainLooper())
     private val windRunnable = Runnable {
-        SoundManager.startWind() // 當按住滿 0.5 秒，正式吹起風聲
+        SoundManager.startWind()
+    }
+
+    // 假進度條模擬器
+    private val progressHandler = Handler(Looper.getMainLooper())
+    private var currentProgress = 0
+    private var isApiFinished = false
+
+    private val progressRunnable = object : Runnable {
+        override fun run() {
+            if (!isApiFinished && currentProgress < 90) {
+                currentProgress += (1..3).random()
+                if (currentProgress > 90) currentProgress = 90
+
+                progressBar.progress = currentProgress
+                tvPercent.text = "$currentProgress%"
+
+                val nextDelay = (320..580).random().toLong()
+                progressHandler.postDelayed(this, nextDelay)
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_diagnose_progress)
 
-        // 🌟 核心新增：綁定最外層佈局與內部元件
-        val progressRoot = findViewById<ConstraintLayout>(R.id.progress_root_layout)
-        val progressBar = findViewById<ProgressBar>(R.id.progressBar_horizontal)
-        val tvPercent = findViewById<TextView>(R.id.tv_percent)
+        // 綁定 UI 元件
+        progressRoot = findViewById(R.id.progress_root_layout)
+        progressBar = findViewById(R.id.progressBar_horizontal)
+        tvPercent = findViewById(R.id.tv_percent)
+        tvStatus = findViewById(R.id.tv_progress_status)
 
-        // 🌟 核心新增：召喚大總管換好背景與百分比文字顏色
+        // 🌟 核心修復 2：綁定 XML 裡的前後景 ID，並指定層級模式
+        leavesBack = findViewById(R.id.falling_leaves_back)
+        leavesFront = findViewById(R.id.falling_leaves_front)
+
+        leavesBack.drawLayerMode = FallingLeavesView.LayerMode.BACKGROUND_ONLY
+        leavesFront.drawLayerMode = FallingLeavesView.LayerMode.FOREGROUND_ONLY
+
+        // 初始化音效管理器
+        SoundManager.init(this)
+
+        // 召喚大總管換好背景與文字色彩
         ThemeManager.applyTheme(
             context = this,
             rootLayout = progressRoot,
-            titles = listOf(tvPercent) // 百分比數字會同步變成主題深色系
+            titles = listOf(tvPercent, tvStatus)
         )
 
-        // 🌟 核心增強：根據目前使用者的主題，動態幫「橫向進度條」染上專屬主題顏色！
+        // 動態染進度條主題色
         val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
         val themeId = sharedPref.getInt("THEME_COLOR_ID", 0)
         val progressColorStr = when (themeId) {
-            1 -> "#1565C0" // 海洋藍進度條
-            2 -> "#D84315" // 暖陽橙進度條
-            3 -> "#AD1457" // 蜜桃粉進度條
-            else -> "#2E7D32" // 經典陽光綠進度條
+            1 -> "#1565C0"
+            2 -> "#D84315"
+            3 -> "#AD1457"
+            else -> "#2E7D32"
         }
         progressBar.progressTintList = ColorStateList.valueOf(Color.parseColor(progressColorStr))
 
@@ -70,11 +110,26 @@ class DiagnoseProgressActivity : AppCompatActivity() {
             return
         }
 
+        // 啟動進度條模擬
+        progressHandler.post(progressRunnable)
+
         val imageUri = Uri.parse(imageUriString)
-        uploadAndDiagnose(imageUri, progressBar, tvPercent)
+        uploadAndDiagnose(imageUri)
     }
 
-    private fun uploadAndDiagnose(uri: Uri, progressBar: ProgressBar, tvPercent: TextView) {
+    override fun onResume() {
+        super.onResume()
+        if (::progressRoot.isInitialized) {
+            ThemeManager.applyTheme(
+                context = this,
+                rootLayout = progressRoot,
+                titles = listOf(tvPercent, tvStatus)
+            )
+        }
+        SoundManager.startBGM()
+    }
+
+    private fun uploadAndDiagnose(uri: Uri) {
         val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
         val token = sharedPref.getString("token", null)
 
@@ -92,6 +147,9 @@ class DiagnoseProgressActivity : AppCompatActivity() {
 
         apiService.predictImage(imagePart).enqueue(object : Callback<PredictionResponse> {
             override fun onResponse(call: Call<PredictionResponse>, response: Response<PredictionResponse>) {
+                isApiFinished = true
+                progressHandler.removeCallbacks(progressRunnable)
+
                 if (response.isSuccessful) {
                     progressBar.progress = 100
                     tvPercent.text = "100%"
@@ -104,9 +162,6 @@ class DiagnoseProgressActivity : AppCompatActivity() {
                         val analysisResult = predictionResult.analysis_result
                         val resultJson = Gson().toJson(analysisResult)
 
-                        Log.d("DEBUG_JSON", "Passing to ResultActivity: $resultJson")
-                        Log.d("DEBUG_ID", "Passing Prediction ID: $predictionId")
-
                         val intent = Intent(this@DiagnoseProgressActivity, ResultActivity::class.java)
                         intent.putExtra("IMAGE_URI", imageUriString)
                         intent.putExtra("PREDICTION_ID", predictionId)
@@ -114,19 +169,18 @@ class DiagnoseProgressActivity : AppCompatActivity() {
                         startActivity(intent)
                         finish()
                     } else {
-                        Log.e("UploadError", "Response successful but body is null. Code: ${response.code()}")
                         Toast.makeText(this@DiagnoseProgressActivity, "分析失敗：伺服器回傳資料為空", Toast.LENGTH_LONG).show()
                         finish()
                     }
                 } else {
-                    Log.e("UploadError", "Code: ${response.code()}, Message: ${response.message()}")
                     Toast.makeText(this@DiagnoseProgressActivity, "分析失敗: ${response.code()}", Toast.LENGTH_LONG).show()
                     finish()
                 }
             }
 
             override fun onFailure(call: Call<PredictionResponse>, t: Throwable) {
-                Log.e("UploadError", t.message ?: "Unknown error")
+                isApiFinished = true
+                progressHandler.removeCallbacks(progressRunnable)
                 Toast.makeText(this@DiagnoseProgressActivity, "網路連線超時，請檢查伺服器", Toast.LENGTH_SHORT).show()
                 finish()
             }
@@ -143,10 +197,15 @@ class DiagnoseProgressActivity : AppCompatActivity() {
         return file
     }
 
-    // 🌟 全螢幕長按雷達，判定長按 0.5 秒才吹風
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event != null) {
-            when (event.action) {
+    /**
+     * 🌟 核心修復 3：分發觸控手勢給前後兩層落葉 View
+     */
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev != null) {
+            if (::leavesBack.isInitialized) leavesBack.onTouchEventHandled(ev)
+            if (::leavesFront.isInitialized) leavesFront.onTouchEventHandled(ev)
+
+            when (ev.action) {
                 MotionEvent.ACTION_DOWN -> {
                     windHandler.postDelayed(windRunnable, 500)
                 }
@@ -156,17 +215,19 @@ class DiagnoseProgressActivity : AppCompatActivity() {
                 }
             }
         }
-        return super.onTouchEvent(event)
+        return super.dispatchTouchEvent(ev)
     }
 
     override fun onStop() {
         super.onStop()
         SoundManager.stopWind()
         windHandler.removeCallbacks(windRunnable)
+        progressHandler.removeCallbacks(progressRunnable)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         windHandler.removeCallbacksAndMessages(null)
+        progressHandler.removeCallbacksAndMessages(null)
     }
 }

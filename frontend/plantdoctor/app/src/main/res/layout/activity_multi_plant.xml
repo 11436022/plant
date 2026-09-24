@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 1. 頂部標題 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🌱 多植物監控與拍攝"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <!-- 2. 相機畫面與選取框繪製層 (FrameLayout 讓兩者疊在一起) -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_marginTop="12dp"
+        android:background="#1E1E1E">
+
+        <!-- 未來對接 CameraX 實體視角預覽用的 ViewFinder (預留) -->
+        <androidx.camera.view.PreviewView
+            android:id="@+id/viewFinder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- 🌟 橘色選取框繪製層 (疊在相機畫面上方) -->
+        <com.example.plantdoctor.InteractiveBoxView
+            android:id="@+id/boxOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
+
+    <!-- 3. 自訂組別名稱輸入框 -->
+    <EditText
+        android:id="@+id/etSessionName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="輸入自訂組別名稱 (例如: 陽台花草組)"
+        android:inputType="text"
+        android:text="陽台花草組" />
+
+    <!-- 4. 按鈕控制區 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnAddPlant"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="➕ 新增植物與選取框" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="#CCCCCC" />
+
+    <!-- 5. 植物卡片清單列表 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewPlants"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

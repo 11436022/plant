@@ -4,34 +4,44 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="20dp">
 
+    <!-- 1. 插圖區：彈性高寬，依 9:16 比例與畫面空間動態調整 -->
     <ImageView
         android:id="@+id/img_intro"
         android:layout_width="0dp"
-        android:layout_height="440dp"
+        android:layout_height="0dp"
+        android:contentDescription="介紹頁插圖"
         android:elevation="4dp"
         android:scaleType="fitCenter"
-        app:layout_constraintDimensionRatio="9:16"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/txt_intro_title"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintDimensionRatio="9:16"
+        app:layout_constraintHeight_percent="0.8"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintVertical_bias="0.25" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <!-- 2. 介紹標題文字：彈性寬度，支援文字動態自動縮放 -->
     <TextView
         android:id="@+id/txt_intro_title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:maxLines="2"
         android:text="介紹文字預設"
         android:textColor="#2E7D32"
-        android:textSize="25sp"
+        android:textSize="28sp"
         android:textStyle="bold"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@+id/img_intro"
+        app:autoSizeMaxTextSize="32sp"
+        app:autoSizeMinTextSize="14sp"
+        app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/img_intro" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

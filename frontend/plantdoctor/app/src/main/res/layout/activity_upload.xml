@@ -1,113 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/upload_scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     android:background="@drawable/gradient_background"
-    android:id="@+id/upload_root_layout"
     tools:context=".UploadActivity">
 
-    <ImageView
-        android:id="@+id/img_preview"
-        android:layout_width="0dp"
-        android:layout_height="350dp"
-        android:layout_marginHorizontal="40dp"
-        android:layout_marginTop="32dp"
-        android:background="@drawable/bg_upload_box"
-        android:scaleType="centerInside"
-        android:src="@android:drawable/ic_menu_camera"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_upload_title" />
-
-    <TextView
-        android:id="@+id/tv_upload_title"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/upload_root_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="132dp"
-        android:text="上傳植物照片"
-        android:textColor="#1B5E20"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:paddingBottom="32dp">
 
-    <Button
-        android:id="@+id/btn_camera"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="590dp"
-        android:layout_weight="1"
-        android:backgroundTint="#2E7D32"
-        android:text="開啟相機"
-        android:textColor="#FFFFFF"
-        android:textSize="25sp"
-        app:cornerRadius="45dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <!-- 🌟 百分比 Guideline：與登錄頁面完全一致，從螢幕高度 15% 處精準對齊 -->
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.1" />
 
-    <Button
-        android:id="@+id/btn_album"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="590dp"
-        android:layout_marginEnd="40dp"
-        android:layout_weight="1"
-        android:backgroundTint="#2E7D32"
-        android:text="相簿選擇"
-        android:textSize="25sp"
-        android:textColor="#FFFFFF"
-        app:cornerRadius="45dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <!-- 1. 返回按鈕：對齊標題，垂直置中 -->
+        <ImageButton
+            android:id="@+id/btn_back_home"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="20dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="返回主頁"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_back"
+            app:layout_constraintBottom_toBottomOf="@id/tv_upload_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_upload_title"
+            app:tint="#2E7D32" />
 
-    <Button
-        android:id="@+id/btn_analyze"
-        android:layout_width="0dp"
-        android:layout_height="70dp"
-        android:layout_marginBottom="124dp"
-        android:backgroundTint="#FFB74D"
-        android:text="開始分析"
-        android:textSize="35sp"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
-        app:cornerRadius="60dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/img_preview"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@id/img_preview" />
+        <!-- 2. 頁面大標題（自適應文字大小，與登錄頁面規則相同） -->
+        <TextView
+            android:id="@+id/tv_upload_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="40dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="上傳植物照片"
+            android:textColor="@color/app_main_text"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            app:autoSizeMaxTextSize="40sp"
+            app:autoSizeMinTextSize="18sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/guideline_top" />
 
-    <ImageButton
-        android:id="@+id/btn_back_home"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="72dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="返回主頁"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_back"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="#2E7D32" />
+        <!-- 3. 照片預覽區域：緊貼標題下方，高度適度、小螢幕安全自適應 -->
+        <ImageView
+            android:id="@+id/img_preview"
+            android:layout_width="0dp"
+            android:layout_height="320dp"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/bg_upload_box"
+            android:scaleType="centerInside"
+            android:src="@android:drawable/ic_menu_camera"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_upload_title" />
 
-    <LinearLayout
-        android:id="@+id/layout_btns"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="@id/img_preview"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@id/img_preview"
-        app:layout_constraintTop_toBottomOf="@id/img_preview">
+        <!-- 4. 開啟相機與相簿選擇按鈕列：平分兩側、緊貼照片框 -->
+        <LinearLayout
+            android:id="@+id/layout_btns"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="22dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/img_preview">
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/btn_camera"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#2E7D32"
+                android:gravity="center"
+                android:maxLines="1"
+                android:text="開啟相機"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                app:autoSizeMaxTextSize="22sp"
+                app:autoSizeMinTextSize="12sp"
+                app:autoSizeTextType="uniform"
+                app:cornerRadius="28dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <Button
+                android:id="@+id/btn_album"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#2E7D32"
+                android:gravity="center"
+                android:maxLines="1"
+                android:text="相簿選擇"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                app:autoSizeMaxTextSize="22sp"
+                app:autoSizeMinTextSize="12sp"
+                app:autoSizeTextType="uniform"
+                app:cornerRadius="28dp" />
+        </LinearLayout>
+
+        <!-- 5. 開始分析主按鈕：緊貼操作按鈕下方 -->
+        <Button
+            android:id="@+id/btn_analyze"
+            android:layout_width="0dp"
+            android:layout_height="62dp"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="22dp"
+            android:backgroundTint="#2E7D32"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="開始分析"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:autoSizeMaxTextSize="28sp"
+            app:autoSizeMinTextSize="14sp"
+            app:autoSizeTextType="uniform"
+            app:cornerRadius="31dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_btns" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

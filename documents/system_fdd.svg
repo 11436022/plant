@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <style>
+      .title { font: 700 44px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
+      .subtitle { font: 400 20px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665f; }
+      .root { font: 700 29px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #ffffff; }
+      .module { font: 700 22px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
+      .code { font: 700 15px "Segoe UI", Arial, sans-serif; fill: #8b5b16; }
+      .item { font: 400 17px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #34443b; }
+      .note { font: 400 17px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #4e5d54; }
+      .root-box { fill: #3f6f55; stroke: #315942; stroke-width: 2; }
+      .module-box { fill: #dcefdc; stroke: #73966f; stroke-width: 2; }
+      .item-box { fill: #ffffff; stroke: #b3c9af; stroke-width: 1.5; }
+      .line { stroke: #6c876e; stroke-width: 2.5; fill: none; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="#f7faf7"/>
+  <text x="64" y="60" class="title">FDD 功能分解圖</text>
+  <text x="64" y="92" class="subtitle">以業務功能分解，避免將 Android、FastAPI 等技術元件與功能重複列在同一層級</text>
+
+  <rect x="490" y="118" width="620" height="76" rx="8" class="root-box"/>
+  <text x="800" y="165" text-anchor="middle" class="root">植葉神醫 Plant Doctor</text>
+
+  <path d="M800 194 V230 M166 230 H1434" class="line"/>
+
+  <g>
+    <path d="M166 230 V260 M420 230 V260 M673 230 V260 M927 230 V260 M1180 230 V260 M1434 230 V260" class="line"/>
+
+    <rect x="46" y="260" width="240" height="68" rx="8" class="module-box"/>
+    <text x="166" y="288" text-anchor="middle" class="code">F1</text>
+    <text x="166" y="315" text-anchor="middle" class="module">帳號與身分驗證</text>
+
+    <rect x="300" y="260" width="240" height="68" rx="8" class="module-box"/>
+    <text x="420" y="288" text-anchor="middle" class="code">F2</text>
+    <text x="420" y="315" text-anchor="middle" class="module">植物影像診斷</text>
+
+    <rect x="553" y="260" width="240" height="68" rx="8" class="module-box"/>
+    <text x="673" y="288" text-anchor="middle" class="code">F3</text>
+    <text x="673" y="315" text-anchor="middle" class="module">診斷紀錄管理</text>
+
+    <rect x="807" y="260" width="240" height="68" rx="8" class="module-box"/>
+    <text x="927" y="288" text-anchor="middle" class="code">F4</text>
+    <text x="927" y="315" text-anchor="middle" class="module">Webcam 監控警報</text>
+
+    <rect x="1060" y="260" width="240" height="68" rx="8" class="module-box"/>
+    <text x="1180" y="288" text-anchor="middle" class="code">F5</text>
+    <text x="1180" y="315" text-anchor="middle" class="module">知識資料管理</text>
+
+    <rect x="1314" y="260" width="240" height="68" rx="8" class="module-box"/>
+    <text x="1434" y="288" text-anchor="middle" class="code">F6</text>
+    <text x="1434" y="315" text-anchor="middle" class="module">管理後台</text>
+  </g>
+
+  <path d="M166 328 V352 M420 328 V352 M673 328 V352 M927 328 V352 M1180 328 V352 M1434 328 V352" class="line"/>
+
+  <g>
+    <rect x="54" y="352" width="224" height="48" rx="6" class="item-box"/>
+    <text x="166" y="382" text-anchor="middle" class="item">註冊、登入與登出</text>
+    <rect x="54" y="412" width="224" height="48" rx="6" class="item-box"/>
+    <text x="166" y="442" text-anchor="middle" class="item">信箱驗證與補寄</text>
+    <rect x="54" y="472" width="224" height="48" rx="6" class="item-box"/>
+    <text x="166" y="502" text-anchor="middle" class="item">忘記與重設密碼</text>
+    <rect x="54" y="532" width="224" height="48" rx="6" class="item-box"/>
+    <text x="166" y="562" text-anchor="middle" class="item">JWT 身分驗證</text>
+  </g>
+
+  <g>
+    <rect x="308" y="352" width="224" height="48" rx="6" class="item-box"/>
+    <text x="420" y="382" text-anchor="middle" class="item">拍照或選取圖片</text>
+    <rect x="308" y="412" width="224" height="48" rx="6" class="item-box"/>
+    <text x="420" y="442" text-anchor="middle" class="item">Gemini 影像分析</text>
+    <rect x="308" y="472" width="224" height="48" rx="6" class="item-box"/>
+    <text x="420" y="502" text-anchor="middle" class="item">名稱與關聯校驗</text>
+    <rect x="308" y="532" width="224" height="48" rx="6" class="item-box"/>
+    <text x="420" y="562" text-anchor="middle" class="item">信心門檻與人工覆核</text>
+    <rect x="308" y="592" width="224" height="48" rx="6" class="item-box"/>
+    <text x="420" y="622" text-anchor="middle" class="item">建議與來源回傳</text>
+  </g>
+
+  <g>
+    <rect x="561" y="352" width="224" height="48" rx="6" class="item-box"/>
+    <text x="673" y="382" text-anchor="middle" class="item">確認並儲存診斷</text>
+    <rect x="561" y="412" width="224" height="48" rx="6" class="item-box"/>
+    <text x="673" y="442" text-anchor="middle" class="item">歷史列表與詳細資料</text>
+    <rect x="561" y="472" width="224" height="48" rx="6" class="item-box"/>
+    <text x="673" y="502" text-anchor="middle" class="item">備註與結果修正</text>
+    <rect x="561" y="532" width="224" height="48" rx="6" class="item-box"/>
+    <text x="673" y="562" text-anchor="middle" class="item">刪除個人紀錄</text>
+  </g>
+
+  <g>
+    <rect x="815" y="352" width="224" height="48" rx="6" class="item-box"/>
+    <text x="927" y="382" text-anchor="middle" class="item">單株與多區域監控</text>
+    <rect x="815" y="412" width="224" height="48" rx="6" class="item-box"/>
+    <text x="927" y="442" text-anchor="middle" class="item">定時擷取影格</text>
+    <rect x="815" y="472" width="224" height="48" rx="6" class="item-box"/>
+    <text x="927" y="502" text-anchor="middle" class="item">連續影格一致判定</text>
+    <rect x="815" y="532" width="224" height="48" rx="6" class="item-box"/>
+    <text x="927" y="562" text-anchor="middle" class="item">聲音、瀏覽器與 Email</text>
+    <rect x="815" y="592" width="224" height="48" rx="6" class="item-box"/>
+    <text x="927" y="622" text-anchor="middle" class="item">警報確認與刪除</text>
+  </g>
+
+  <g>
+    <rect x="1068" y="352" width="224" height="48" rx="6" class="item-box"/>
+    <text x="1180" y="382" text-anchor="middle" class="item">作物、病害與蟲害</text>
+    <rect x="1068" y="412" width="224" height="48" rx="6" class="item-box"/>
+    <text x="1180" y="442" text-anchor="middle" class="item">官方資料同步</text>
+    <rect x="1068" y="472" width="224" height="48" rx="6" class="item-box"/>
+    <text x="1180" y="502" text-anchor="middle" class="item">RAG 知識檢索</text>
+    <rect x="1068" y="532" width="224" height="48" rx="6" class="item-box"/>
+    <text x="1180" y="562" text-anchor="middle" class="item">參考來源追溯</text>
+  </g>
+
+  <g>
+    <rect x="1322" y="352" width="224" height="48" rx="6" class="item-box"/>
+    <text x="1434" y="382" text-anchor="middle" class="item">統計儀表板</text>
+    <rect x="1322" y="412" width="224" height="48" rx="6" class="item-box"/>
+    <text x="1434" y="442" text-anchor="middle" class="item">紀錄搜尋與分頁</text>
+    <rect x="1322" y="472" width="224" height="48" rx="6" class="item-box"/>
+    <text x="1434" y="502" text-anchor="middle" class="item">診斷紀錄修改與刪除</text>
+    <rect x="1322" y="532" width="224" height="48" rx="6" class="item-box"/>
+    <text x="1434" y="562" text-anchor="middle" class="item">使用者列表與查詢</text>
+  </g>
+
+  <rect x="64" y="718" width="1472" height="112" rx="8" fill="#fff7e6" stroke="#d6aa61" stroke-width="1.5"/>
+  <text x="92" y="758" class="note">一致性原則：</text>
+  <text x="214" y="758" class="note">F1-F6 是唯一的一級功能分類；Android App、瀏覽器與 FastAPI 屬於系統架構，不再重複列為功能。</text>
+  <text x="92" y="794" class="note">防幻覺原則：</text>
+  <text x="214" y="794" class="note">AI 結果須經資料庫與官方來源覆核；未通過門檻時標示需人工確認，且不得觸發自動警報。</text>
+  <text x="1536" y="874" text-anchor="end" class="subtitle">版本：現行已實作功能</text>
+</svg>

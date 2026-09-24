@@ -1,6 +1,8 @@
 package com.example.plantdoctor
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,25 +14,27 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout // 🌟 新增
+import androidx.constraintlayout.widget.ConstraintLayout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class RegisterActivity : AppCompatActivity() {
 
-    // 🌟 1. 建立風聲延遲計時器與任務（放在 onCreate 外面）
+    // 🌟 1. 建立風聲延遲計時器與任務
     private val windHandler = Handler(Looper.getMainLooper())
     private val windRunnable = Runnable {
         SoundManager.startWind() // 當按住滿 0.5 秒，正式吹起風聲
     }
+
+    private lateinit var registerRoot: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
         // --- 2. 綁定 UI 元件 ---
-        val registerRoot = findViewById<ConstraintLayout>(R.id.register_root_layout) // 🌟 核心新增：最外層佈局
+        registerRoot = findViewById(R.id.register_root_layout) // 🌟 最外層佈局
         val edtUsername = findViewById<EditText>(R.id.et_reg_username)
         val edtPassword = findViewById<EditText>(R.id.et_reg_password)
         val edtEmail = findViewById<EditText>(R.id.et_reg_gmail)
@@ -38,19 +42,20 @@ class RegisterActivity : AppCompatActivity() {
         val tvBackLogin = findViewById<TextView>(R.id.tv_back_to_login)
         val tvRegisterTitle = findViewById<TextView>(R.id.tv_register_title)
 
-        // 🌟 核心新增：召喚大總管！將最外層背景、註冊按鈕、返回文字交給它處理
+        // 🌟 初始化音效管理器
+        SoundManager.init(this)
+
+        // 🌟 召喚大總管！將最外層背景、註冊按鈕、返回文字交給它處理
         ThemeManager.applyTheme(
             context = this,
             rootLayout = registerRoot,
-            titles = listOf(tvBackLogin,tvRegisterTitle), // 讓「返回登入」文字同步換成主題深色系字體
-            mainButtons = listOf(btnSubmit) // 讓「註冊送出按鈕」同步對齊主題色
+            titles = listOf(tvBackLogin, tvRegisterTitle),
+            mainButtons = listOf(btnSubmit)
         )
 
-        // 註冊時不需要 Token，所以傳 null 建立 API Service
         val apiService = PlantApiService.create(null)
 
         btnSubmit.setOnClickListener {
-            // 點擊送出按鈕播放泡泡聲
             SoundManager.playBubblePop()
 
             val username = edtUsername.text.toString().trim()
@@ -62,7 +67,6 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // 根據後端新 Schema 建立註冊資料
             val regData = RegisterRequest(
                 username = username,
                 password = password,
@@ -70,25 +74,21 @@ class RegisterActivity : AppCompatActivity() {
                 full_name = username
             )
 
-            // 呼叫 API，回傳型態改為 GenericResponse (對應後端 status, message)
             apiService.register(regData).enqueue(object : Callback<GenericResponse> {
                 override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
                     if (response.isSuccessful) {
                         val body = response.body()
                         Log.d("RegisterActivity", "Success: ${body?.message}")
 
-                        // 🌟 在 RegisterActivity 收到註冊成功回應的地方加入這段：
                         val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
                         with(sharedPref.edit()) {
-                            putString("registered_email", email) // 👈 把剛註冊成功的 Email 存起來，鑰匙叫 "registered_email"
+                            putString("registered_email", email)
                             apply()
                         }
 
-                        // --- 【邏輯變更：引導去收信】 ---
                         showVerificationDialog(email)
 
                     } else {
-                        // 嘗試解析後端傳回的錯誤訊息 (例如：Username already exists)
                         val errorBody = response.errorBody()?.string()
                         Log.e("RegisterActivity", "Error: $errorBody")
                         Toast.makeText(this@RegisterActivity, "註冊失敗：帳號或 Email 已被使用", Toast.LENGTH_LONG).show()
@@ -103,31 +103,36 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         tvBackLogin.setOnClickListener {
-            // 點擊返回登入播放泡泡聲
             SoundManager.playBubblePop()
             finish()
         }
-    } // onCreate 的結尾
-
-    // 顯示對話框，提醒使用者去驗證信箱
-    private fun showVerificationDialog(email: String) {
-        AlertDialog.Builder(this)
-            .setTitle("註冊成功！")
-            .setMessage("我們已發送驗證信至：$email\n請先前往信箱點擊驗證連結，再回來登入喔！")
-            .setCancelable(false)
-            .setPositiveButton("我知道了") { _, _ ->
-                // 點擊對話框按鈕時播放泡泡聲
-                SoundManager.playBubblePop()
-                // 點擊後回到登入頁面
-                finish()
-            }
-            .show()
     }
 
-    // 🌟 全螢幕長按雷達，判定長按 0.5 秒才吹風
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event != null) {
-            when (event.action) {
+    override fun onResume() {
+        super.onResume()
+        // 🌟 每次回到註冊頁時，重新刷新主題色彩與啟動背景音樂
+        if (::registerRoot.isInitialized) {
+            val tvBackLogin = findViewById<TextView>(R.id.tv_back_to_login)
+            val tvRegisterTitle = findViewById<TextView>(R.id.tv_register_title)
+            val btnSubmit = findViewById<Button>(R.id.btn_register_submit)
+
+            ThemeManager.applyTheme(
+                context = this,
+                rootLayout = registerRoot,
+                titles = listOf(tvBackLogin, tvRegisterTitle),
+                mainButtons = listOf(btnSubmit)
+            )
+        }
+        SoundManager.startBGM()
+    }
+
+    /**
+     * 🌟 核心關鍵突破：搶在 ScrollView 吃掉事件之前分發 Touch 事件！
+     * 無論頁面是否有 ScrollView 滾動，按住畫面 0.5 秒依然會吹起風聲。
+     */
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev != null) {
+            when (ev.action) {
                 MotionEvent.ACTION_DOWN -> {
                     windHandler.postDelayed(windRunnable, 500)
                 }
@@ -137,7 +142,66 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
         }
-        return super.onTouchEvent(event)
+        return super.dispatchTouchEvent(ev)
+    }
+
+    // 顯示對話框，提醒使用者去驗證信箱（動態對齊當前主題色彩）
+    private fun showVerificationDialog(email: String) {
+        val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+        val currentTheme = sharedPref.getInt("THEME_COLOR_ID", 0)
+
+        val textColorStr = if (currentTheme in 1..3) "#FFFFFF" else "#222222"
+        val bgColorStr = when (currentTheme) {
+            1 -> "#1A237E"
+            2 -> "#3E2723"
+            3 -> "#4A0033"
+            else -> "#FFFFFF"
+        }
+        val textColor = Color.parseColor(textColorStr)
+        val bgColor = Color.parseColor(bgColorStr)
+
+        val dialogLayout = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(60, 50, 60, 40)
+        }
+
+        val tvTitle = TextView(this).apply {
+            text = "註冊成功！"
+            textSize = 20f
+            typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
+            setTextColor(textColor)
+            setPadding(0, 10, 0, 20)
+        }
+
+        val tvMessage = TextView(this).apply {
+            text = "我們已發送驗證信至：\n$email\n\n請先前往信箱點擊驗證連結，再回來登入喔！"
+            textSize = 16f
+            setTextColor(textColor)
+            setPadding(0, 0, 0, 20)
+        }
+
+        dialogLayout.addView(tvTitle)
+        dialogLayout.addView(tvMessage)
+
+        val alertDialog = AlertDialog.Builder(this)
+            .setView(dialogLayout)
+            .setCancelable(false)
+            .setPositiveButton("我知道了") { _, _ ->
+                SoundManager.playBubblePop()
+                finish()
+            }
+            .create()
+
+        alertDialog.show()
+
+        alertDialog.window?.let { window ->
+            val background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(bgColor)
+                cornerRadius = 32f
+            }
+            window.setBackgroundDrawable(background)
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(textColor)
+        }
     }
 
     override fun onStop() {

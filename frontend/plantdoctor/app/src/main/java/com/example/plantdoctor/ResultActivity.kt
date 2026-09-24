@@ -406,8 +406,8 @@ class ResultActivity : AppCompatActivity() {
         )
 
         val apiService = PlantApiService.create(token)
-        apiService.confirmDiary(predictionId!!, request).enqueue(object : retrofit2.Callback<GenericResponse> {
-            override fun onResponse(call: retrofit2.Call<GenericResponse>, response: retrofit2.Response<GenericResponse>) {
+        apiService.confirmDiary(predictionId!!, request).enqueue(object : retrofit2.Callback<DiaryConfirmResponse> {
+            override fun onResponse(call: retrofit2.Call<DiaryConfirmResponse>, response: retrofit2.Response<DiaryConfirmResponse>) {
                 if (response.isSuccessful) {
                     Toast.makeText(this@ResultActivity, "紀錄已成功儲存！", Toast.LENGTH_SHORT).show()
                     btnSave.text = "已儲存"
@@ -423,7 +423,7 @@ class ResultActivity : AppCompatActivity() {
                     btnSave.text = "儲存至歷史病例"
                 }
             }
-            override fun onFailure(call: retrofit2.Call<GenericResponse>, t: Throwable) {
+            override fun onFailure(call: retrofit2.Call<DiaryConfirmResponse>, t: Throwable) {
                 Toast.makeText(this@ResultActivity, "網路連線失敗", Toast.LENGTH_SHORT).show()
                 btnSave.isEnabled = true
                 btnSave.text = "儲存至歷史病例"
