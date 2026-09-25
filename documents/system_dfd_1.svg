@@ -1,0 +1,321 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920">
+  <defs>
+    <style>
+      .title { font: 700 36px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #3e4940; }
+      .subtitle { font: 400 15px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #667168; }
+      .lane-title { font: 700 14px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #708074; }
+      .heading { font: 700 18px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #344138; }
+      .body { font: 400 13px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #48544b; }
+      .small { font: 400 12px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665d; }
+      .flow-label { 
+        font: 600 12px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; 
+        fill: #2a382f; 
+        paint-order: stroke fill; 
+        stroke: #ffffff; 
+        stroke-width: 6px; 
+        stroke-linecap: round;
+        stroke-linejoin: round; 
+      }
+      .entity { fill: #f7f9f6; stroke: #77867b; stroke-width: 2.2; }
+      .process { fill: #dcefd4; stroke: #789767; stroke-width: 2.2; }
+      .store { fill: #fff; stroke: #789767; stroke-width: 2.2; }
+      .store-head { fill: #e9f4e4; }
+      .reference { fill: #f7fbf5; stroke: #789767; stroke-width: 2.2; stroke-dasharray: 8 6; }
+      .lane-a { fill: #fbfcfa; stroke: #dce4dd; stroke-width: 1; }
+      .lane-b { fill: #f6f9f5; stroke: #dce4dd; stroke-width: 1; }
+      .flow { fill: none; stroke: #66766a; stroke-width: 2.2; marker-end: url(#arrow); }
+      .data-flow { fill: none; stroke: #789767; stroke-width: 2.2; marker-end: url(#arrow-green); }
+      .note { fill: #fff9df; stroke: #c5a84c; stroke-width: 2; }
+      .note-title { font: 700 13.5px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #6c5920; }
+      .note-text { font: 400 11.5px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #6c5920; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L9,5 L1,9 Z" fill="#66766a"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L9,5 L1,9 Z" fill="#789767"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="920" fill="#ffffff"/>
+  <text x="800" y="41" text-anchor="middle" class="title">植葉神醫 Plant Doctor｜DFD 資料流程圖 Level 1</text>
+  <text x="800" y="67" text-anchor="middle" class="subtitle">雙模型協同推論（Gemini 多模態模型 + 本地專屬模型）與 RAG 知識庫校驗架構</text>
+
+  <!-- Lane backgrounds -->
+  <rect x="20" y="85" width="1560" height="150" rx="6" class="lane-a"/>
+  <rect x="20" y="245" width="1560" height="290" rx="6" class="lane-b"/>
+  <rect x="20" y="545" width="1560" height="180" rx="6" class="lane-a"/>
+  <rect x="20" y="735" width="1560" height="165" rx="6" class="lane-b"/>
+  <text x="36" y="106" class="lane-title">A｜帳號驗證資料流</text>
+  <text x="36" y="266" class="lane-title">B｜雙模型診斷、決策仲裁、紀錄與回饋資料流</text>
+  <text x="36" y="566" class="lane-title">C｜Webcam 監控與警報資料流</text>
+  <text x="36" y="756" class="lane-title">D｜管理後台資料流</text>
+
+  <!-- ================= Lane A: Account ================= -->
+  <g>
+    <rect x="50" y="125" width="180" height="78" rx="7" class="entity"/>
+    <text x="140" y="156" text-anchor="middle" class="heading">E1 使用者</text>
+    <text x="140" y="183" text-anchor="middle" class="body">Android App</text>
+  </g>
+  <g>
+    <rect x="300" y="115" width="230" height="98" rx="7" class="process"/>
+    <text x="415" y="146" text-anchor="middle" class="heading">P1 / F1 帳號管理</text>
+    <text x="415" y="172" text-anchor="middle" class="body">註冊、登入、信箱驗證</text>
+    <text x="415" y="195" text-anchor="middle" class="body">密碼重設與 JWT</text>
+  </g>
+  <g>
+    <rect x="650" y="125" width="270" height="78" rx="5" class="store"/>
+    <rect x="650" y="125" width="270" height="25" rx="5" class="store-head"/>
+    <line x1="650" y1="150" x2="920" y2="150" stroke="#789767" stroke-width="2.2"/>
+    <text x="785" y="144" text-anchor="middle" class="body">D1 帳號與 Token</text>
+    <text x="785" y="178" text-anchor="middle" class="body">user / user_one_time_tokens</text>
+  </g>
+  <g>
+    <rect x="1080" y="125" width="220" height="78" rx="7" class="entity"/>
+    <text x="1190" y="156" text-anchor="middle" class="heading">E4 SMTP / Gmail</text>
+    <text x="1190" y="183" text-anchor="middle" class="body">驗證與密碼重設信</text>
+  </g>
+  <!-- Lane A Flows -->
+  <path d="M230 143 H300" class="flow"/>
+  <text x="265" y="133" text-anchor="middle" class="flow-label">註冊／登入</text>
+  <path d="M300 193 H230" class="flow"/>
+  <text x="265" y="210" text-anchor="middle" class="flow-label">JWT／狀態</text>
+  <path d="M530 143 H650" class="data-flow"/>
+  <text x="590" y="133" text-anchor="middle" class="flow-label">新增／查詢</text>
+  <path d="M650 193 H530" class="data-flow"/>
+  <text x="590" y="210" text-anchor="middle" class="flow-label">帳號／Token</text>
+  <path d="M530 115 V97 H1190 V125" class="flow"/>
+  <text x="860" y="93" text-anchor="middle" class="flow-label">信箱驗證信／密碼重設信</text>
+
+  <!-- ================= Lane B: Diagnosis & Decision Arbitration ================= -->
+  <!-- E1: User -->
+  <g>
+    <rect x="50" y="320" width="180" height="120" rx="7" class="entity"/>
+    <text x="140" y="348" text-anchor="middle" class="heading">E1 使用者</text>
+    <text x="140" y="374" text-anchor="middle" class="body">拍照或選取植物圖片</text>
+    <text x="140" y="396" text-anchor="middle" class="body">確認保存／查詢／備註</text>
+    <text x="140" y="418" text-anchor="middle" class="body" fill="#1f5c35" font-weight="700">診斷結果反饋 (糾錯)</text>
+  </g>
+
+  <!-- P2: Image Diagnostic Dispatcher -->
+  <g>
+    <rect x="290" y="315" width="200" height="95" rx="7" class="process"/>
+    <text x="390" y="344" text-anchor="middle" class="heading">P2 / F2 影像診斷</text>
+    <text x="390" y="370" text-anchor="middle" class="body">影像前處理與特徵提取</text>
+    <text x="390" y="393" text-anchor="middle" class="body">並行派發雙模型推論</text>
+  </g>
+
+  <!-- E3: Gemini Multi-modal Model -->
+  <g>
+    <rect x="555" y="265" width="260" height="70" rx="7" class="entity"/>
+    <text x="685" y="293" text-anchor="middle" class="heading">E3 Gemini 多模態模型</text>
+    <text x="685" y="318" text-anchor="middle" class="body">影像語意分析、病徵描述與候選診斷</text>
+  </g>
+
+  <!-- E6: Local / Task-Specific Model -->
+  <g>
+    <rect x="555" y="350" width="260" height="75" rx="7" class="entity"/>
+    <rect x="555" y="350" width="260" height="22" rx="7" fill="#e8f3e5"/>
+    <text x="685" y="366" text-anchor="middle" class="small" fill="#2d5e3f" font-weight="700">特定作物分類模型</text>
+    <text x="685" y="392" text-anchor="middle" class="heading">E6 本地／特定作物專屬模型</text>
+    <text x="685" y="413" text-anchor="middle" class="body">特定病蟲害分類、特寫病徵特徵識別</text>
+  </g>
+
+  <!-- P3: Decision Arbitration & Knowledge Verification (Academic Terminology) -->
+  <g>
+    <rect x="875" y="280" width="290" height="115" rx="7" class="process"/>
+    <text x="1020" y="308" text-anchor="middle" class="heading">P3 / F5 決策仲裁與知識校驗</text>
+    <text x="1020" y="332" text-anchor="middle" class="body" font-weight="700" fill="#2d5e3f">多模型決策仲裁核心</text>
+    <text x="1020" y="354" text-anchor="middle" class="body">一致性比對、局部特徵互補與衝突過濾</text>
+    <text x="1020" y="376" text-anchor="middle" class="small">結合 RAG 檢索、信心度門檻與資料庫校驗</text>
+  </g>
+
+  <!-- E5: Agriculture Ministry Open Data -->
+  <g>
+    <rect x="875" y="248" width="290" height="26" rx="6" class="entity"/>
+    <text x="1020" y="266" text-anchor="middle" class="small">E5 農業部公開資料開放平台</text>
+  </g>
+
+  <!-- D2: Knowledge & Vector Store -->
+  <g>
+    <rect x="1240" y="265" width="310" height="85" rx="5" class="store"/>
+    <rect x="1240" y="265" width="310" height="24" rx="5" class="store-head"/>
+    <line x1="1240" y1="289" x2="1550" y2="289" stroke="#789767" stroke-width="2.2"/>
+    <text x="1395" y="283" text-anchor="middle" class="body">D2 知識庫、向量索引與來源資料</text>
+    <text x="1395" y="312" text-anchor="middle" class="body">crop / disease / pests / FAISS 向量庫</text>
+    <text x="1395" y="334" text-anchor="middle" class="small">農業部官方來源：網址與資料流水號可溯源</text>
+  </g>
+
+  <!-- P4: Diary & Feedback Management -->
+  <g>
+    <rect x="875" y="420" width="290" height="90" rx="7" class="process"/>
+    <text x="1020" y="447" text-anchor="middle" class="heading">P4 / F3 紀錄與回饋管理</text>
+    <text x="1020" y="472" text-anchor="middle" class="body">日誌保存、排序、備註編輯、刪除</text>
+    <text x="1020" y="494" text-anchor="middle" class="body">回饋接收、快取清理與圖片轉存</text>
+  </g>
+
+  <!-- D3 & D5 Stores in Lane B -->
+  <g>
+    <rect x="1240" y="380" width="310" height="58" rx="5" class="store"/>
+    <rect x="1240" y="380" width="310" height="20" rx="5" class="store-head"/>
+    <line x1="1240" y1="400" x2="1550" y2="400" stroke="#789767" stroke-width="2.2"/>
+    <text x="1395" y="395" text-anchor="middle" class="small" font-weight="700">D3 診斷紀錄與圖片</text>
+    <text x="1395" y="422" text-anchor="middle" class="small">plant_diary / static/uploads</text>
+  </g>
+  <g>
+    <rect x="1240" y="452" width="310" height="58" rx="5" class="store"/>
+    <rect x="1240" y="452" width="310" height="20" rx="5" class="store-head"/>
+    <line x1="1240" y1="472" x2="1550" y2="472" stroke="#789767" stroke-width="2.2"/>
+    <text x="1395" y="467" text-anchor="middle" class="small" font-weight="700">D5 診斷回饋與圖片</text>
+    <text x="1395" y="494" text-anchor="middle" class="small">diagnosis_feedback / static/feedback_uploads</text>
+  </g>
+
+  <!-- Lane B Flows -->
+  <!-- Flow 1: E1 -> P2 -->
+  <path d="M230 355 H290" class="flow"/>
+  <text x="260" y="345" text-anchor="middle" class="flow-label">植物影像</text>
+
+  <!-- Flow 2: P2 -> E3 -->
+  <path d="M490 340 H520 V300 H555" class="flow"/>
+  <text x="522" y="292" text-anchor="middle" class="flow-label">影像／Prompt</text>
+
+  <!-- Flow 3: P2 -> E6 -->
+  <path d="M490 388 H555" class="flow"/>
+  <text x="522" y="380" text-anchor="middle" class="flow-label">特徵／影像</text>
+
+  <!-- Flow 4: E3 -> P3 -->
+  <path d="M815 300 H875" class="flow"/>
+  <text x="845" y="292" text-anchor="middle" class="flow-label">通用模型初判</text>
+
+  <!-- Flow 5: E6 -> P3 -->
+  <path d="M815 388 H875" class="flow"/>
+  <text x="845" y="380" text-anchor="middle" class="flow-label">專屬模型預測</text>
+
+  <!-- Flow 6: P3 <-> D2 -->
+  <path d="M1165 295 H1240" class="data-flow"/>
+  <text x="1202" y="287" text-anchor="middle" class="flow-label">RAG 向量檢索</text>
+  <path d="M1240 325 H1165" class="data-flow"/>
+  <text x="1202" y="337" text-anchor="middle" class="flow-label">標準知識／來源</text>
+
+  <!-- Flow 7: E5 -> P3 -->
+  <path d="M1020 274 V280" class="data-flow"/>
+
+  <!-- Flow 8: P3 -> P4 -->
+  <path d="M1020 395 V420" class="flow"/>
+  <text x="1075" y="411" text-anchor="middle" class="flow-label">仲裁綜合診斷</text>
+  
+  <!-- Flow 9: User -> P4 (Save/Modify diary) -->
+  <path d="M230 442 H875" class="flow"/>
+  <text x="540" y="435" text-anchor="middle" class="flow-label">確認保存／查詢／編輯備註／刪除</text>
+
+  <!-- Flow 10: User -> P4 (Error Feedback) -->
+  <path d="M230 472 H875" class="flow"/>
+  <text x="540" y="465" text-anchor="middle" class="flow-label">診斷回饋 (錯誤標記／修正名稱)</text>
+
+  <!-- Flow 11: Return flow P4 -> User -->
+  <path d="M875 502 H140 V440" class="flow"/>
+  <text x="540" y="495" text-anchor="middle" class="flow-label">綜合診斷結果、照護建議、官方來源與歷史清單</text>
+
+  <!-- Flow 12: P4 <-> D3 & D5 -->
+  <path d="M1165 400 H1240" class="data-flow"/>
+  <text x="1202" y="393" text-anchor="middle" class="flow-label">日誌寫入</text>
+  <path d="M1240 422 H1165" class="data-flow"/>
+  <text x="1202" y="434" text-anchor="middle" class="flow-label">歷史紀錄</text>
+  <path d="M1165 480 H1240" class="data-flow"/>
+  <text x="1202" y="473" text-anchor="middle" class="flow-label">回饋寫入</text>
+
+  <!-- ================= Lane C: Webcam ================= -->
+  <g>
+    <rect x="50" y="585" width="180" height="85" rx="7" class="entity"/>
+    <text x="140" y="615" text-anchor="middle" class="heading">E1 使用者</text>
+    <text x="140" y="640" text-anchor="middle" class="body">Webcam 瀏覽器／App</text>
+    <text x="140" y="659" text-anchor="middle" class="small">即時連續鏡頭監控</text>
+  </g>
+  <g>
+    <rect x="300" y="575" width="250" height="100" rx="7" class="process"/>
+    <text x="425" y="607" text-anchor="middle" class="heading">P5 / F4 Webcam 監控</text>
+    <text x="425" y="633" text-anchor="middle" class="body">單株／多區域、連續影格共識判定</text>
+    <text x="425" y="656" text-anchor="middle" class="body">聲音、App、Email 警報</text>
+  </g>
+  <g>
+    <rect x="650" y="585" width="250" height="80" rx="7" class="reference"/>
+    <text x="775" y="616" text-anchor="middle" class="heading">共用 P2 + P3</text>
+    <text x="775" y="642" text-anchor="middle" class="body">雙模型推論、決策仲裁與信心門檻</text>
+  </g>
+  <g>
+    <rect x="1000" y="585" width="270" height="80" rx="5" class="store"/>
+    <rect x="1000" y="585" width="270" height="25" rx="5" class="store-head"/>
+    <line x1="1000" y1="610" x2="1270" y2="610" stroke="#789767" stroke-width="2.2"/>
+    <text x="1135" y="603" text-anchor="middle" class="body">D4 Webcam 警報與圖片</text>
+    <text x="1135" y="640" text-anchor="middle" class="body">webcam_alert / static/uploads</text>
+  </g>
+  <g>
+    <rect x="1350" y="585" width="200" height="80" rx="7" class="entity"/>
+    <text x="1450" y="616" text-anchor="middle" class="heading">E4 SMTP / Gmail</text>
+    <text x="1450" y="643" text-anchor="middle" class="body">Email 警報通知</text>
+  </g>
+  <!-- Lane C Flows -->
+  <path d="M230 601 H300" class="flow"/>
+  <text x="265" y="591" text-anchor="middle" class="flow-label">設定／影格</text>
+  <path d="M300 653 H230" class="flow"/>
+  <text x="265" y="670" text-anchor="middle" class="flow-label">警報／覆核提示</text>
+  <path d="M550 601 H650" class="flow"/>
+  <text x="600" y="591" text-anchor="middle" class="flow-label">取樣影格</text>
+  <path d="M650 653 H550" class="flow"/>
+  <text x="600" y="670" text-anchor="middle" class="flow-label">校驗後結果</text>
+  <path d="M425 675 V706 H1135 V665" class="data-flow"/>
+  <text x="780" y="698" text-anchor="middle" class="flow-label">連續一致異常、警報紀錄與快照圖片</text>
+  <path d="M550 575 V555 H1450 V585" class="flow"/>
+  <text x="1010" y="551" text-anchor="middle" class="flow-label">達警報門檻後寄送 Email</text>
+
+  <!-- ================= Lane D: Administration ================= -->
+  <g>
+    <rect x="50" y="770" width="180" height="88" rx="7" class="entity"/>
+    <text x="140" y="801" text-anchor="middle" class="heading">E2 管理員</text>
+    <text x="140" y="828" text-anchor="middle" class="body">Web 管理後台</text>
+    <text x="140" y="848" text-anchor="middle" class="small">儀表板／列表／專家標註</text>
+  </g>
+  <g>
+    <rect x="300" y="760" width="250" height="108" rx="7" class="process"/>
+    <text x="425" y="789" text-anchor="middle" class="heading">P6 / F6 管理後台</text>
+    <text x="425" y="813" text-anchor="middle" class="body">統計總覽、搜尋、分頁與資料維護</text>
+    <text x="425" y="835" text-anchor="middle" class="body">使用者、診斷日誌與警報管理</text>
+    <text x="425" y="856" text-anchor="middle" class="body" fill="#1f5c35" font-weight="700">回饋審核與專屬模型訓練標註</text>
+  </g>
+  <g>
+    <rect x="670" y="760" width="580" height="108" rx="5" class="store"/>
+    <rect x="670" y="760" width="580" height="28" rx="5" class="store-head"/>
+    <line x1="670" y1="788" x2="1250" y2="788" stroke="#789767" stroke-width="2.2"/>
+    <line x1="815" y1="760" x2="815" y2="868" stroke="#789767" stroke-width="1.5"/>
+    <line x1="960" y1="760" x2="960" y2="868" stroke="#789767" stroke-width="1.5"/>
+    <line x1="1105" y1="760" x2="1105" y2="868" stroke="#789767" stroke-width="1.5"/>
+    <text x="960" y="780" text-anchor="middle" class="body">資料庫管理查詢與審核標註（對應上方資料儲存區）</text>
+    <text x="742" y="818" text-anchor="middle" class="heading">D1</text>
+    <text x="742" y="842" text-anchor="middle" class="body">使用者帳號</text>
+    <text x="887" y="818" text-anchor="middle" class="heading">D3</text>
+    <text x="887" y="842" text-anchor="middle" class="body">診斷紀錄</text>
+    <text x="1032" y="818" text-anchor="middle" class="heading">D4</text>
+    <text x="1032" y="842" text-anchor="middle" class="body">Webcam 警報</text>
+    <text x="1177" y="818" text-anchor="middle" class="heading">D5</text>
+    <text x="1177" y="842" text-anchor="middle" class="body">回饋與標註</text>
+  </g>
+
+  <!-- Note Box: Model Arbitration & Safety Rules (Formal Academic Terms) -->
+  <g>
+    <rect x="1285" y="750" width="275" height="128" rx="7" class="note"/>
+    <text x="1422" y="776" text-anchor="middle" class="note-title">模型仲裁與防幻覺安全規則</text>
+    <text x="1422" y="800" text-anchor="middle" class="note-text">1. 預測一致：雙模型結果吻合，確認為高置信度診斷</text>
+    <text x="1422" y="821" text-anchor="middle" class="note-text">2. 特徵互補：通用模型未確診時，採納專屬模型局部特徵</text>
+    <text x="1422" y="842" text-anchor="middle" class="note-text">3. 衝突過濾：結果分歧時啟動安全機制，標記人工確認</text>
+    <text x="1422" y="863" text-anchor="middle" class="note-text">4. 持續學習：管理後台標註回饋，供專屬模型迭代訓練</text>
+  </g>
+  <!-- Lane D Flows -->
+  <path d="M230 793 H300" class="flow"/>
+  <text x="265" y="781" text-anchor="middle" class="flow-label">搜尋／維護</text>
+  <path d="M300 845 H230" class="flow"/>
+  <text x="265" y="863" text-anchor="middle" class="flow-label">統計／列表</text>
+  <path d="M550 793 H670" class="data-flow"/>
+  <text x="610" y="781" text-anchor="middle" class="flow-label">查詢／標註更新</text>
+  <path d="M670 845 H550" class="data-flow"/>
+  <text x="610" y="863" text-anchor="middle" class="flow-label">帳號／日誌／警報／回饋</text>
+</svg>

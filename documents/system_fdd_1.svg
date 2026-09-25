@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="850" viewBox="0 0 1600 850">
+  <defs>
+    <style>
+      .title { font: 700 40px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
+      .subtitle { font: 400 18px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665f; }
+      .root { font: 700 27px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #ffffff; }
+      .module { font: 700 21px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
+      .code { font: 700 14px "Segoe UI", Arial, sans-serif; fill: #8b5b16; }
+      .item { font: 400 15px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #34443b; }
+      .note { font: 400 15px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #4e5d54; }
+      .root-box { fill: #3f6f55; stroke: #315942; stroke-width: 2; }
+      .module-box { fill: #dcefdc; stroke: #73966f; stroke-width: 2; }
+      .item-box { fill: #ffffff; stroke: #b3c9af; stroke-width: 1.5; }
+      .line { stroke: #6c876e; stroke-width: 2.5; fill: none; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="850" fill="#f7faf7"/>
+  <text x="64" y="55" class="title">FDD 功能分解圖 (Functional Decomposition Diagram)</text>
+  <text x="64" y="85" class="subtitle">依系統六大核心業務模組（F1–F6）劃分，完全對應 DFD Level 1 與資料庫實體結構</text>
+
+  <!-- Root System Box -->
+  <rect x="520" y="110" width="560" height="70" rx="8" class="root-box"/>
+  <text x="800" y="153" text-anchor="middle" class="root">植葉神醫 Plant Doctor</text>
+
+  <!-- Tree Lines -->
+  <path d="M800 180 V215 M166 215 H1434" class="line"/>
+  <path d="M166 215 V245 M420 215 V245 M673 215 V245 M927 215 V245 M1180 215 V245 M1434 215 V245" class="line"/>
+
+  <!-- Module Headers (F1 ~ F6) -->
+  <g>
+    <!-- F1 -->
+    <rect x="46" y="245" width="240" height="66" rx="8" class="module-box"/>
+    <text x="166" y="272" text-anchor="middle" class="code">F1</text>
+    <text x="166" y="299" text-anchor="middle" class="module">帳號與身分驗證</text>
+
+    <!-- F2 -->
+    <rect x="300" y="245" width="240" height="66" rx="8" class="module-box"/>
+    <text x="420" y="272" text-anchor="middle" class="code">F2</text>
+    <text x="420" y="299" text-anchor="middle" class="module">植物影像診斷</text>
+
+    <!-- F3 -->
+    <rect x="553" y="245" width="240" height="66" rx="8" class="module-box"/>
+    <text x="673" y="272" text-anchor="middle" class="code">F3</text>
+    <text x="673" y="299" text-anchor="middle" class="module">診斷紀錄管理</text>
+
+    <!-- F4 -->
+    <rect x="807" y="245" width="240" height="66" rx="8" class="module-box"/>
+    <text x="927" y="272" text-anchor="middle" class="code">F4</text>
+    <text x="927" y="299" text-anchor="middle" class="module">Webcam 監控警報</text>
+
+    <!-- F5 -->
+    <rect x="1060" y="245" width="240" height="66" rx="8" class="module-box"/>
+    <text x="1180" y="272" text-anchor="middle" class="code">F5</text>
+    <text x="1180" y="299" text-anchor="middle" class="module">知識資料管理</text>
+
+    <!-- F6 -->
+    <rect x="1314" y="245" width="240" height="66" rx="8" class="module-box"/>
+    <text x="1434" y="272" text-anchor="middle" class="code">F6</text>
+    <text x="1434" y="299" text-anchor="middle" class="module">管理後台</text>
+  </g>
+
+  <!-- Drop Lines to Items -->
+  <path d="M166 311 V335 M420 311 V335 M673 311 V335 M927 311 V335 M1180 311 V335 M1434 311 V335" class="line"/>
+
+  <!-- ================= Functional Items (5 items per module) ================= -->
+  <!-- F1: Account -->
+  <g>
+    <rect x="54" y="335" width="224" height="44" rx="6" class="item-box"/>
+    <text x="166" y="362" text-anchor="middle" class="item">註冊、登入與登出</text>
+    <rect x="54" y="391" width="224" height="44" rx="6" class="item-box"/>
+    <text x="166" y="418" text-anchor="middle" class="item">信箱驗證與補寄通知</text>
+    <rect x="54" y="447" width="224" height="44" rx="6" class="item-box"/>
+    <text x="166" y="474" text-anchor="middle" class="item">忘記與安全重設密碼</text>
+    <rect x="54" y="503" width="224" height="44" rx="6" class="item-box"/>
+    <text x="166" y="530" text-anchor="middle" class="item">JWT 身分權杖校驗</text>
+    <rect x="54" y="559" width="224" height="44" rx="6" class="item-box"/>
+    <text x="166" y="586" text-anchor="middle" class="item">個人帳號資料查詢</text>
+  </g>
+
+  <!-- F2: Diagnosis -->
+  <g>
+    <rect x="308" y="335" width="224" height="44" rx="6" class="item-box"/>
+    <text x="420" y="362" text-anchor="middle" class="item">拍照或選取植物圖片</text>
+    <rect x="308" y="391" width="224" height="44" rx="6" class="item-box"/>
+    <text x="420" y="418" text-anchor="middle" class="item">雙模型協同推論</text>
+    <rect x="308" y="447" width="224" height="44" rx="6" class="item-box"/>
+    <text x="420" y="474" text-anchor="middle" class="item">決策仲裁與特徵互補</text>
+    <rect x="308" y="503" width="224" height="44" rx="6" class="item-box"/>
+    <text x="420" y="530" text-anchor="middle" class="item">信心度門檻與防幻覺校驗</text>
+    <rect x="308" y="559" width="224" height="44" rx="6" class="item-box"/>
+    <text x="420" y="586" text-anchor="middle" class="item">防治指引與官方來源回傳</text>
+  </g>
+
+  <!-- F3: Diary & Feedback -->
+  <g>
+    <rect x="561" y="335" width="224" height="44" rx="6" class="item-box"/>
+    <text x="673" y="362" text-anchor="middle" class="item">確認並儲存診斷紀錄</text>
+    <rect x="561" y="391" width="224" height="44" rx="6" class="item-box"/>
+    <text x="673" y="418" text-anchor="middle" class="item">歷史紀錄列表與詳細資訊</text>
+    <rect x="561" y="447" width="224" height="44" rx="6" class="item-box"/>
+    <text x="673" y="474" text-anchor="middle" class="item">新增與編輯診斷備忘筆記</text>
+    <rect x="561" y="503" width="224" height="44" rx="6" class="item-box"/>
+    <text x="673" y="530" text-anchor="middle" class="item">診斷結果反饋與糾錯</text>
+    <rect x="561" y="559" width="224" height="44" rx="6" class="item-box"/>
+    <text x="673" y="586" text-anchor="middle" class="item">刪除個人診斷紀錄</text>
+  </g>
+
+  <!-- F4: Webcam Monitoring -->
+  <g>
+    <rect x="815" y="335" width="224" height="44" rx="6" class="item-box"/>
+    <text x="927" y="362" text-anchor="middle" class="item">單株與多區域即時監控</text>
+    <rect x="815" y="391" width="224" height="44" rx="6" class="item-box"/>
+    <text x="927" y="418" text-anchor="middle" class="item">定時連續擷取影像影格</text>
+    <rect x="815" y="447" width="224" height="44" rx="6" class="item-box"/>
+    <text x="927" y="474" text-anchor="middle" class="item">連續影格一致性判定</text>
+    <rect x="815" y="503" width="224" height="44" rx="6" class="item-box"/>
+    <text x="927" y="530" text-anchor="middle" class="item">聲音、App 與 Email 警報</text>
+    <rect x="815" y="559" width="224" height="44" rx="6" class="item-box"/>
+    <text x="927" y="586" text-anchor="middle" class="item">警報紀錄確認、已讀與刪除</text>
+  </g>
+
+  <!-- F5: Knowledge & Care -->
+  <g>
+    <rect x="1068" y="335" width="224" height="44" rx="6" class="item-box"/>
+    <text x="1180" y="362" text-anchor="middle" class="item">作物、病害與蟲害主檔</text>
+    <rect x="1068" y="391" width="224" height="44" rx="6" class="item-box"/>
+    <text x="1180" y="418" text-anchor="middle" class="item">農業部官方資料同步更新</text>
+    <rect x="1068" y="447" width="224" height="44" rx="6" class="item-box"/>
+    <text x="1180" y="474" text-anchor="middle" class="item">FAISS 向量庫與 RAG 檢索</text>
+    <rect x="1068" y="503" width="224" height="44" rx="6" class="item-box"/>
+    <text x="1180" y="530" text-anchor="middle" class="item">參考來源溯源與網址查閱</text>
+    <rect x="1068" y="559" width="224" height="44" rx="6" class="item-box"/>
+    <text x="1180" y="586" text-anchor="middle" class="item">田間氣象與防病照護建議</text>
+  </g>
+
+  <!-- F6: Admin Console -->
+  <g>
+    <rect x="1322" y="335" width="224" height="44" rx="6" class="item-box"/>
+    <text x="1434" y="362" text-anchor="middle" class="item">營運統計數據儀表板</text>
+    <rect x="1322" y="391" width="224" height="44" rx="6" class="item-box"/>
+    <text x="1434" y="418" text-anchor="middle" class="item">診斷紀錄搜尋與分頁維護</text>
+    <rect x="1322" y="447" width="224" height="44" rx="6" class="item-box"/>
+    <text x="1434" y="474" text-anchor="middle" class="item">使用者帳號列表與管理</text>
+    <rect x="1322" y="503" width="224" height="44" rx="6" class="item-box"/>
+    <text x="1434" y="530" text-anchor="middle" class="item">回饋審核與專家人工標註</text>
+    <rect x="1322" y="559" width="224" height="44" rx="6" class="item-box"/>
+    <text x="1434" y="586" text-anchor="middle" class="item">模型訓練資料匯出 (JSONL)</text>
+  </g>
+
+  <!-- Bottom Academic Principles & Guidance -->
+  <rect x="54" y="628" width="1492" height="150" rx="8" fill="#fff7e6" stroke="#d6aa61" stroke-width="1.5"/>
+  <text x="82" y="662" class="note" font-weight="700">架構一致性原則：</text>
+  <text x="235" y="662" class="note">F1–F6 為唯一之一級業務功能分類；Android 端、Web 端與 FastAPI 技術元件屬於系統架構，不重複列入功能層級。</text>
+  
+  <text x="82" y="700" class="note" font-weight="700">雙模型與防幻覺：</text>
+  <text x="235" y="700" class="note">採用通用多模態（Gemini）與本地特定作物專屬模型協同推論，結合 RAG 向量知識庫與官方資料進行多維度一致性檢驗。</text>
+  
+  <text x="82" y="738" class="note" font-weight="700">主動學習閉環：</text>
+  <text x="235" y="738" class="note">提供診斷結果反饋機制，管理者透過後台進行專家人工標註並匯出標準訓練集，為專屬模型提供持續迭代優化之依據。</text>
+
+  <text x="1546" y="805" text-anchor="end" class="subtitle" font-size="14px">版本：現行已實作完整功能（畢業專題正式版本）</text>
+</svg>

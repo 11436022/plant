@@ -1,0 +1,203 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <style>
+      .title { font: 700 44px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
+      .subtitle { font: 400 20px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665f; }
+      .lane { font: 700 24px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #315942; }
+      .head { font: 700 20px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
+      .text { font: 400 16px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #3d4d43; }
+      .small { font: 400 14px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #5a695f; }
+      .lane-box { fill: #f7faf7; stroke: #9fb5a0; stroke-width: 2; }
+      .client { fill: #e7f2e4; stroke: #789879; stroke-width: 2; }
+      .service { fill: #ffffff; stroke: #73966f; stroke-width: 2; }
+      .safety { fill: #fff7e6; stroke: #d3a354; stroke-width: 2; }
+      .external { fill: #eef3f7; stroke: #7b929f; stroke-width: 2; }
+      .ai-box { fill: #eaf4fc; stroke: #6b93af; stroke-width: 2; }
+      .line { stroke: #667b6b; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .return { stroke: #8a9b8e; stroke-width: 1.8; stroke-dasharray: 6 4; fill: none; marker-end: url(#arrow2); }
+      .flow-label {
+        font: 700 13px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+        fill: #2d5e3f;
+        paint-order: stroke fill;
+        stroke: #ffffff;
+        stroke-width: 6px;
+        stroke-linejoin: round;
+      }
+      .halo-text {
+        font: 400 14px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+        fill: #5a695f;
+        paint-order: stroke fill;
+        stroke: #ffffff;
+        stroke-width: 5px;
+        stroke-linejoin: round;
+      }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#667b6b"/>
+    </marker>
+    <marker id="arrow2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#8a9b8e"/>
+    </marker>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="1600" height="900" fill="#ffffff"/>
+  <text x="60" y="56" class="title">現行系統架構圖 (System Architecture)</text>
+  <text x="60" y="88" class="subtitle">前端介面、FastAPI 核心微服務、多模型決策仲裁、資料持久層與外部 AI 服務</text>
+
+  <!-- Swimlanes -->
+  <rect x="50" y="118" width="380" height="706" rx="8" class="lane-box"/>
+  <rect x="470" y="118" width="650" height="706" rx="8" class="lane-box"/>
+  <rect x="1160" y="118" width="390" height="706" rx="8" class="lane-box"/>
+  <text x="240" y="156" text-anchor="middle" class="lane">使用介面 (Presentation Layer)</text>
+  <text x="795" y="156" text-anchor="middle" class="lane">FastAPI 後端核心服務 (Application Layer)</text>
+  <text x="1355" y="156" text-anchor="middle" class="lane">資料層與外部服務 (Data &amp; External Services)</text>
+
+  <!-- ================= LANE 1: Presentation Layer ================= -->
+  <!-- 1. Android App -->
+  <rect x="86" y="190" width="308" height="155" rx="8" class="client"/>
+  <text x="240" y="224" text-anchor="middle" class="head">Android 行動端 App</text>
+  <text x="240" y="254" text-anchor="middle" class="text">拍照診斷、歷史紀錄檢視</text>
+  <text x="240" y="280" text-anchor="middle" class="text">個人備忘筆記編輯、診斷回饋糾錯</text>
+  <text x="240" y="314" text-anchor="middle" class="small">Kotlin / Retrofit2 / CameraX / JWT</text>
+
+  <!-- 2. Webcam Interface -->
+  <rect x="86" y="375" width="308" height="155" rx="8" class="client"/>
+  <text x="240" y="409" text-anchor="middle" class="head">Webcam 即時監控介面</text>
+  <text x="240" y="439" text-anchor="middle" class="text">單株／多區域連續鏡頭串流</text>
+  <text x="240" y="465" text-anchor="middle" class="text">定時連續擷取影格、即時告警響應</text>
+  <text x="240" y="499" text-anchor="middle" class="small">CameraX / HTML5 Canvas / OpenCV</text>
+
+  <!-- 3. Web Admin Console -->
+  <rect x="86" y="560" width="308" height="155" rx="8" class="client"/>
+  <text x="240" y="594" text-anchor="middle" class="head">Web 管理者後台</text>
+  <text x="240" y="624" text-anchor="middle" class="text">統計儀表板、全站診斷紀錄維護</text>
+  <text x="240" y="650" text-anchor="middle" class="text">使用者糾錯審核、訓練資料匯出</text>
+  <text x="240" y="684" text-anchor="middle" class="small">FastAPI / Jinja2 模板 / JavaScript</text>
+
+  <!-- ================= LANE 2: Application Layer (FastAPI) ================= -->
+  <!-- 1. API Gateway / Routing & Security Layer -->
+  <rect x="510" y="190" width="570" height="92" rx="8" class="service"/>
+  <text x="795" y="222" text-anchor="middle" class="head">API 路由與身分安全層</text>
+  <text x="795" y="250" text-anchor="middle" class="text">Auth / Predict / Diaries / Feedback / Webcam / Knowledge / Admin</text>
+  <text x="795" y="271" text-anchor="middle" class="small">OAuth2 / JWT 權限驗證、請求解析與全域例外處理</text>
+
+  <!-- 2A. Dual-model Dispatch & Diagnosis -->
+  <rect x="510" y="314" width="270" height="142" rx="8" class="service"/>
+  <text x="645" y="344" text-anchor="middle" class="head">雙模型診斷調度服務</text>
+  <text x="645" y="372" text-anchor="middle" class="text">影像品質與格式校驗</text>
+  <text x="645" y="398" text-anchor="middle" class="text">並行派發通用與專屬模型</text>
+  <text x="645" y="424" text-anchor="middle" class="text">特徵提取與候選診斷彙整</text>
+  <text x="645" y="444" text-anchor="middle" class="small">Async HTTP / 并行異步推論</text>
+
+  <!-- 2B. Webcam Edge Alert Service -->
+  <rect x="810" y="314" width="270" height="142" rx="8" class="service"/>
+  <text x="945" y="344" text-anchor="middle" class="head">Webcam 警報服務</text>
+  <text x="945" y="372" text-anchor="middle" class="text">時序連續影格共識判定</text>
+  <text x="945" y="398" text-anchor="middle" class="text">防止單幀誤報與晃動干擾</text>
+  <text x="945" y="424" text-anchor="middle" class="text">警報觸發、狀態快取與推播</text>
+  <text x="945" y="444" text-anchor="middle" class="small">SMTP Email / 鈴聲提示</text>
+
+  <!-- 3. Multi-Model Decision Arbitration & Knowledge Verification -->
+  <rect x="510" y="490" width="570" height="130" rx="8" class="safety"/>
+  <text x="795" y="520" text-anchor="middle" class="head">多模型決策仲裁與知識校驗核心</text>
+  <text x="795" y="548" text-anchor="middle" class="text">通用語意與局部特徵互補比對、多模型衝突過濾仲裁</text>
+  <text x="795" y="574" text-anchor="middle" class="text">FAISS 向量檢索 → 官方病害名單對齊 → 信心度門檻評估 (70%)</text>
+  <text x="795" y="602" text-anchor="middle" class="small">未通過：標記 requires_review=true；阻斷自動警報與模型幻覺</text>
+
+  <!-- 4. Diary, Feedback & Training Data Operations -->
+  <rect x="510" y="650" width="570" height="105" rx="8" class="service"/>
+  <text x="795" y="680" text-anchor="middle" class="head">日誌、回饋與數據管理服務</text>
+  <text x="795" y="708" text-anchor="middle" class="text">日誌保存、條件檢索、備忘筆記編輯、全站紀錄刪除維護</text>
+  <text x="795" y="734" text-anchor="middle" class="text">糾錯回饋接收、圖片轉存、管理員人工標註與 JSONL 訓練集匯出</text>
+
+  <!-- ================= LANE 3: Data & External Services (Stacked Single Column) ================= -->
+  <!-- 1. MySQL Relational DB -->
+  <rect x="1196" y="190" width="318" height="115" rx="8" class="external"/>
+  <text x="1355" y="220" text-anchor="middle" class="head">MySQL 關聯式資料庫</text>
+  <text x="1355" y="247" text-anchor="middle" class="text">user / plant_diary / webcam_alert</text>
+  <text x="1355" y="271" text-anchor="middle" class="text">diagnosis_feedback (回饋表)</text>
+  <text x="1355" y="293" text-anchor="middle" class="small">crop / disease / pests / tokens (8 大資料表)</text>
+
+  <!-- 2. Agricultural Knowledge Base & FAISS -->
+  <rect x="1196" y="320" width="318" height="105" rx="8" class="external"/>
+  <text x="1355" y="348" text-anchor="middle" class="head">官方知識庫與向量資料庫</text>
+  <text x="1355" y="374" text-anchor="middle" class="text">農業部公開資料庫 / FAISS 向量索引</text>
+  <text x="1355" y="398" text-anchor="middle" class="text">標準病徵描述、官方用藥防治建議</text>
+  <text x="1355" y="416" text-anchor="middle" class="small">資料來源網址與序號全程可溯源</text>
+
+  <!-- 3. Gemini Multimodal AI Model -->
+  <rect x="1196" y="440" width="318" height="95" rx="8" class="ai-box"/>
+  <text x="1355" y="468" text-anchor="middle" class="head">Gemini 2.5 Flash 雲端多模態模型</text>
+  <text x="1355" y="494" text-anchor="middle" class="text">廣域影像語意初判、病徵特徵文字描述</text>
+  <text x="1355" y="518" text-anchor="middle" class="small">Google GenAI SDK / 候選疾病與處方推論</text>
+
+  <!-- 4. Local Task-Specific Model -->
+  <rect x="1196" y="550" width="318" height="95" rx="8" class="ai-box"/>
+  <text x="1355" y="578" text-anchor="middle" class="head">本地／特定作物專屬模型</text>
+  <text x="1355" y="604" text-anchor="middle" class="text">特定作物病害分類、局部病徵微觀識別</text>
+  <text x="1355" y="628" text-anchor="middle" class="small">本地自訓 ConvNet 卷積神經網絡 (零雲端託管成本)</text>
+
+  <!-- 5. External Services: SMTP, Weather & Active Learning -->
+  <rect x="1196" y="660" width="318" height="105" rx="8" class="external"/>
+  <text x="1355" y="688" text-anchor="middle" class="head">外部支援服務 (SMTP / CWA)</text>
+  <text x="1355" y="714" text-anchor="middle" class="text">Gmail SMTP 驗證信件與警報推播</text>
+  <text x="1355" y="738" text-anchor="middle" class="text">CWA 中央氣象署即時溫濕度建議</text>
+  <text x="1355" y="756" text-anchor="middle" class="small">主動學習訓練資料匯出 (JSONL)</text>
+
+  <!-- ================= Connecting Flows & Arrows (All collision-free) ================= -->
+  <!-- 1. Lane 1 -> Lane 2 -->
+  <path d="M394 236 H510" class="line"/>
+  <path d="M394 420 H510" class="line"/>
+  <path d="M394 605 H510" class="line"/>
+  <text x="452" y="226" text-anchor="middle" class="halo-text">HTTPS / JSON</text>
+  <text x="452" y="410" text-anchor="middle" class="halo-text">Frame Stream</text>
+  <text x="452" y="595" text-anchor="middle" class="halo-text">REST / Admin</text>
+
+  <!-- 2. Inside Lane 2 -->
+  <path d="M645 282 V314" class="line"/>
+  <path d="M945 282 V314" class="line"/>
+  <path d="M645 456 V490" class="line"/>
+  <path d="M945 456 V490" class="line"/>
+  <path d="M795 620 V650" class="line"/>
+
+  <!-- 3. Lane 2 <-> Lane 3 Connections in Dedicated Channels -->
+  <!-- Flow 1: API Layer <-> MySQL (y=226 & y=256) -->
+  <path d="M1080 226 H1196" class="line"/>
+  <path d="M1196 256 H1080" class="return"/>
+  <text x="1138" y="218" text-anchor="middle" class="flow-label">查詢／驗證</text>
+
+  <!-- Flow 2: 圖片診斷 (Box 2A) -> Gemini (via clear channel y=472) -->
+  <!-- Path exits Box 2A right edge into the gap, runs in channel y=472 into Gemini (y=472) -->
+  <path d="M780 435 H795 V472 H1196" class="line"/>
+  <text x="1000" y="466" text-anchor="middle" class="flow-label">派發 Gemini 多模態推論</text>
+
+  <!-- Flow 3: 仲裁核心 (Box 3) -> 專屬作物模型 (y=580) -->
+  <path d="M1080 580 H1196" class="line"/>
+  <text x="1138" y="572" text-anchor="middle" class="flow-label">專屬推論</text>
+
+  <!-- Flow 4: Return from AI Models to Arbitration Core (y=500 & y=605) -->
+  <path d="M1196 500 H1120 V520 H1080" class="return"/>
+  <path d="M1196 605 H1120 V550 H1080" class="return"/>
+
+  <!-- Flow 5: 仲裁核心 <-> 官方知識庫 & FAISS (x=1140 & x=1115 tracks) -->
+  <path d="M1080 515 H1142 V360 H1196" class="line"/>
+  <text x="1142" y="348" text-anchor="middle" class="flow-label">RAG 檢索</text>
+  <path d="M1196 385 H1115 V535 H1080" class="return"/>
+
+  <!-- Flow 6: Webcam 警報服務 -> SMTP 外部郵件 (x=1165 track) -->
+  <path d="M1080 410 H1165 V690 H1196" class="line"/>
+  <text x="1165" y="675" text-anchor="middle" class="flow-label">觸發警報</text>
+
+  <!-- Flow 7: 日誌、回饋與數據管理 -> MySQL (x=1152 track up to MySQL) -->
+  <path d="M1080 675 H1150 V280 H1196" class="line"/>
+  <text x="1150" y="270" text-anchor="middle" class="flow-label">寫入紀錄</text>
+
+  <!-- Flow 8: CWA 氣象開放資料 -> 服務層 (y=725) -->
+  <path d="M1196 725 H1080" class="return"/>
+  <text x="1138" y="717" text-anchor="middle" class="flow-label">氣象回傳</text>
+
+  <!-- ================= Bottom System Annotation ================= -->
+  <rect x="50" y="836" width="1500" height="42" rx="6" fill="#eef5ee" stroke="#b1c6b1"/>
+  <text x="800" y="862" text-anchor="middle" class="small">診斷流程採 Gemini 雲端多模態與特定作物專屬模型雙軌推論，經仲裁核心與官方資料庫校驗後寫入；使用者反饋經審核可匯出 JSONL 訓練集以持續迭代優化模型。</text>
+</svg>

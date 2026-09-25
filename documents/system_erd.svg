@@ -1,141 +1,793 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
-  <defs>
-    <style>
-      .title { font: 700 42px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
-      .subtitle { font: 400 19px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665f; }
-      .head { font: 700 21px "Segoe UI", "Microsoft JhengHei", sans-serif; fill: #ffffff; }
-      .field { font: 400 15px "Segoe UI", "Microsoft JhengHei", sans-serif; fill: #334239; }
-      .key { font: 700 14px "Segoe UI", Arial, sans-serif; fill: #98651c; }
-      .label { font: 700 14px "Segoe UI", Arial, sans-serif; fill: #53665a; }
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1600"
+   height="960"
+   viewBox="0 0 1600 960"
+   version="1.1"
+   id="svg92"
+   sodipodi:docname="system_erd.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview92"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.840625"
+     inkscape:cx="800"
+     inkscape:cy="480"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg92" />
+  <defs
+     id="defs1">
+    <style
+       id="style1">
+      .title { font: 700 40px 'Microsoft JhengHei', 'Noto Sans TC', Arial, sans-serif; fill: #26352d; }
+      .subtitle { font: 400 18px 'Microsoft JhengHei', 'Noto Sans TC', Arial, sans-serif; fill: #59665f; }
+      .head { font: 700 20px 'Segoe UI', 'Microsoft JhengHei', sans-serif; fill: #ffffff; }
+      .field { font: 400 15px 'Segoe UI', 'Microsoft JhengHei', sans-serif; fill: #334239; }
+      .key { font: 700 14px 'Segoe UI', Arial, sans-serif; fill: #98651c; }
+      .label { font: 700 14px 'Segoe UI', Arial, sans-serif; fill: #53665a; }
       .table { fill: #ffffff; stroke: #6f9075; stroke-width: 2; }
       .header { fill: #47765a; }
       .line { stroke: #6b7e70; stroke-width: 2.2; fill: none; }
       .optional { stroke: #87998c; stroke-width: 1.8; stroke-dasharray: 7 5; fill: none; }
     </style>
   </defs>
-  <rect width="1600" height="900" fill="#f8faf8"/>
-  <text x="52" y="55" class="title">資料庫實體關聯圖</text>
-  <text x="52" y="86" class="subtitle">依現行 SQLAlchemy models：實線為主要外鍵關聯，虛線為診斷結果的可選病害／蟲害關聯</text>
-
-  <!-- user -->
-  <g>
-    <rect x="50" y="150" width="300" height="250" rx="8" class="table"/>
-    <rect x="50" y="150" width="300" height="48" rx="8" class="header"/>
-    <rect x="50" y="190" width="300" height="8" fill="#47765a"/>
-    <text x="200" y="181" text-anchor="middle" class="head">user</text>
-    <text x="70" y="226" class="key">PK</text><text x="110" y="226" class="field">user_id</text>
-    <text x="70" y="254" class="field">username · email</text>
-    <text x="70" y="282" class="field">password_hash · full_name</text>
-    <text x="70" y="310" class="field">role · is_email_verified</text>
-    <text x="70" y="338" class="field">email_verified_at</text>
-    <text x="70" y="366" class="field">created_at</text>
+  <rect
+     width="1600"
+     height="960"
+     fill="#f8faf8"
+     id="rect1"
+     x="7.1375465"
+     y="-3.5687733" />
+  <text
+     x="52"
+     y="52"
+     class="title"
+     id="text1">資料庫實體關聯圖 (Entity-Relationship Diagram)</text>
+  <text
+     x="52"
+     y="82"
+     class="subtitle"
+     id="text2">依現行 SQLAlchemy Models 繪製：實線為主要外鍵關聯，虛線為可選關聯（如可選病害／蟲害、匿名回饋、選填作物）</text>
+  <!-- 1. user -->
+  <g
+     id="g11">
+    <rect
+       x="50"
+       y="130"
+       width="320"
+       height="240"
+       rx="8"
+       class="table"
+       id="rect2" />
+    <rect
+       x="50"
+       y="130"
+       width="320"
+       height="46"
+       rx="8"
+       class="header"
+       id="rect3" />
+    <rect
+       x="50"
+       y="168"
+       width="320"
+       height="8"
+       fill="#47765a"
+       id="rect4" />
+    <text
+       x="210"
+       y="160"
+       text-anchor="middle"
+       class="head"
+       id="text4">user (使用者)</text>
+    <text
+       x="70"
+       y="204"
+       class="key"
+       id="text5">PK</text>
+    <text
+       x="110"
+       y="204"
+       class="field"
+       id="text6">user_id</text>
+    <text
+       x="70"
+       y="230"
+       class="field"
+       id="text7">username · email</text>
+    <text
+       x="70"
+       y="256"
+       class="field"
+       id="text8">password_hash · full_name</text>
+    <text
+       x="70"
+       y="282"
+       class="field"
+       id="text9">role · is_email_verified</text>
+    <text
+       x="70"
+       y="308"
+       class="field"
+       id="text10">email_verified_at</text>
+    <text
+       x="70"
+       y="334"
+       class="field"
+       id="text11">created_at</text>
   </g>
-
-  <!-- tokens -->
-  <g>
-    <rect x="50" y="525" width="300" height="245" rx="8" class="table"/>
-    <rect x="50" y="525" width="300" height="48" rx="8" class="header"/>
-    <rect x="50" y="565" width="300" height="8" fill="#47765a"/>
-    <text x="200" y="556" text-anchor="middle" class="head">user_one_time_tokens</text>
-    <text x="70" y="601" class="key">PK</text><text x="110" y="601" class="field">id</text>
-    <text x="70" y="629" class="key">FK</text><text x="110" y="629" class="field">user_id</text>
-    <text x="70" y="657" class="field">purpose · token_hash</text>
-    <text x="70" y="685" class="field">expires_at · used_at</text>
-    <text x="70" y="713" class="field">created_at</text>
+  <!-- 2. user_one_time_tokens -->
+  <g
+     id="g20">
+    <rect
+       x="50"
+       y="410"
+       width="320"
+       height="205"
+       rx="8"
+       class="table"
+       id="rect11" />
+    <rect
+       x="50"
+       y="410"
+       width="320"
+       height="46"
+       rx="8"
+       class="header"
+       id="rect12" />
+    <rect
+       x="50"
+       y="448"
+       width="320"
+       height="8"
+       fill="#47765a"
+       id="rect13" />
+    <text
+       x="210"
+       y="440"
+       text-anchor="middle"
+       class="head"
+       id="text13">user_one_time_tokens (一次性權杖)</text>
+    <text
+       x="70"
+       y="484"
+       class="key"
+       id="text14">PK</text>
+    <text
+       x="110"
+       y="484"
+       class="field"
+       id="text15">id</text>
+    <text
+       x="70"
+       y="510"
+       class="key"
+       id="text16">FK</text>
+    <text
+       x="110"
+       y="510"
+       class="field"
+       id="text17">user_id</text>
+    <text
+       x="70"
+       y="536"
+       class="field"
+       id="text18">purpose · token_hash</text>
+    <text
+       x="70"
+       y="562"
+       class="field"
+       id="text19">expires_at · used_at</text>
+    <text
+       x="70"
+       y="588"
+       class="field"
+       id="text20">created_at</text>
   </g>
-
-  <!-- webcam alert -->
-  <g>
-    <rect x="470" y="130" width="380" height="285" rx="8" class="table"/>
-    <rect x="470" y="130" width="380" height="48" rx="8" class="header"/>
-    <rect x="470" y="170" width="380" height="8" fill="#47765a"/>
-    <text x="660" y="161" text-anchor="middle" class="head">webcam_alert</text>
-    <text x="490" y="206" class="key">PK</text><text x="530" y="206" class="field">id</text>
-    <text x="490" y="234" class="key">FK</text><text x="530" y="234" class="field">user_id · crop_id</text>
-    <text x="490" y="262" class="field">category · status_name</text>
-    <text x="490" y="290" class="field">confidence · consecutive_matches</text>
-    <text x="490" y="318" class="field">image_url · email_sent</text>
-    <text x="490" y="346" class="field">acknowledged_at · created_at</text>
+  <!-- 3. diagnosis_feedback (新增/補齊) -->
+  <g
+     id="g31"
+     transform="matrix(1.0937825,0,0,1.1396827,-29.588708,-113.95159)">
+    <rect
+       x="51.163143"
+       y="654.99817"
+       width="318.83865"
+       height="245.00366"
+       rx="7.9709659"
+       class="table"
+       id="rect20" />
+    <rect
+       x="48.862572"
+       y="656.00574"
+       width="320"
+       height="46"
+       rx="8"
+       class="header"
+       id="rect21" />
+    <rect
+       x="50"
+       y="693"
+       width="320"
+       height="8"
+       fill="#47765a"
+       id="rect22" />
+    <text
+       x="210"
+       y="685"
+       text-anchor="middle"
+       class="head"
+       id="text22"
+       style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:20px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">diagnosis_feedback (診斷回饋)</text>
+    <text
+       x="64.430946"
+       y="729"
+       class="key"
+       id="text23"
+       style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:14px;line-height:normal;font-family:'Segoe UI', Arial, sans-serif">PK</text>
+    <text
+       x="110"
+       y="729"
+       class="field"
+       id="text24"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">id</text>
+    <text
+       x="62.203327"
+       y="755"
+       class="key"
+       id="text25"
+       style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:14px;line-height:normal;font-family:'Segoe UI', Arial, sans-serif">FK?</text>
+    <text
+       x="110"
+       y="755"
+       class="field"
+       id="text26"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">user_id · prediction_id</text>
+    <text
+       x="59.975708"
+       y="781"
+       class="field"
+       id="text27"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">image_url</text>
+    <text
+       x="55.520466"
+       y="805.86499"
+       class="field"
+       id="text28"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">original_plant_name · original_disease_name</text>
+    <text
+       x="59.975708"
+       y="833"
+       class="field"
+       id="text29"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">is_plant_error · is_disease_error</text>
+    <text
+       x="56.280552"
+       y="854.19843"
+       class="field"
+       id="text30"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif"
+       transform="matrix(0.99999953,-9.9237068e-4,9.5156031e-4,0.99999953,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan92"
+         x="56.280552"
+         y="854.19843">corrected_plant_name ·</tspan><tspan
+         sodipodi:role="line"
+         id="tspan93"
+         x="56.280552"
+         y="872.94843">corrected_disease_name</tspan></text>
+    <text
+       x="62.386845"
+       y="893.35034"
+       class="field"
+       id="text31"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">created_at</text>
   </g>
-
-  <!-- plant diary -->
-  <g>
-    <rect x="470" y="505" width="380" height="330" rx="8" class="table"/>
-    <rect x="470" y="505" width="380" height="48" rx="8" class="header"/>
-    <rect x="470" y="545" width="380" height="8" fill="#47765a"/>
-    <text x="660" y="536" text-anchor="middle" class="head">plant_diary</text>
-    <text x="490" y="581" class="key">PK</text><text x="530" y="581" class="field">id</text>
-    <text x="490" y="609" class="key">FK</text><text x="530" y="609" class="field">user_id · crop_id</text>
-    <text x="490" y="637" class="key">FK?</text><text x="530" y="637" class="field">disease_id · pest_id</text>
-    <text x="490" y="665" class="field">status_name · confidence</text>
-    <text x="490" y="693" class="field">image_url · suggestion · treatment</text>
-    <text x="490" y="721" class="field">user_note · user_corrected_status</text>
-    <text x="490" y="749" class="field">created_at</text>
+  <!-- 4. webcam_alert -->
+  <g
+     id="g41">
+    <rect
+       x="460"
+       y="130"
+       width="370"
+       height="285"
+       rx="8"
+       class="table"
+       id="rect31" />
+    <rect
+       x="460"
+       y="130"
+       width="370"
+       height="46"
+       rx="8"
+       class="header"
+       id="rect32" />
+    <rect
+       x="460"
+       y="168"
+       width="370"
+       height="8"
+       fill="#47765a"
+       id="rect33" />
+    <text
+       x="645"
+       y="160"
+       text-anchor="middle"
+       class="head"
+       id="text33">webcam_alert (即時監控告警)</text>
+    <text
+       x="480"
+       y="204"
+       class="key"
+       id="text34">PK</text>
+    <text
+       x="520"
+       y="204"
+       class="field"
+       id="text35">id</text>
+    <text
+       x="480"
+       y="230"
+       class="key"
+       id="text36">FK</text>
+    <text
+       x="520"
+       y="230"
+       class="field"
+       id="text37">user_id · crop_id (可選)</text>
+    <text
+       x="480"
+       y="256"
+       class="field"
+       id="text38">category · status_name</text>
+    <text
+       x="480"
+       y="282"
+       class="field"
+       id="text39">confidence · consecutive_matches</text>
+    <text
+       x="480"
+       y="308"
+       class="field"
+       id="text40">image_url · email_sent</text>
+    <text
+       x="480"
+       y="334"
+       class="field"
+       id="text41">acknowledged_at · created_at</text>
   </g>
-
-  <!-- crop -->
-  <g>
-    <rect x="1010" y="120" width="250" height="190" rx="8" class="table"/>
-    <rect x="1010" y="120" width="250" height="48" rx="8" class="header"/>
-    <rect x="1010" y="160" width="250" height="8" fill="#47765a"/>
-    <text x="1135" y="151" text-anchor="middle" class="head">crop</text>
-    <text x="1030" y="196" class="key">PK</text><text x="1070" y="196" class="field">crop_id</text>
-    <text x="1030" y="224" class="field">crop_name</text>
-    <text x="1030" y="252" class="field">crop_name_en</text>
+  <!-- 5. plant_diary -->
+  <g
+     id="g53"
+     transform="matrix(1.0001572,0,0,0.94254139,-0.10144388,27.256782)">
+    <rect
+       x="460"
+       y="475"
+       width="370"
+       height="330"
+       rx="8"
+       class="table"
+       id="rect41" />
+    <rect
+       x="460"
+       y="475"
+       width="370"
+       height="46"
+       rx="8"
+       class="header"
+       id="rect42" />
+    <rect
+       x="460"
+       y="513"
+       width="370"
+       height="8"
+       fill="#47765a"
+       id="rect43" />
+    <text
+       x="645"
+       y="505"
+       text-anchor="middle"
+       class="head"
+       id="text43"
+       style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:20px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">plant_diary (植物診斷日誌)</text>
+    <text
+       x="480"
+       y="549"
+       class="key"
+       id="text44"
+       style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:14px;line-height:normal;font-family:'Segoe UI', Arial, sans-serif">PK</text>
+    <text
+       x="520"
+       y="549"
+       class="field"
+       id="text45"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">id</text>
+    <text
+       x="480"
+       y="575"
+       class="key"
+       id="text46"
+       style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:14px;line-height:normal;font-family:'Segoe UI', Arial, sans-serif">FK</text>
+    <text
+       x="520"
+       y="575"
+       class="field"
+       id="text47"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">user_id · crop_id</text>
+    <text
+       x="480"
+       y="601"
+       class="key"
+       id="text48"
+       style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:14px;line-height:normal;font-family:'Segoe UI', Arial, sans-serif">FK?</text>
+    <text
+       x="520"
+       y="601"
+       class="field"
+       id="text49"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">disease_id · pest_id</text>
+    <text
+       x="480"
+       y="627"
+       class="field"
+       id="text50"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">status_name · confidence</text>
+    <text
+       x="480"
+       y="653"
+       class="field"
+       id="text51"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">image_url · suggestion · treatment</text>
+    <text
+       x="480"
+       y="679"
+       class="field"
+       id="text52"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">user_note · user_corrected_status</text>
+    <text
+       x="480"
+       y="705"
+       class="field"
+       id="text53"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Segoe UI', 'Microsoft JhengHei', sans-serif">created_at</text>
   </g>
-
-  <!-- disease -->
-  <g>
-    <rect x="1320" y="120" width="230" height="290" rx="8" class="table"/>
-    <rect x="1320" y="120" width="230" height="48" rx="8" class="header"/>
-    <rect x="1320" y="160" width="230" height="8" fill="#47765a"/>
-    <text x="1435" y="151" text-anchor="middle" class="head">disease</text>
-    <text x="1340" y="196" class="key">PK</text><text x="1380" y="196" class="field">disease_id</text>
-    <text x="1340" y="224" class="key">FK</text><text x="1380" y="224" class="field">crop_id</text>
-    <text x="1340" y="252" class="field">disease_name</text>
-    <text x="1340" y="280" class="field">description · treatment</text>
-    <text x="1340" y="308" class="field">source_name</text>
-    <text x="1340" y="336" class="field">source_url</text>
-    <text x="1340" y="364" class="field">source_record_id</text>
+  <!-- 6. crop -->
+  <g
+     id="g59">
+    <rect
+       x="930"
+       y="120"
+       width="250"
+       height="190"
+       rx="8"
+       class="table"
+       id="rect53" />
+    <rect
+       x="930"
+       y="120"
+       width="250"
+       height="46"
+       rx="8"
+       class="header"
+       id="rect54" />
+    <rect
+       x="930"
+       y="158"
+       width="250"
+       height="8"
+       fill="#47765a"
+       id="rect55" />
+    <text
+       x="1055"
+       y="150"
+       text-anchor="middle"
+       class="head"
+       id="text55">crop (作物)</text>
+    <text
+       x="950"
+       y="194"
+       class="key"
+       id="text56">PK</text>
+    <text
+       x="990"
+       y="194"
+       class="field"
+       id="text57">crop_id</text>
+    <text
+       x="950"
+       y="222"
+       class="field"
+       id="text58">crop_name</text>
+    <text
+       x="950"
+       y="250"
+       class="field"
+       id="text59">crop_name_en</text>
   </g>
-
-  <!-- pests -->
-  <g>
-    <rect x="1320" y="505" width="230" height="290" rx="8" class="table"/>
-    <rect x="1320" y="505" width="230" height="48" rx="8" class="header"/>
-    <rect x="1320" y="545" width="230" height="8" fill="#47765a"/>
-    <text x="1435" y="536" text-anchor="middle" class="head">pests</text>
-    <text x="1340" y="581" class="key">PK</text><text x="1380" y="581" class="field">pest_id</text>
-    <text x="1340" y="609" class="key">FK</text><text x="1380" y="609" class="field">crop_id</text>
-    <text x="1340" y="637" class="field">pest_name</text>
-    <text x="1340" y="665" class="field">description · treatment</text>
-    <text x="1340" y="693" class="field">source_name</text>
-    <text x="1340" y="721" class="field">source_url</text>
-    <text x="1340" y="749" class="field">source_record_id</text>
+  <!-- 7. disease -->
+  <g
+     id="g70">
+    <rect
+       x="1270"
+       y="120"
+       width="280"
+       height="295"
+       rx="8"
+       class="table"
+       id="rect59" />
+    <rect
+       x="1270"
+       y="120"
+       width="280"
+       height="46"
+       rx="8"
+       class="header"
+       id="rect60" />
+    <rect
+       x="1270"
+       y="158"
+       width="280"
+       height="8"
+       fill="#47765a"
+       id="rect61" />
+    <text
+       x="1410"
+       y="150"
+       text-anchor="middle"
+       class="head"
+       id="text61">disease (病害資料庫)</text>
+    <text
+       x="1290"
+       y="194"
+       class="key"
+       id="text62">PK</text>
+    <text
+       x="1330"
+       y="194"
+       class="field"
+       id="text63">disease_id</text>
+    <text
+       x="1290"
+       y="222"
+       class="key"
+       id="text64">FK</text>
+    <text
+       x="1330"
+       y="222"
+       class="field"
+       id="text65">crop_id</text>
+    <text
+       x="1290"
+       y="250"
+       class="field"
+       id="text66">disease_name</text>
+    <text
+       x="1290"
+       y="278"
+       class="field"
+       id="text67">description · treatment</text>
+    <text
+       x="1290"
+       y="306"
+       class="field"
+       id="text68">source_name</text>
+    <text
+       x="1290"
+       y="334"
+       class="field"
+       id="text69">source_url</text>
+    <text
+       x="1290"
+       y="362"
+       class="field"
+       id="text70">source_record_id</text>
   </g>
-
+  <!-- 8. pests -->
+  <g
+     id="g81">
+    <rect
+       x="1270"
+       y="475"
+       width="280"
+       height="295"
+       rx="8"
+       class="table"
+       id="rect70" />
+    <rect
+       x="1270"
+       y="475"
+       width="280"
+       height="46"
+       rx="8"
+       class="header"
+       id="rect71" />
+    <rect
+       x="1270"
+       y="513"
+       width="280"
+       height="8"
+       fill="#47765a"
+       id="rect72" />
+    <text
+       x="1410"
+       y="505"
+       text-anchor="middle"
+       class="head"
+       id="text72">pests (蟲害資料庫)</text>
+    <text
+       x="1290"
+       y="549"
+       class="key"
+       id="text73">PK</text>
+    <text
+       x="1330"
+       y="549"
+       class="field"
+       id="text74">pest_id</text>
+    <text
+       x="1290"
+       y="577"
+       class="key"
+       id="text75">FK</text>
+    <text
+       x="1330"
+       y="577"
+       class="field"
+       id="text76">crop_id</text>
+    <text
+       x="1290"
+       y="605"
+       class="field"
+       id="text77">pest_name</text>
+    <text
+       x="1290"
+       y="633"
+       class="field"
+       id="text78">description · treatment</text>
+    <text
+       x="1290"
+       y="661"
+       class="field"
+       id="text79">source_name</text>
+    <text
+       x="1290"
+       y="689"
+       class="field"
+       id="text80">source_url</text>
+    <text
+       x="1290"
+       y="717"
+       class="field"
+       id="text81">source_record_id</text>
+  </g>
   <!-- Relations -->
-  <path d="M200 400 V525" class="line"/>
-  <text x="212" y="470" class="label">1 : N</text>
-  <path d="M350 265 H470" class="line"/>
-  <text x="398" y="250" class="label">1 : N</text>
-  <path d="M350 310 H410 V610 H470" class="line"/>
-  <text x="420" y="590" class="label">1 : N</text>
-
-  <path d="M1010 210 H920 V234 H850" class="line"/>
-  <text x="918" y="198" class="label">1 : N</text>
-  <path d="M1010 250 H900 V609 H850" class="line"/>
-  <text x="912" y="595" class="label">1 : N</text>
-  <path d="M1260 190 H1320" class="line"/>
-  <text x="1274" y="178" class="label">1 : N</text>
-  <path d="M1135 310 V650 H1320" class="line"/>
-  <text x="1148" y="474" class="label">1 : N</text>
-
-  <path d="M1320 380 H1240 V637 H850" class="optional"/>
-  <text x="1165" y="625" class="label">0..1 : N</text>
-  <path d="M1320 755 H1210 V675 H850" class="optional"/>
-  <text x="1135" y="696" class="label">0..1 : N</text>
-
-  <rect x="50" y="852" width="1500" height="30" rx="6" fill="#eef5ee" stroke="#b1c6b1"/>
-  <text x="800" y="873" text-anchor="middle" class="subtitle">webcam_alert 只保存通過連續影格與資料庫覆核的異常；disease、pests 保留官方來源欄位。</text>
+  <!-- user -> user_one_time_tokens -->
+  <path
+     d="M210 370 V410"
+     class="line"
+     id="path81" />
+  <text
+     x="222"
+     y="395"
+     class="label"
+     id="text82">1 : N</text>
+  <!-- user -> diagnosis_feedback (optional FK, allows anonymous) -->
+  <path
+     d="M370 270 H400 V720 H370"
+     class="optional"
+     id="path82" />
+  <text
+     x="406"
+     y="500"
+     class="label"
+     id="text83">0..1 : N</text>
+  <!-- user -> webcam_alert -->
+  <path
+     d="M370 190 H460"
+     class="line"
+     id="path83" />
+  <text
+     x="395"
+     y="178"
+     class="label"
+     id="text84">1 : N</text>
+  <!-- user -> plant_diary -->
+  <path
+     d="M370 330 H425 V570 H460"
+     class="line"
+     id="path84" />
+  <text
+     x="435"
+     y="550"
+     class="label"
+     id="text85">1 : N</text>
+  <!-- crop -> webcam_alert (optional FK) -->
+  <path
+     d="M930 200 H880 V230 H830"
+     class="optional"
+     id="path85" />
+  <text
+     x="886"
+     y="190"
+     class="label"
+     id="text86">0..1 : N</text>
+  <!-- crop -> plant_diary -->
+  <path
+     d="M930 250 H865 V575 H830"
+     class="line"
+     id="path86" />
+  <text
+     x="872"
+     y="555"
+     class="label"
+     id="text87">1 : N</text>
+  <!-- crop -> disease -->
+  <path
+     d="M1180 190 H1270"
+     class="line"
+     id="path87" />
+  <text
+     x="1205"
+     y="178"
+     class="label"
+     id="text88">1 : N</text>
+  <!-- crop -> pests -->
+  <path
+     d="M1055 310 V615 H1270"
+     class="line"
+     id="path88" />
+  <text
+     x="1065"
+     y="470"
+     class="label"
+     id="text89">1 : N</text>
+  <!-- disease -> plant_diary (optional) -->
+  <path
+     d="M1270 380 H1210 V635 H830"
+     class="optional"
+     id="path89" />
+  <text
+     x="1130"
+     y="625"
+     class="label"
+     id="text90">0..1 : N</text>
+  <!-- pests -> plant_diary (optional) -->
+  <path
+     d="M1270 725 H1175 V675 H830"
+     class="optional"
+     id="path90" />
+  <text
+     x="1100"
+     y="695"
+     class="label"
+     id="text91">0..1 : N</text>
+  <!-- Bottom Annotation -->
+  <rect
+     x="50"
+     y="915"
+     width="1500"
+     height="32"
+     rx="6"
+     fill="#eef5ee"
+     stroke="#b1c6b1"
+     id="rect91" />
+  <text
+     x="800"
+     y="936"
+     text-anchor="middle"
+     class="subtitle"
+     id="text92">webcam_alert 僅保存通過連續影格與覆核之異常；diagnosis_feedback 補齊匿名與回饋機制；disease、pests 保留官方農委會來源資訊。</text>
 </svg>
