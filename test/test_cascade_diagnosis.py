@@ -219,3 +219,42 @@ def test_convnext_user_crop_respected_when_confident():
             assert result["is_confidence_override"] is False
 
 
+def test_unknown_diagnosis_cannot_be_saved_to_diary():
+    """方案 A：驗證當診斷結果為未知植物或無法判定時，confirm_and_create_diary 會被嚴格阻擋 (400)"""
+    import asyncio
+    from fastapi import HTTPException
+    from app.routers.diaries import confirm_and_create_diary
+    from app.routers.prediction import prediction_cache
+    from app.schemas.diaries import DiaryConfirm
+    from unittest.mock import MagicMock
+
+    pred_id = "test-unknown-id-123"
+    prediction_cache[pred_id] = {
+        "result": {
+            "crop_name": "未知作物",
+            "status_name": "無法判定",
+            "category": "unknown",
+            "confidence": 0.2,
+        },
+        "temp_path": "static/tmp/dummy.jpg"
+    }
+
+    mock_user = MagicMock()
+    mock_user.user_id = 1
+    mock_db = MagicMock()
+    payload = DiaryConfirm(user_note="想存未知", disease_name="無法判定", gemini_advice="特徵不足")
+
+    with pytest.raises(HTTPException) as exc_info:
+        asyncio.run(
+            confirm_and_create_diary(
+                prediction_id=pred_id,
+                payload=payload,
+                current_user=mock_user,
+                db=mock_db
+            )
+        )
+
+    assert exc_info.value.status_code == 400
+    assert "不可存入病歷日記" in exc_info.value.detail
+
+

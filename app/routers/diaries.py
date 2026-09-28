@@ -35,7 +35,7 @@ async def get_all_history(current_user: models.User = Depends(get_current_user))
             sql = """
             SELECT
                 d.id,
-                c.crop_name AS crop_name,
+                COALESCE(c.crop_name, '未知作物') AS crop_name,
                 d.status_name,
                 d.user_corrected_status,
                 d.image_url,
@@ -68,7 +68,7 @@ async def get_diary_detail(diary_id: int, current_user: models.User = Depends(ge
     try:
         with conn.cursor() as cursor:
             sql = """
-            SELECT d.*, c.crop_name AS crop_name, d.user_corrected_status
+            SELECT d.*, COALESCE(c.crop_name, '未知作物') AS crop_name, d.user_corrected_status
             FROM plant_diary d
             LEFT JOIN crop c ON d.crop_id = c.crop_id
             WHERE d.id = %s AND d.user_id = %s
@@ -159,6 +159,20 @@ async def confirm_and_create_diary(
 
     ai_result = cached_data["result"]
     temp_path = Path(cached_data["temp_path"])
+
+    # 方案 A 核心防禦：未知作物或無法判定之結果禁止寫入病例日記
+    crop_name = ai_result.get("crop_name")
+    status_name = ai_result.get("status_name")
+    category = str(ai_result.get("category", "")).lower()
+    if (
+        category == "unknown"
+        or crop_name in ["未知作物", "未知", "無法判定", None]
+        or status_name in ["無法判定", "未知", None]
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="診斷結果為未知植物或無法判定之病害，不可存入病歷日記。"
+        )
 
     # 2. 檢查圖片是否存在
     if not temp_path.exists():

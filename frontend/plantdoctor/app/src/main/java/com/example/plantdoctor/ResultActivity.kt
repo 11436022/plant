@@ -39,6 +39,7 @@ class ResultActivity : AppCompatActivity() {
     private var imageUriString: String? = null
     private var plantName: String? = null
     private var diseaseName: String? = null
+    private var isUnknownResult: Boolean = false
 
     private var dX = 0f
     private var dY = 0f
@@ -107,6 +108,26 @@ class ResultActivity : AppCompatActivity() {
                 append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
             }.toString()
             binding.tvAdvice.text = fullAdvice
+
+            isUnknownResult = (plantName.isNullOrEmpty() || plantName in listOf("未知作物", "未知", "無法判定")
+                    || diseaseName.isNullOrEmpty() || diseaseName in listOf("無法判定", "未知")
+                    || data.category?.lowercase() == "unknown")
+
+            if (isUnknownResult) {
+                // 方案 A：無法判定或未知作物時，隱藏「儲存至日記」，只保留「結果有誤？（回饋）」選項
+                binding.btnSave.visibility = View.GONE
+                val params = binding.btnDiscard.layoutParams as android.widget.LinearLayout.LayoutParams
+                params.marginEnd = 0
+                binding.btnDiscard.layoutParams = params
+                binding.btnDiscard.text = "結果有誤？（回饋）"
+            } else {
+                binding.btnSave.visibility = View.VISIBLE
+                val marginPx = (8 * resources.displayMetrics.density).toInt()
+                val params = binding.btnDiscard.layoutParams as android.widget.LinearLayout.LayoutParams
+                params.marginEnd = marginPx
+                binding.btnDiscard.layoutParams = params
+                binding.btnDiscard.text = "結果有誤"
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "報告內容解析失敗", Toast.LENGTH_SHORT).show()
@@ -127,7 +148,11 @@ class ResultActivity : AppCompatActivity() {
 
         binding.btnBackHome.setOnClickListener {
             SoundManager.playBubblePop()
-            showSaveConfirmationDialog(predictionId)
+            if (isUnknownResult) {
+                goToHome()
+            } else {
+                showSaveConfirmationDialog(predictionId)
+            }
         }
 
         // 補上 "結果有誤" 按鈕的監聽器
@@ -155,6 +180,16 @@ class ResultActivity : AppCompatActivity() {
         super.onDestroy()
         windHandler.removeCallbacks(windRunnable)
         SoundManager.stopWind()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (isUnknownResult) {
+            goToHome()
+        } else {
+            val predictionId = intent.getStringExtra("PREDICTION_ID")
+            showSaveConfirmationDialog(predictionId)
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -229,6 +264,11 @@ class ResultActivity : AppCompatActivity() {
     }
 
     private fun confirmAndSaveDiary(predictionId: String?) {
+        if (isUnknownResult) {
+            Toast.makeText(this, "未知作物或無法判定之結果，無法儲存至日記", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         if (predictionId.isNullOrEmpty()) {
             Toast.makeText(this, "缺少預測ID，無法儲存", Toast.LENGTH_SHORT).show()
             return

@@ -34,9 +34,9 @@ import retrofit2.Response
 // 歷史紀錄資料模型
 data class HistoryItem(
     @SerializedName("id") val id: Int,
-    @SerializedName("crop_name") val crop_name: String,
+    @SerializedName("crop_name") val crop_name: String?,
     @SerializedName("created_at") val created_at: String,
-    @SerializedName("status_name") val status_name: String,
+    @SerializedName("status_name") val status_name: String?,
     @SerializedName("user_corrected_status") val user_corrected_status: String?,
     @SerializedName("image_url") val image_url: String,
     @SerializedName("suggestion") var suggestion: String? = null,
@@ -117,8 +117,8 @@ class HistoryListActivity : AppCompatActivity() {
             fullHistoryList
         } else {
             fullHistoryList.filter {
-                it.crop_name.contains(query, ignoreCase = true) ||
-                        it.status_name.contains(query, ignoreCase = true)
+                (it.crop_name ?: "").contains(query, ignoreCase = true) ||
+                        (it.status_name ?: "").contains(query, ignoreCase = true)
             }
         }
         displayList.clear()
@@ -202,9 +202,9 @@ class HistoryAdapter(
 
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
         val item = historyList[position]
-        holder.tvName.text = item.crop_name
+        holder.tvName.text = item.crop_name ?: "未知作物"
         holder.tvDate.text = item.created_at
-        holder.tvStatus.text = item.status_name
+        holder.tvStatus.text = item.status_name ?: "無法判定"
 
         val finalUrl = fixImageUrl(item.image_url)
 
