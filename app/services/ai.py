@@ -62,7 +62,7 @@ def arbitrate_diagnosis(
     retrieved_rag_context: str = "",
 ) -> dict:
     """
-    後端大法官：三方會診（Vertex AI 客製化模型、Gemini 多模態、RAG 知識庫）裁決核心。
+    後端大法官：三方會診（本地 ConvNeXt 模型、Gemini 多模態、RAG 知識庫）裁決核心。
     處理五大情境：
       1. 雙重命中：Gemini 與客製化模型高度吻合。
       2. 分佈外過濾：Gemini 認出作物，且不在客製化標籤白名單（如草莓），直接捨棄客製化猜測。
