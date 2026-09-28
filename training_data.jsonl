@@ -1,3 +1,0 @@
-{"imageGcsUri": "gs://plant-doctor-training-data-chm/feedback_images/feedback_ee43997d55ef4c39838e67255d25815f.jpg", "classificationAnnotation": {"displayName": "扁蒲-健康"}}
-{"imageGcsUri": "gs://plant-doctor-training-data-chm/feedback_images/feedback_b8169baf2d09464aa95d5ab388cb894b.jpg", "classificationAnnotation": {"displayName": "樺木-葉斑病"}}
-{"imageGcsUri": "gs://plant-doctor-training-data-chm/feedback_images/feedback_232d597b3484425f917ab45f326089fd.jpg", "classificationAnnotation": {"displayName": "扶桑-缺鐵症"}}

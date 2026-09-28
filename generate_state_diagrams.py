@@ -928,7 +928,7 @@ def generate_svg_admin():
       <rect width="400" height="95" class="ai-box" />
       <path d="M 0 6 Q 0 0 6 0 L 394 0 Q 400 0 400 6 L 400 24 L 0 24 Z" class="ai-header" />
       <text x="200" y="17" class="state-name" fill="#15803d">匯出訓練集供 ConvNet 訓練 (Export_JSONL)</text>
-      <text x="10" y="42" class="action-text">do / 執行 export_training_data.py 將審核資料匯出為 JSONL</text>
+      <text x="10" y="42" class="action-text">do / 匯出審核回饋資料為標準標註訓練集 (Dataset Export)</text>
       <text x="10" y="56" class="action-text">do / 影像自動增強 (Data Augmentation) 擴增樣本集</text>
       <text x="10" y="70" class="action-text">do / 驅動本地 PyTorch ConvNet 卷積模型持續訓練 (Active Learning)</text>
       <text x="10" y="85" class="action-text">do / 迭代更新 convnet.pth 權重檔，零雲端託管端點開銷</text>
