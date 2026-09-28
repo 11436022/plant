@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 700" width="1150" height="700">
+  <defs>
+    <style>
+      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 20px; font-weight: bold; fill: #0f172a; }
+      .group-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #1e293b; }
+      .state-name { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .action-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #475569; }
+      .transition-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #1d4ed8; font-weight: 500; }
+      .guard-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 9px; fill: #b91c1c; font-style: italic; }
+      
+      .composite-bg { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 6,4; rx: 8; ry: 8; }
+      .composite-header { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.5; }
+      
+      .state-box { fill: #ffffff; stroke: #2563eb; stroke-width: 1.5; rx: 6; ry: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .state-header { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.5; }
+      
+      .danger-box { fill: #fef2f2; stroke: #dc2626; stroke-width: 1.5; rx: 6; ry: 6; }
+      .danger-header { fill: #fee2e2; stroke: #dc2626; stroke-width: 1.5; }
+      
+      .ai-box { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 6; ry: 6; }
+      .ai-header { fill: #dcfce7; stroke: #16a34a; stroke-width: 1.5; }
+      
+      .line { stroke: #334155; stroke-width: 1.3; fill: none; marker-end: url(#arrow); }
+      .line-back { stroke: #64748b; stroke-width: 1.2; stroke-dasharray: 4,3; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+    </marker>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#ffffff" />
+  <text x="575" y="32" class="title" text-anchor="middle">圖 7-4-5 檢視儀表板與日誌管理 狀態圖 (State Diagram)</text>
+
+  <!-- Initial State -->
+  <circle cx="50" cy="120" r="8" fill="#0f172a" />
+  <line x1="58" y1="120" x2="95" y2="120" class="line" />
+
+  <!-- ================= COMPOSITE 1: DASHBOARD OVERVIEW ================= -->
+  <g transform="translate(100, 60)">
+    <rect width="310" height="600" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 302 0 Q 310 0 310 8 L 310 30 L 0 30 Z" class="composite-header" />
+    <text x="15" y="20" class="group-title">管理員儀表板狀態 (Admin Dashboard)</text>
+
+    <!-- State 1: 權限認證 -->
+    <g transform="translate(20, 50)">
+      <rect width="270" height="75" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 264 0 Q 270 0 270 6 L 270 24 L 0 24 Z" class="state-header" />
+      <text x="135" y="17" class="state-name">管理員鑑權 (Admin_Auth)</text>
+      <text x="10" y="42" class="action-text">entry / 驗證 JWT Token 具備 Admin 角色</text>
+      <text x="10" y="56" class="action-text">guard / [非管理員] 重導向 403 拒絕訪問</text>
+      <text x="10" y="70" class="action-text">do / 載入管理者操作控制台</text>
+    </g>
+
+    <line x1="155" y1="125" x2="155" y2="185" class="line" />
+    <text x="160" y="160" class="transition-text">身分查驗合格</text>
+
+    <!-- State 2: 儀表板總覽 -->
+    <g transform="translate(20, 185)">
+      <rect width="270" height="100" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 264 0 Q 270 0 270 6 L 270 24 L 0 24 Z" class="state-header" />
+      <text x="135" y="17" class="state-name">儀表板總覽態 (Dashboard_Active)</text>
+      <text x="10" y="42" class="action-text">entry / 統計全站總診斷次數與植物健康比率</text>
+      <text x="10" y="56" class="action-text">do / 渲染病害高發排行榜、用戶活躍度圖表</text>
+      <text x="10" y="70" class="action-text">do / 顯示待審核糾錯反饋通知數 (Pending)</text>
+      <text x="10" y="84" class="action-text">do / 輪詢 Webcam 監控即時串流與警報狀態</text>
+    </g>
+
+    <line x1="155" y1="285" x2="155" y2="350" class="line" />
+    <text x="160" y="320" class="transition-text">選擇管理維護模組</text>
+
+    <!-- State 3: 會話維持 -->
+    <g transform="translate(20, 350)">
+      <rect width="270" height="75" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 264 0 Q 270 0 270 6 L 270 24 L 0 24 Z" class="state-header" />
+      <text x="135" y="17" class="state-name">後台會話就緒 (Session_Ready)</text>
+      <text x="10" y="42" class="action-text">do / 支援多模組即時切換</text>
+      <text x="10" y="56" class="action-text">do / 記錄管理者審計日誌 (Audit Log)</text>
+      <text x="10" y="70" class="action-text">exit / 點擊登出銷毀會話</text>
+    </g>
+
+    <line x1="155" y1="425" x2="155" y2="480" class="line" />
+    <circle cx="155" cy="495" r="9" stroke="#0f172a" stroke-width="1.5" fill="none" />
+    <circle cx="155" cy="495" r="5" fill="#0f172a" />
+  </g>
+
+  <!-- ================= SUB-PROCESS 1: LOG MANAGEMENT (UC-09) ================= -->
+  <path d="M 290 235 L 450 235 L 450 150 L 480 150" class="line" />
+  <text x="370" y="195" class="transition-text">進入診斷日誌列表</text>
+
+  <g transform="translate(480, 60)">
+    <rect width="630" height="260" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 622 0 Q 630 0 630 8 L 630 30 L 0 30 Z" class="composite-header" fill="#fee2e2" />
+    <text x="15" y="20" class="group-title" fill="#991b1b">管理功能 1：全站診斷日誌檢視與異常紀錄刪除 (UC-09 專屬權限)</text>
+
+    <!-- State 4: 檢閱全站日誌清單 -->
+    <g transform="translate(15, 50)">
+      <rect width="240" height="75" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 234 0 Q 240 0 240 6 L 240 24 L 0 24 Z" class="state-header" />
+      <text x="120" y="17" class="state-name">檢閱全站日誌 (Browsing_All)</text>
+      <text x="10" y="42" class="action-text">entry / 顯示所有使用者植物診斷記錄</text>
+      <text x="10" y="56" class="action-text">do / 支援使用者帳號、作物、病害篩選</text>
+      <text x="10" y="70" class="action-text">do / 檢視使用者備忘 (user_note) 與照片</text>
+    </g>
+
+    <line x1="255" y1="87" x2="345" y2="87" class="line" />
+    <rect x="260" y="70" width="80" height="15" fill="#ffffff" rx="3" />
+    <text x="300" y="82" class="transition-text" text-anchor="middle">點擊刪除按鈕</text>
+
+    <!-- State 5: 刪除確認對話框 -->
+    <g transform="translate(345, 50)">
+      <rect width="280" height="85" class="danger-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 24 L 0 24 Z" class="danger-header" />
+      <text x="140" y="17" class="state-name" fill="#991b1b">二次刪除確認 (Deletion_Confirm)</text>
+      <text x="10" y="42" class="action-text" fill="#b91c1c">entry / 彈出「確認安全刪除紀錄」警告視窗</text>
+      <text x="10" y="56" class="action-text" fill="#b91c1c">do / 提示此操作將自 MySQL 徹底抹除不可復原</text>
+      <text x="10" y="70" class="guard-text">[點擊取消] 返回日誌列表</text>
+      <text x="10" y="82" class="guard-text">[點擊確認] 發送 DELETE /api/v1/admin/diaries/{id}</text>
+    </g>
+
+    <!-- State 6: 抹除與審計日誌更新 -->
+    <g transform="translate(180, 165)">
+      <rect width="280" height="75" class="danger-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 24 L 0 24 Z" class="danger-header" />
+      <text x="140" y="17" class="state-name" fill="#991b1b">資料庫安全清除 (Record_Purged)</text>
+      <text x="10" y="42" class="action-text" fill="#b91c1c">do / 自 plant_diary 表格移除該筆資料</text>
+      <text x="10" y="56" class="action-text" fill="#b91c1c">do / 同步刪除 static/uploads 磁碟圖片檔案</text>
+      <text x="10" y="70" class="action-text" fill="#b91c1c">do / 即時刷新後台日誌列表，回傳 200 OK</text>
+    </g>
+
+    <path d="M 470 135 L 470 165 L 460 165" class="line" />
+    <path d="M 180 202 L 145 202 L 145 125" class="line-back" />
+    <text x="110" y="170" class="transition-text">刷新清單</text>
+  </g>
+
+  <!-- ================= SUB-PROCESS 2: FEEDBACK & ACTIVE LEARNING (UC-14) ================= -->
+  <path d="M 290 260 L 450 260 L 450 480 L 480 480" class="line" />
+  <text x="370" y="430" class="transition-text">審核糾錯反饋</text>
+
+  <g transform="translate(480, 360)">
+    <rect width="630" height="300" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 622 0 Q 630 0 630 8 L 630 30 L 0 30 Z" class="composite-header" fill="#dcfce7" />
+    <text x="15" y="20" class="group-title" fill="#15803d">管理功能 2：糾錯審核與本地 ConvNet 模型持續訓練標註 (UC-14)</text>
+
+    <!-- State 7: 審核糾錯反饋清單 -->
+    <g transform="translate(20, 50)">
+      <rect width="250" height="90" class="ai-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 244 0 Q 250 0 250 6 L 250 24 L 0 24 Z" class="ai-header" />
+      <text x="125" y="17" class="state-name" fill="#15803d">反饋審查 (Reviewing_Feedback)</text>
+      <text x="10" y="42" class="action-text">entry / 載入 diagnosis_feedback 待審清單</text>
+      <text x="10" y="56" class="action-text">do / 比對原 AI 診斷與用戶糾錯標籤</text>
+      <text x="10" y="70" class="action-text">do / 放大檢視病患葉片微觀病徵</text>
+      <text x="10" y="84" class="action-text">do / 農學專家人工標註真值 (Ground Truth)</text>
+    </g>
+
+    <line x1="270" y1="95" x2="330" y2="95" class="line" />
+    <text x="300" y="88" class="transition-text" text-anchor="middle">審核通過標註</text>
+
+    <!-- State 8: 標註確認與入庫 -->
+    <g transform="translate(330, 50)">
+      <rect width="280" height="90" class="ai-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 24 L 0 24 Z" class="ai-header" />
+      <text x="140" y="17" class="state-name" fill="#15803d">專家標註確認 (Label_Confirmed)</text>
+      <text x="10" y="42" class="action-text">do / 更新 diagnosis_feedback 狀態為已審查</text>
+      <text x="10" y="56" class="action-text">do / 鎖定標註之真值作物與病害類別</text>
+      <text x="10" y="70" class="action-text">do / 加入待微調樣本候選池 (Candidate Pool)</text>
+      <text x="10" y="84" class="action-text">exit / 準備批次匯出訓練集</text>
+    </g>
+
+    <line x1="470" y1="140" x2="470" y2="185" class="line" />
+    <text x="475" y="165" class="transition-text">點擊匯出訓練集</text>
+
+    <!-- State 9: 匯出 JSONL 供 ConvNet 訓練 -->
+    <g transform="translate(180, 185)">
+      <rect width="400" height="95" class="ai-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 394 0 Q 400 0 400 6 L 400 24 L 0 24 Z" class="ai-header" />
+      <text x="200" y="17" class="state-name" fill="#15803d">匯出訓練集供 ConvNet 訓練 (Export_JSONL)</text>
+      <text x="10" y="42" class="action-text">do / 執行 export_training_data.py 將審核資料匯出為 JSONL</text>
+      <text x="10" y="56" class="action-text">do / 影像自動增強 (Data Augmentation) 擴增樣本集</text>
+      <text x="10" y="70" class="action-text">do / 驅動本地 PyTorch ConvNet 卷積模型持續訓練 (Active Learning)</text>
+      <text x="10" y="85" class="action-text">do / 迭代更新 convnet.pth 權重檔，零雲端託管端點開銷</text>
+    </g>
+  </g>
+</svg>

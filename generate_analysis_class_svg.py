@@ -1,0 +1,169 @@
+# Generate perfectly aligned system_analysis_class.svg (圖 5-4-1 分析類別圖)
+svg_content = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 580" width="980" height="580">
+  <defs>
+    <style>
+      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 18px; font-weight: bold; fill: #0f172a; }
+      .class-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 13px; font-weight: bold; fill: #ffffff; text-anchor: middle; }
+      .stereotype { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 10px; font-style: italic; fill: #e2e8f0; text-anchor: middle; }
+      .member-text { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; fill: #1e293b; }
+      .cardinality { font-family: 'Consolas', monospace; font-size: 11px; font-weight: bold; fill: #334155; }
+      .rel-label { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #64748b; text-anchor: middle; }
+      
+      .class-box { fill: #ffffff; stroke: #2563eb; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .class-header { fill: #2563eb; }
+      
+      .core-box { fill: #ffffff; stroke: #059669; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .core-header { fill: #059669; }
+      
+      .feedback-box { fill: #ffffff; stroke: #d97706; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .feedback-header { fill: #d97706; }
+
+      .assoc-line { stroke: #334155; stroke-width: 1.3; fill: none; }
+      .divider { stroke: #e2e8f0; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#ffffff" />
+
+  <!-- Diagram Title -->
+  <text x="490" y="32" class="title" text-anchor="middle">圖 5-4-1 分析類別圖 (Analysis Class Diagram)</text>
+
+  <!-- ================= ROW 1 ================= -->
+  <!-- Col 1: 使用者 (User) -->
+  <g transform="translate(40, 65)">
+    <rect width="240" height="155" class="class-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 236 0 Q 240 0 240 4 L 240 28 L 0 28 Z" class="class-header" />
+    <text x="120" y="14" class="stereotype">&lt;&lt;domain concept&gt;&gt;</text>
+    <text x="120" y="25" class="class-title">使用者 (User)</text>
+    <text x="12" y="48" class="member-text">+ username: String (用戶名稱)</text>
+    <text x="12" y="66" class="member-text">+ email: String (電子郵件)</text>
+    <text x="12" y="84" class="member-text">+ role: String (角色權限)</text>
+    <line x1="0" y1="94" x2="240" y2="94" class="divider" />
+    <text x="12" y="112" class="member-text">+ login() (登入驗證)</text>
+    <text x="12" y="130" class="member-text">+ register() (帳號註冊)</text>
+    <text x="12" y="146" class="member-text">+ verify_email() (信箱認證)</text>
+  </g>
+
+  <!-- Col 2: 植物日誌 (PlantDiary) -->
+  <g transform="translate(365, 65)">
+    <rect width="250" height="165" class="core-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 246 0 Q 250 0 250 4 L 250 28 L 0 28 Z" class="core-header" />
+    <text x="125" y="14" class="stereotype">&lt;&lt;domain concept&gt;&gt;</text>
+    <text x="125" y="25" class="class-title">植物日誌 (PlantDiary)</text>
+    <text x="12" y="48" class="member-text">+ created_at: Date (建立時間)</text>
+    <text x="12" y="66" class="member-text">+ user_note: String (個人備忘筆記)</text>
+    <text x="12" y="84" class="member-text">+ status_name: String (病名狀態)</text>
+    <text x="12" y="102" class="member-text">+ confidence: Float (綜合信心度)</text>
+    <line x1="0" y1="112" x2="250" y2="112" class="divider" />
+    <text x="12" y="130" class="member-text">+ create_entry() (確認建立日誌)</text>
+    <text x="12" y="148" class="member-text">+ update_note() (編輯備忘筆記)</text>
+    <text x="12" y="162" class="member-text">+ delete_entry() (刪除日誌紀錄)</text>
+  </g>
+
+  <!-- Col 3: 診斷結果 (DiagnosisResult) -->
+  <g transform="translate(695, 65)">
+    <rect width="245" height="165" class="core-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 241 0 Q 245 0 245 4 L 245 28 L 0 28 Z" class="core-header" />
+    <text x="122" y="14" class="stereotype">&lt;&lt;domain concept&gt;&gt;</text>
+    <text x="122" y="25" class="class-title">診斷結果 (DiagnosisResult)</text>
+    <text x="12" y="48" class="member-text">+ crop_name: String (作物種類)</text>
+    <text x="12" y="66" class="member-text">+ disease_name: String (病害名稱)</text>
+    <text x="12" y="84" class="member-text">+ confidence: Float (信心指數)</text>
+    <text x="12" y="102" class="member-text">+ suggestion: Text (病理特徵描述)</text>
+    <text x="12" y="120" class="member-text">+ treatment: Text (建議處置方針)</text>
+    <line x1="0" y1="130" x2="245" y2="130" class="divider" />
+    <text x="12" y="148" class="member-text">+ arbitrate() (雙模型決策仲裁)</text>
+    <text x="12" y="162" class="member-text">+ rag_verify() (知識庫校驗)</text>
+  </g>
+
+  <!-- ================= ROW 2 ================= -->
+  <!-- Col 1: 智慧監控警報 (WebcamAlert) -->
+  <g transform="translate(40, 310)">
+    <rect width="240" height="155" class="class-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 236 0 Q 240 0 240 4 L 240 28 L 0 28 Z" class="class-header" />
+    <text x="120" y="14" class="stereotype">&lt;&lt;domain concept&gt;&gt;</text>
+    <text x="120" y="25" class="class-title">監控警報 (WebcamAlert)</text>
+    <text x="12" y="48" class="member-text">+ snapshot_url: String (異常擷圖)</text>
+    <text x="12" y="66" class="member-text">+ alert_status: String (警報狀態)</text>
+    <text x="12" y="84" class="member-text">+ alert_time: DateTime (警報時間)</text>
+    <text x="12" y="102" class="member-text">+ is_resolved: Boolean (處理狀態)</text>
+    <line x1="0" y1="112" x2="240" y2="112" class="divider" />
+    <text x="12" y="130" class="member-text">+ trigger_alert() (觸發連續警報)</text>
+    <text x="12" y="148" class="member-text">+ mark_resolved() (標記已處理)</text>
+  </g>
+
+  <!-- Col 2: 病害圖片 (Image) -->
+  <g transform="translate(365, 310)">
+    <rect width="250" height="155" class="class-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 246 0 Q 250 0 250 4 L 250 28 L 0 28 Z" class="class-header" />
+    <text x="125" y="14" class="stereotype">&lt;&lt;domain concept&gt;&gt;</text>
+    <text x="125" y="25" class="class-title">病害圖片 (Image)</text>
+    <text x="12" y="48" class="member-text">+ file_path: String (圖片存放路徑)</text>
+    <text x="12" y="66" class="member-text">+ mime_type: String (影像格式)</text>
+    <text x="12" y="84" class="member-text">+ upload_time: DateTime (上傳時間)</text>
+    <line x1="0" y1="94" x2="250" y2="94" class="divider" />
+    <text x="12" y="112" class="member-text">+ compress() (影像預處理)</text>
+    <text x="12" y="130" class="member-text">+ persist() (持久化儲存)</text>
+    <text x="12" y="148" class="member-text">+ get_public_url() (取得存取網址)</text>
+  </g>
+
+  <!-- Col 3: 診斷反饋與糾錯 (DiagnosisFeedback) -->
+  <g transform="translate(695, 310)">
+    <rect width="245" height="155" class="feedback-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 241 0 Q 245 0 245 4 L 245 28 L 0 28 Z" class="feedback-header" />
+    <text x="122" y="14" class="stereotype">&lt;&lt;domain concept&gt;&gt;</text>
+    <text x="122" y="25" class="class-title">診斷反饋與糾錯 (Feedback)</text>
+    <text x="12" y="48" class="member-text">+ original_status: String (原診斷)</text>
+    <text x="12" y="66" class="member-text">+ corrected_status: String (糾錯標籤)</text>
+    <text x="12" y="84" class="member-text">+ comments: Text (使用者意見回饋)</text>
+    <text x="12" y="102" class="member-text">+ is_reviewed: Boolean (審核狀態)</text>
+    <line x1="0" y1="112" x2="245" y2="112" class="divider" />
+    <text x="12" y="130" class="member-text">+ submit_feedback() (提報糾錯)</text>
+    <text x="12" y="148" class="member-text">+ export_active_learning() (匯出訓練)</text>
+  </g>
+
+  <!-- ================= ASSOCIATIONS (ZERO CROSSINGS) ================= -->
+  <!-- 1. User to PlantDiary (Row 1, Col 1 to Col 2) -->
+  <line x1="280" y1="135" x2="365" y2="135" class="assoc-line" />
+  <text x="288" y="127" class="cardinality">1</text>
+  <text x="345" y="127" class="cardinality">0..*</text>
+  <text x="322" y="148" class="rel-label">擁有</text>
+
+  <!-- 2. PlantDiary to DiagnosisResult (Row 1, Col 2 to Col 3) -->
+  <line x1="615" y1="135" x2="695" y2="135" class="assoc-line" />
+  <text x="623" y="127" class="cardinality">1</text>
+  <text x="682" y="127" class="cardinality">1</text>
+  <text x="655" y="148" class="rel-label">包含</text>
+
+  <!-- 3. User to WebcamAlert (Straight vertical: Col 1) -->
+  <line x1="160" y1="220" x2="160" y2="310" class="assoc-line" />
+  <text x="166" y="235" class="cardinality">1</text>
+  <text x="166" y="300" class="cardinality">0..*</text>
+  <text x="185" y="265" class="rel-label">監控警報</text>
+
+  <!-- 4. PlantDiary to Image (Straight vertical: Col 2) -->
+  <line x1="490" y1="230" x2="490" y2="310" class="assoc-line" />
+  <text x="496" y="245" class="cardinality">1</text>
+  <text x="496" y="300" class="cardinality">1</text>
+  <text x="525" y="270" class="rel-label">病徵相片</text>
+
+  <!-- 5. PlantDiary to DiagnosisFeedback (Diagonal or from Col 2 to Col 3) -->
+  <path d="M 615 180 L 655 180 L 655 350 L 695 350" class="assoc-line" />
+  <text x="622" y="172" class="cardinality">1</text>
+  <text x="670" y="342" class="cardinality">0..1</text>
+  <text x="675" y="265" class="rel-label">糾錯反饋</text>
+
+  <!-- Notes -->
+  <g transform="translate(40, 500)">
+    <rect width="900" height="55" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+    <text x="15" y="23" font-family="'Microsoft JhengHei', sans-serif" font-size="11" font-weight="bold" fill="#334155">領域概念說明：</text>
+    <text x="15" y="43" font-family="'Microsoft JhengHei', sans-serif" font-size="11" fill="#64748b">本圖展現領域模型概念實體，核心為植物日誌 (PlantDiary)、雙模型仲裁結果 (DiagnosisResult) 與使用者反饋 (DiagnosisFeedback)，嚴格對齊 UC-01 至 UC-14 功能需求。</text>
+  </g>
+
+</svg>
+"""
+
+with open('documents/system_analysis_class.svg', 'w', encoding='utf-8') as f:
+    f.write(svg_content.strip())
+print("Created aligned documents/system_analysis_class.svg")

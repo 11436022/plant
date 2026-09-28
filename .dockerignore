@@ -1,0 +1,47 @@
+# Git 與 IDE 設定
+.git
+.gitignore
+.github
+.idea
+.vscode
+
+# Python 快取與虛擬環境
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+venv/
+.venv/
+env/
+
+# 環境變數機密檔案（應由 Docker Compose 或 runtime 注入，不打包進映像檔）
+.env
+*.env.local
+
+# 前端專案與文件檔案
+frontend/
+documents/
+*.docx
+docx_summary.txt
+
+# 暫存與產生圖片檔案
+augmented_images/
+temp_images/
+static/uploads/*
+static/feedback_uploads/*
+!static/uploads/.gitkeep
+!static/feedback_uploads/.gitkeep
+
+# 腳本與測試檔案
+test/
+*.ps1
+*.bat
+
+# Docker 設定檔自身
+Dockerfile
+docker-compose*.yml
+compose*.yaml
+.dockerignore

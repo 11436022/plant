@@ -1,0 +1,208 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750">
+  <defs>
+    <style>
+      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 20px; font-weight: bold; fill: #0f172a; }
+      .node-header { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 13px; font-weight: bold; fill: #1e293b; }
+      .node-sub { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 10px; font-style: italic; fill: #64748b; }
+      .artifact-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 11px; font-weight: bold; fill: #0f172a; }
+      .artifact-desc { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 10px; fill: #475569; }
+      .protocol-label { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; font-weight: bold; fill: #2563eb; text-anchor: middle; }
+      .protocol-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 9px; fill: #64748b; text-anchor: middle; }
+      
+      .device-box { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.5; rx: 6; ry: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+      .device-header { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.5; }
+      .container-box { fill: #ffffff; stroke: #3b82f6; stroke-width: 1.5; rx: 4; ry: 4; }
+      .ai-box { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 4; ry: 4; }
+      .db-box { fill: #fffbeb; stroke: #d97706; stroke-width: 1.5; rx: 4; ry: 4; }
+      .cloud-box { fill: #f5f3ff; stroke: #8b5cf6; stroke-width: 1.5; rx: 6; ry: 6; }
+      
+      .conn-line { stroke: #334155; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
+      .bidir-line { stroke: #334155; stroke-width: 1.5; fill: none; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#ffffff" />
+
+  <!-- Title -->
+  <text x="600" y="32" class="title" text-anchor="middle">圖 7-1-1 系統實體佈署圖 (Deployment Diagram)</text>
+
+  <!-- ================= TIER 1: CLIENT TIER ================= -->
+  <!-- Node: Android Mobile Device -->
+  <g transform="translate(40, 65)">
+    <rect width="250" height="260" class="device-box" />
+    <path d="M 0 6 Q 0 0 6 0 L 244 0 Q 250 0 250 6 L 250 32 L 0 32 Z" class="device-header" />
+    <text x="15" y="16" class="node-sub">&lt;&lt;device&gt;&gt;</text>
+    <text x="15" y="28" class="node-header">行動終端設備 (Android 智慧型手機)</text>
+    
+    <!-- Environment -->
+    <rect x="15" y="45" width="220" height="200" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" rx="4" />
+    <text x="25" y="62" class="node-sub">&lt;&lt;execution environment&gt;&gt; Android 12+</text>
+    
+    <!-- Artifact -->
+    <rect x="25" y="75" width="200" height="80" class="container-box" />
+    <text x="35" y="93" class="artifact-title">«artifact» PlantDoctor.apk</text>
+    <text x="35" y="110" class="artifact-desc">• UI Layer: Jetpack Compose / XML</text>
+    <text x="35" y="125" class="artifact-desc">• Network: Retrofit2 + OkHttp3</text>
+    <text x="35" y="140" class="artifact-desc">• Hardware: 相機模組 (CameraX)</text>
+
+    <rect x="25" y="165" width="200" height="65" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+    <text x="35" y="183" class="artifact-title">«artifact» Client Cache</text>
+    <text x="35" y="200" class="artifact-desc">• SharedPreferences (JWT Token)</text>
+    <text x="35" y="215" class="artifact-desc">• 本地暫存影像快取</text>
+  </g>
+
+  <!-- Node: PC Web Browser -->
+  <g transform="translate(40, 350)">
+    <rect width="250" height="240" class="device-box" />
+    <path d="M 0 6 Q 0 0 6 0 L 244 0 Q 250 0 250 6 L 250 32 L 0 32 Z" class="device-header" />
+    <text x="15" y="16" class="node-sub">&lt;&lt;device&gt;&gt;</text>
+    <text x="15" y="28" class="node-header">監控與管理終端 (PC 工作站)</text>
+    
+    <!-- Environment -->
+    <rect x="15" y="45" width="220" height="180" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" rx="4" />
+    <text x="25" y="62" class="node-sub">&lt;&lt;execution environment&gt;&gt; Web Browser</text>
+    
+    <!-- Artifacts -->
+    <rect x="25" y="75" width="200" height="65" class="container-box" />
+    <text x="35" y="93" class="artifact-title">«artifact» 管理者儀表板</text>
+    <text x="35" y="110" class="artifact-desc">• HTML5 / Vue.js / Jinja2 樣板</text>
+    <text x="35" y="125" class="artifact-desc">• 紀錄審查、糾錯回饋審核與匯出</text>
+
+    <rect x="25" y="150" width="200" height="65" class="container-box" />
+    <text x="35" y="168" class="artifact-title">«artifact» Webcam 監控用戶端</text>
+    <text x="35" y="185" class="artifact-desc">• HTML5 Canvas + MediaDevices</text>
+    <text x="35" y="200" class="artifact-desc">• 定時影格擷取與警報預覽</text>
+  </g>
+
+  <!-- ================= TIER 2: SERVER TIER ================= -->
+  <!-- Node: Application Server Host (Linux/Docker) -->
+  <g transform="translate(410, 65)">
+    <rect width="420" height="525" class="device-box" />
+    <path d="M 0 6 Q 0 0 6 0 L 414 0 Q 420 0 420 6 L 420 32 L 0 32 Z" class="device-header" />
+    <text x="15" y="16" class="node-sub">&lt;&lt;device&gt;&gt;</text>
+    <text x="15" y="28" class="node-header">後端主機伺服器 (Linux / Docker Host)</text>
+    
+    <!-- FastAPI Container -->
+    <rect x="15" y="45" width="390" height="270" class="container-box" />
+    <text x="25" y="65" class="artifact-title">«container» FastAPI Application Server (Port 8000)</text>
+    <text x="25" y="80" class="artifact-desc">執行環境: Python 3.10 / Uvicorn ASGI 高併發伺服器</text>
+    
+    <rect x="25" y="90" width="370" height="60" fill="#f8fafc" stroke="#93c5fd" rx="4" />
+    <text x="35" y="108" class="artifact-title">«component» RESTful API 路由群組 (APIRouter)</text>
+    <text x="35" y="125" class="artifact-desc">• AuthRouter / PredictionRouter / DiariesRouter</text>
+    <text x="35" y="140" class="artifact-desc">• FeedbackRouter / WebcamRouter / AdminDashboard</text>
+
+    <rect x="25" y="160" width="370" height="70" fill="#f8fafc" stroke="#93c5fd" rx="4" />
+    <text x="35" y="178" class="artifact-title">«component» 多模型決策仲裁核心 (Arbitration Core)</text>
+    <text x="35" y="195" class="artifact-desc">• 雙模型推論協同調度 (Parallel Async Orchestrator)</text>
+    <text x="35" y="210" class="artifact-desc">• 置信度 70% 檢核閾值與防幻覺多重校驗演算法</text>
+
+    <rect x="25" y="240" width="370" height="65" fill="#f8fafc" stroke="#93c5fd" rx="4" />
+    <text x="35" y="258" class="artifact-title">«component» 資料持久化存取層 (Data Access Layer)</text>
+    <text x="35" y="275" class="artifact-desc">• SQLAlchemy 2.0 ORM 連線池管理</text>
+    <text x="35" y="290" class="artifact-desc">• PyMySQL 資料庫驅動與連線複用</text>
+
+    <!-- Local AI Engine (Inside Host) -->
+    <rect x="15" y="330" width="390" height="175" class="ai-box" />
+    <text x="25" y="350" class="artifact-title">«execution environment» 本地 AI 推論環境 (Local Inference Engine)</text>
+    <text x="25" y="365" class="artifact-desc">零雲端端點託管成本，確保高隱私與離線微觀病斑分類</text>
+
+    <rect x="25" y="375" width="370" height="55" fill="#ffffff" stroke="#86efac" rx="4" />
+    <text x="35" y="393" class="artifact-title">«artifact» 本地自訓特定作物 ConvNet 權重庫</text>
+    <text x="35" y="410" class="artifact-desc">• PyTorch / TorchVision 卷積神經網路 (weights/convnet.pth)</text>
+    <text x="35" y="423" class="artifact-desc">• 38 類植物葉片病害特徵萃取分類器</text>
+
+    <rect x="25" y="440" width="370" height="55" fill="#ffffff" stroke="#86efac" rx="4" />
+    <text x="35" y="458" class="artifact-title">«artifact» FAISS 向量知識庫與檢索增強索引</text>
+    <text x="35" y="475" class="artifact-desc">• 農業部官方病蟲害開放資料高維向量索引 (FlatIP Index)</text>
+    <text x="35" y="488" class="artifact-desc">• 毫米級語意相似度檢索 (RAG 防幻覺驗證核心)</text>
+  </g>
+
+  <!-- ================= TIER 3: EXTERNAL & DATABASE TIER ================= -->
+  <!-- Cloud Node: Google Gemini API -->
+  <g transform="translate(930, 65)">
+    <rect width="230" height="135" class="cloud-box" />
+    <path d="M 0 6 Q 0 0 6 0 L 224 0 Q 230 0 230 6 L 230 30 L 0 30 Z" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5" />
+    <text x="15" y="15" class="node-sub">&lt;&lt;cloud service&gt;&gt;</text>
+    <text x="15" y="26" class="node-header">Google Cloud AI</text>
+    
+    <text x="15" y="52" class="artifact-title">Gemini 2.5 Flash</text>
+    <text x="15" y="70" class="artifact-desc">• 雲端多模態大語言模型</text>
+    <text x="15" y="85" class="artifact-desc">• 廣域影像特徵初判與臨床語意解說</text>
+    <text x="15" y="100" class="artifact-desc">• google-genai 官方 SDK</text>
+    <text x="15" y="115" class="artifact-desc">• JSON Schema 結構化輸出規格</text>
+  </g>
+
+  <!-- Cloud Node: SMTP Mail Service -->
+  <g transform="translate(930, 215)">
+    <rect width="230" height="105" class="cloud-box" />
+    <path d="M 0 6 Q 0 0 6 0 L 224 0 Q 230 0 230 6 L 230 30 L 0 30 Z" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5" />
+    <text x="15" y="15" class="node-sub">&lt;&lt;cloud service&gt;&gt;</text>
+    <text x="15" y="26" class="node-header">Google SMTP 郵件服務</text>
+    
+    <text x="15" y="52" class="artifact-title">Gmail SMTP Server</text>
+    <text x="15" y="70" class="artifact-desc">• 啟用信箱認證驗證碼發送</text>
+    <text x="15" y="85" class="artifact-desc">• 密碼重設與高危病害警報推播</text>
+    <text x="15" y="100" class="artifact-desc">• TLS 安全加密通道 (Port 587)</text>
+  </g>
+
+  <!-- Database Node: MySQL 8.0 Server -->
+  <g transform="translate(930, 335)">
+    <rect width="230" height="255" class="device-box" />
+    <path d="M 0 6 Q 0 0 6 0 L 224 0 Q 230 0 230 6 L 230 32 L 0 32 Z" class="device-header" />
+    <text x="15" y="16" class="node-sub">&lt;&lt;device&gt;&gt;</text>
+    <text x="15" y="28" class="node-header">資料庫伺服器 (MySQL Server)</text>
+    
+    <rect x="15" y="45" width="200" height="195" class="db-box" />
+    <text x="25" y="65" class="artifact-title">«database system» MySQL 8.0</text>
+    <text x="25" y="82" class="artifact-desc">關聯式資料庫 (8 大實體資料表):</text>
+    <text x="25" y="100" class="artifact-desc">• user (使用者帳號與權限)</text>
+    <text x="25" y="115" class="artifact-desc">• user_one_time_tokens (一次性憑證)</text>
+    <text x="25" y="130" class="artifact-desc">• crop (農作物知識庫)</text>
+    <text x="25" y="145" class="artifact-desc">• disease / pests (病害與害蟲處置)</text>
+    <text x="25" y="160" class="artifact-desc">• plant_diary (日誌與備忘 user_note)</text>
+    <text x="25" y="175" class="artifact-desc">• webcam_alert (時序連續影格警報)</text>
+    <text x="25" y="190" class="artifact-desc">• diagnosis_feedback (糾錯反饋)</text>
+    <text x="25" y="210" class="artifact-desc">持久化存儲: Docker Volume</text>
+  </g>
+
+  <!-- ================= NETWORKING CONNECTIONS ================= -->
+  <!-- Android to FastAPI -->
+  <line x1="290" y1="195" x2="410" y2="195" class="conn-line" />
+  <text x="350" y="180" class="protocol-label">HTTPS / REST</text>
+  <text x="350" y="193" class="protocol-sub">JSON / Multipart</text>
+
+  <!-- Web to FastAPI -->
+  <line x1="290" y1="470" x2="410" y2="470" class="conn-line" />
+  <text x="350" y="455" class="protocol-label">HTTP / WebSocket</text>
+  <text x="350" y="468" class="protocol-sub">Dashboard / Stream</text>
+
+  <!-- FastAPI to Gemini -->
+  <line x1="830" y1="130" x2="930" y2="130" class="conn-line" />
+  <text x="880" y="118" class="protocol-label">HTTPS</text>
+  <text x="880" y="128" class="protocol-sub">REST API</text>
+
+  <!-- FastAPI to SMTP -->
+  <line x1="830" y1="265" x2="930" y2="265" class="conn-line" />
+  <text x="880" y="253" class="protocol-label">SMTP/TLS</text>
+  <text x="880" y="263" class="protocol-sub">Port 587</text>
+
+  <!-- FastAPI to MySQL -->
+  <line x1="830" y1="450" x2="930" y2="450" class="conn-line" />
+  <text x="880" y="438" class="protocol-label">TCP / SQL</text>
+  <text x="880" y="448" class="protocol-sub">Port 3306</text>
+
+  <!-- Legend / Highlights -->
+  <g transform="translate(40, 625)">
+    <rect width="1120" height="95" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2" rx="6" />
+    <text x="20" y="25" class="artifact-title" font-size="12">架構亮點與技術特色說明 (Deployment Highlights):</text>
+    <text x="20" y="47" class="artifact-desc">• 雙模型協同推論 (Dual-Model Parallel)：FastAPI 非同步協同調度 Google Gemini 2.5 Flash (廣域多模態) 與本地自訓 ConvNet (微觀病斑分類)，兼具雲端強大推理與本地即時高隱私。</text>
+    <text x="20" y="65" class="artifact-desc">• 零雲端託管成本 (Zero Cloud Hosting Cost)：完全免除 Vertex AI / AutoML 端點高昂固定租金；本地自訓特定作物卷積神經網路直接部署於主機內部，經濟且可隨時複訓迭代。</text>
+    <text x="20" y="83" class="artifact-desc">• 知識庫檢索增強與客觀校驗 (RAG Verification)：整合 FAISS 向量索引與農業部官方病蟲害知識庫，結合 70% 信心度閾值過濾，杜絕 AI 幻覺，確保診斷指引具備農政權威性。</text>
+  </g>
+
+</svg>

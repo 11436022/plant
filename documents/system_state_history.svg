@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 680" width="1100" height="680">
+  <defs>
+    <style>
+      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 20px; font-weight: bold; fill: #0f172a; }
+      .group-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #1e293b; }
+      .state-name { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .action-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #475569; }
+      .transition-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #1d4ed8; font-weight: 500; }
+      .guard-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 9px; fill: #b91c1c; font-style: italic; }
+      
+      .composite-bg { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 6,4; rx: 8; ry: 8; }
+      .composite-header { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.5; }
+      
+      .state-box { fill: #ffffff; stroke: #2563eb; stroke-width: 1.5; rx: 6; ry: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .state-header { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.5; }
+      
+      .edit-box { fill: #fffbeb; stroke: #d97706; stroke-width: 1.5; rx: 6; ry: 6; }
+      .edit-header { fill: #fef3c7; stroke: #d97706; stroke-width: 1.5; }
+      
+      .feedback-box { fill: #f5f3ff; stroke: #7c3aed; stroke-width: 1.5; rx: 6; ry: 6; }
+      .feedback-header { fill: #ede9fe; stroke: #7c3aed; stroke-width: 1.5; }
+      
+      .line { stroke: #334155; stroke-width: 1.3; fill: none; marker-end: url(#arrow); }
+      .line-back { stroke: #64748b; stroke-width: 1.2; stroke-dasharray: 4,3; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+    </marker>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#ffffff" />
+  <text x="550" y="32" class="title" text-anchor="middle">圖 7-4-4 查看歷史紀錄與備忘編輯 狀態圖 (State Diagram)</text>
+
+  <!-- Initial State -->
+  <circle cx="50" cy="120" r="8" fill="#0f172a" />
+  <line x1="58" y1="120" x2="95" y2="120" class="line" />
+
+  <!-- ================= MAIN FLOW: LIST & DETAIL ================= -->
+  <g transform="translate(100, 60)">
+    <rect width="440" height="580" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 432 0 Q 440 0 440 8 L 440 30 L 0 30 Z" class="composite-header" />
+    <text x="15" y="20" class="group-title">主歷程檢視狀態 (Browsing History &amp; Detail)</text>
+
+    <!-- State 1: 請求日誌清單 -->
+    <g transform="translate(30, 50)">
+      <rect width="240" height="75" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 234 0 Q 240 0 240 6 L 240 24 L 0 24 Z" class="state-header" />
+      <text x="120" y="17" class="state-name">加載日誌列表 (Loading_Diaries)</text>
+      <text x="10" y="42" class="action-text">entry / 發送 GET /api/v1/diaries (帶 JWT)</text>
+      <text x="10" y="56" class="action-text">do / 後端查詢該 user_id 所有 plant_diary</text>
+      <text x="10" y="70" class="action-text">do / 按診斷建立時間降冪排序</text>
+    </g>
+
+    <line x1="150" y1="125" x2="150" y2="185" class="line" />
+    <text x="155" y="160" class="transition-text">清單載入完畢</text>
+
+    <!-- State 2: 歷史列表呈現中 -->
+    <g transform="translate(30, 185)">
+      <rect width="240" height="85" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 234 0 Q 240 0 240 6 L 240 24 L 0 24 Z" class="state-header" />
+      <text x="120" y="17" class="state-name">日誌清單展示 (Diary_List_Active)</text>
+      <text x="10" y="42" class="action-text">entry / RecyclerView 渲染縮圖與病害摘要</text>
+      <text x="10" y="56" class="action-text">do / 呈現診斷日期、置信度徽章、筆記摘要</text>
+      <text x="10" y="70" class="action-text">do / 支援下拉更新與關鍵字篩選</text>
+      <text x="10" y="82" class="action-text">exit / 選取特定項目進入詳情</text>
+    </g>
+
+    <line x1="150" y1="270" x2="150" y2="330" class="line" />
+    <text x="155" y="305" class="transition-text">點擊單筆日誌項目</text>
+
+    <!-- State 3: 日誌詳情檢閱中 -->
+    <g transform="translate(30, 330)">
+      <rect width="280" height="100" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 24 L 0 24 Z" class="state-header" />
+      <text x="140" y="17" class="state-name">檢視日誌詳情 (Viewing_Detail)</text>
+      <text x="10" y="42" class="action-text">entry / 啟動 HistoryDetailActivity</text>
+      <text x="10" y="56" class="action-text">do / 展示高解析原始患病葉片照片</text>
+      <text x="10" y="70" class="action-text">do / 呈現完整診斷結論、化學/有機防治處方</text>
+      <text x="10" y="84" class="action-text">do / 顯示個人備忘筆記區塊 (user_note)</text>
+      <text x="10" y="96" class="action-text">do / 提供「編輯筆記」與「糾錯反饋」按鈕</text>
+    </g>
+
+    <!-- Final State -->
+    <line x1="150" y1="430" x2="150" y2="490" class="line" />
+    <text x="155" y="465" class="transition-text">離開歷史頁</text>
+    <circle cx="150" cy="510" r="9" stroke="#0f172a" stroke-width="1.5" fill="none" />
+    <circle cx="150" cy="510" r="5" fill="#0f172a" />
+  </g>
+
+  <!-- ================= BRANCH ACTIONS ================= -->
+  <!-- Branch 1: Edit Note -->
+  <path d="M 410 380 L 590 380 L 590 150 L 630 150" class="line" />
+  <text x="500" y="260" class="transition-text" transform="rotate(-90, 500, 260)">點擊「編輯備忘筆記」(UC-08)</text>
+
+  <g transform="translate(630, 60)">
+    <rect width="430" height="260" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 422 0 Q 430 0 430 8 L 430 30 L 0 30 Z" class="composite-header" fill="#fef3c7" />
+    <text x="15" y="20" class="group-title" fill="#92400e">分支狀態 A：編輯個人備忘筆記 (UC-08)</text>
+
+    <!-- State 4: 編輯備忘對話框 -->
+    <g transform="translate(20, 45)">
+      <rect width="390" height="75" class="edit-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 384 0 Q 390 0 390 6 L 390 24 L 0 24 Z" class="edit-header" />
+      <text x="195" y="17" class="state-name" fill="#92400e">備忘編輯狀態 (Editing_User_Note)</text>
+      <text x="10" y="42" class="action-text">entry / 彈出筆記對話框，預載既有 user_note</text>
+      <text x="10" y="56" class="action-text">do / 使用者鍵入最新照護進展、施藥時間心得</text>
+      <text x="10" y="70" class="action-text">exit / 點擊「儲存筆記」發送 PATCH /api/v1/diaries/{id}/note</text>
+    </g>
+
+    <line x1="215" y1="120" x2="215" y2="155" class="line" />
+
+    <!-- State 5: 資料庫持久化與即時刷新 -->
+    <g transform="translate(20, 155)">
+      <rect width="390" height="75" class="edit-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 384 0 Q 390 0 390 6 L 390 24 L 0 24 Z" class="edit-header" />
+      <text x="195" y="17" class="state-name" fill="#92400e">筆記寫入與同步 (Note_Updated)</text>
+      <text x="10" y="42" class="action-text">do / 後端更新 MySQL plant_diary.user_note 欄位</text>
+      <text x="10" y="56" class="action-text">do / 回傳 200 OK，即時更新詳情頁備忘文字</text>
+      <text x="10" y="70" class="action-text">exit / 提示「筆記儲存成功」，關閉對話框</text>
+    </g>
+  </g>
+
+  <!-- Loop back from Note to Detail -->
+  <path d="M 630 250 L 560 250 L 560 400 L 410 400" class="line-back" />
+  <text x="520" y="325" class="transition-text" text-anchor="middle">返回詳情頁</text>
+
+  <!-- Branch 2: Submit Feedback -->
+  <path d="M 410 415 L 590 415 L 590 470 L 630 470" class="line" />
+  <text x="500" y="450" class="transition-text">點擊「反饋糾錯」(UC-13)</text>
+
+  <g transform="translate(630, 360)">
+    <rect width="430" height="280" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 422 0 Q 430 0 430 8 L 430 30 L 0 30 Z" class="composite-header" fill="#ede9fe" />
+    <text x="15" y="20" class="group-title" fill="#5b21b6">分支狀態 B：提交診斷反饋與糾錯 (UC-13)</text>
+
+    <!-- State 6: 填寫糾錯資訊 -->
+    <g transform="translate(20, 45)">
+      <rect width="390" height="80" class="feedback-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 384 0 Q 390 0 390 6 L 390 24 L 0 24 Z" class="feedback-header" />
+      <text x="195" y="17" class="state-name" fill="#5b21b6">填寫糾錯反饋 (Filling_Feedback_Modal)</text>
+      <text x="10" y="42" class="action-text">entry / 彈出糾錯表單，顯示 AI 原始判定</text>
+      <text x="10" y="56" class="action-text">do / 勾選錯誤類別 (作物誤判 / 病害誤判)</text>
+      <text x="10" y="70" class="action-text">do / 鍵入使用者認為正確之作物名與病害名</text>
+    </g>
+
+    <line x1="215" y1="125" x2="215" y2="160" class="line" />
+
+    <!-- State 7: 送交 diagnosis_feedback -->
+    <g transform="translate(20, 160)">
+      <rect width="390" height="95" class="feedback-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 384 0 Q 390 0 390 6 L 390 24 L 0 24 Z" class="feedback-header" />
+      <text x="195" y="17" class="state-name" fill="#5b21b6">反饋持久化 (Feedback_Persisted)</text>
+      <text x="10" y="42" class="action-text">do / 發送 POST /api/v1/feedback</text>
+      <text x="10" y="56" class="action-text">do / 寫入 MySQL diagnosis_feedback 表格</text>
+      <text x="10" y="70" class="action-text">do / 影像歸檔至 feedback_uploads 資料夾</text>
+      <text x="10" y="84" class="action-text">exit / 作為專家審核與本地 ConvNet 模型微調樣本</text>
+    </g>
+  </g>
+
+  <!-- Loop back from Feedback to Detail -->
+  <path d="M 630 580 L 560 580 L 560 425 L 410 425" class="line-back" />
+  <text x="520" y="510" class="transition-text" text-anchor="middle">返回詳情頁</text>
+</svg>

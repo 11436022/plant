@@ -1,0 +1,117 @@
+# Generate system_analysis_object.svg (圖 5-4-2 分析物件圖)
+svg_content = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="900" height="520">
+  <defs>
+    <style>
+      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 18px; font-weight: bold; fill: #0f172a; }
+      .obj-title { font-family: 'Consolas', 'Courier New', monospace; font-size: 12px; font-weight: bold; text-decoration: underline; fill: #ffffff; text-anchor: middle; }
+      .stereotype { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 10px; font-style: italic; fill: #e2e8f0; text-anchor: middle; }
+      .member-text { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; fill: #1e293b; }
+      .cardinality { font-family: 'Consolas', monospace; font-size: 11px; font-weight: bold; fill: #334155; }
+      .rel-label { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #64748b; text-anchor: middle; }
+      
+      .obj-box { fill: #ffffff; stroke: #2563eb; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .obj-header { fill: #2563eb; }
+      
+      .core-box { fill: #ffffff; stroke: #059669; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .core-header { fill: #059669; }
+
+      .feedback-box { fill: #ffffff; stroke: #d97706; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .feedback-header { fill: #d97706; }
+
+      .assoc-line { stroke: #334155; stroke-width: 1.3; fill: none; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#ffffff" />
+
+  <!-- Diagram Title -->
+  <text x="450" y="32" class="title" text-anchor="middle">圖 5-4-2 分析物件圖 (Analysis Object Diagram)</text>
+
+  <!-- Object 1: user_01:使用者 -->
+  <g transform="translate(40, 65)">
+    <rect width="240" height="135" class="obj-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 236 0 Q 240 0 240 4 L 240 28 L 0 28 Z" class="obj-header" />
+    <text x="120" y="14" class="stereotype">&lt;&lt;object instance&gt;&gt;</text>
+    <text x="120" y="25" class="obj-title">user_01 : 使用者</text>
+    <text x="12" y="50" class="member-text">username = "john_farmer"</text>
+    <text x="12" y="70" class="member-text">email = "john@example.com"</text>
+    <text x="12" y="90" class="member-text">role = "user"</text>
+    <text x="12" y="110" class="member-text">is_email_verified = true</text>
+  </g>
+
+  <!-- Object 2: diary_01:植物日誌 -->
+  <g transform="translate(340, 65)">
+    <rect width="250" height="155" class="core-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 246 0 Q 250 0 250 4 L 250 28 L 0 28 Z" class="core-header" />
+    <text x="125" y="14" class="stereotype">&lt;&lt;object instance&gt;&gt;</text>
+    <text x="125" y="25" class="obj-title">diary_01 : 植物日誌</text>
+    <text x="12" y="50" class="member-text">created_at = "2026-05-24"</text>
+    <text x="12" y="70" class="member-text">user_note = "葉緣焦枯，先隔離"</text>
+    <text x="12" y="90" class="member-text">status_name = "番茄早疫病"</text>
+    <text x="12" y="110" class="member-text">confidence = 0.92</text>
+    <text x="12" y="130" class="member-text">is_resolved = false</text>
+  </g>
+
+  <!-- Object 3: diag_01:診斷結果 -->
+  <g transform="translate(640, 65)">
+    <rect width="220" height="155" class="core-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 216 0 Q 220 0 220 4 L 220 28 L 0 28 Z" class="core-header" />
+    <text x="110" y="14" class="stereotype">&lt;&lt;object instance&gt;&gt;</text>
+    <text x="110" y="25" class="obj-title">diag_01 : 診斷結果</text>
+    <text x="12" y="50" class="member-text">crop_name = "番茄"</text>
+    <text x="12" y="70" class="member-text">disease_name = "早疫病"</text>
+    <text x="12" y="90" class="member-text">suggestion = "輪紋狀褐斑"</text>
+    <text x="12" y="110" class="member-text">treatment = "及時清除病葉"</text>
+    <text x="12" y="130" class="member-text">confidence = 0.92</text>
+  </g>
+
+  <!-- Object 4: image_01:病害圖片 -->
+  <g transform="translate(340, 275)">
+    <rect width="250" height="125" class="obj-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 246 0 Q 250 0 250 4 L 250 28 L 0 28 Z" class="obj-header" />
+    <text x="125" y="14" class="stereotype">&lt;&lt;object instance&gt;&gt;</text>
+    <text x="125" y="25" class="obj-title">image_01 : 病害圖片</text>
+    <text x="12" y="50" class="member-text">file_path = "uploads/leaf_01.jpg"</text>
+    <text x="12" y="70" class="member-text">mime_type = "image/jpeg"</text>
+    <text x="12" y="90" class="member-text">file_size = 348210 (bytes)</text>
+    <text x="12" y="110" class="member-text">upload_time = "2026-05-24 14:20"</text>
+  </g>
+
+  <!-- Object 5: feedback_01:診斷反饋與糾錯 -->
+  <g transform="translate(640, 275)">
+    <rect width="220" height="125" class="feedback-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 216 0 Q 220 0 220 4 L 220 28 L 0 28 Z" class="feedback-header" />
+    <text x="110" y="14" class="stereotype">&lt;&lt;object instance&gt;&gt;</text>
+    <text x="110" y="25" class="obj-title">fb_01 : 診斷反饋</text>
+    <text x="12" y="50" class="member-text">original_status = "早疫病"</text>
+    <text x="12" y="70" class="member-text">corrected_status = "斑枯病"</text>
+    <text x="12" y="90" class="member-text">comments = "專家鑑定為斑枯"</text>
+    <text x="12" y="110" class="member-text">is_reviewed = true</text>
+  </g>
+
+  <!-- Connections -->
+  <!-- user_01 to diary_01 -->
+  <line x1="280" y1="130" x2="340" y2="130" class="assoc-line" />
+
+  <!-- diary_01 to diag_01 -->
+  <line x1="590" y1="130" x2="640" y2="130" class="assoc-line" />
+
+  <!-- diary_01 to image_01 (vertical) -->
+  <line x1="465" y1="220" x2="465" y2="275" class="assoc-line" />
+
+  <!-- diary_01 to fb_01 (diagonal/clean step) -->
+  <path d="M 590 170 L 615 170 L 615 330 L 640 330" class="assoc-line" />
+
+  <!-- Explanation note -->
+  <g transform="translate(40, 440)">
+    <rect width="820" height="45" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+    <text x="15" y="27" font-family="'Microsoft JhengHei', sans-serif" font-size="11" fill="#64748b">物件圖展現單一使用者情境下的實例鏈結狀態：包含建立之植物日誌、綁定之圖片路徑以及提報糾錯之反饋紀錄。</text>
+  </g>
+
+</svg>
+"""
+
+with open('documents/system_analysis_object.svg', 'w', encoding='utf-8') as f:
+    f.write(svg_content.strip())
+print("Created documents/system_analysis_object.svg")

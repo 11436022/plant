@@ -1,4 +1,4 @@
-# Docker Compose 現行規範（Compose Specification，已移除已棄用的 top-level version）
+# Docker Compose 現行標準規範（Compose Specification 官方預設標準檔名 compose.yaml）
 services:
   web:
     # 使用當前目錄的 Dockerfile 來建構映像檔
