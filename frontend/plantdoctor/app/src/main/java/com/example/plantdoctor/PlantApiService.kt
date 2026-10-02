@@ -167,7 +167,20 @@ data class WebcamMonitoringState(
     val required_matches: Int? = null,
     val session_id: String? = null,
     val region_id: String? = null
-)
+) {
+    fun matchesScope(sessionId: String, regionId: String): Boolean =
+        (session_id == null || session_id == sessionId) &&
+            (region_id == null || region_id == regionId)
+
+    fun statusLabel(): String = when (status?.trim()) {
+        "triggered" -> "已建立警報"
+        "cooldown" -> "警報冷卻中"
+        "collecting_consensus" -> "正在累積連續判定"
+        "not_a_grounded_anomaly" -> "未符合警報條件"
+        null, "" -> "未提供監控狀態"
+        else -> "無法辨識監控狀態"
+    }
+}
 
 data class WebcamAlertItem(
     val id: Int,
