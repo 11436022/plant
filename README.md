@@ -4,7 +4,7 @@ Plant Doctor 是一套以 Android App 與瀏覽器 webcam 為前端、FastAPI �
 
 ## 已實作流程與驗證範圍
 
-以下為程式中已具備的流程，不代表已完成實機或正式環境驗收。測試證據、限制與待驗證項目另見 `documents/verification_report.md`。
+以下為程式中已具備的流程，不代表已完成實機或正式環境驗收。測試證據、限制與待驗證項目另見[修正與驗證報告](documents/verification_report.md)。
 
 - 帳號註冊、Email 驗證、登入、JWT 驗證與忘記密碼
 - Android 拍照／相簿上傳、診斷確認、歷史紀錄、備註與使用者修正
@@ -14,7 +14,7 @@ Plant Doctor 是一套以 Android App 與瀏覽器 webcam 為前端、FastAPI �
 - AI 作物／病蟲害名稱白名單、信心門檻與作物關聯校驗
 - AI 建議改由資料庫症狀與處置內容提供
 - Webcam 定時掃描、分工作階段與區域的連續影格判定，以及聲音／瀏覽器／Android／Email 通知程式
-- Webcam 警報紀錄、確認與刪除
+- 瀏覽器 Webcam 警報紀錄、確認與刪除；Android 目前只有對應 API 宣告，尚無警報管理畫面
 
 ## 系統架構
 
@@ -148,7 +148,9 @@ Docker 連接主機 MySQL 時，將 `.env` 的 `DB_HOST` 改為 `host.docker.int
 
 一般上傳與 Webcam 共用圖片解碼、MIME 對照、容量、最低尺寸及基本畫面資訊檢查。一般上傳也要求 JWT；分析後先回傳 `prediction_id`，本人在 15 分鐘內確認才建立正式歷史紀錄。未知或需複核結果可以保存，但保留警示且不觸發自動警報。病蟲害來源、信心值及複核狀態保存為當時快照，Android 結果及歷史畫面保留這些欄位。
 
-目前診斷暫存與監控累計使用程序內記憶體，需以單一 worker 運行；重啟會失去待確認資料及連續計數。過期診斷在下次上傳或確認時清理，不是分散式持久化佇列。使用者修正為個人註記，不會取代原始建議或構成專業複核；管理後台的修正也不改寫原始辨識依據。
+目前診斷暫存與監控累計使用程序內記憶體，需以單一 worker 運行；重啟會失去待確認資料及連續計數。過期診斷在下次上傳或確認時清理，不是分散式持久化佇列。App 與管理後台的使用者修正為個人註記，不會取代原始建議或構成專業複核。舊版 PATCH 若直接修改作物或狀態，會重新校驗作物與病蟲害關聯、更新建議及來源、清空信心值並標記需複核，不是重新呼叫模型。
+
+Webcam 警報在回應資料準備完成後提交資料庫，再獨立嘗試寄信。寄送失敗不刪除已保存的警報及圖片；若提交結果不明，會保留圖片供維護者核對，可能留下尚未關聯紀錄的圖片，不能直接批次刪除。
 
 這些機制能降低幻覺與誤報，但影像 AI 不能保證 100% 正確。高風險處置、農藥選擇與劑量仍應由農業專業人員確認。
 
@@ -156,7 +158,7 @@ Docker 連接主機 MySQL 時，將 `.env` 的 `DB_HOST` 改為 `host.docker.int
 
 ## Android 設定
 
-在 `frontend/plantdoctor/local.properties` 設定後端主機：
+先安裝 Android SDK，並由 Android Studio 設定 SDK 路徑或在 `frontend/plantdoctor/local.properties` 填寫有效的 `sdk.dir`；同一檔案再設定後端主機：
 
 ```properties
 WIFI_HOST=192.168.1.100
@@ -166,10 +168,11 @@ Android 模擬器會自動使用 `10.0.2.2:8000`；實體裝置與後端需位�
 
 ## 測試
 
-執行防幻覺與 webcam 安全測試：
+執行完整後端離線回歸測試，以及瀏覽器監控邏輯測試（需 Node.js）：
 
 ```powershell
-python -m pytest test/test_ai_validation.py test/test_reference_data.py test/test_seed.py test/test_webcam.py -q
+python -m pytest test -q
+node --test test/webcam_browser_regressions.cjs
 ```
 
 檢查 Alembic migration：
@@ -179,7 +182,7 @@ python -m alembic heads
 python -m alembic upgrade head
 ```
 
-目前 migration head 為 `d42a91c8e510`。完整後端測試可執行 `python -m pytest test -q`；測試使用隔離 SQLite、模擬 AI 與郵件，不代表 MySQL、Gemini、相機或 SMTP 收件已驗收。
+目前 migration head 為 `d42a91c8e510`。後端測試使用隔離 SQLite、實際 FAISS 索引，以及替代的 AI／向量與郵件服務；MySQL 僅做離線 SQL 編譯檢查。瀏覽器測試執行頁面原始 JavaScript，但使用替代的頁面與相機介面，不是實際瀏覽器操作。兩者均不代表 MySQL、Gemini、相機或 SMTP 收件已驗收。
 
 Android 契約測試：在已安裝 Android SDK 的環境，於 `frontend/plantdoctor` 執行 `gradlew.bat :app:testDebugUnitTest`。本次環境缺少 Android SDK，未能完成此建置。
 
