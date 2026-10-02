@@ -50,6 +50,7 @@ async def get_all_history(current_user: models.User = Depends(get_current_user))
             cursor.execute(sql, (current_user.user_id,))
             rows = cursor.fetchall()
             for row in rows:
+                row["requires_review"] = bool(row.get("requires_review", True))
                 if row.get("image_url"):
                     row["image_url"] = build_public_image_url(row["image_url"])
             
@@ -77,6 +78,7 @@ async def get_diary_detail(diary_id: int, current_user: models.User = Depends(ge
             detail = cursor.fetchone()
             if not detail:
                 raise HTTPException(status_code=404, detail="Diary not found.")
+            detail["requires_review"] = bool(detail.get("requires_review", True))
             if detail.get("image_url"):
                 detail["image_url"] = build_public_image_url(detail["image_url"])
             return {"status": "success", "data": detail}
