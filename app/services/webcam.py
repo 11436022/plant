@@ -1,78 +1,32 @@
 from __future__ import annotations
 
-import io
 import threading
 import uuid
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import HTTPException
-from PIL import Image, ImageStat, UnidentifiedImageError
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.db import models
 from app.services.email import send_email
-from app.services.files import build_public_image_url, create_safe_upload_path
-
-
-ALLOWED_IMAGE_FORMATS = {"JPEG", "PNG", "WEBP"}
-
-
-@dataclass(frozen=True)
-class FrameMetadata:
-    width: int
-    height: int
-    image_format: str
+from app.services.files import FrameMetadata, build_public_image_url, create_safe_upload_path, validate_image_content
 
 
 def validate_webcam_frame(content: bytes, content_type: str | None) -> FrameMetadata:
-    """Reject oversized, malformed, tiny, or effectively blank webcam frames."""
-
-    if content_type not in {"image/jpeg", "image/png", "image/webp"}:
-        raise HTTPException(status_code=400, detail="Webcam frame must be JPEG, PNG, or WebP.")
-    if not content:
-        raise HTTPException(status_code=400, detail="Webcam frame is empty.")
-    if len(content) > settings.WEBCAM_MAX_IMAGE_BYTES:
-        raise HTTPException(status_code=413, detail="Webcam frame exceeds the upload size limit.")
-
-    try:
-        with Image.open(io.BytesIO(content)) as image:
-            image.verify()
-        with Image.open(io.BytesIO(content)) as image:
-            width, height = image.size
-            image_format = str(image.format or "").upper()
-            grayscale = image.convert("L")
-            grayscale.thumbnail((320, 320))
-            contrast = float(ImageStat.Stat(grayscale).stddev[0])
-    except (Image.DecompressionBombError, UnidentifiedImageError, OSError, ValueError) as exc:
-        raise HTTPException(status_code=400, detail="Webcam frame is not a valid image.") from exc
-
-    if image_format not in ALLOWED_IMAGE_FORMATS:
-        raise HTTPException(status_code=400, detail="Unsupported webcam image format.")
-    if width < settings.WEBCAM_MIN_IMAGE_WIDTH or height < settings.WEBCAM_MIN_IMAGE_HEIGHT:
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Webcam frame is too small. "
-                f"Minimum size is {settings.WEBCAM_MIN_IMAGE_WIDTH}x{settings.WEBCAM_MIN_IMAGE_HEIGHT}."
-            ),
-        )
-    if contrast < 5.0:
-        raise HTTPException(status_code=422, detail="Webcam frame lacks enough visual detail for diagnosis.")
-
-    return FrameMetadata(width=width, height=height, image_format=image_format)
+    return validate_image_content(content, content_type)
 
 
 class AlertConsensusTracker:
     """Require repeated matching diagnoses before allowing an automatic alert."""
 
     def __init__(self) -> None:
-        self._states: dict[int, dict] = {}
+        self._states: dict[tuple[int, str, str], dict] = {}
         self._lock = threading.Lock()
 
-    def evaluate(self, user_id: int, diagnosis: dict, now: datetime | None = None) -> dict:
+    def evaluate(self, user_id: int, diagnosis: dict, now: datetime | None = None, *,
+                 session_id: str = "legacy", region_id: str = "full-frame") -> dict:
         current_time = now or datetime.now(timezone.utc)
         category = str(diagnosis.get("category", "")).lower()
         confidence = float(diagnosis.get("confidence") or 0.0)
@@ -85,16 +39,29 @@ class AlertConsensusTracker:
         )
 
         with self._lock:
+            stale_seconds = max(settings.WEBCAM_ALERT_COOLDOWN_SECONDS, 3600)
+            for key, value in list(self._states.items()):
+                if (current_time - value["last_seen"]).total_seconds() > stale_seconds:
+                    del self._states[key]
+            key = (user_id, session_id, region_id)
+            if key not in self._states and len(self._states) >= 10000:
+                raise HTTPException(status_code=429, detail="Too many active monitoring regions.")
             state = self._states.setdefault(
-                user_id,
+                key,
                 {
                     "fingerprint": None,
                     "streak": 0,
                     "last_alert_fingerprint": None,
                     "last_alert_at": None,
+                    "last_seen": current_time,
                 },
             )
 
+            gap = (current_time - state["last_seen"]).total_seconds()
+            if gap > max(settings.WEBCAM_SAMPLE_INTERVAL_SECONDS * 3, 120):
+                state["fingerprint"] = None
+                state["streak"] = 0
+            state["last_seen"] = current_time
             if not is_grounded_anomaly:
                 state["fingerprint"] = None
                 state["streak"] = 0
@@ -154,6 +121,8 @@ def create_webcam_alert(
     diagnosis: dict,
     image_path: Path,
     consecutive_matches: int,
+    session_id: str = "legacy",
+    region_id: str = "full-frame",
 ) -> models.WebcamAlert:
     crop = db.query(models.Crop).filter(models.Crop.crop_name == diagnosis["crop_name"]).first()
     if not crop:
@@ -168,6 +137,13 @@ def create_webcam_alert(
         consecutive_matches=consecutive_matches,
         image_url=str(image_path.as_posix()),
         email_sent=False,
+        session_id=session_id,
+        region_id=region_id,
+        requires_review=diagnosis.get("requires_review", True),
+        grounding_source=diagnosis.get("grounding_source", "legacy_unverified"),
+        reference_source=diagnosis.get("reference_source"),
+        reference_url=diagnosis.get("reference_url"),
+        reference_record_id=diagnosis.get("reference_record_id"),
     )
     db.add(alert)
     db.commit()
@@ -201,6 +177,13 @@ def serialize_webcam_alert(alert: models.WebcamAlert) -> dict:
         "status_name": alert.status_name,
         "confidence": alert.confidence,
         "consecutive_matches": alert.consecutive_matches,
+        "session_id": alert.session_id,
+        "region_id": alert.region_id,
+        "requires_review": alert.requires_review,
+        "grounding_source": alert.grounding_source,
+        "reference_source": alert.reference_source,
+        "reference_url": alert.reference_url,
+        "reference_record_id": alert.reference_record_id,
         "image_url": build_public_image_url(alert.image_url),
         "email_sent": alert.email_sent,
         "acknowledged_at": alert.acknowledged_at,
