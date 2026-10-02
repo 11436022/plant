@@ -1,4 +1,5 @@
 import json
+import hashlib
 import os
 from pathlib import Path
 
@@ -37,7 +38,18 @@ def load_knowledge_base():
     try:
         faiss_index = faiss.read_index(str(FAISS_INDEX_PATH))
         with open(CONTENT_PATH, "r", encoding="utf-8") as f:
-            knowledge_content = json.load(f)
+            manifest = json.load(f)
+        if not isinstance(manifest, dict) or manifest.get("schema_version") != 2:
+            raise ValueError("Legacy or undocumented RAG corpus; rebuild from reference records.")
+        entries = manifest.get("entries", [])
+        if (manifest.get("embedding_model") != EMBEDDING_MODEL
+                or manifest.get("dimension") != EMBEDDING_DIMENSION
+                or manifest.get("index_sha256") != hashlib.sha256(FAISS_INDEX_PATH.read_bytes()).hexdigest()
+                or not isinstance(entries, list) or faiss_index.ntotal != len(entries)
+                or not all(isinstance(entry, dict) and all(entry.get(key) for key in
+                           ("text", "source_name", "source_url", "source_record_id")) for entry in entries)):
+            raise ValueError("RAG index and source manifest do not match.")
+        knowledge_content = [entry["text"] for entry in entries]
         if (
             faiss_index.d != EMBEDDING_DIMENSION
             or faiss_index.metric_type != faiss.METRIC_INNER_PRODUCT
