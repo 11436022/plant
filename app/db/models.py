@@ -65,7 +65,7 @@ class User(Base):
     role = Column(String(20), nullable=False, default="user")
     # 新註冊帳號需要先驗證信箱；既有資料庫則由 migration 與啟動修補補齊欄位。
     is_email_verified = Column(Boolean, nullable=False, default=True)
-    email_verified_at = Column(DateTime(timezone=True), nullable=False)
+    email_verified_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     plant_diary = relationship("PlantDiary", back_populates="user")
@@ -77,7 +77,7 @@ class UserOneTimeToken(Base):
 
     __tablename__ = "user_one_time_tokens"
 
-    id = Column(BigInteger, primary_key=True, index=True)
+    id = Column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("user.user_id"), nullable=False)
     purpose = Column(String(32), nullable=False)
     token_hash = Column(String(64), nullable=False, unique=True)
@@ -102,6 +102,12 @@ class PlantDiary(Base):
     disease_id = Column(Integer, ForeignKey("disease.disease_id"), nullable=True)
     pest_id = Column(Integer, ForeignKey("pests.pest_id"), nullable=True)
     confidence = Column(Float)
+    category = Column(String(20), nullable=False, default="unknown", server_default="unknown")
+    requires_review = Column(Boolean, nullable=False, default=True, server_default="1")
+    grounding_source = Column(String(64), nullable=False, default="legacy_unverified", server_default="legacy_unverified")
+    reference_source = Column(String(100))
+    reference_url = Column(String(2048))
+    reference_record_id = Column(String(128))
     gemini_suggestion = Column("suggestion", Text)  # 重新命名 suggestion -> gemini_suggestion
     gemini_treatment = Column("treatment", Text)    # 重新命名 treatment -> gemini_treatment
     user_note = Column(Text)
@@ -119,12 +125,19 @@ class WebcamAlert(Base):
 
     __tablename__ = "webcam_alert"
 
-    id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
+    id = Column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True, index=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("user.user_id"), nullable=False, index=True)
     crop_id = Column(Integer, ForeignKey("crop.crop_id"), nullable=True)
     category = Column(String(20), nullable=False)
     status_name = Column(String(100), nullable=False)
     confidence = Column(Float, nullable=False)
+    requires_review = Column(Boolean, nullable=False, default=True, server_default="1")
+    grounding_source = Column(String(64), nullable=False, default="legacy_unverified", server_default="legacy_unverified")
+    reference_source = Column(String(100))
+    reference_url = Column(String(2048))
+    reference_record_id = Column(String(128))
+    session_id = Column(String(64), nullable=False, default="legacy", server_default="legacy")
+    region_id = Column(String(64), nullable=False, default="full-frame", server_default="full-frame")
     consecutive_matches = Column(Integer, nullable=False)
     image_url = Column(String(2048), nullable=False)
     email_sent = Column(Boolean, nullable=False, default=False)
