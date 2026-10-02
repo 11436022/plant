@@ -7,14 +7,13 @@ from sqlalchemy.orm import Session, joinedload
 from app.db import models
 from app.core.config import settings
 from app.db.session import get_db, get_db_connection
-from app.services.ai import classify_agriculture_term, diagnostic_plant, get_reference_lists, save_to_db
+from app.services.ai import ground_diagnosis_in_database, save_to_db
 from app.services.auth import get_current_user
 from app.services.files import (
     build_public_image_url,
     create_safe_upload_path,
     ensure_image_upload,
 )
-from app.services.knowledge import get_or_complete_knowledge
 from app.schemas.patch import DiaryUpdate, DiaryConfirm
 
 # 從 prediction 路由器引入暫存區
@@ -101,35 +100,37 @@ async def patch_diary(
     if not db_entry or (not is_admin and db_entry.user_id != user_id):
         raise HTTPException(status_code=404, detail="Diary not found.")
 
-    new_crop_name = update_data.crop_name
-    new_status = update_data.status_name
-
-    if new_crop_name:
-        crop_info = await get_or_complete_knowledge("crop", new_crop_name, db)
-        db_entry.crop_id = crop_info["id"]
-
-    if new_status and new_status not in ["string", ""] and new_status != db_entry.status_name:
-        category = await classify_agriculture_term(new_status)
-        if category == "invalid":
-            raise HTTPException(status_code=400, detail="Status must be a disease or pest.")
-
-        # 呼叫知識庫服務，主要目的是為了拿到新診斷的 ID，並確保它存在於知識庫中
-        knowledge = await get_or_complete_knowledge(category, new_status, db)
-        
-        # 更新日記的狀態名稱
-        db_entry.status_name = new_status
-        
-        # 根據分類，更新對應的關聯 ID，並清除另一個
-        if category == "disease":
-            db_entry.disease_id = knowledge["id"]
-            db_entry.pest_id = None
-        elif category == "pest":
-            db_entry.pest_id = knowledge["id"]
-            db_entry.disease_id = None
-        
-        # 關鍵：不再用知識庫的通用 description 和 treatment 覆蓋 AI 的原始分析結果
-        # db_entry.suggestion = knowledge["suggestion"]
-        # db_entry.treatment = knowledge["treatment"]
+    if update_data.crop_name or update_data.status_name:
+        crop_name = update_data.crop_name or (db_entry.crop.crop_name if db_entry.crop else None)
+        crop = db.query(models.Crop).filter(models.Crop.crop_name == crop_name).first()
+        if not crop:
+            raise HTTPException(status_code=400, detail="Crop must exist in the reference database.")
+        status_name = update_data.status_name or db_entry.status_name
+        disease = db.query(models.Disease).filter(
+            models.Disease.crop_id == crop.crop_id, models.Disease.disease_name == status_name,
+        ).first()
+        pest = db.query(models.Pest).filter(
+            models.Pest.crop_id == crop.crop_id, models.Pest.pest_name == status_name,
+        ).first()
+        category = "disease" if disease else "pest" if pest else "healthy" if status_name == "健康" else "unknown"
+        if category == "unknown":
+            raise HTTPException(status_code=400, detail="Status must match the selected crop; use user_corrected_status for a personal annotation.")
+        grounded = ground_diagnosis_in_database(
+            {"crop_name": crop.crop_name, "category": category, "status_name": status_name, "confidence": 1.0}, db,
+        )
+        db_entry.crop_id = crop.crop_id
+        db_entry.status_name = status_name
+        db_entry.category = category
+        db_entry.disease_id = disease.disease_id if disease else None
+        db_entry.pest_id = pest.pest_id if pest else None
+        # A manual edit is not a new model inference or expert review.
+        db_entry.confidence = None
+        db_entry.requires_review = True
+        db_entry.grounding_source = "user_edited_database_match"
+        for field in ("reference_source", "reference_url", "reference_record_id"):
+            setattr(db_entry, field, grounded.get(field))
+        db_entry.gemini_suggestion = grounded["suggestion"]
+        db_entry.gemini_treatment = grounded["treatment"]
 
     optional_fields = ["user_note"]
     for field in optional_fields:
