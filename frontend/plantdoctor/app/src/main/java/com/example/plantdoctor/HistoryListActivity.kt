@@ -42,7 +42,14 @@ data class HistoryItem(
     @SerializedName("suggestion") var suggestion: String? = null,
     @SerializedName("treatment") var treatment: String? = null,
     @SerializedName("user_note") val user_note: String?,
-    var isExpanded: Boolean = false
+    var isExpanded: Boolean = false,
+    @SerializedName("confidence") val confidence: Double? = null,
+    @SerializedName("category") val category: String? = null,
+    @SerializedName("requires_review") val requires_review: Boolean? = null,
+    @SerializedName("grounding_source") val grounding_source: String? = null,
+    @SerializedName("reference_source") val reference_source: String? = null,
+    @SerializedName("reference_url") val reference_url: String? = null,
+    @SerializedName("reference_record_id") val reference_record_id: String? = null
 )
 
 class HistoryListActivity : AppCompatActivity() {
@@ -118,7 +125,8 @@ class HistoryListActivity : AppCompatActivity() {
         } else {
             fullHistoryList.filter {
                 it.crop_name.contains(query, ignoreCase = true) ||
-                        it.status_name.contains(query, ignoreCase = true)
+                        it.status_name.contains(query, ignoreCase = true) ||
+                        it.user_corrected_status?.contains(query, ignoreCase = true) == true
             }
         }
         displayList.clear()
@@ -204,7 +212,13 @@ class HistoryAdapter(
         val item = historyList[position]
         holder.tvName.text = item.crop_name
         holder.tvDate.text = item.created_at
-        holder.tvStatus.text = item.status_name
+        holder.tvStatus.text = buildString {
+            append("原始診斷：${item.status_name}")
+            item.user_corrected_status?.takeIf { it.isNotBlank() }?.let {
+                append("\n使用者修正：$it（非重新診斷）")
+            }
+            if (item.requires_review == true) append("\n需要人工複核")
+        }
 
         val finalUrl = fixImageUrl(item.image_url)
 
