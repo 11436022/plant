@@ -161,7 +161,7 @@ async def admin_add_diary(status_name: str = Form(...)):
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
-            sql = "INSERT INTO plant_diary (status_name, created_at) VALUES (%s, NOW())"
+            sql = "INSERT INTO plant_diary (status_name, category, requires_review, grounding_source, created_at) VALUES (%s, 'unknown', 1, 'manual_entry', NOW())"
             cursor.execute(sql, (status_name,))
         conn.commit()
         return RedirectResponse(url="/admin/", status_code=303)
@@ -174,7 +174,8 @@ async def admin_update_diary(diary_id: int, status_name: str = Form(...)):
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
-            sql = "UPDATE plant_diary SET status_name = %s WHERE id = %s"
+            # A manual correction must not relabel the original AI advice.
+            sql = "UPDATE plant_diary SET user_corrected_status = %s WHERE id = %s"
             cursor.execute(sql, (status_name, diary_id))
         conn.commit()
         return RedirectResponse(url="/admin/", status_code=303)
