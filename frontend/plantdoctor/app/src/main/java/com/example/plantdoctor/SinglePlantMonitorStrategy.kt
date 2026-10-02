@@ -6,44 +6,26 @@ import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.YuvImage
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.camera.core.ImageProxy
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.ByteArrayOutputStream
 import kotlin.math.min
 
 class SinglePlantMonitorStrategy(private val activity: WebcamActivity) {
 
     private var lastSampleTime = 0L
-    private var streakCount = 0
-    private var lastDiseaseName = ""
-
-    // 紀錄上次發送「手機系統通知」的時間戳記 (毫秒)
-    private var lastAlertTime = 0L
-    // 系統通知重複提醒冷卻間隔：1 小時 (3,600,000 毫秒)
-    private val alertCooldownMillis = 3_600_000L
-
-    private val mainHandler = Handler(Looper.getMainLooper())
-
     /**
      * 🌟 顯示單植物「正中心 1:1 方框」於畫面上
-     * 歸一化座標：left=0.15, top=0.25, right=0.85, bottom=0.75 (大致為正中心區域)
+     * 歸一化座標：left=0.2, top=0.2, right=0.8, bottom=0.8 (大致為正中心區域)
      */
     fun showCenterCropZone(boxOverlay: InteractiveBoxView) {
         val centerZone = CropZone(
             id = 999,
             name = "單植物目標區 (正中心)",
-            rectNorm = RectF(0.15f, 0.25f, 0.85f, 0.75f),
+            rectNorm = RectF(0.2f, 0.2f, 0.8f, 0.8f),
             intervalMinutes = 0
         )
-        boxOverlay.updateZones(listOf(centerZone))
+        boxOverlay.updateZones(listOf(centerZone), editable = false)
     }
 
     /**
@@ -121,71 +103,7 @@ class SinglePlantMonitorStrategy(private val activity: WebcamActivity) {
      * 🌟 上傳至後端 API 診斷
      */
     private fun sendFrameToApi(jpegBytes: ByteArray) {
-        val sharedPref = activity.getSharedPreferences("PlantDoctor", android.content.Context.MODE_PRIVATE)
-        val token = sharedPref.getString("token", null)
-
-        val requestFile = jpegBytes.toRequestBody("image/jpeg".toMediaTypeOrNull())
-        val body = MultipartBody.Part.createFormData("file", "webcam_single.jpg", requestFile)
-
-        val apiService = PlantApiService.create(token)
-        apiService.analyzeWebcamFrame(body).enqueue(object : Callback<WebcamAnalyzeResponse> {
-            override fun onResponse(
-                call: Call<WebcamAnalyzeResponse>,
-                response: Response<WebcamAnalyzeResponse>
-            ) {
-                if (response.isSuccessful) {
-                    response.body()?.let { result ->
-                        val cropName = result.diagnosis.crop_name ?: ""
-                        val statusName = result.diagnosis.status_name ?: "狀態未知"
-                        val fullDiseaseName = "$cropName $statusName".trim()
-
-                        handleDiagnosisResult(fullDiseaseName)
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<WebcamAnalyzeResponse>, t: Throwable) {
-                Log.e("SINGLE_STRATEGY", "影格分析失敗: ${t.message}")
-            }
-        })
-    }
-
-    /**
-     * 🌟 連續 3 次診斷計數：更新 APP 文字，連擊滿 3 次觸發系統通知（1小時冷卻）
-     */
-    private fun handleDiagnosisResult(diseaseName: String) {
-        mainHandler.post {
-            val isHealthy = diseaseName.contains("健康") || diseaseName.lowercase().contains("healthy")
-
-            // 1. 如果恢復健康：重置計數與通知冷卻時間
-            if (isHealthy) {
-                streakCount = 0
-                lastDiseaseName = diseaseName
-                lastAlertTime = 0L
-                activity.updateDiagnosisUI(diseaseName, streakCount)
-                return@post
-            }
-
-            // 2. 累積同種病害命中次數
-            if (diseaseName == lastDiseaseName) {
-                streakCount++
-            } else {
-                streakCount = 1
-                lastDiseaseName = diseaseName
-                lastAlertTime = 0L
-            }
-
-            // 3. 純粹更新 APP 畫面上的診斷與命中數字
-            activity.updateDiagnosisUI(diseaseName, streakCount)
-
-            // 4. 連續滿 3 次，且超過 1 小時冷卻期，觸發手機系統頂部下拉通知
-            val currentTime = System.currentTimeMillis()
-            if (streakCount >= 3 && (currentTime - lastAlertTime >= alertCooldownMillis)) {
-                lastAlertTime = currentTime
-
-                // 發送 Android 手機系統通知列訊息
-                activity.sendAlertNotification(diseaseName)
-            }
-        }
+        // Share session IDs, request lifecycle and backend-only alert handling.
+        activity.uploadSinglePlantFrame(jpegBytes)
     }
 }
