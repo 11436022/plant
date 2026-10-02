@@ -24,7 +24,7 @@ from sqlalchemy.schema import CreateTable
 from test_api_regressions import diagnosis, frame, password_hash, runtime
 from app.core.config import settings
 from app.db import models
-from app.routers import admin, prediction, webcam
+from app.routers import admin, diaries, prediction, webcam
 from app.services import ai
 from app.services.auth import create_access_token, verify_admin
 from app.services.webcam import AlertConsensusTracker
@@ -266,6 +266,105 @@ def test_grounding_unknown_and_cross_crop_use_real_sql(runtime, category, record
     db.get(record_type, 20).source_url = None
     db.commit()
     assert ai.ground_diagnosis_in_database(dict(candidate, crop_name="Other crop"), db)["requires_review"] is True
+
+
+@pytest.mark.parametrize("category,record_type,name_field", [
+    ("disease", models.Disease, "disease_name"), ("pest", models.Pest, "pest_name"),
+])
+@pytest.mark.parametrize("blank_field", ["source_name", "source_url", "source_record_id", "treatment"])
+def test_grounding_normalizes_whitespace_sources_and_requires_review(runtime, category, record_type, name_field, blank_field):
+    db = runtime["db"]
+    sources = {"source_name": "Reference", "source_url": "https://example.invalid/source", "source_record_id": "record-1"}
+    reference = record_type(crop_id=1, **{name_field: "Whitespace reference"},
+                            description="  Symptoms  ", treatment="  Advice  ",
+                            **{field: f" \t{value}\r\n" for field, value in sources.items()})
+    db.add(reference)
+    db.commit()
+    candidate = dict(diagnosis(), category=category, status_name="Whitespace reference")
+    source_fields = {"source_name": "reference_source", "source_url": "reference_url", "source_record_id": "reference_record_id"}
+    expected = {source_fields[field]: value for field, value in sources.items()}
+    grounded = ai.ground_diagnosis_in_database(candidate, db)
+    assert {field: grounded[field] for field in expected} == expected
+    assert grounded["requires_review"] is False
+    assert (grounded["suggestion"], grounded["treatment"]) == ("Symptoms", "Advice")
+    setattr(reference, blank_field, " \t\r\n")
+    db.commit()
+    grounded = ai.ground_diagnosis_in_database(candidate, db)
+    if blank_field in source_fields:
+        expected[source_fields[blank_field]] = None
+        assert grounded["treatment"] == "Advice"
+    else:
+        assert "\u8655\u7f6e\u53c3\u8003" in grounded["treatment"]
+        assert "\u6838\u51c6" not in grounded["treatment"]
+    assert {field: grounded[field] for field in expected} == expected
+    assert grounded["requires_review"] is True and grounded["category"] == category
+    assert grounded["grounding_source"] == f"{category}_database"
+
+
+@pytest.mark.parametrize("fail_router_read", [False, True], ids=["router-read-succeeds", "router-read-fails"])
+def test_confirm_does_not_refresh_or_restore_prediction_after_commit(runtime, monkeypatch, fail_router_read):
+    db, client, headers = runtime["db"], runtime["client"], runtime["headers"][1]
+    monkeypatch.setattr(prediction, "diagnostic_plant", lambda *args: diagnosis())
+    content = frame()
+    result = client.post("/api/v1/predict/", headers=headers, files={"file": ("leaf.jpg", content, "image/jpeg")})
+    assert result.status_code == 200, result.text
+    prediction_id = result.json()["prediction_id"]
+    temporary_image = Path(prediction.prediction_cache[prediction_id]["temp_path"])
+    assert temporary_image.read_bytes() == content and db.expire_on_commit
+    commits, returned_ids, postcommit_reads, router_reads = [], [], [], []
+    forbidden_refresh = Mock(side_effect=RuntimeError("Injected refresh failure"))
+
+    def after_commit(session):
+        commits.append(True)
+
+    def guard_postcommit_read(state):
+        if commits:
+            postcommit_reads.append(state.statement)
+            raise AssertionError("save_to_db must return its pre-commit ID without an implicit reload")
+
+    async def guarded_save(**kwargs):
+        # Guard only the service; the router is allowed to query after it returns.
+        with monkeypatch.context() as service_patch:
+            service_patch.setattr(db, "refresh", forbidden_refresh)
+            sa.event.listen(db, "after_commit", after_commit)
+            sa.event.listen(db, "do_orm_execute", guard_postcommit_read)
+            try:
+                diary_id = await ai.save_to_db(**kwargs)
+                returned_ids.append(diary_id)
+                return diary_id
+            finally:
+                sa.event.remove(db, "do_orm_execute", guard_postcommit_read)
+                sa.event.remove(db, "after_commit", after_commit)
+
+    original_query = db.query
+
+    def query(*entities, **kwargs):
+        if entities == (models.PlantDiary,):
+            router_reads.append(True)
+            if fail_router_read:
+                raise RuntimeError("Injected post-commit router read failure")
+        return original_query(*entities, **kwargs)
+
+    monkeypatch.setattr(diaries, "save_to_db", guarded_save)
+    monkeypatch.setattr(db, "query", query)
+    url = f"/api/v1/diaries/confirm/{prediction_id}"
+    response = client.post(url, headers=headers, json={"user_note": "Committed once"})
+    assert response.status_code == (500 if fail_router_read else 201), response.text
+    forbidden_refresh.assert_not_called()
+    assert commits == [True] and postcommit_reads == [] and router_reads == [True]
+    assert len(returned_ids) == 1 and isinstance(returned_ids[0], int) and returned_ids[0] > 0
+    assert prediction_id not in prediction.prediction_cache and not temporary_image.exists()
+    with sa.orm.Session(db.get_bind()) as verification:
+        entry = verification.query(models.PlantDiary).one()
+        assert entry.id == returned_ids[0] and entry.user_note == "Committed once"
+        saved_image = Path(entry.image_url)
+        assert saved_image.parent == runtime["uploads"] and saved_image.read_bytes() == content
+        if not fail_router_read:
+            assert response.json()["data"]["id"] == entry.id
+    assert client.post(url, headers=headers, json={}).status_code == 404
+    assert not list(runtime["temporary"].iterdir()) and list(runtime["uploads"].iterdir()) == [saved_image]
+    with sa.orm.Session(db.get_bind()) as verification:
+        assert verification.query(models.PlantDiary).count() == 1
 
 
 def test_admin_helpers_use_database_role_not_username_or_token_claim(runtime):
