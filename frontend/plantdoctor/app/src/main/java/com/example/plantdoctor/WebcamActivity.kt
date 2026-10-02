@@ -102,6 +102,11 @@ class WebcamActivity : AppCompatActivity() {
     private val regionIds = IdentityHashMap<CropZone, String>()
     private val pendingUploads = mutableMapOf<String, Call<WebcamAnalyzeResponse>>()
     private val notifiedAlertIds = mutableSetOf<Int>()
+    private data class PendingAlertNotification(val sessionId: String, val diagnosisName: String)
+    private val pendingAlertNotifications = linkedMapOf<Int, PendingAlertNotification>()
+    private var notificationPermissionRequestInFlight = false
+    private var notificationPermissionSessionId: String? = null
+    private val notificationPermissionPreferenceKey = "WEBCAM_NOTIFICATION_PERMISSION_REQUESTED"
     private var backendStatusText = ""
 
     // 狀態變數
@@ -137,6 +142,25 @@ class WebcamActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "需要相機權限才能進行即時監控", Toast.LENGTH_SHORT).show()
             finish()
+        }
+    }
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        val requestedSessionId = notificationPermissionSessionId
+        notificationPermissionRequestInFlight = false
+        notificationPermissionSessionId = null
+        val queuedAlerts = pendingAlertNotifications.toMap()
+        pendingAlertNotifications.clear()
+        if (isGranted && isMonitoring && requestedSessionId != null &&
+            monitoringSessionId == requestedSessionId && !isFinishing && !isDestroyed) {
+            for ((alertId, pending) in queuedAlerts) {
+                if (pending.sessionId == requestedSessionId && alertId !in notifiedAlertIds &&
+                    postAlertNotification(pending.diagnosisName, alertId, pending.sessionId)) {
+                    notifiedAlertIds.add(alertId)
+                }
+            }
         }
     }
 
@@ -283,6 +307,10 @@ class WebcamActivity : AppCompatActivity() {
         monitorJob?.cancel()
         monitorJob = null
         monitoringSessionId = null
+        pendingAlertNotifications.clear()
+        notifiedAlertIds.clear()
+        // Keep the in-flight flag until the OS returns the outstanding request.
+        notificationPermissionSessionId = null
         val calls = pendingUploads.values.toList()
         pendingUploads.clear()
         calls.forEach { it.cancel() }
@@ -304,7 +332,6 @@ class WebcamActivity : AppCompatActivity() {
         monitoringSessionId = UUID.randomUUID().toString()
         totalCaptureCount = 0
         backendStatusText = ""
-        notifiedAlertIds.clear()
         currentSession?.cropZones?.forEach { it.lastCapturedTime = 0L }
         updateDiagnosisUI("準備中...", totalCaptureCount)
 
@@ -570,6 +597,9 @@ class WebcamActivity : AppCompatActivity() {
         regionId: String,
         regionName: String
     ) {
+        if (!isMonitoring || monitoringSessionId != sessionId || isFinishing || isDestroyed) return
+        val monitoring = result.monitoring
+        if (!monitoring.matchesScope(sessionId, regionId)) return
         val alert = result.alert
         if (alert?.session_id != null && alert.session_id != sessionId) return
         if (alert?.region_id != null && alert.region_id != regionId) return
@@ -579,11 +609,12 @@ class WebcamActivity : AppCompatActivity() {
             false -> ""
             null -> "（複核狀態未提供）"
         }
-        backendStatusText = "$regionName：後端連續判定 ${result.monitoring.streak} 次（${result.monitoring.status}）"
+        backendStatusText = "$regionName：連續判定 ${monitoring.streak} 次；${monitoring.statusLabel()}"
         updateDiagnosisUI("$regionName：$statusText$reviewText", totalCaptureCount)
 
         // Only a newly created backend alert can produce a phone notification.
-        if (result.monitoring.triggered && alert != null && notifiedAlertIds.add(alert.id)) {
+        if (monitoring.triggered && alert != null &&
+            alert.id !in notifiedAlertIds && alert.id !in pendingAlertNotifications) {
             sendAlertNotification("$regionName：$statusText", alert.id)
             Toast.makeText(this, "後端已建立監控警報", Toast.LENGTH_LONG).show()
         }
@@ -761,36 +792,87 @@ class WebcamActivity : AppCompatActivity() {
     }
 
     fun sendAlertNotification(diagnosisName: String, notificationId: Int = 1001) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
-                return
+        runOnUiThread {
+            val sessionId = monitoringSessionId ?: return@runOnUiThread
+            if (!isMonitoring || isFinishing || isDestroyed ||
+                notificationId in notifiedAlertIds || notificationId in pendingAlertNotifications) {
+                return@runOnUiThread
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                if (notificationPermissionRequestInFlight) {
+                    if (notificationPermissionSessionId == sessionId) {
+                        pendingAlertNotifications[notificationId] =
+                            PendingAlertNotification(sessionId, diagnosisName)
+                    }
+                    return@runOnUiThread
+                }
+
+                val preferences = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
+                if (preferences.getBoolean(notificationPermissionPreferenceKey, false)) {
+                    return@runOnUiThread
+                }
+
+                // Queue before launching: the permission result can arrive immediately.
+                pendingAlertNotifications[notificationId] =
+                    PendingAlertNotification(sessionId, diagnosisName)
+                notificationPermissionSessionId = sessionId
+                notificationPermissionRequestInFlight = true
+                preferences.edit().putBoolean(notificationPermissionPreferenceKey, true).apply()
+                try {
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                } catch (e: IllegalStateException) {
+                    notificationPermissionRequestInFlight = false
+                    notificationPermissionSessionId = null
+                    pendingAlertNotifications.clear()
+                    Log.w("WEBCAM_PROD", "Could not request notification permission", e)
+                }
+                return@runOnUiThread
+            }
+
+            if (postAlertNotification(diagnosisName, notificationId, sessionId)) {
+                notifiedAlertIds.add(notificationId)
             }
         }
+    }
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channelId = "webcam_alert_channel"
+    private fun postAlertNotification(
+        diagnosisName: String,
+        notificationId: Int,
+        sessionId: String
+    ): Boolean {
+        if (!isMonitoring || monitoringSessionId != sessionId || isFinishing || isDestroyed) return false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED) return false
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "植物監控警報",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            notificationManager.createNotificationChannel(channel)
+        return try {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            if (!notificationManager.areNotificationsEnabled()) return false
+            val channelId = "webcam_alert_channel"
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                notificationManager.createNotificationChannel(
+                    NotificationChannel(channelId, "植物監控警報", NotificationManager.IMPORTANCE_HIGH)
+                )
+                if (notificationManager.getNotificationChannel(channelId)?.importance ==
+                    NotificationManager.IMPORTANCE_NONE) return false
+            }
+
+            val notification = NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.drawable.ic_camera)
+                .setContentTitle("植物監控警報")
+                .setContentText("即時監控診斷異常：$diagnosisName")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .build()
+            notificationManager.notify(notificationId, notification)
+            true
+        } catch (e: SecurityException) {
+            Log.w("WEBCAM_PROD", "Notification permission is unavailable", e)
+            false
         }
-
-        val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_camera)
-            .setContentTitle("🚨 植物健康警告！")
-            .setContentText("即時監控診斷異常：$diagnosisName")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .build()
-
-        notificationManager.notify(notificationId, notification)
     }
 
     /**
