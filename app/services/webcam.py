@@ -58,7 +58,7 @@ class AlertConsensusTracker:
             )
 
             gap = (current_time - state["last_seen"]).total_seconds()
-            if gap > max(settings.WEBCAM_SAMPLE_INTERVAL_SECONDS * 3, 120):
+            if gap > max(settings.WEBCAM_SAMPLE_INTERVAL_SECONDS * 3, 1800):
                 state["fingerprint"] = None
                 state["streak"] = 0
             state["last_seen"] = current_time
