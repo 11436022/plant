@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1235" viewBox="0 0 1600 1235">
   <defs>
     <style>
       .title { font: 700 42px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
@@ -13,129 +13,134 @@
       .optional { stroke: #87998c; stroke-width: 1.8; stroke-dasharray: 7 5; fill: none; }
     </style>
   </defs>
-  <rect width="1600" height="900" fill="#f8faf8"/>
-  <text x="52" y="55" class="title">資料庫實體關聯圖</text>
-  <text x="52" y="86" class="subtitle">依現行 SQLAlchemy models：實線為主要外鍵關聯，虛線為診斷結果的可選病害／蟲害關聯</text>
-
-  <!-- user -->
-  <g>
-    <rect x="50" y="150" width="300" height="250" rx="8" class="table"/>
-    <rect x="50" y="150" width="300" height="48" rx="8" class="header"/>
-    <rect x="50" y="190" width="300" height="8" fill="#47765a"/>
-    <text x="200" y="181" text-anchor="middle" class="head">user</text>
-    <text x="70" y="226" class="key">PK</text><text x="110" y="226" class="field">user_id</text>
-    <text x="70" y="254" class="field">username · email</text>
-    <text x="70" y="282" class="field">password_hash · full_name</text>
-    <text x="70" y="310" class="field">role · is_email_verified</text>
-    <text x="70" y="338" class="field">email_verified_at</text>
-    <text x="70" y="366" class="field">created_at</text>
-  </g>
-
-  <!-- tokens -->
-  <g>
-    <rect x="50" y="525" width="300" height="245" rx="8" class="table"/>
-    <rect x="50" y="525" width="300" height="48" rx="8" class="header"/>
-    <rect x="50" y="565" width="300" height="8" fill="#47765a"/>
-    <text x="200" y="556" text-anchor="middle" class="head">user_one_time_tokens</text>
-    <text x="70" y="601" class="key">PK</text><text x="110" y="601" class="field">id</text>
-    <text x="70" y="629" class="key">FK</text><text x="110" y="629" class="field">user_id</text>
-    <text x="70" y="657" class="field">purpose · token_hash</text>
-    <text x="70" y="685" class="field">expires_at · used_at</text>
-    <text x="70" y="713" class="field">created_at</text>
-  </g>
-
-  <!-- webcam alert -->
-  <g>
-    <rect x="470" y="130" width="380" height="285" rx="8" class="table"/>
-    <rect x="470" y="130" width="380" height="48" rx="8" class="header"/>
-    <rect x="470" y="170" width="380" height="8" fill="#47765a"/>
-    <text x="660" y="161" text-anchor="middle" class="head">webcam_alert</text>
-    <text x="490" y="206" class="key">PK</text><text x="530" y="206" class="field">id</text>
-    <text x="490" y="234" class="key">FK</text><text x="530" y="234" class="field">user_id · crop_id</text>
-    <text x="490" y="262" class="field">category · status_name</text>
-    <text x="490" y="290" class="field">confidence · consecutive_matches</text>
-    <text x="490" y="318" class="field">image_url · email_sent</text>
-    <text x="490" y="346" class="field">acknowledged_at · created_at</text>
-  </g>
-
-  <!-- plant diary -->
-  <g>
-    <rect x="470" y="505" width="380" height="330" rx="8" class="table"/>
-    <rect x="470" y="505" width="380" height="48" rx="8" class="header"/>
-    <rect x="470" y="545" width="380" height="8" fill="#47765a"/>
-    <text x="660" y="536" text-anchor="middle" class="head">plant_diary</text>
-    <text x="490" y="581" class="key">PK</text><text x="530" y="581" class="field">id</text>
-    <text x="490" y="609" class="key">FK</text><text x="530" y="609" class="field">user_id · crop_id</text>
-    <text x="490" y="637" class="key">FK?</text><text x="530" y="637" class="field">disease_id · pest_id</text>
-    <text x="490" y="665" class="field">status_name · confidence</text>
-    <text x="490" y="693" class="field">image_url · suggestion · treatment</text>
-    <text x="490" y="721" class="field">user_note · user_corrected_status</text>
-    <text x="490" y="749" class="field">created_at</text>
-  </g>
-
-  <!-- crop -->
-  <g>
-    <rect x="1010" y="120" width="250" height="190" rx="8" class="table"/>
-    <rect x="1010" y="120" width="250" height="48" rx="8" class="header"/>
-    <rect x="1010" y="160" width="250" height="8" fill="#47765a"/>
-    <text x="1135" y="151" text-anchor="middle" class="head">crop</text>
-    <text x="1030" y="196" class="key">PK</text><text x="1070" y="196" class="field">crop_id</text>
-    <text x="1030" y="224" class="field">crop_name</text>
-    <text x="1030" y="252" class="field">crop_name_en</text>
-  </g>
-
-  <!-- disease -->
-  <g>
-    <rect x="1320" y="120" width="230" height="290" rx="8" class="table"/>
-    <rect x="1320" y="120" width="230" height="48" rx="8" class="header"/>
-    <rect x="1320" y="160" width="230" height="8" fill="#47765a"/>
-    <text x="1435" y="151" text-anchor="middle" class="head">disease</text>
-    <text x="1340" y="196" class="key">PK</text><text x="1380" y="196" class="field">disease_id</text>
-    <text x="1340" y="224" class="key">FK</text><text x="1380" y="224" class="field">crop_id</text>
-    <text x="1340" y="252" class="field">disease_name</text>
-    <text x="1340" y="280" class="field">description · treatment</text>
-    <text x="1340" y="308" class="field">source_name</text>
-    <text x="1340" y="336" class="field">source_url</text>
-    <text x="1340" y="364" class="field">source_record_id</text>
-  </g>
-
-  <!-- pests -->
-  <g>
-    <rect x="1320" y="505" width="230" height="290" rx="8" class="table"/>
-    <rect x="1320" y="505" width="230" height="48" rx="8" class="header"/>
-    <rect x="1320" y="545" width="230" height="8" fill="#47765a"/>
-    <text x="1435" y="536" text-anchor="middle" class="head">pests</text>
-    <text x="1340" y="581" class="key">PK</text><text x="1380" y="581" class="field">pest_id</text>
-    <text x="1340" y="609" class="key">FK</text><text x="1380" y="609" class="field">crop_id</text>
-    <text x="1340" y="637" class="field">pest_name</text>
-    <text x="1340" y="665" class="field">description · treatment</text>
-    <text x="1340" y="693" class="field">source_name</text>
-    <text x="1340" y="721" class="field">source_url</text>
-    <text x="1340" y="749" class="field">source_record_id</text>
-  </g>
-
-  <!-- Relations -->
-  <path d="M200 400 V525" class="line"/>
-  <text x="212" y="470" class="label">1 : N</text>
-  <path d="M350 265 H470" class="line"/>
-  <text x="398" y="250" class="label">1 : N</text>
-  <path d="M350 310 H410 V610 H470" class="line"/>
-  <text x="420" y="590" class="label">1 : N</text>
-
-  <path d="M1010 210 H920 V234 H850" class="line"/>
-  <text x="918" y="198" class="label">1 : N</text>
-  <path d="M1010 250 H900 V609 H850" class="line"/>
-  <text x="912" y="595" class="label">1 : N</text>
-  <path d="M1260 190 H1320" class="line"/>
-  <text x="1274" y="178" class="label">1 : N</text>
-  <path d="M1135 310 V650 H1320" class="line"/>
-  <text x="1148" y="474" class="label">1 : N</text>
-
-  <path d="M1320 380 H1240 V637 H850" class="optional"/>
-  <text x="1165" y="625" class="label">0..1 : N</text>
-  <path d="M1320 755 H1210 V675 H850" class="optional"/>
-  <text x="1135" y="696" class="label">0..1 : N</text>
-
-  <rect x="50" y="852" width="1500" height="30" rx="6" fill="#eef5ee" stroke="#b1c6b1"/>
-  <text x="800" y="873" text-anchor="middle" class="subtitle">webcam_alert 只保存通過連續影格與資料庫覆核的異常；disease、pests 保留官方來源欄位。</text>
+  <style>.field {font-size:15px} .key {font-size:13px} .label {font-size:13px}</style>
+  <rect width="1600" height="1235" fill="#ffffff"/>
+  <text x="52" y="55" text-anchor="start" class="title">資料庫實體關聯圖</text>
+  <text x="52" y="86" text-anchor="start" class="subtitle">依現行 SQLAlchemy models；PK＝主鍵、FK＝外鍵、?＝可為 NULL。實體欄位不等於部署 schema 已驗證。</text>
+  <rect x="50" y="150" width="300" height="260" rx="8" class="table"/>
+  <rect x="50" y="150" width="300" height="48" rx="8" class="header"/>
+<rect x="50" y="190" width="300" height="8" fill="#47765a"/>
+  <text x="200" y="181" text-anchor="middle" class="head">user</text>
+  <text x="70" y="227" text-anchor="start" class="key">PK</text>
+  <text x="128" y="227" text-anchor="start" class="field">user_id</text>
+  <text x="70" y="254" text-anchor="start" class="field">username · email</text>
+  <text x="70" y="281" text-anchor="start" class="field">password_hash · full_name</text>
+  <text x="70" y="308" text-anchor="start" class="field">role · is_email_verified</text>
+  <text x="70" y="335" text-anchor="start" class="field">email_verified_at (NULL 可空)</text>
+  <text x="70" y="362" text-anchor="start" class="field">created_at</text>
+  <rect x="50" y="672" width="300" height="254" rx="8" class="table"/>
+  <rect x="50" y="672" width="300" height="48" rx="8" class="header"/>
+<rect x="50" y="712" width="300" height="8" fill="#47765a"/>
+  <text x="200" y="703" text-anchor="middle" class="head">user_one_time_tokens</text>
+  <text x="70" y="749" text-anchor="start" class="key">PK</text>
+  <text x="128" y="749" text-anchor="start" class="field">id</text>
+  <text x="70" y="776" text-anchor="start" class="key">FK</text>
+  <text x="128" y="776" text-anchor="start" class="field">user_id (NOT NULL)</text>
+  <text x="70" y="803" text-anchor="start" class="field">purpose: String(32) · token_hash</text>
+  <text x="70" y="830" text-anchor="start" class="field">expires_at · used_at</text>
+  <text x="70" y="857" text-anchor="start" class="field">created_at</text>
+  <rect x="470" y="130" width="455" height="430" rx="8" class="table"/>
+  <rect x="470" y="130" width="455" height="48" rx="8" class="header"/>
+<rect x="470" y="170" width="455" height="8" fill="#47765a"/>
+  <text x="697.5" y="161" text-anchor="middle" class="head">webcam_alert</text>
+  <text x="490" y="207" text-anchor="start" class="key">PK</text>
+  <text x="548" y="207" text-anchor="start" class="field">id</text>
+  <text x="490" y="234" text-anchor="start" class="key">FK</text>
+  <text x="548" y="234" text-anchor="start" class="field">user_id (NOT NULL)</text>
+  <text x="490" y="261" text-anchor="start" class="key">FK?</text>
+  <text x="548" y="261" text-anchor="start" class="field">crop_id</text>
+  <text x="490" y="288" text-anchor="start" class="field">category · status_name</text>
+  <text x="490" y="315" text-anchor="start" class="field">confidence · consecutive_matches</text>
+  <text x="490" y="342" text-anchor="start" class="field">requires_review · grounding_source</text>
+  <text x="490" y="369" text-anchor="start" class="field">reference_source · reference_record_id</text>
+  <text x="490" y="396" text-anchor="start" class="field">reference_url</text>
+  <text x="490" y="423" text-anchor="start" class="field">session_id · region_id</text>
+  <text x="490" y="450" text-anchor="start" class="field">image_url · email_sent</text>
+  <text x="490" y="477" text-anchor="start" class="field">acknowledged_at · created_at</text>
+  <rect x="470" y="642" width="455" height="425" rx="8" class="table"/>
+  <rect x="470" y="642" width="455" height="48" rx="8" class="header"/>
+<rect x="470" y="682" width="455" height="8" fill="#47765a"/>
+  <text x="697.5" y="673" text-anchor="middle" class="head">plant_diary</text>
+  <text x="490" y="719" text-anchor="start" class="key">PK</text>
+  <text x="548" y="719" text-anchor="start" class="field">id</text>
+  <text x="490" y="746" text-anchor="start" class="key">FK?</text>
+  <text x="548" y="746" text-anchor="start" class="field">user_id · crop_id</text>
+  <text x="490" y="773" text-anchor="start" class="key">FK?</text>
+  <text x="548" y="773" text-anchor="start" class="field">disease_id · pest_id</text>
+  <text x="490" y="800" text-anchor="start" class="field">category · status_name · confidence</text>
+  <text x="490" y="827" text-anchor="start" class="field">requires_review · grounding_source</text>
+  <text x="490" y="854" text-anchor="start" class="field">reference_source · reference_record_id</text>
+  <text x="490" y="881" text-anchor="start" class="field">reference_url</text>
+  <text x="490" y="908" text-anchor="start" class="field">image_url · suggestion · treatment</text>
+  <text x="490" y="935" text-anchor="start" class="field">user_note · user_corrected_status</text>
+  <text x="490" y="962" text-anchor="start" class="field">created_at</text>
+  <rect x="1040" y="130" width="235" height="194" rx="8" class="table"/>
+  <rect x="1040" y="130" width="235" height="48" rx="8" class="header"/>
+<rect x="1040" y="170" width="235" height="8" fill="#47765a"/>
+  <text x="1157.5" y="161" text-anchor="middle" class="head">crop</text>
+  <text x="1060" y="207" text-anchor="start" class="key">PK</text>
+  <text x="1118" y="207" text-anchor="start" class="field">crop_id</text>
+  <text x="1060" y="234" text-anchor="start" class="field">crop_name</text>
+  <text x="1060" y="261" text-anchor="start" class="field">crop_name_en</text>
+  <rect x="1320" y="130" width="230" height="308" rx="8" class="table"/>
+  <rect x="1320" y="130" width="230" height="48" rx="8" class="header"/>
+<rect x="1320" y="170" width="230" height="8" fill="#47765a"/>
+  <text x="1435" y="161" text-anchor="middle" class="head">disease</text>
+  <text x="1340" y="207" text-anchor="start" class="key">PK</text>
+  <text x="1398" y="207" text-anchor="start" class="field">disease_id</text>
+  <text x="1340" y="234" text-anchor="start" class="key">FK?</text>
+  <text x="1398" y="234" text-anchor="start" class="field">crop_id</text>
+  <text x="1340" y="261" text-anchor="start" class="field">disease_name</text>
+  <text x="1340" y="288" text-anchor="start" class="field">description · treatment</text>
+  <text x="1340" y="315" text-anchor="start" class="field">source_name</text>
+  <text x="1340" y="342" text-anchor="start" class="field">source_url</text>
+  <text x="1340" y="369" text-anchor="start" class="field">source_record_id</text>
+  <rect x="1320" y="694" width="230" height="308" rx="8" class="table"/>
+  <rect x="1320" y="694" width="230" height="48" rx="8" class="header"/>
+<rect x="1320" y="734" width="230" height="8" fill="#47765a"/>
+  <text x="1435" y="725" text-anchor="middle" class="head">pests</text>
+  <text x="1340" y="771" text-anchor="start" class="key">PK</text>
+  <text x="1398" y="771" text-anchor="start" class="field">pest_id</text>
+  <text x="1340" y="798" text-anchor="start" class="key">FK?</text>
+  <text x="1398" y="798" text-anchor="start" class="field">crop_id</text>
+  <text x="1340" y="825" text-anchor="start" class="field">pest_name</text>
+  <text x="1340" y="852" text-anchor="start" class="field">description · treatment</text>
+  <text x="1340" y="879" text-anchor="start" class="field">source_name</text>
+  <text x="1340" y="906" text-anchor="start" class="field">source_url</text>
+  <text x="1340" y="933" text-anchor="start" class="field">source_record_id</text>
+  <path d="M200 410 V672" class="line"/>
+  <text x="218" y="434" text-anchor="middle" class="label">1</text>
+  <text x="229" y="657" text-anchor="middle" class="label">0..N</text>
+  <path d="M350 251 H470" class="line"/>
+  <text x="365" y="238" text-anchor="middle" class="label">1</text>
+  <text x="441" y="238" text-anchor="middle" class="label">0..N</text>
+  <path d="M350 329 H402 V746 H470" class="optional"/>
+  <text x="377" y="317" text-anchor="middle" class="label">0..1</text>
+  <text x="439" y="735" text-anchor="middle" class="label">0..N</text>
+  <path d="M1040 223 H982 V261 H925" class="optional"/>
+  <text x="1005" y="211" text-anchor="middle" class="label">0..1</text>
+  <text x="952" y="281" text-anchor="middle" class="label">0..N</text>
+  <path d="M1040 285 H998 V746 H925" class="optional"/>
+  <text x="1010" y="307" text-anchor="middle" class="label">0..1</text>
+  <text x="956" y="735" text-anchor="middle" class="label">0..N</text>
+  <path d="M1275 234 H1320" class="optional"/>
+  <text x="1297" y="213" text-anchor="middle" class="label">0..1</text>
+  <text x="1297" y="255" text-anchor="middle" class="label">0..N</text>
+  <path d="M1158 324 V798 H1320" class="optional"/>
+  <text x="1186" y="349" text-anchor="middle" class="label">0..1</text>
+  <text x="1281" y="785" text-anchor="middle" class="label">0..N</text>
+  <path d="M1320 411 H1235 V773 H925" class="optional"/>
+  <text x="1282" y="400" text-anchor="middle" class="label">0..1</text>
+  <text x="952" y="797" text-anchor="middle" class="label">0..N</text>
+  <path d="M1320 948 H1205 V836 H925" class="optional"/>
+  <text x="1280" y="972" text-anchor="middle" class="label">0..1</text>
+  <text x="958" y="858" text-anchor="middle" class="label">0..N</text>
+  <text x="220" y="974" text-anchor="middle" class="field">實線：必填外鍵；虛線：可為 NULL</text>
+  <text x="220" y="1004" text-anchor="middle" class="field">父端 1／0..1；子端 0..N</text>
+  <text x="220" y="1034" text-anchor="middle" class="field">數字標在對應實體的一端</text>
+  <rect x="50" y="1090" width="1500" height="124" rx="6" fill="#eef5ee" stroke="#b1c6b1"/>
+  <text x="800" y="1118" text-anchor="middle" class="field">日誌與警報均保存 category、requires_review、grounding_source 與 reference_* 來源快照；並非即時來源表的替代外鍵。</text>
+  <text x="800" y="1147" text-anchor="middle" class="field">image_url 是檔案路徑；圖片存 static/uploads。診斷暫存為記憶體＋static/tmp，不是資料庫實體。</text>
+  <text x="800" y="1175" text-anchor="middle" class="field">unknown／需複核可確認保存日誌；新警報須通過門檻與連續判定。requires_review 標記不表示專業複核已完成。</text>
+  <text x="800" y="1202" text-anchor="middle" class="field">MySQL 驗證範圍：SQL 離線檢查；未執行實庫遷移或查詢驗證。</text>
 </svg>
