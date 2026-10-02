@@ -15,6 +15,7 @@ from app.services.webcam import (
     alert_consensus,
     create_webcam_alert,
     save_alert_image,
+    send_webcam_alert_email,
     serialize_webcam_alert,
     validate_webcam_frame,
 )
@@ -61,6 +62,7 @@ async def analyze_webcam_frame(
     temp_path.write_bytes(content)
 
     saved_alert_path = None
+    preserve_alert_image = False
     try:
         crops, diseases, pests = get_reference_lists(db)
         model_result = diagnostic_plant(str(temp_path), crops, diseases, pests)
@@ -84,6 +86,14 @@ async def analyze_webcam_frame(
                 region_id=region_id,
             )
             alert_data = serialize_webcam_alert(alert)
+            recipient = current_user.email
+            # A failed COMMIT can have an uncertain outcome; never delete its image.
+            preserve_alert_image = True
+            db.commit()
+            alert_data["email_sent"] = send_webcam_alert_email(
+                db=db, alert_id=alert_data["id"], recipient=recipient,
+                diagnosis=diagnosis, consecutive_matches=monitoring["streak"],
+            )
 
         return {
             "status": "success",
@@ -96,12 +106,12 @@ async def analyze_webcam_frame(
                 "format": metadata.image_format,
             },
         }
-    except HTTPException:
-        raise
     except Exception as exc:
         db.rollback()
-        if saved_alert_path and saved_alert_path.exists():
+        if not preserve_alert_image and saved_alert_path and saved_alert_path.exists():
             saved_alert_path.unlink()
+        if isinstance(exc, HTTPException):
+            raise
         raise HTTPException(status_code=500, detail="Webcam analysis failed.") from exc
     finally:
         if temp_path.exists():
