@@ -3,6 +3,7 @@ package com.example.plantdoctor
 import com.google.gson.annotations.SerializedName
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -34,7 +35,8 @@ data class EmailVerificationRequest(val email: String)
 
 data class GenericResponse(
     val status: String,
-    val message: String?
+    val message: String?,
+    val email_sent: Boolean? = null
 )
 
 // --- Predict (第一階段預測) ---
@@ -50,8 +52,42 @@ data class AnalysisResult(
     val category: String? = null,
     val confidence: Double?,
     val suggestion: String?,
-    val treatment: String?
+    val treatment: String?,
+    val requires_review: Boolean? = null,
+    val grounding_source: String? = null,
+    val reference_source: String? = null,
+    val reference_url: String? = null,
+    val reference_record_id: String? = null
 )
+
+fun formatDiagnosisMetadata(
+    confidence: Double?,
+    category: String?,
+    requiresReview: Boolean?,
+    groundingSource: String?,
+    referenceSource: String?,
+    referenceUrl: String?,
+    referenceRecordId: String?
+): String {
+    val confidenceText = confidence
+        ?.takeIf { it.isFinite() && it in 0.0..1.0 }
+        ?.let { String.format(java.util.Locale.getDefault(), "%.1f%%", it * 100) }
+        ?: "未提供"
+    val reviewText = when (requiresReview) {
+        true -> "需要人工複核"
+        false -> "系統未標記需複核（不代表已由專家審核）"
+        null -> "未提供複核狀態"
+    }
+    return listOf(
+        "模型信心值：$confidenceText（非準確率）",
+        "分類：${category?.takeIf { it.isNotBlank() } ?: "未提供"}",
+        "複核狀態：$reviewText",
+        "校驗依據：${groundingSource?.takeIf { it.isNotBlank() } ?: "未提供"}",
+        "參考來源：${referenceSource?.takeIf { it.isNotBlank() } ?: "未提供"}",
+        "來源網址：${referenceUrl?.takeIf { it.isNotBlank() } ?: "未提供"}",
+        "來源紀錄：${referenceRecordId?.takeIf { it.isNotBlank() } ?: "未提供"}"
+    ).joinToString("\n")
+}
 
 // --- Confirm (第二階段確認寫入日記) ---
 // 相容你原本 ResultActivity 傳入的 disease_name 與 gemini_advice，後端忽略即可
@@ -68,7 +104,13 @@ data class DiaryConfirmData(
     val confidence: Double?,
     val image_url: String,
     val suggestion: String?,
-    val treatment: String?
+    val treatment: String?,
+    val category: String? = null,
+    val requires_review: Boolean? = null,
+    val grounding_source: String? = null,
+    val reference_source: String? = null,
+    val reference_url: String? = null,
+    val reference_record_id: String? = null
 )
 
 data class DiaryConfirmResponse(
@@ -132,7 +174,10 @@ data class WebcamAlertItem(
     val image_url: String,
     val consecutive_matches: Int,
     val created_at: String,
-    val acknowledged_at: String?
+    val acknowledged_at: String?,
+    val session_id: String? = null,
+    val region_id: String? = null,
+    val email_sent: Boolean? = null
 )
 
 data class WebcamAnalyzeResponse(
@@ -218,7 +263,9 @@ interface PlantApiService {
     @Multipart
     @POST("webcam/analyze")
     fun analyzeWebcamFrame(
-        @Part file: MultipartBody.Part
+        @Part file: MultipartBody.Part,
+        @Part("session_id") sessionId: RequestBody? = null,
+        @Part("region_id") regionId: RequestBody? = null
     ): Call<WebcamAnalyzeResponse>
 
     @GET("webcam/alerts")
