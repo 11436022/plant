@@ -162,7 +162,11 @@ data class WebcamSettingsResponse(
 data class WebcamMonitoringState(
     val streak: Int,
     val triggered: Boolean,
-    val status: String
+    @SerializedName(value = "reason", alternate = ["status"])
+    val status: String? = null,
+    val required_matches: Int? = null,
+    val session_id: String? = null,
+    val region_id: String? = null
 )
 
 data class WebcamAlertItem(
