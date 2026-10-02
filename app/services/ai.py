@@ -173,10 +173,10 @@ def ground_diagnosis_in_database(data: dict, db: Session) -> dict:
 
     description = str(record.description or "").strip()
     treatment = str(record.treatment or "").strip()
-    source_name = getattr(record, "source_name", None)
-    source_url = getattr(record, "source_url", None)
-    source_record_id = getattr(record, "source_record_id", None)
-    has_verified_source = bool(
+    source_name = str(getattr(record, "source_name", None) or "").strip() or None
+    source_url = str(getattr(record, "source_url", None) or "").strip() or None
+    source_record_id = str(getattr(record, "source_record_id", None) or "").strip() or None
+    has_traceable_source = bool(
         source_name and source_url and source_record_id
     )
     return {
@@ -185,12 +185,12 @@ def ground_diagnosis_in_database(data: dict, db: Session) -> dict:
         "status_name": getattr(record, "disease_name" if category == "disease" else "pest_name"),
         "confidence": confidence,
         "suggestion": description or "- 已比對到此作物資料庫中的病蟲害紀錄",
-        "treatment": treatment or "1. 資料庫尚無核准處置內容，請諮詢農業專業人員",
+        "treatment": treatment or "1. 資料庫尚無處置參考內容，請諮詢農業專業人員",
         "grounding_source": "disease_database" if category == "disease" else "pest_database",
         "reference_source": source_name,
         "reference_url": source_url,
         "reference_record_id": source_record_id,
-        "requires_review": not bool(description and treatment and has_verified_source),
+        "requires_review": not bool(description and treatment and has_traceable_source),
     }
 
 
@@ -396,9 +396,10 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
         new_diary.created_at = datetime.now()
 
         db.add(new_diary)
+        db.flush()
+        diary_id = new_diary.id
         db.commit()
-        db.refresh(new_diary)
-        return new_diary.id
+        return diary_id
     except Exception as exc:
         db.rollback()
         print(f"CRITICAL DATABASE ERROR: {str(exc)}") # 🌟 這行會把真正的錯誤原因印在後端視窗
