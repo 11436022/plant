@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import uuid
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session, joinedload
 
@@ -49,6 +49,8 @@ async def get_webcam_settings(current_user: models.User = Depends(get_current_us
 @router.post("/analyze")
 async def analyze_webcam_frame(
     file: UploadFile = File(...),
+    session_id: str = Form("legacy", min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$"),
+    region_id: str = Form("full-frame", min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$"),
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -66,7 +68,8 @@ async def analyze_webcam_frame(
             raise HTTPException(status_code=502, detail="AI analysis service failed.")
 
         diagnosis = ground_diagnosis_in_database(model_result, db)
-        monitoring = alert_consensus.evaluate(current_user.user_id, diagnosis)
+        monitoring = alert_consensus.evaluate(current_user.user_id, diagnosis, session_id=session_id, region_id=region_id)
+        monitoring.update(session_id=session_id, region_id=region_id)
         alert_data = None
 
         if monitoring["triggered"]:
@@ -77,6 +80,8 @@ async def analyze_webcam_frame(
                 diagnosis=diagnosis,
                 image_path=saved_alert_path,
                 consecutive_matches=monitoring["streak"],
+                session_id=session_id,
+                region_id=region_id,
             )
             alert_data = serialize_webcam_alert(alert)
 
@@ -97,7 +102,7 @@ async def analyze_webcam_frame(
         db.rollback()
         if saved_alert_path and saved_alert_path.exists():
             saved_alert_path.unlink()
-        raise HTTPException(status_code=500, detail=f"Webcam analysis failed: {exc}") from exc
+        raise HTTPException(status_code=500, detail="Webcam analysis failed.") from exc
     finally:
         if temp_path.exists():
             temp_path.unlink()
