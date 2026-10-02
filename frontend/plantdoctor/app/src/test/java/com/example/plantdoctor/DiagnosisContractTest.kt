@@ -147,4 +147,86 @@ class DiagnosisContractTest {
         assertNull(legacy.session_id)
         assertNull(legacy.region_id)
     }
+
+    @Test
+    fun monitoringReasonAndLegacyStatusDecodeFromFullResponses() {
+        for (key in listOf("reason", "status")) {
+            val json = """
+                {
+                  "status": "success",
+                  "diagnosis": $diagnosisJson,
+                  "monitoring": {
+                    "streak": 2, "triggered": false,
+                    "$key": "collecting_consensus", "required_matches": 3,
+                    "session_id": "run-1", "region_id": "region-2"
+                  },
+                  "alert": null
+                }
+            """.trimIndent()
+            val response = gson.fromJson(json, WebcamAnalyzeResponse::class.java)
+            assertEquals("success", response.status)
+            assertEquals("collecting_consensus", response.monitoring.status)
+            assertEquals(3, response.monitoring.required_matches)
+            assertEquals("run-1", response.monitoring.session_id)
+            assertEquals("region-2", response.monitoring.region_id)
+            assertTrue(response.monitoring.matchesScope("run-1", "region-2"))
+            val encoded = gson.toJsonTree(response.monitoring).asJsonObject
+            assertTrue(encoded.has("reason"))
+            assertFalse(encoded.has("status"))
+        }
+    }
+
+    @Test
+    fun missingNullAndUnknownMonitoringReasonsHaveReadableFallbacks() {
+        val fixtures = listOf(
+            """{"streak":0,"triggered":false}""",
+            """{"streak":0,"triggered":false,"reason":null}""",
+            """{"streak":0,"triggered":false,"reason":""}""",
+            """{"streak":0,"triggered":false,"reason":"   "}""",
+            """{"streak":0,"triggered":false,"status":null}"""
+        )
+        for (json in fixtures) {
+            val state = gson.fromJson(json, WebcamMonitoringState::class.java)
+            assertEquals("未提供監控狀態", state.statusLabel())
+        }
+        val unknown = gson.fromJson(
+            """{"streak":0,"triggered":false,"reason":"future_reason"}""",
+            WebcamMonitoringState::class.java
+        )
+        assertEquals("無法辨識監控狀態", unknown.statusLabel())
+        assertFalse(unknown.statusLabel().contains("future_reason"))
+    }
+
+    @Test
+    fun knownMonitoringReasonsUseTraditionalChineseLabels() {
+        val labels = mapOf(
+            "triggered" to "已建立警報",
+            "cooldown" to "警報冷卻中",
+            "collecting_consensus" to "正在累積連續判定",
+            "not_a_grounded_anomaly" to "未符合警報條件"
+        )
+        for ((reason, expectedLabel) in labels) {
+            val state = WebcamMonitoringState(0, false, status = reason)
+            assertEquals(expectedLabel, state.statusLabel())
+        }
+    }
+
+    @Test
+    fun monitoringScopeRejectsContradictoryEchoesButAcceptsLegacyOmission() {
+        val state = WebcamMonitoringState(
+            2, false, session_id = "run-1", region_id = "region-2"
+        )
+        assertTrue(state.matchesScope("run-1", "region-2"))
+        assertFalse(state.matchesScope("old-run", "region-2"))
+        assertFalse(state.matchesScope("run-1", "different-region"))
+        assertFalse(state.copy(session_id = "").matchesScope("run-1", "region-2"))
+        assertFalse(state.copy(region_id = "").matchesScope("run-1", "region-2"))
+        assertTrue(state.copy(session_id = null).matchesScope("run-1", "region-2"))
+        assertTrue(state.copy(region_id = null).matchesScope("run-1", "region-2"))
+        val legacy = gson.fromJson(
+            """{"streak":0,"triggered":false}""",
+            WebcamMonitoringState::class.java
+        )
+        assertTrue(legacy.matchesScope("run-1", "region-2"))
+    }
 }
