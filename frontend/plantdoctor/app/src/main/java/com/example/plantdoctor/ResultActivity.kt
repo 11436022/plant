@@ -252,13 +252,13 @@ class ResultActivity : AppCompatActivity() {
                 }
             }
 
-            // 3️⃣ 第三步：AI 醫生處方箋說明
+            // 第三步：診斷參考資訊
             startStep3 = {
                 if (currentStep == 3) {
                     SoundManager.playBubblePop()
                     targetView3 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
                         com.getkeepsafe.taptargetview.TapTarget.forView(
-                            tvAdvice, "第三步：AI 醫生處方箋", "這裡會顯示詳細的病害分析、澆水與除蟲建議，幫你對症下藥！"
+                            tvAdvice, "第三步：診斷參考資訊", "這裡列出模型信心值、複核提示與參考來源。照護建議僅供參考，不代表已由專業人員複核。"
                         ).outerCircleColor(targetColorRes)
                             .targetCircleColor(android.R.color.white)
                             .titleTextSize(24).descriptionTextSize(16)
@@ -287,7 +287,7 @@ class ResultActivity : AppCompatActivity() {
                     SoundManager.playBubblePop()
                     targetView2 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
                         com.getkeepsafe.taptargetview.TapTarget.forView(
-                            viewDragHandle, "第二步：展開完整報告", "將這個卡片向上滑動，就能解鎖 AI 醫生為你準備的完整病害處方箋喔！"
+                            viewDragHandle, "第二步：展開診斷資訊", "向上滑動即可查看這次診斷的參考資訊與觀察筆記。"
                         ).outerCircleColor(targetColorRes)
                             .targetCircleColor(android.R.color.white)
                             .titleTextSize(24).descriptionTextSize(16)
