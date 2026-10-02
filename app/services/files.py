@@ -1,9 +1,47 @@
 import uuid
+import io
+from dataclasses import dataclass
 from pathlib import Path
 
 from fastapi import HTTPException, UploadFile
+from PIL import Image, ImageStat, UnidentifiedImageError
 
 from app.core.config import settings
+
+
+@dataclass(frozen=True)
+class FrameMetadata:
+    width: int
+    height: int
+    image_format: str
+
+
+def validate_image_content(content: bytes, content_type: str | None) -> FrameMetadata:
+    """Decode bounded images before any AI call, regardless of upload entry point."""
+    mime_formats = {"image/jpeg": "JPEG", "image/png": "PNG", "image/webp": "WEBP"}
+    if content_type not in mime_formats or not content:
+        raise HTTPException(status_code=400, detail="A nonempty JPEG, PNG, or WebP image is required.")
+    if len(content) > settings.WEBCAM_MAX_IMAGE_BYTES:
+        raise HTTPException(status_code=413, detail="Image exceeds the upload size limit.")
+    try:
+        with Image.open(io.BytesIO(content)) as image:
+            image.verify()
+        with Image.open(io.BytesIO(content)) as image:
+            width, height = image.size
+            image_format = str(image.format or "").upper()
+            if width * height > 20_000_000:
+                raise HTTPException(status_code=400, detail="Image resolution is too large.")
+            if image_format != mime_formats[content_type]:
+                raise HTTPException(status_code=400, detail="Image format does not match its content type.")
+            if width < settings.WEBCAM_MIN_IMAGE_WIDTH or height < settings.WEBCAM_MIN_IMAGE_HEIGHT:
+                raise HTTPException(status_code=400, detail=f"Minimum image size is {settings.WEBCAM_MIN_IMAGE_WIDTH}x{settings.WEBCAM_MIN_IMAGE_HEIGHT}.")
+            grayscale = image.convert("L")
+            grayscale.thumbnail((320, 320))
+            if float(ImageStat.Stat(grayscale).stddev[0]) < 5.0:
+                raise HTTPException(status_code=422, detail="Image lacks enough visual detail for diagnosis.")
+    except (Image.DecompressionBombError, UnidentifiedImageError, OSError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail="Image data is invalid or damaged.") from exc
+    return FrameMetadata(width, height, image_format)
 
 
 def build_public_image_url(image_path: str) -> str:
