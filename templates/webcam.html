@@ -454,6 +454,7 @@
 
             try {
                 const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.86));
+                if (sessionId !== state.sessionId) return;
                 if (!blob) throw new Error("無法擷取攝影機影格。");
                 const form = new FormData();
                 form.append("file", blob, "webcam-frame.jpg");
@@ -461,14 +462,20 @@
                 form.append("region_id", "full-frame");
                 const payload = await api("/webcam/analyze", { method: "POST", body: form });
                 if (sessionId !== state.sessionId) return;
+                if (payload.monitoring?.session_id !== sessionId || payload.monitoring?.region_id !== "full-frame") {
+                    throw new Error("監控回應不屬於目前工作階段，已忽略。");
+                }
                 renderDiagnosis(payload);
                 byId("lastScan").textContent = new Date().toLocaleTimeString("zh-TW", { hour12: false });
-                if (payload.alert) {
+                const newAlert = payload.monitoring.triggered && payload.alert?.session_id === sessionId && payload.alert?.region_id === "full-frame";
+                if (newAlert) {
                     fireAlarm(payload.alert);
                     await loadAlerts();
                 }
-                setMonitorStatus(state.timer ? "監控中" : "攝影機已開啟", payload.alert ? "alert" : "live");
+                if (sessionId !== state.sessionId) return;
+                setMonitorStatus(state.timer ? "監控中" : "攝影機已開啟", newAlert ? "alert" : "live");
             } catch (error) {
+                if (sessionId !== state.sessionId) return;
                 byId("monitorError").textContent = error.message;
                 setMonitorStatus(state.timer ? "等待下次掃描" : "攝影機已開啟", "live");
             } finally {
@@ -505,6 +512,7 @@
             byId("intervalInput").value = interval;
             byId("intervalSummary").textContent = `每 ${interval} 秒`;
             if ("Notification" in window && Notification.permission === "default") await Notification.requestPermission();
+            if (sessionId !== state.sessionId || !state.stream) return;
             await captureFrame();
             if (sessionId !== state.sessionId) return;
             state.timer = window.setInterval(captureFrame, interval * 1000);
