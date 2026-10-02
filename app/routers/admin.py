@@ -1,12 +1,75 @@
-import os
-from fastapi import APIRouter, Request, Form, Query
+from fastapi import APIRouter, Depends, HTTPException, Request, Form, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 import pymysql
+from sqlalchemy.orm import Session
 
-from app.db.session import get_db_connection
+from app.core.config import settings
+from app.db.session import get_db, get_db_connection
+from app.routers.auth import get_user_by_username, pwd_context
+from app.services.auth import create_access_token, get_current_user, verify_admin
 from app.services.files import build_public_image_url
 
-router = APIRouter(prefix="/admin", tags=["admin"])
+ADMIN_COOKIE = "plant_admin_session"
+
+
+def check_form_origin(request: Request):
+    if request.method not in {"GET", "HEAD", "OPTIONS"}:
+        origin = request.headers.get("origin")
+        if origin and origin != str(request.base_url).rstrip("/"):
+            raise HTTPException(status_code=403, detail="Cross-origin form submission denied.")
+
+
+async def require_admin(request: Request, db: Session = Depends(get_db)):
+    check_form_origin(request)
+    if request.url.path.rstrip("/") == "/admin/login":
+        return
+    authorization = request.headers.get("authorization", "")
+    token = authorization[7:] if authorization.lower().startswith("bearer ") else request.cookies.get(ADMIN_COOKIE)
+    if not token:
+        if "text/html" in request.headers.get("accept", ""):
+            raise HTTPException(status_code=303, headers={"Location": "/admin/login"})
+        raise HTTPException(status_code=401, detail="Administrator login required.")
+    user = get_current_user(db=db, token=token)
+    if not user.is_email_verified:
+        raise HTTPException(status_code=403, detail="Email verification required.")
+    return await verify_admin(user)
+
+
+router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])
+
+
+@router.get("/login", response_class=HTMLResponse)
+async def admin_login_page():
+    return HTMLResponse('''<!doctype html><html lang="zh-Hant"><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>管理員登入</title><main><h1>管理員登入</h1>
+    <form method="post" action="/admin/login">
+    <p><label>帳號 <input name="username" autocomplete="username" required></label></p>
+    <p><label>密碼 <input name="password" type="password" autocomplete="current-password" required></label></p>
+    <button type="submit">登入</button></form></main></html>''', headers={"Cache-Control": "no-store"})
+
+
+@router.post("/login")
+async def admin_login(request: Request, username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+    user = get_user_by_username(db, username)
+    if not user or not pwd_context.verify(password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid username or password.")
+    if not user.is_email_verified:
+        raise HTTPException(status_code=403, detail="Email verification required.")
+    await verify_admin(user)
+    token = create_access_token({"user_id": user.user_id, "sub": user.username})
+    response = RedirectResponse("/admin/", status_code=303)
+    response.set_cookie(ADMIN_COOKIE, token, max_age=settings.JWT_EXPIRE_MINUTES * 60,
+                        httponly=True, secure=request.url.scheme == "https", samesite="strict", path="/admin")
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
+@router.post("/logout")
+async def admin_logout():
+    response = RedirectResponse("/admin/login", status_code=303)
+    response.delete_cookie(ADMIN_COOKIE, path="/admin")
+    return response
 
 ITEMS_PER_PAGE = 20  # 每頁顯示的紀錄數量
 
