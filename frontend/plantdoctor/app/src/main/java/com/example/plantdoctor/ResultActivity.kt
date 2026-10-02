@@ -149,10 +149,16 @@ class ResultActivity : AppCompatActivity() {
             tvDiseaseName.text = "診斷：${data.status_name ?: "未知"}"
 
             val fullAdvice = StringBuilder().apply {
-                append("【專家建議】\n${data.suggestion ?: "尚無建議"}\n\n")
-                append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
+                append(formatDiagnosisMetadata(
+                    data.confidence, data.category, data.requires_review,
+                    data.grounding_source, data.reference_source,
+                    data.reference_url, data.reference_record_id
+                ))
+                append("\n\n【原始診斷參考建議】\n${data.suggestion ?: "尚無建議"}\n\n")
+                append("【原始診斷處理參考】\n${data.treatment ?: "請諮詢專業人員"}")
             }.toString()
             tvAdvice.text = fullAdvice
+            tvAdvice.setTextIsSelectable(true)
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "報告內容解析失敗", Toast.LENGTH_SHORT).show()
@@ -386,8 +392,6 @@ class ResultActivity : AppCompatActivity() {
 
     // 🌟 將原本的網路儲存邏輯抽離出來供 Dialog 呼叫
     private fun executeSaveLogic(predictionId: String?, sharedPref: android.content.SharedPreferences) {
-        val diseaseName = tvDiseaseName.text.toString().removePrefix("診斷：")
-        val adviceText = tvAdvice.text.toString()
         val userNote = etUserNote.text.toString()
 
         val token = sharedPref.getString("token", null)
@@ -399,11 +403,8 @@ class ResultActivity : AppCompatActivity() {
         btnSave.isEnabled = false
         btnSave.text = "儲存中..."
 
-        val request = DiaryConfirmRequest(
-            user_note = userNote,
-            disease_name = diseaseName,
-            gemini_advice = adviceText
-        )
+        // The server saves the diagnosis snapshot; display labels are not input.
+        val request = DiaryConfirmRequest(user_note = userNote)
 
         val apiService = PlantApiService.create(token)
         apiService.confirmDiary(predictionId!!, request).enqueue(object : retrofit2.Callback<DiaryConfirmResponse> {
