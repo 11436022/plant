@@ -1,4 +1,5 @@
 import json
+import math
 import os
 from datetime import datetime
 from pathlib import Path
@@ -46,7 +47,7 @@ def _coerce_confidence(value) -> float:
         confidence = float(value)
     except (TypeError, ValueError):
         return 0.0
-    return max(0.0, min(1.0, confidence))
+    return max(0.0, min(1.0, confidence)) if math.isfinite(confidence) else 0.0
 
 
 def _safe_text(value: str | None, fallback: str) -> str:
@@ -140,6 +141,8 @@ def ground_diagnosis_in_database(data: dict, db: Session) -> dict:
     category = str(data.get("category", "")).strip().lower()
     if category == "unknown":
         return _uncertain_diagnosis(crop.crop_name, confidence)
+    if confidence < MIN_DIAGNOSIS_CONFIDENCE:
+        return _uncertain_diagnosis(crop.crop_name, confidence)
 
     if category == "healthy":
         if confidence < MIN_HEALTHY_CONFIDENCE:
@@ -170,14 +173,10 @@ def ground_diagnosis_in_database(data: dict, db: Session) -> dict:
 
     description = str(record.description or "").strip()
     treatment = str(record.treatment or "").strip()
-    has_source_fields = all(
-        hasattr(record, field)
-        for field in ("source_name", "source_url", "source_record_id")
-    )
     source_name = getattr(record, "source_name", None)
     source_url = getattr(record, "source_url", None)
     source_record_id = getattr(record, "source_record_id", None)
-    has_verified_source = not has_source_fields or bool(
+    has_verified_source = bool(
         source_name and source_url and source_record_id
     )
     return {
@@ -348,19 +347,30 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
     try:
         # 只接受既有資料庫中的病蟲害名稱，避免 AI 幻覺資料被寫入知識庫。
         if category == "disease":
-            disease = db.query(models.Disease).filter(models.Disease.disease_name == status_name).first()
+            disease = db.query(models.Disease).filter(
+                models.Disease.disease_name == status_name,
+                models.Disease.crop_id == target_crop_id,
+            ).first() if target_crop_id is not None else None
             if disease:
                 disease_id = disease.disease_id
             else:
                 category = "unknown"
                 status_name = UNKNOWN_STATUS_NAME
         elif category == "pest":
-            pest = db.query(models.Pest).filter(models.Pest.pest_name == status_name).first()
+            pest = db.query(models.Pest).filter(
+                models.Pest.pest_name == status_name,
+                models.Pest.crop_id == target_crop_id,
+            ).first() if target_crop_id is not None else None
             if pest:
                 pest_id = pest.pest_id
             else:
                 category = "unknown"
                 status_name = UNKNOWN_STATUS_NAME
+
+        if category == "unknown":
+            data = _uncertain_diagnosis(crop_name, _coerce_confidence(data.get("confidence")))
+            final_suggestion = data["suggestion"]
+            final_treatment = data["treatment"]
 
         new_diary = models.PlantDiary()
         new_diary.user_id = user_id
@@ -370,6 +380,12 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
         new_diary.disease_id = disease_id
         new_diary.pest_id = pest_id
         new_diary.confidence = data.get("confidence")
+        new_diary.category = category
+        new_diary.requires_review = data.get("requires_review", True)
+        new_diary.grounding_source = data.get("grounding_source") or "legacy_unverified"
+        new_diary.reference_source = data.get("reference_source")
+        new_diary.reference_url = data.get("reference_url")
+        new_diary.reference_record_id = data.get("reference_record_id")
 
         # 🌟 這裡使用手動賦值，避免建構子屬性名稱混淆
         # 如果您的資料庫欄位是 suggestion，這會正確運作
