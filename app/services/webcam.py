@@ -124,6 +124,7 @@ def create_webcam_alert(
     session_id: str = "legacy",
     region_id: str = "full-frame",
 ) -> models.WebcamAlert:
+    """Stage an alert; the caller must serialize it and commit the transaction."""
     crop = db.query(models.Crop).filter(models.Crop.crop_name == diagnosis["crop_name"]).first()
     if not crop:
         raise RuntimeError("Grounded webcam diagnosis has no matching crop record.")
@@ -146,27 +147,36 @@ def create_webcam_alert(
         reference_record_id=diagnosis.get("reference_record_id"),
     )
     db.add(alert)
-    db.commit()
+    db.flush()
     db.refresh(alert)
-
-    if user.email:
-        try:
-            send_email(
-                to_email=user.email,
-                subject=f"Plant Doctor 警報：{alert.status_name}",
-                text_body=(
-                    f"Webcam 連續 {consecutive_matches} 次辨識到 {diagnosis['crop_name']} "
-                    f"可能有 {alert.status_name}，信心值 {alert.confidence:.0%}。\n\n"
-                    f"資料庫處置建議：\n{diagnosis['treatment']}"
-                ),
-            )
-            alert.email_sent = True
-            db.commit()
-            db.refresh(alert)
-        except Exception as exc:
-            print(f"[WEBCAM ALERT EMAIL FAILED]: {exc}")
-
     return alert
+
+
+def send_webcam_alert_email(
+    *, db: Session, alert_id: int, recipient: str | None, diagnosis: dict, consecutive_matches: int,
+) -> bool:
+    """Notify after persistence, using cached values and a separate status transaction."""
+    if not recipient:
+        return False
+    try:
+        send_email(
+            to_email=recipient,
+            subject=f"Plant Doctor 警報：{diagnosis['status_name']}",
+            text_body=(
+                f"Webcam 連續 {consecutive_matches} 次辨識到 {diagnosis['crop_name']} "
+                f"可能有 {diagnosis['status_name']}，信心值 {diagnosis['confidence']:.0%}。\n\n"
+                f"資料庫處置建議：\n{diagnosis['treatment']}"
+            ),
+        )
+        db.query(models.WebcamAlert).filter(models.WebcamAlert.id == alert_id).update(
+            {models.WebcamAlert.email_sent: True}, synchronize_session=False,
+        )
+        db.commit()
+        return True
+    except Exception as exc:
+        db.rollback()
+        print(f"[WEBCAM ALERT EMAIL FAILED]: {exc}")
+        return False
 
 
 def serialize_webcam_alert(alert: models.WebcamAlert) -> dict:
