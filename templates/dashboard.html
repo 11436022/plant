@@ -116,7 +116,6 @@
                     <th>AI 診斷 (可修改)</th>
                     <th>使用者備註</th>
                     <th>診斷時間</th>
-                    <th>管理操作</th>
                 </tr>
             </thead>
             <tbody>
@@ -147,11 +146,6 @@
                     </td>
 
                     <td>{{ diary.created_at.strftime('%Y-%m-%d %H:%M') if diary.created_at else '' }}</td>
-                    <td>
-                        <form action="/admin/delete/{{ diary.id }}" method="post" onsubmit="return confirm('警告：確定要永久刪除這筆紀錄嗎？');">
-                            <button type="submit" class="btn-delete">🗑️ 刪除</button>
-                        </form>
-                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
