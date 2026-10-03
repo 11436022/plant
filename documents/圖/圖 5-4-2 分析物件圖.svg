@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530" width="1000" height="530">
+  <defs>
+    <style>
+      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 18px; font-weight: bold; fill: #0f172a; }
+      .obj-title { font-family: 'Microsoft JhengHei', 'Consolas', sans-serif; font-size: 12.5px; font-weight: bold; fill: #ffffff; text-anchor: middle; }
+      .member-text { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; fill: #1e293b; }
+      .cardinality { font-family: 'Consolas', monospace; font-size: 11px; font-weight: bold; fill: #334155; }
+      .rel-label { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10.5px; font-weight: bold; fill: #475569; }
+      
+      .obj-box { fill: #ffffff; stroke: #2563eb; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .obj-header { fill: #2563eb; }
+      
+      .core-box { fill: #ffffff; stroke: #059669; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .core-header { fill: #059669; }
+
+      .feedback-box { fill: #ffffff; stroke: #d97706; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .feedback-header { fill: #d97706; }
+
+      .assoc-line { stroke: #334155; stroke-width: 1.3; fill: none; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#ffffff" />
+
+  <!-- Diagram Title -->
+  <text x="500" y="32" class="title" text-anchor="middle">圖 5-4-2 分析物件圖 (Analysis Object Diagram)</text>
+
+  <!-- ================= ROW 1 ================= -->
+  <!-- Object 1: user_01:使用者 -->
+  <g transform="translate(40, 65)">
+    <rect width="260" height="135" class="obj-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 256 0 Q 260 0 260 4 L 260 28 L 0 28 Z" class="obj-header" />
+    <text x="130" y="19" class="obj-title">user_01 : 使用者</text>
+    <text x="12" y="50" class="member-text">username = "john_farmer"</text>
+    <text x="12" y="70" class="member-text">email = "john@example.com"</text>
+    <text x="12" y="90" class="member-text">role = "user"</text>
+    <text x="12" y="110" class="member-text">is_email_verified = true</text>
+  </g>
+
+  <!-- Object 2: diary_01:植物日誌 -->
+  <g transform="translate(360, 65)">
+    <rect width="260" height="155" class="core-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 256 0 Q 260 0 260 4 L 260 28 L 0 28 Z" class="core-header" />
+    <text x="130" y="19" class="obj-title">diary_01 : 植物日誌</text>
+    <text x="12" y="50" class="member-text">created_at = "2026-05-24"</text>
+    <text x="12" y="70" class="member-text">user_note = "葉緣焦枯，先隔離"</text>
+    <text x="12" y="90" class="member-text">status_name = "番茄早疫病"</text>
+    <text x="12" y="110" class="member-text">confidence = 0.92</text>
+    <text x="12" y="130" class="member-text">is_resolved = false</text>
+  </g>
+
+  <!-- Object 3: diag_01:診斷結果 -->
+  <g transform="translate(680, 65)">
+    <rect width="270" height="155" class="core-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 266 0 Q 270 0 270 4 L 270 28 L 0 28 Z" class="core-header" />
+    <text x="135" y="19" class="obj-title">diag_01 : 診斷結果</text>
+    <text x="12" y="50" class="member-text">crop_name = "番茄"</text>
+    <text x="12" y="70" class="member-text">disease_name = "早疫病"</text>
+    <text x="12" y="90" class="member-text">suggestion = "輪紋狀褐斑"</text>
+    <text x="12" y="110" class="member-text">treatment = "及時清除病葉"</text>
+    <text x="12" y="130" class="member-text">confidence = 0.92</text>
+  </g>
+
+  <!-- ================= ROW 2 ================= -->
+  <!-- Object 6: alert_01:監控警報 (WebcamAlert) - Generous width 260, height 135 -->
+  <g transform="translate(40, 275)">
+    <rect width="260" height="135" class="obj-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 256 0 Q 260 0 260 4 L 260 28 L 0 28 Z" class="obj-header" />
+    <text x="130" y="19" class="obj-title">alert_01 : 監控警報 (WebcamAlert)</text>
+    <text x="12" y="50" class="member-text">snapshot_url = "uploads/alert_01.jpg"</text>
+    <text x="12" y="70" class="member-text">alert_status = "番茄晚疫病 (Webcam偵測)"</text>
+    <text x="12" y="90" class="member-text">alert_time = "2026-05-24 16:30"</text>
+    <text x="12" y="110" class="member-text">is_resolved = false</text>
+  </g>
+
+  <!-- Object 4: image_01:病害圖片 -->
+  <g transform="translate(360, 275)">
+    <rect width="260" height="135" class="obj-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 256 0 Q 260 0 260 4 L 260 28 L 0 28 Z" class="obj-header" />
+    <text x="130" y="19" class="obj-title">image_01 : 病害圖片</text>
+    <text x="12" y="50" class="member-text">file_path = "uploads/leaf_01.jpg"</text>
+    <text x="12" y="70" class="member-text">mime_type = "image/jpeg"</text>
+    <text x="12" y="90" class="member-text">file_size = 348210 (bytes)</text>
+    <text x="12" y="110" class="member-text">upload_time = "2026-05-24 14:20"</text>
+  </g>
+
+  <!-- Object 5: fb_01:診斷反饋 (明確註明：診斷錯誤時之糾錯實例) -->
+  <g transform="translate(680, 275)">
+    <rect width="270" height="135" class="feedback-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 266 0 Q 270 0 270 4 L 270 28 L 0 28 Z" class="feedback-header" />
+    <text x="135" y="19" class="obj-title">fb_01 : 診斷反饋 (診斷錯誤時)</text>
+    <text x="12" y="50" class="member-text">original_status = "早疫病 (AI判斷錯誤)"</text>
+    <text x="12" y="70" class="member-text">corrected_status = "斑枯病 (糾錯標籤)"</text>
+    <text x="12" y="90" class="member-text">is_disease_error = true</text>
+    <text x="12" y="110" class="member-text">is_plant_error = false</text>
+  </g>
+
+  <!-- Connections -->
+  <!-- user_01 to diary_01 -->
+  <line x1="300" y1="130" x2="360" y2="130" class="assoc-line" />
+
+  <!-- diary_01 to diag_01 -->
+  <line x1="620" y1="130" x2="680" y2="130" class="assoc-line" />
+
+  <!-- user_01 to alert_01 (vertical, label beside line) -->
+  <line x1="170" y1="200" x2="170" y2="275" class="assoc-line" />
+  <text x="178" y="241" class="rel-label" text-anchor="start">警報</text>
+
+  <!-- diary_01 to image_01 (vertical, label beside line) -->
+  <line x1="490" y1="220" x2="490" y2="275" class="assoc-line" />
+  <text x="498" y="251" class="rel-label" text-anchor="start">病徵相片</text>
+
+  <!-- diary_01 to fb_01 (step route, label cleanly beside vertical line) -->
+  <path d="M 620 170 L 650 170 L 650 340 L 680 340" class="assoc-line" />
+  <text x="642" y="251" class="rel-label" text-anchor="end">若診斷有誤</text>
+
+  <!-- Explanation note -->
+  <g transform="translate(40, 445)">
+    <rect width="910" height="58" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2" rx="6" />
+    <text x="15" y="23" font-family="'Microsoft JhengHei', sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">分析物件說明：</text>
+    <text x="15" y="43" font-family="'Microsoft JhengHei', sans-serif" font-size="11" font-weight="500" fill="#334155">本圖展現使用者情境下的實例狀態：包含植物日誌、病徵相片、AI 診斷結果；若判斷有誤則提報糾錯反饋 (fb_01)，並記錄 Webcam 監控觸發之警報事件 (alert_01)。</text>
+  </g>
+
+</svg>

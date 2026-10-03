@@ -1,0 +1,241 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 680" width="1180" height="680">
+  <defs>
+    <style>
+      <![CDATA[
+      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 21px; font-weight: bold; fill: #0f172a; }
+      .group-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 14px; font-weight: bold; fill: #1e293b; }
+      .state-name { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .action-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #000000; }
+      .transition-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #1e40af; font-weight: bold; }
+      .guard-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #b91c1c; font-style: italic; font-weight: bold; }
+      
+      /* Composite Groups */
+      .composite-bg { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 6,4; rx: 8; ry: 8; }
+      .composite-header { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.5; }
+      
+      /* Standard States (Crisp Refreshing Blue) - ONLY STATES HAVE BOXES */
+      .state-box { fill: #ffffff; stroke: #2563eb; stroke-width: 1.5; rx: 6; ry: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .state-header { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.5; }
+      
+      /* Error States (Warning Coral Red) */
+      .error-state-box { fill: #fef2f2; stroke: #dc2626; stroke-width: 1.5; rx: 6; ry: 6; }
+      .error-state-header { fill: #fee2e2; stroke: #dc2626; stroke-width: 1.5; }
+      
+      /* Lines and Connectors - 100% UNBROKEN */
+      .line { stroke: #1e293b; stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+      .line-inter { stroke: #2563eb; stroke-width: 1.5; fill: none; stroke-dasharray: 6,4; marker-end: url(#blue-arrow); }
+      .line-back { stroke: #dc2626; stroke-width: 1.4; stroke-dasharray: 5,4; fill: none; marker-end: url(#red-arrow); }
+      ]]>
+    </style>
+
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b" />
+    </marker>
+    <marker id="blue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#2563eb" />
+    </marker>
+    <marker id="red-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#dc2626" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#ffffff" />
+
+  <!-- Diagram Title -->
+  <text x="590" y="32" class="title" text-anchor="middle">圖 7-4-3 診斷紀錄確認與備忘筆記儲存 狀態圖 (State Diagram)</text>
+
+  <!-- ========================================================================= -->
+  <!-- 1. COMPOSITE STATE 1: CLIENT REVIEW & NOTE (x=25, y=55, w=460)           -->
+  <!-- ========================================================================= -->
+  <g transform="translate(25, 55)">
+    <rect width="460" height="605" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 452 0 Q 460 0 460 8 L 460 30 L 0 30 Z" class="composite-header" />
+    <text x="14" y="20" class="group-title">狀態群組 1：客戶端檢閱與備忘編輯 (Client Review &amp; Note)</text>
+
+    <!-- Initial State -->
+    <circle cx="180" cy="46" r="8" fill="#0f172a" />
+    <line x1="180" y1="54" x2="180" y2="68" class="line" />
+
+    <!-- State S1: 檢閱診斷結論 (Reviewing_Diagnosis) -->
+    <g transform="translate(20, 68)">
+      <rect width="320" height="76" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 314 0 Q 320 0 320 6 L 320 24 L 0 24 Z" class="state-header" />
+      <text x="160" y="17" class="state-name">檢閱診斷結論 (Reviewing_Diagnosis)</text>
+      <text x="10" y="44" class="action-text">entry / 顯示 AI 推論病害名稱與信心度指標</text>
+      <text x="10" y="64" class="action-text">do / 檢視建議之防治方針（化學用藥與有機處方）</text>
+    </g>
+
+    <!-- Transition S1 -> S2: Unbroken Vertical Line at x=75, Pure Text at right -->
+    <line x1="75" y1="144" x2="75" y2="178" class="line" />
+    <text x="90" y="166" class="transition-text">點擊填寫備忘或直接儲存</text>
+
+    <!-- State S2: 編輯個人備忘 (Editing_User_Note) -->
+    <g transform="translate(20, 180)">
+      <rect width="320" height="86" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 314 0 Q 320 0 320 6 L 320 24 L 0 24 Z" class="state-header" />
+      <text x="160" y="17" class="state-name">編輯個人備忘 (Editing_User_Note)</text>
+      <text x="10" y="42" class="action-text">entry / 展開個人筆記輸入區域 (user_note)</text>
+      <text x="10" y="60" class="action-text">do / 輸入自定義備忘、栽種位置、施藥心得</text>
+      <text x="10" y="78" class="action-text">exit / 打包 prediction_id 與 user_note 負載</text>
+    </g>
+
+    <!-- Transition S2 -> S3: Unbroken Vertical Line at x=75, Pure Text at right -->
+    <line x1="75" y1="266" x2="75" y2="300" class="line" />
+    <text x="90" y="288" class="transition-text">點擊「確認儲存日誌」</text>
+
+    <!-- State S3: 提交儲存請求 (Submitting_Confirm) -->
+    <g transform="translate(20, 302)">
+      <rect width="320" height="86" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 314 0 Q 320 0 320 6 L 320 24 L 0 24 Z" class="state-header" />
+      <text x="160" y="17" class="state-name">提交儲存請求 (Submitting_Confirm)</text>
+      <text x="10" y="42" class="action-text">entry / 呈現儲存等待進度對話框</text>
+      <text x="10" y="60" class="action-text">do / 發送 POST /api/v1/diaries/confirm/{id}</text>
+      <text x="10" y="78" class="action-text">do / 請求標頭附加 Bearer JWT 憑證授權</text>
+    </g>
+
+    <!-- State S8: 日誌儲存成功 (Diary_Saved) -->
+    <g transform="translate(20, 460)">
+      <rect width="320" height="86" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 314 0 Q 320 0 320 6 L 320 24 L 0 24 Z" class="state-header" />
+      <text x="160" y="17" class="state-name">日誌儲存成功 (Diary_Saved)</text>
+      <text x="10" y="42" class="action-text">entry / 提示「診斷紀錄已儲存至個人日誌」</text>
+      <text x="10" y="60" class="action-text">do / 本機歷史日誌列表即時刷新快取</text>
+      <text x="10" y="78" class="action-text">exit / 自動跳轉歷史紀錄詳細頁</text>
+    </g>
+
+    <!-- Transition S8 -> Final State [*] -->
+    <line x1="180" y1="546" x2="180" y2="574" class="line" />
+    <circle cx="180" cy="585" r="11" stroke="#0f172a" stroke-width="1.8" fill="none" />
+    <circle cx="180" cy="585" r="6" fill="#0f172a" />
+    <text x="235" y="589" class="action-text" font-weight="bold">流程完畢 [*]</text>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- INTER-COMPOSITE TRANSITION: Client S3 -> Server S4 (HTTP POST)           -->
+  <!-- ========================================================================= -->
+  <path d="M 365 390 L 485 390 L 485 169 L 533 169" class="line-inter" />
+  <text x="425" y="378" class="transition-text" text-anchor="middle">發送確認請求</text>
+
+  <!-- ========================================================================= -->
+  <!-- 2. COMPOSITE STATE 2: DATABASE PERSISTENCE PIPELINE (x=515, y=55, w=640) -->
+  <!-- ========================================================================= -->
+  <g transform="translate(515, 55)">
+    <rect width="640" height="605" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 632 0 Q 640 0 640 8 L 640 30 L 0 30 Z" class="composite-header" />
+    <text x="14" y="20" class="group-title">狀態群組 2：伺服器端資料持久化管線 (Database Persistence Pipeline)</text>
+
+    <!-- State S4: 快取有效性核對 (Cache_Check) -->
+    <g transform="translate(20, 68)">
+      <rect width="300" height="92" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 294 0 Q 300 0 300 6 L 300 24 L 0 24 Z" class="state-header" />
+      <text x="150" y="17" class="state-name">快取有效性核對 (Cache_Check)</text>
+      <text x="10" y="42" class="action-text">do / 查詢快取中是否存在 prediction_id</text>
+      <text x="10" y="60" class="action-text">do / 驗證請求者 user_id 身分所有權</text>
+      <text x="10" y="78" class="action-text">do / 檢查臨時影像實體 (temp_path.exists())</text>
+    </g>
+
+    <!-- Transition S4 -> Error E1: Unbroken Horizontal Line, Pure Guard text ABOVE -->
+    <line x1="320" y1="81" x2="418" y2="81" class="line" />
+    <text x="369" y="71" class="guard-text" text-anchor="middle">[快取逾期/遺失]</text>
+
+    <!-- Error State E1: 快取失效 (Cache_Expired) -->
+    <g transform="translate(420, 48)">
+      <rect width="200" height="66" class="error-state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 194 0 Q 200 0 200 6 L 200 22 L 0 22 Z" class="error-state-header" />
+      <text x="100" y="16" class="state-name" fill="#991b1b">快取失效 (Cache_Expired)</text>
+      <text x="10" y="38" class="action-text" fill="#b91c1c">entry / 回傳 404 (ID不存在或逾期)</text>
+      <text x="10" y="54" class="action-text" fill="#b91c1c">do / 提示快取已過期，請重新拍照</text>
+    </g>
+
+    <!-- Transition S4 -> Error E2: Unbroken Horizontal Line, Pure Guard text ABOVE -->
+    <line x1="320" y1="142" x2="418" y2="142" class="line" />
+    <text x="369" y="132" class="guard-text" text-anchor="middle">[未知植物/病害]</text>
+
+    <!-- Error State E2: 阻擋儲存 (Save_Rejected) - 方案 A 核心防禦 -->
+    <g transform="translate(420, 128)">
+      <rect width="200" height="66" class="error-state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 194 0 Q 200 0 200 6 L 200 22 L 0 22 Z" class="error-state-header" />
+      <text x="100" y="16" class="state-name" fill="#991b1b">阻擋儲存 (Save_Rejected)</text>
+      <text x="10" y="38" class="action-text" fill="#b91c1c">entry / 回傳 400 Bad Request</text>
+      <text x="10" y="54" class="action-text" fill="#b91c1c">do / 提示未知作物不可存入病歷</text>
+    </g>
+
+    <!-- Transition S4 -> S5: Unbroken Vertical Line at x=80, Pure Text at right -->
+    <line x1="80" y1="160" x2="80" y2="198" class="line" />
+    <text x="95" y="184" class="transition-text">[快取有效且判定明確]</text>
+
+    <!-- State S5: 移轉檔案 (Persist_Image_File) -->
+    <g transform="translate(20, 200)">
+      <rect width="300" height="86" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 294 0 Q 300 0 300 6 L 300 24 L 0 24 Z" class="state-header" />
+      <text x="150" y="17" class="state-name">移轉檔案 (Persist_Image_File)</text>
+      <text x="10" y="42" class="action-text">do / 將圖片自 static/tmp/ 移至 static/uploads/</text>
+      <text x="10" y="60" class="action-text">do / 生成安全雜湊檔名與建立永久目錄</text>
+      <text x="10" y="78" class="action-text">do / 建立永久相對訪問路徑 (Image URL)</text>
+    </g>
+
+    <!-- Transition S5 -> S6: Unbroken Vertical Line at x=80, Pure Text at right -->
+    <line x1="80" y1="286" x2="80" y2="320" class="line" />
+    <text x="95" y="308" class="transition-text">檔案移轉完成 / 準備寫入資料庫</text>
+
+    <!-- State S6: 寫入資料庫實體 (Write_MySQL_Diary) -->
+    <g transform="translate(20, 322)">
+      <rect width="300" height="104" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 294 0 Q 300 0 300 6 L 300 24 L 0 24 Z" class="state-header" />
+      <text x="150" y="17" class="state-name">寫入資料庫實體 (Write_MySQL_Diary)</text>
+      <text x="10" y="40" class="action-text">do / 實例化 PlantDiary (user, crop, status)</text>
+      <text x="10" y="58" class="action-text">do / 寫入信心度、處方建議與用藥方針</text>
+      <text x="10" y="76" class="action-text">do / 存入使用者自定義備忘 (user_note)</text>
+      <text x="10" y="94" class="action-text">do / SQLAlchemy db.session.commit()</text>
+    </g>
+
+    <!-- Transition S6 -> Error E3: Unbroken Horizontal Line, Pure Guard text ABOVE -->
+    <line x1="320" y1="374" x2="418" y2="374" class="line" />
+    <text x="369" y="364" class="guard-text" text-anchor="middle">[寫入發生異常]</text>
+
+    <!-- Error State E3: 資料庫異常 (DB_Failed) -->
+    <g transform="translate(420, 336)">
+      <rect width="200" height="76" class="error-state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 194 0 Q 200 0 200 6 L 200 22 L 0 22 Z" class="error-state-header" />
+      <text x="100" y="16" class="state-name" fill="#991b1b">資料庫異常 (DB_Failed)</text>
+      <text x="10" y="38" class="action-text" fill="#b91c1c">entry / db.rollback() 交易回滾</text>
+      <text x="10" y="54" class="action-text" fill="#b91c1c">do / 刪除移轉圖片（避免孤兒檔案）</text>
+      <text x="10" y="70" class="action-text" fill="#b91c1c">exit / 回傳 500 Internal Error</text>
+    </g>
+
+    <!-- Error Final State [*] below E3 -->
+    <line x1="520" y1="412" x2="520" y2="467" class="line-back" />
+    <text x="528" y="442" class="guard-text">回傳 500</text>
+    <circle cx="520" cy="480" r="11" stroke="#dc2626" stroke-width="1.8" fill="none" />
+    <circle cx="520" cy="480" r="6" fill="#dc2626" />
+    <text x="520" y="506" class="action-text" text-anchor="middle" font-weight="bold" fill="#dc2626">異常終止 [*]</text>
+
+    <!-- Transition S6 -> S7: Unbroken Vertical Line at x=80, Pure Text at right -->
+    <line x1="80" y1="426" x2="80" y2="458" class="line" />
+    <text x="95" y="446" class="transition-text">[寫入成功 / 提交完成]</text>
+
+    <!-- State S7: 清理快取與回傳 (Purge_Cache) -->
+    <g transform="translate(20, 460)">
+      <rect width="300" height="86" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 294 0 Q 300 0 300 6 L 300 24 L 0 24 Z" class="state-header" />
+      <text x="150" y="17" class="state-name">清理快取與回傳 (Purge_Cache)</text>
+      <text x="10" y="42" class="action-text">do / 自 prediction_cache 註銷 prediction_id</text>
+      <text x="10" y="60" class="action-text">do / 回傳 HTTP 201 Created 與完整日誌 DTO</text>
+      <text x="10" y="78" class="action-text">exit / 伺服器端生命週期終止</text>
+    </g>
+
+    <!-- Transition S7 -> Server Final State [*] -->
+    <line x1="80" y1="546" x2="80" y2="574" class="line" />
+    <circle cx="80" cy="585" r="11" stroke="#0f172a" stroke-width="1.8" fill="none" />
+    <circle cx="80" cy="585" r="6" fill="#0f172a" />
+    <text x="135" y="589" class="action-text" font-weight="bold">流程完畢 [*]</text>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- INTER-COMPOSITE RESPONSE: Server S7 -> Client S8 (HTTP 201 Response)     -->
+  <!-- ========================================================================= -->
+  <line x1="535" y1="558" x2="367" y2="558" class="line-inter" />
+  <text x="451" y="546" class="transition-text" text-anchor="middle">接收回應 [HTTP 201 Created]</text>
+
+</svg>

@@ -1,0 +1,259 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 720" width="1150" height="720">
+  <defs>
+    <style>
+      <![CDATA[
+      .title { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 21px; font-weight: bold; fill: #0f172a; }
+      .group-title { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 14px; font-weight: bold; fill: #1e293b; }
+      .state-name { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 13px; font-weight: bold; fill: #1e3a8a; text-anchor: middle; }
+      .action-text { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 11.5px; fill: #000000; }
+      .transition-text { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', serif; font-size: 11.5px; fill: #1e40af; font-weight: bold; }
+      .guard-text { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', serif; font-size: 11px; fill: #b91c1c; font-style: italic; font-weight: bold; }
+      
+      /* Subtle Academic Composite Group */
+      .composite-bg { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.4; stroke-dasharray: 6,4; rx: 8; ry: 8; }
+      .composite-header { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.4; }
+      
+      /* Standard States (Crisp Refreshing Blue) - ONLY STATES HAVE BOXES */
+      .state-box { fill: #ffffff; stroke: #2563eb; stroke-width: 1.4; rx: 6; ry: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+      .state-header { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.4; }
+      
+      /* Step 1 ConvNeXt (Fresh Emerald Green) */
+      .ai-green-box { fill: #ffffff; stroke: #059669; stroke-width: 1.4; rx: 6; ry: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+      .ai-green-header { fill: #ecfdf5; stroke: #059669; stroke-width: 1.4; }
+      
+      /* Step 2 Gemini (Refined Tech Indigo) */
+      .ai-indigo-box { fill: #ffffff; stroke: #6366f1; stroke-width: 1.4; rx: 6; ry: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+      .ai-indigo-header { fill: #eef2ff; stroke: #6366f1; stroke-width: 1.4; }
+      
+      /* Error State (Warning Coral Red) */
+      .error-box { fill: #ffffff; stroke: #dc2626; stroke-width: 1.4; rx: 6; ry: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+      .error-header { fill: #fee2e2; stroke: #dc2626; stroke-width: 1.4; }
+
+      /* Lines and Connectors - 100% UNBROKEN */
+      .line { stroke: #1e293b; stroke-width: 1.3; fill: none; marker-end: url(#arrow); }
+      .line-inter { stroke: #2563eb; stroke-width: 1.5; fill: none; stroke-dasharray: 6,4; marker-end: url(#blue-arrow); }
+      .line-green { stroke: #059669; stroke-width: 1.4; fill: none; marker-end: url(#green-arrow); }
+      .line-red { stroke: #dc2626; stroke-width: 1.4; fill: none; stroke-dasharray: 5,4; marker-end: url(#red-arrow); }
+      .line-recover { stroke: #2563eb; stroke-width: 1.4; fill: none; stroke-dasharray: 5,4; marker-end: url(#blue-arrow); }
+      
+      /* Choice Pseudo-state */
+      .choice-diamond { fill: #ffffff; stroke: #0f172a; stroke-width: 1.5; }
+      ]]>
+    </style>
+
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b" />
+    </marker>
+    <marker id="blue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#2563eb" />
+    </marker>
+    <marker id="green-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#059669" />
+    </marker>
+    <marker id="red-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#dc2626" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#ffffff" />
+
+  <!-- Diagram Title -->
+  <text x="575" y="32" class="title" text-anchor="middle">圖 7-4-2 影像上傳與階層式推論診斷 狀態圖 (State Diagram)</text>
+
+  <!-- ========================================================================= -->
+  <!-- 1. COMPOSITE STATE 1: CLIENT SUBSYSTEM (x=20, y=55, w=325, h=645)        -->
+  <!-- ========================================================================= -->
+  <g id="client-subsystem" transform="translate(20, 55)">
+    <rect width="325" height="645" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 317 0 Q 325 0 325 8 L 325 28 L 0 28 Z" class="composite-header" />
+    <text x="14" y="19" class="group-title">客戶端拍照與傳輸狀態 (Client Subsystem)</text>
+
+    <!-- Initial State -->
+    <circle cx="178" cy="44" r="7" fill="#0f172a" />
+    <line x1="178" y1="51" x2="178" y2="60" class="line" />
+
+    <!-- State C1: 待拍攝/選圖 (Idle_Ready) -->
+    <g transform="translate(48, 60)">
+      <rect width="255" height="88" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 249 0 Q 255 0 255 6 L 255 23 L 0 23 Z" class="state-header" />
+      <text x="127" y="16" class="state-name">待拍攝/選圖 (Idle_Ready)</text>
+      <text x="10" y="40" class="action-text">entry / 啟動相機介面或開啟本機相簿</text>
+      <text x="10" y="58" class="action-text">do / 拍攝或挑選清晰植物葉片照片</text>
+      <text x="10" y="76" class="action-text">do / (可選) 預先選定作物種類 (crop_hint)</text>
+    </g>
+
+    <!-- Transition C1 -> C2: Unbroken Vertical Line at x=95, Pure Text at right -->
+    <line x1="95" y1="148" x2="95" y2="172" class="line" />
+    <text x="115" y="164" class="transition-text">選取照片完畢 [影像就緒]</text>
+
+    <!-- State C2: 影像預處理中 (Image_Preprocessing) -->
+    <g transform="translate(48, 172)">
+      <rect width="255" height="88" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 249 0 Q 255 0 255 6 L 255 23 L 0 23 Z" class="state-header" />
+      <text x="127" y="16" class="state-name">影像預處理中 (Image_Preprocessing)</text>
+      <text x="10" y="40" class="action-text">do / 本機壓縮至最適解析度 (防超限保護)</text>
+      <text x="10" y="58" class="action-text">do / 讀取 EXIF 資訊進行方向旋轉校正</text>
+      <text x="10" y="76" class="action-text">do / 編碼為 JPEG 二進位資料流</text>
+    </g>
+
+    <!-- Transition C2 -> C3: Unbroken Vertical Line at x=95, Pure Text at right -->
+    <line x1="95" y1="260" x2="95" y2="284" class="line" />
+    <text x="115" y="276" class="transition-text">點擊開始診斷 [啟動傳輸]</text>
+
+    <!-- State C3: 請求傳輸中 (Uploading) -->
+    <g transform="translate(48, 284)">
+      <rect width="255" height="90" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 249 0 Q 255 0 255 6 L 255 23 L 0 23 Z" class="state-header" />
+      <text x="127" y="16" class="state-name">請求傳輸中 (Uploading)</text>
+      <text x="10" y="40" class="action-text">entry / 請求注入 Authorization: Bearer JWT</text>
+      <text x="10" y="58" class="action-text">do / Multipart/form-data 封裝影像</text>
+      <text x="10" y="76" class="action-text">do / POST /api/v1/predict/ (附作物提示)</text>
+    </g>
+
+    <!-- State C4: 結果展示中 (Result_Displayed) -->
+    <g transform="translate(48, 396)">
+      <rect width="255" height="98" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 249 0 Q 255 0 255 6 L 255 23 L 0 23 Z" class="state-header" />
+      <text x="127" y="16" class="state-name">結果展示中 (Result_Displayed)</text>
+      <text x="10" y="40" class="action-text">entry / 渲染作物病害診斷卡片</text>
+      <text x="10" y="58" class="action-text">do / 呈現病名、置信度與階梯處置建議</text>
+      <text x="10" y="76" class="action-text">do / 暫存 prediction_id 於本機記憶體</text>
+      <text x="10" y="93" class="action-text">exit / 導向儲存病歷紀錄或手動糾錯</text>
+    </g>
+
+    <!-- Transition C4 -> Final State [*] -->
+    <line x1="215" y1="494" x2="215" y2="512" class="line" />
+    <circle cx="215" cy="522" r="9" stroke="#0f172a" stroke-width="1.5" fill="none" />
+    <circle cx="215" cy="522" r="4.5" fill="#0f172a" />
+    <text x="215" y="538" class="action-text" text-anchor="middle" font-weight="bold">診斷就緒 [*]</text>
+
+    <!-- State CE: 異常中斷處理 (Error_Handled) -->
+    <g transform="translate(48, 546)">
+      <rect width="255" height="84" class="error-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 249 0 Q 255 0 255 6 L 255 23 L 0 23 Z" class="error-header" />
+      <text x="127" y="16" class="state-name" fill="#b91c1c">異常中斷處理 (Error_Handled)</text>
+      <text x="10" y="40" class="action-text">entry / 彈出異常警示對話框 (顯示錯誤原因)</text>
+      <text x="10" y="58" class="action-text">do / 本地快取保留失敗日誌以供網路除錯</text>
+      <text x="10" y="75" class="action-text">exit / 清理暫存上傳資源，準備狀態重置</text>
+    </g>
+
+    <!-- TRACK 1 (Inner, x=30): C3 -> Error_Handled (Red dashed line, 100% UNBROKEN, Pure Guard Text ABOVE line) -->
+    <path d="M 48 335 L 30 335 L 30 528 L 95 528 L 95 544" class="line-red" />
+    <text x="80" y="520" class="guard-text" text-anchor="middle">[逾時 / 4xx / 500 異常]</text>
+
+    <!-- TRACK 2 (Outer, x=14): Error_Handled -> C1 (Blue dashed Recovery Loop, 100% UNBROKEN, Pure Text ABOVE line) -->
+    <path d="M 48 606 L 14 606 L 14 46 L 105 46 L 105 58" class="line-recover" />
+    <text x="80" y="40" class="transition-text" text-anchor="middle">點擊重試 [狀態重置]</text>
+  </g>
+
+
+  <!-- ========================================================================= -->
+  <!-- 2. COMPOSITE STATE 2: SERVER CASCADE INFERENCE (x=455, y=55, w=670, h=645) -->
+  <!-- ========================================================================= -->
+  <g id="server-subsystem" transform="translate(455, 55)">
+    <rect width="670" height="645" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 662 0 Q 670 0 670 8 L 670 28 L 0 28 Z" class="composite-header" />
+    <text x="14" y="19" class="group-title">伺服器端階層式推論與動態處方引擎 (Cascade Inference Engine)</text>
+
+    <!-- State S1: 接收校驗與暫存 (Request_Cached) -->
+    <g transform="translate(185, 50)">
+      <rect width="300" height="74" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 294 0 Q 300 0 300 6 L 300 23 L 0 23 Z" class="state-header" />
+      <text x="150" y="16" class="state-name">接收校驗與暫存 (Request_Cached)</text>
+      <text x="10" y="42" class="action-text">do / 影像格式與大小校驗 (解析可選作物提示)</text>
+      <text x="10" y="62" class="action-text">do / 寫入 static/tmp/ 並指派 UUID prediction_id</text>
+    </g>
+
+    <!-- Transition S1 -> Step 1 (ConvNeXt): Line is 100% UNBROKEN at y=148; Pure Text ABOVE line at y=141 -->
+    <path d="M 260 124 L 260 148 L 158 148 L 158 170" class="line" />
+    <text x="215" y="141" class="transition-text" text-anchor="middle">優先啟動本地快篩</text>
+
+    <!-- State S2a: 本地 ConvNeXt 快篩中 (ConvNeXt_Screening) -->
+    <g transform="translate(20, 172)">
+      <rect width="280" height="106" class="ai-green-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 23 L 0 23 Z" class="ai-green-header" />
+      <text x="140" y="16" class="state-name" fill="#065f46">本地 ConvNeXt 快篩中 (ConvNeXt_Screening)</text>
+      <text x="10" y="42" class="action-text">entry / 載入 PyTorch 38 類病害特徵卷積權重</text>
+      <text x="10" y="61" class="action-text">do / 毫秒級微觀病斑特徵萃取與分類辨識</text>
+      <text x="10" y="80" class="action-text">do / 計算置信度並比對閥值 (門檻 75% / 85%)</text>
+      <text x="10" y="99" class="action-text">exit / 輸出 Top-1 預測作物、病害與置信分數</text>
+    </g>
+
+    <!-- Choice Pseudo-state (Diamond) & Pure Guard Condition: Line UNBROKEN -->
+    <line x1="300" y1="225" x2="327" y2="225" class="line" />
+    <polygon points="335,217 343,225 335,233 327,225" class="choice-diamond" />
+
+    <!-- Choice Branch 1: [信心度 < 75%] -> S2b (Gemini) (Pure Guard text ABOVE line at y=212) -->
+    <line x1="343" y1="225" x2="368" y2="225" class="line" />
+    <text x="335" y="211" class="guard-text" text-anchor="middle">[信心度 &lt; 75%]</text>
+
+    <!-- State S2b: Gemini 2.5 Flash 雲端兜底 (Gemini_Inferencing) -->
+    <g transform="translate(370, 172)">
+      <rect width="280" height="106" class="ai-indigo-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 23 L 0 23 Z" class="ai-indigo-header" />
+      <text x="140" y="16" class="state-name" fill="#3730a3">Gemini 2.5 Flash 雲端兜底 (Gemini_Inferencing)</text>
+      <text x="10" y="42" class="action-text">entry / 呼叫 Google GenAI 官方 SDK</text>
+      <text x="10" y="61" class="action-text">do / 全域多模態病徵視覺理解與長尾鑑別</text>
+      <text x="10" y="80" class="action-text">do / 強制約束 JSON Schema 結構化輸出規格</text>
+      <text x="10" y="99" class="action-text">exit / 回傳多模態分析與臨床病害初判成果</text>
+    </g>
+
+    <!-- Choice Branch 2: [信心度 ≥ 75%] -> S3 (Line at y=306 is UNBROKEN; Pure Text ABOVE line at y=298) -->
+    <path d="M 335 233 L 335 306 L 230 306 L 230 326" class="line-green" />
+    <text x="240" y="298" class="transition-text" fill="#065f46" text-anchor="middle">[信心度 ≥ 75%] 0元成本直達</text>
+
+    <!-- Transition Step 2 -> Step 3 (Line at y=306 is UNBROKEN; Pure Text ABOVE line at y=298) -->
+    <path d="M 510 278 L 510 306 L 425 306 L 425 326" class="line" />
+    <text x="430" y="298" class="transition-text" text-anchor="middle">雲端兜底分析完成</text>
+
+    <!-- State S3: 動態處方決策中 (Decision_Integrating) -->
+    <g transform="translate(105, 328)">
+      <rect width="460" height="122" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 454 0 Q 460 0 460 6 L 460 23 L 0 23 Z" class="state-header" />
+      <text x="230" y="16" class="state-name">動態處方決策中 (Decision_Integrating)</text>
+      <text x="10" y="42" class="action-text">entry / 接收作物與病害名稱，依判定來源分流決策</text>
+      <text x="10" y="60" class="action-text">do / 【ConvNeXt 命中】本地專家庫直出階梯處方 (純本地 0 API費用)</text>
+      <text x="10" y="78" class="action-text">do / 【Gemini 兜底】FAISS RAG 向量檢索農業部手冊 (杜絕模型幻覺)</text>
+      <text x="10" y="96" class="action-text">do / 辨別健康植株 (≥85%) 或依相片病徵嚴重度動態開立</text>
+      <text x="10" y="114" class="action-text">do / 信心度未達安全門檻 (65%) 啟動防禦煞車引導補拍</text>
+    </g>
+
+    <!-- Transition Step 3 -> S4: Line is UNBROKEN at x=290; Pure Text placed cleanly to the RIGHT -->
+    <line x1="290" y1="450" x2="290" y2="483" class="line" />
+    <text x="368" y="471" class="transition-text" text-anchor="middle">整合完整診斷數據包</text>
+
+    <!-- State S4: 診斷結果暫存就緒 (Diagnosis_Ready) -->
+    <g transform="translate(145, 485)">
+      <rect width="380" height="88" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 374 0 Q 380 0 380 6 L 380 23 L 0 23 Z" class="state-header" />
+      <text x="190" y="16" class="state-name">診斷結果暫存就緒 (Diagnosis_Ready)</text>
+      <text x="10" y="43" class="action-text">entry / 組裝 PredictionResponse (作物、病害、處置、耗時)</text>
+      <text x="10" y="62" class="action-text">do / 寫入伺服器暫存字典 prediction_cache (10分鐘有效)</text>
+      <text x="10" y="81" class="action-text">exit / 封裝並發送 JSON 診斷響應包至客戶端</text>
+    </g>
+
+    <!-- SERVER FINAL STATE [*]: Request lifecycle terminates after sending response -->
+    <line x1="335" y1="573" x2="335" y2="598" class="line" />
+    <circle cx="335" cy="608" r="9" stroke="#0f172a" stroke-width="1.5" fill="none" />
+    <circle cx="335" cy="608" r="4.5" fill="#0f172a" />
+    <text x="335" y="626" class="action-text" text-anchor="middle" font-weight="bold">推論響應送出，流程完畢 [*]</text>
+  </g>
+
+
+  <!-- ========================================================================= -->
+  <!-- 3. TOP-LEVEL INTER-SUB-PROCESS TRANSITIONS (Pure text, NO box, 100% UNBROKEN) -->
+  <!-- ========================================================================= -->
+  
+  <!-- TRANSITION 1: Client C3 -> Server S1 (POST /predict) -->
+  <path d="M 323 329 L 360 329 L 360 87 L 640 87" class="line-inter" />
+  <!-- Pure text placed cleanly to the RIGHT of x=360 by 12px -->
+  <text x="408" y="208" class="transition-text" text-anchor="middle">傳輸影像與提示</text>
+  <text x="408" y="222" class="transition-text" text-anchor="middle">POST /predict</text>
+
+  <!-- TRANSITION 2: Server S4 -> Client C4 (Asynchronous Response Signal / Event) -->
+  <path d="M 600 573 L 600 665 L 360 665 L 360 445 L 323 445" class="line-inter" />
+  <!-- Pure Event & Guard text placed cleanly ABOVE horizontal line at y=665 -->
+  <text x="485" y="654" class="transition-text" text-anchor="middle">接收診斷響應 [HTTP 200 OK]</text>
+
+</svg>

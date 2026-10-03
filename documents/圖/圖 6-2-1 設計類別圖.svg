@@ -1,0 +1,427 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 970" width="1280" height="970">
+  <defs>
+    <style>
+      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 22px; font-weight: bold; fill: #000000; }
+      .layer-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 15px; font-weight: bold; fill: #000000; }
+      .class-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 13px; font-weight: bold; fill: #ffffff; text-anchor: middle; }
+      .stereotype { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 10px; font-style: italic; fill: #e2e8f0; text-anchor: middle; }
+      .member-text { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; fill: #1e293b; }
+      .member-method { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; fill: #0f766e; }
+      
+      /* Pure Black, crisp supplementary text with zero overlaps */
+      .cardinality { font-family: 'Consolas', monospace; font-size: 12px; font-weight: bold; fill: #000000; }
+      .rel-label { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 11px; font-weight: bold; fill: #000000; text-anchor: middle; }
+      .pipeline-label { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 11px; font-weight: bold; fill: #000000; text-anchor: middle; }
+      
+      .layer-bg { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; rx: 8; ry: 8; }
+      
+      .class-box { fill: #ffffff; stroke: #2563eb; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .class-header-blue { fill: #2563eb; }
+      
+      .service-box { fill: #ffffff; stroke: #059669; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .class-header-green { fill: #059669; }
+      
+      .entity-box { fill: #ffffff; stroke: #d97706; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .class-header-amber { fill: #d97706; }
+      
+      .divider { stroke: #e2e8f0; stroke-width: 1; }
+      .assoc-line { stroke: #000000; stroke-width: 1.5; fill: none; }
+      .dep-line { stroke: #000000; stroke-width: 1.4; stroke-dasharray: 5,4; fill: none; marker-end: url(#black-arrow); }
+      .cascade-line { stroke: #000000; stroke-width: 1.5; stroke-dasharray: 5,3; fill: none; marker-end: url(#black-arrow); }
+    </style>
+    
+    <marker id="black-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#000000" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#ffffff" />
+
+  <!-- Diagram Title -->
+  <text x="640" y="32" class="title" text-anchor="middle">圖 6-2-1 系統設計類別圖 (Design Class Diagram)</text>
+
+  <!-- ================= LAYER 1: CLIENT & CONTROLLER LAYER ================= -->
+  <rect x="30" y="55" width="1220" height="195" class="layer-bg" />
+  <text x="50" y="78" class="layer-title">客戶端通訊與介面控制器層</text>
+
+  <!-- Class: PlantApiService (Retrofit) (x: 50..290, width: 240) -->
+  <g transform="translate(50, 95)">
+    <rect width="240" height="140" class="class-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 236 0 Q 240 0 240 4 L 240 32 L 0 32 Z" class="class-header-blue" />
+    <text x="120" y="15" class="stereotype">&lt;&lt;Client Service&gt;&gt;</text>
+    <text x="120" y="28" class="class-title">PlantApiService (Retrofit2)</text>
+    <text x="10" y="47" class="member-text">- baseUrl: String = "https://..."</text>
+    <text x="10" y="61" class="member-text">- client: OkHttpClient (JWT)</text>
+    <line x1="0" y1="69" x2="240" y2="69" class="divider" />
+    <text x="10" y="84" class="member-method">+ login(dto): Call&lt;AuthToken&gt;</text>
+    <text x="10" y="98" class="member-method">+ predictImage(part): Call&lt;PredRes&gt;</text>
+    <text x="10" y="112" class="member-method">+ confirmDiary(dto): Call&lt;DiaryRes&gt;</text>
+    <text x="10" y="126" class="member-method">+ submitFeedback(dto): Call&lt;BaseRes&gt;</text>
+  </g>
+
+  <!-- Class: AuthRouter (x: 320..520, width: 200) -->
+  <g transform="translate(320, 95)">
+    <rect width="200" height="140" class="class-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 196 0 Q 200 0 200 4 L 200 32 L 0 32 Z" class="class-header-blue" />
+    <text x="100" y="15" class="stereotype">&lt;&lt;API Router&gt;&gt;</text>
+    <text x="100" y="28" class="class-title">AuthRouter</text>
+    <text x="10" y="47" class="member-text">- prefix: "/api/v1/auth"</text>
+    <text x="10" y="61" class="member-text">- oauth2: OAuth2Bearer</text>
+    <line x1="0" y1="69" x2="200" y2="69" class="divider" />
+    <text x="10" y="84" class="member-method">+ /login(form): Token</text>
+    <text x="10" y="98" class="member-method">+ /register(dto): Status</text>
+    <text x="10" y="112" class="member-method">+ /verify-email(t): Status</text>
+    <text x="10" y="126" class="member-method">+ /resend-token(email): Res</text>
+  </g>
+
+  <!-- Class: PredictionRouter (x: 550..770, width: 220) -->
+  <g transform="translate(550, 95)">
+    <rect width="220" height="140" class="class-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 216 0 Q 220 0 220 4 L 220 32 L 0 32 Z" class="class-header-blue" />
+    <text x="110" y="15" class="stereotype">&lt;&lt;API Router&gt;&gt;</text>
+    <text x="110" y="28" class="class-title">PredictionRouter</text>
+    <text x="10" y="47" class="member-text">- upload_dir: Path = "uploads/"</text>
+    <text x="10" y="61" class="member-text">- conf_limit: Float = 0.70</text>
+    <line x1="0" y1="69" x2="220" y2="69" class="divider" />
+    <text x="10" y="84" class="member-method">+ /predict(file, u): PredRes</text>
+    <text x="10" y="98" class="member-method">+ /predict/webcam(): Alert</text>
+    <text x="10" y="112" class="member-method">+ /diaries/confirm(): DiaryOut</text>
+    <text x="10" y="126" class="member-method">+ /models/status(): JSON</text>
+  </g>
+
+  <!-- Class: Diaries & FeedbackRouter (x: 790..1020, width: 230) -->
+  <g transform="translate(790, 95)">
+    <rect width="230" height="140" class="class-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 226 0 Q 230 0 230 4 L 230 32 L 0 32 Z" class="class-header-blue" />
+    <text x="115" y="15" class="stereotype">&lt;&lt;API Router&gt;&gt;</text>
+    <text x="115" y="28" class="class-title">Diaries &amp; FeedbackRouter</text>
+    <text x="10" y="47" class="member-text">- db: Session (Depends)</text>
+    <text x="10" y="61" class="member-text">- current_user: User (Depends)</text>
+    <line x1="0" y1="69" x2="230" y2="69" class="divider" />
+    <text x="10" y="84" class="member-method">+ /diaries (GET): List&lt;DiaryOut&gt;</text>
+    <text x="10" y="98" class="member-method">+ /diaries/{id}/note (PUT): Res</text>
+    <text x="10" y="112" class="member-method">+ /diaries/{id} (DELETE): Status</text>
+    <text x="10" y="126" class="member-method">+ /feedback (POST): FeedbackOut</text>
+  </g>
+
+  <!-- Class: AdminDashboard (x: 1040..1240, width: 200) -->
+  <g transform="translate(1040, 95)">
+    <rect width="200" height="140" class="class-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 196 0 Q 200 0 200 4 L 200 32 L 0 32 Z" class="class-header-blue" />
+    <text x="100" y="15" class="stereotype">&lt;&lt;Web Controller&gt;&gt;</text>
+    <text x="100" y="28" class="class-title">AdminDashboard</text>
+    <text x="10" y="47" class="member-text">- templates: Jinja2</text>
+    <text x="10" y="61" class="member-text">- require_admin: Dep</text>
+    <line x1="0" y1="69" x2="200" y2="69" class="divider" />
+    <text x="10" y="84" class="member-method">+ show_dashboard(): HTML</text>
+    <text x="10" y="98" class="member-method">+ audit_feedback(id): Res</text>
+    <text x="10" y="112" class="member-method">+ show_feedbacks(): HTML</text>
+    <text x="10" y="126" class="member-method">+ show_users(): HTML</text>
+  </g>
+
+  <!-- ================= LAYER 2: SERVICE LAYER ================= -->
+  <rect x="30" y="265" width="1220" height="235" class="layer-bg" />
+  <text x="50" y="288" class="layer-title">業務邏輯與階層式推論服務層 (高內聚單一職責設計)</text>
+
+  <!-- Service 1: AuthService (x: 50..250, width: 200) -->
+  <g transform="translate(50, 310)">
+    <rect width="200" height="175" class="service-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 196 0 Q 200 0 200 4 L 200 32 L 0 32 Z" class="class-header-green" />
+    <text x="100" y="15" class="stereotype">&lt;&lt;Security Service&gt;&gt;</text>
+    <text x="100" y="28" class="class-title">AuthService (認證服務)</text>
+    <text x="10" y="47" class="member-text">- pwd_ctx: CryptContext</text>
+    <text x="10" y="61" class="member-text">- secret_key: str (JWT)</text>
+    <text x="10" y="75" class="member-text">- token_exp: int = 1440</text>
+    <line x1="0" y1="84" x2="200" y2="84" class="divider" />
+    <text x="10" y="101" class="member-method">+ hash_password(pwd): str</text>
+    <text x="10" y="117" class="member-method">+ verify_password(): bool</text>
+    <text x="10" y="133" class="member-method">+ create_jwt_token(): str</text>
+    <text x="10" y="149" class="member-method">+ send_verify_email(): Void</text>
+    <text x="10" y="165" class="member-method">+ check_one_time_token(): bool</text>
+  </g>
+
+  <!-- Service 2: PredictionService (x: 275..515, width: 240) -->
+  <g transform="translate(275, 310)">
+    <rect width="240" height="175" class="service-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 236 0 Q 240 0 240 4 L 240 32 L 0 32 Z" class="class-header-green" />
+    <text x="120" y="15" class="stereotype">&lt;&lt;Service Core&gt;&gt;</text>
+    <text x="120" y="28" class="class-title">PredictionService (階層調度)</text>
+    <text x="10" y="47" class="member-text">- convnet_svc: LocalConvNetService</text>
+    <text x="10" y="61" class="member-text">- gemini_svc: GeminiService</text>
+    <text x="10" y="75" class="member-text">- rag_svc: RAGService</text>
+    <text x="10" y="89" class="member-text">- threshold: Float = 0.70</text>
+    <line x1="0" y1="96" x2="240" y2="96" class="divider" />
+    <text x="10" y="111" class="member-method">+ run_cascade_inference(): Dict</text>
+    <text x="10" y="125" class="member-method">+ arbitrate_and_fuse(): Dict</text>
+    <text x="10" y="139" class="member-method">+ verify_confidence(): Bool</text>
+    <text x="10" y="153" class="member-method">+ mark_as_unknown(): Dict (煞車)</text>
+    <text x="10" y="167" class="member-method">+ confirm_and_save(): Diary</text>
+  </g>
+
+  <!-- Service 3: LocalConvNetService (Step 1) (x: 540..760, width: 220) -->
+  <g transform="translate(540, 310)">
+    <rect width="220" height="175" class="service-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 216 0 Q 220 0 220 4 L 220 32 L 0 32 Z" class="class-header-green" />
+    <text x="110" y="15" class="stereotype">&lt;&lt;步驟 1：本地卷積快篩&gt;&gt;</text>
+    <text x="110" y="28" class="class-title">LocalConvNetService (快篩)</text>
+    <text x="10" y="47" class="member-text">- model_path: "convnet.pth"</text>
+    <text x="10" y="61" class="member-text">- class_names: List[str] (38種)</text>
+    <text x="10" y="75" class="member-text">- fast_threshold: Float = 0.75</text>
+    <line x1="0" y1="84" x2="220" y2="84" class="divider" />
+    <text x="10" y="103" class="member-method">+ load_model_weights(): Void</text>
+    <text x="10" y="123" class="member-method">+ classify_lesion(img): Dict</text>
+    <text x="10" y="143" class="member-method">+ get_top_k(k: int = 3): List</text>
+    <text x="10" y="163" class="member-method">+ is_cloud_cost_zero(): True</text>
+  </g>
+
+  <!-- Service 4: GeminiService (Step 2) (x: 785..1005, width: 220) -->
+  <g transform="translate(785, 310)">
+    <rect width="220" height="175" class="service-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 216 0 Q 220 0 220 4 L 220 32 L 0 32 Z" class="class-header-green" />
+    <text x="110" y="15" class="stereotype">&lt;&lt;步驟 2：雲端多模態兜底&gt;&gt;</text>
+    <text x="110" y="28" class="class-title">GeminiService (雲端兜底)</text>
+    <text x="10" y="47" class="member-text">- model: "gemini-2.5-flash"</text>
+    <text x="10" y="61" class="member-text">- client: genai.Client(key)</text>
+    <text x="10" y="75" class="member-text">- schema: DiagnosisSchema</text>
+    <line x1="0" y1="84" x2="220" y2="84" class="divider" />
+    <text x="10" y="103" class="member-method">+ analyze_image(bytes): JSON</text>
+    <text x="10" y="123" class="member-method">+ extract_symptoms(): Text</text>
+    <text x="10" y="143" class="member-method">+ generate_explanation(): Text</text>
+    <text x="10" y="163" class="member-method">+ fallback_retry(): JSON</text>
+  </g>
+
+  <!-- Service 5: RAGService (Step 3) (x: 1030..1230, width: 200) -->
+  <g transform="translate(1030, 310)">
+    <rect width="200" height="175" class="service-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 196 0 Q 200 0 200 4 L 200 32 L 0 32 Z" class="class-header-green" />
+    <text x="100" y="15" class="stereotype">&lt;&lt;步驟 3：官方病蟲害知識庫&gt;&gt;</text>
+    <text x="100" y="28" class="class-title">RAGService (知識檢索)</text>
+    <text x="10" y="47" class="member-text">- faiss_index: IndexFlatIP</text>
+    <text x="10" y="61" class="member-text">- embedding: gemini-embed</text>
+    <text x="10" y="75" class="member-text">- content: List[str] (農業手冊)</text>
+    <line x1="0" y1="84" x2="200" y2="84" class="divider" />
+    <text x="10" y="101" class="member-method">+ search_knowledge(q): str</text>
+    <text x="10" y="117" class="member-method">+ query_disease_manual(): Dict</text>
+    <text x="10" y="133" class="member-method">+ query_pests_manual(): Dict</text>
+    <text x="10" y="149" class="member-method">+ cross_validate_moa(): Dict</text>
+    <text x="10" y="165" class="member-method">+ gen_prescription(): Tuple</text>
+  </g>
+
+  <!-- ================= LAYER 3: DATA PERSISTENCE LAYER ================= -->
+  <rect x="30" y="520" width="1220" height="430" class="layer-bg" />
+  <text x="50" y="543" class="layer-title">領域實體與資料庫持久化層 (8 大核心資料表)</text>
+
+  <!-- Row 1 of Entities: Core Diagnostic Pipeline -->
+  <!-- Entity: User (x: 50..230, width: 180) -->
+  <g transform="translate(50, 560)">
+    <rect width="180" height="155" class="entity-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 176 0 Q 180 0 180 4 L 180 28 L 0 28 Z" class="class-header-amber" />
+    <text x="90" y="14" class="stereotype">&lt;&lt;user&gt;&gt;</text>
+    <text x="90" y="25" class="class-title">User</text>
+    <text x="10" y="45" class="member-text">+ id: Integer (PK)</text>
+    <text x="10" y="61" class="member-text">+ username: String(50)</text>
+    <text x="10" y="77" class="member-text">+ email: String(100) (UK)</text>
+    <text x="10" y="93" class="member-text">+ hashed_password: String</text>
+    <text x="10" y="109" class="member-text">+ role: Enum(user, admin)</text>
+    <text x="10" y="125" class="member-text">+ is_email_verified: Bool</text>
+    <text x="10" y="141" class="member-text">+ created_at: DateTime</text>
+  </g>
+
+  <!-- Entity: PlantDiary (x: 280..520, width: 240) -->
+  <g transform="translate(280, 560)">
+    <rect width="240" height="175" class="entity-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 236 0 Q 240 0 240 4 L 240 28 L 0 28 Z" class="class-header-amber" />
+    <text x="120" y="14" class="stereotype">&lt;&lt;plant_diary&gt;&gt;</text>
+    <text x="120" y="25" class="class-title">PlantDiary</text>
+    <text x="10" y="45" class="member-text">+ id: Integer (PK)</text>
+    <text x="10" y="60" class="member-text">+ user_id: Integer (FK)</text>
+    <text x="10" y="75" class="member-text">+ crop_id: Integer (FK)</text>
+    <text x="10" y="90" class="member-text">+ disease_id: Integer (FK)</text>
+    <text x="10" y="105" class="member-text">+ pest_id: Integer (FK)</text>
+    <text x="10" y="120" class="member-text">+ image_url: String(255)</text>
+    <text x="10" y="135" class="member-text">+ status_name: String(100)</text>
+    <text x="10" y="150" class="member-text">+ confidence: Float</text>
+    <text x="10" y="165" class="member-text">+ user_note: Text (個人筆記)</text>
+  </g>
+
+  <!-- Entity: Crop (x: 570..760, width: 190) -->
+  <g transform="translate(570, 560)">
+    <rect width="190" height="155" class="entity-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 186 0 Q 190 0 190 4 L 190 28 L 0 28 Z" class="class-header-amber" />
+    <text x="95" y="14" class="stereotype">&lt;&lt;crop&gt;&gt;</text>
+    <text x="95" y="25" class="class-title">Crop</text>
+    <text x="10" y="45" class="member-text">+ id: Integer (PK)</text>
+    <text x="10" y="65" class="member-text">+ crop_name: String(100)</text>
+    <text x="10" y="85" class="member-text">+ crop_name_en: String</text>
+    <text x="10" y="105" class="member-text">+ description: Text</text>
+    <text x="10" y="125" class="member-text">+ created_at: DateTime</text>
+  </g>
+
+  <!-- Entity: Disease (x: 805..1005, width: 200) -->
+  <g transform="translate(805, 560)">
+    <rect width="200" height="155" class="entity-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 196 0 Q 200 0 200 4 L 200 28 L 0 28 Z" class="class-header-amber" />
+    <text x="100" y="14" class="stereotype">&lt;&lt;disease&gt;&gt;</text>
+    <text x="100" y="25" class="class-title">Disease (病害字典)</text>
+    <text x="10" y="45" class="member-text">+ disease_id: Integer (PK)</text>
+    <text x="10" y="65" class="member-text">+ crop_id: Integer (FK)</text>
+    <text x="10" y="85" class="member-text">+ disease_name: String(100)</text>
+    <text x="10" y="105" class="member-text">+ description: Text (病徵)</text>
+    <text x="10" y="125" class="member-text">+ treatment: Text (推薦藥劑)</text>
+    <text x="10" y="145" class="member-text">+ source_name: String</text>
+  </g>
+
+  <!-- Entity: Pests (x: 1045..1230, width: 185) -->
+  <g transform="translate(1045, 560)">
+    <rect width="185" height="155" class="entity-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 181 0 Q 185 0 185 4 L 185 28 L 0 28 Z" class="class-header-amber" />
+    <text x="92" y="14" class="stereotype">&lt;&lt;pests&gt;&gt;</text>
+    <text x="92" y="25" class="class-title">Pest (蟲害字典)</text>
+    <text x="10" y="45" class="member-text">+ pest_id: Integer (PK)</text>
+    <text x="10" y="65" class="member-text">+ crop_id: Integer (FK)</text>
+    <text x="10" y="85" class="member-text">+ pest_name: String(100)</text>
+    <text x="10" y="105" class="member-text">+ description: Text (蟲害徵兆)</text>
+    <text x="10" y="125" class="member-text">+ treatment: Text (防治資材)</text>
+    <text x="10" y="145" class="member-text">+ source_name: String</text>
+  </g>
+
+  <!-- Row 2 of Entities: Security, Feedback, Webcam -->
+  <!-- Entity: UserOneTimeTokens (x: 50..230) -->
+  <g transform="translate(50, 770)">
+    <rect width="180" height="145" class="entity-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 176 0 Q 180 0 180 4 L 180 28 L 0 28 Z" class="class-header-amber" />
+    <text x="90" y="14" class="stereotype">&lt;&lt;user_one_time_tokens&gt;&gt;</text>
+    <text x="90" y="25" class="class-title">UserOneTimeToken</text>
+    <text x="10" y="45" class="member-text">+ id: BigInteger (PK)</text>
+    <text x="10" y="65" class="member-text">+ user_id: Integer (FK)</text>
+    <text x="10" y="85" class="member-text">+ token_hash: String (UK)</text>
+    <text x="10" y="105" class="member-text">+ expires_at: DateTime</text>
+    <text x="10" y="125" class="member-text">+ used_at: DateTime</text>
+  </g>
+
+  <!-- Entity: DiagnosisFeedback (x: 280..520) -->
+  <g transform="translate(280, 770)">
+    <rect width="240" height="155" class="entity-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 236 0 Q 240 0 240 4 L 240 28 L 0 28 Z" class="class-header-amber" />
+    <text x="120" y="14" class="stereotype">&lt;&lt;diagnosis_feedback&gt;&gt;</text>
+    <text x="120" y="25" class="class-title">DiagnosisFeedback</text>
+    <text x="10" y="45" class="member-text">+ id: Integer (PK)</text>
+    <text x="10" y="61" class="member-text">+ diary_id: Integer (FK)</text>
+    <text x="10" y="77" class="member-text">+ user_id: Integer (FK)</text>
+    <text x="10" y="93" class="member-text">+ original_status: String</text>
+    <text x="10" y="109" class="member-text">+ corrected_status: String</text>
+    <text x="10" y="125" class="member-text">+ is_plant_error: Boolean</text>
+    <text x="10" y="141" class="member-text">+ is_disease_error: Boolean</text>
+  </g>
+
+  <!-- Entity: WebcamAlert (x: 570..760) -->
+  <g transform="translate(570, 770)">
+    <rect width="190" height="145" class="entity-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 186 0 Q 190 0 190 4 L 190 28 L 0 28 Z" class="class-header-amber" />
+    <text x="95" y="14" class="stereotype">&lt;&lt;webcam_alert&gt;&gt;</text>
+    <text x="95" y="25" class="class-title">WebcamAlert</text>
+    <text x="10" y="45" class="member-text">+ id: Integer (PK)</text>
+    <text x="10" y="65" class="member-text">+ user_id: Integer (FK)</text>
+    <text x="10" y="85" class="member-text">+ image_url: String(255)</text>
+    <text x="10" y="105" class="member-text">+ status_name: String</text>
+    <text x="10" y="125" class="member-text">+ alert_time: DateTime</text>
+  </g>
+
+  <!-- ================= ASSOCIATIONS & CARDINALITIES (Solid Black Lines) ================= -->
+  <!-- 1. User to PlantDiary (1 to 0..*) -->
+  <line x1="230" y1="635" x2="280" y2="635" class="assoc-line" />
+  <text x="238" y="627" class="cardinality">1</text>
+  <text x="260" y="627" class="cardinality">0..*</text>
+
+  <!-- 2. PlantDiary to Crop (0..* to 1) -->
+  <line x1="520" y1="635" x2="570" y2="635" class="assoc-line" />
+  <text x="528" y="627" class="cardinality">0..*</text>
+  <text x="555" y="627" class="cardinality">1</text>
+
+  <!-- 3. Crop to Disease (1 to 0..*) -->
+  <line x1="760" y1="635" x2="805" y2="635" class="assoc-line" />
+  <text x="768" y="627" class="cardinality">1</text>
+  <text x="788" y="627" class="cardinality">0..*</text>
+
+  <!-- 4. Disease to Pests (平行關係，皆屬於作物字典) -->
+  <line x1="1005" y1="635" x2="1045" y2="635" class="assoc-line" />
+  <text x="1012" y="627" class="cardinality">1</text>
+  <text x="1030" y="627" class="cardinality">0..*</text>
+
+  <!-- 5. User to UserOneTimeToken (1 to 0..*) -->
+  <line x1="140" y1="715" x2="140" y2="770" class="assoc-line" />
+  <text x="148" y="730" class="cardinality">1</text>
+  <text x="148" y="760" class="cardinality">0..*</text>
+
+  <!-- 6. PlantDiary to DiagnosisFeedback (1 to 0..1) -->
+  <line x1="400" y1="735" x2="400" y2="770" class="assoc-line" />
+  <text x="410" y="746" class="cardinality">1</text>
+  <text x="410" y="762" class="cardinality">0..1</text>
+
+  <!-- 7. User to DiagnosisFeedback (1 to 0..*, FK user_id) -->
+  <line x1="230" y1="840" x2="280" y2="840" class="assoc-line" />
+  <text x="238" y="832" class="cardinality">1</text>
+  <text x="262" y="832" class="cardinality">0..*</text>
+  <text x="255" y="855" class="rel-label">反饋歸屬</text>
+
+  <!-- 8. User to WebcamAlert (1 to 0..*) -->
+  <path d="M 140 915 L 140 938 L 665 938 L 665 915" class="assoc-line" />
+  <text x="148" y="930" class="cardinality">1</text>
+  <text x="655" y="930" class="cardinality">0..*</text>
+  <text x="400" y="952" class="rel-label">智慧警報關聯</text>
+
+  <!-- ================= INTER-LAYER & INTRA-SERVICE DEPENDENCY ARROWS ================= -->
+  <!-- 9. Client to AuthRouter (HTTPS Login/Token) -->
+  <line x1="290" y1="135" x2="320" y2="135" class="dep-line" />
+  <text x="305" y="128" class="rel-label">HTTPS</text>
+
+  <!-- 10. Client to PredictionRouter (REST Predict API) -->
+  <path d="M 290 175 L 310 175 L 310 246 L 660 246 L 660 235" class="dep-line" />
+  <text x="480" y="242" class="rel-label">影像診斷 REST 請求</text>
+
+  <!-- 11. AuthRouter to AuthService (Call Auth, Vertical & Clean!) -->
+  <path d="M 420 235 L 420 275 L 150 275 L 150 310" class="dep-line" />
+  <text x="270" y="270" class="rel-label">&lt;&lt;call&gt;&gt; 密碼雜湊與 JWT 簽發</text>
+
+  <!-- 12. PredictionRouter to PredictionService (Call Dispatch) -->
+  <path d="M 660 235 L 660 275 L 395 275 L 395 310" class="dep-line" />
+  <text x="530" y="270" class="rel-label">&lt;&lt;call&gt;&gt; 派發診斷請求</text>
+
+  <!-- 13. Cascade AI Pipeline - Step 1: PredictionService -> LocalConvNetService -->
+  <line x1="515" y1="380" x2="540" y2="380" class="cascade-line" />
+  <text x="528" y="370" class="pipeline-label">步驟1: 快篩</text>
+
+  <!-- 14. Cascade AI Pipeline - Step 2: LocalConvNetService -> GeminiService -->
+  <line x1="760" y1="380" x2="785" y2="380" class="cascade-line" />
+  <text x="772" y="370" class="pipeline-label">步驟2: 兜底</text>
+
+  <!-- 15. Cascade AI Pipeline - Step 3: GeminiService -> RAGService -->
+  <line x1="1005" y1="380" x2="1030" y2="380" class="cascade-line" />
+  <text x="1018" y="370" class="pipeline-label">步驟3: 檢索</text>
+
+  <!-- 16. AI Pipeline Return: RAGService -> PredictionService -->
+  <path d="M 1130 485 L 1130 500 L 420 500 L 420 485" class="dep-line" />
+  <text x="770" y="496" class="rel-label">回傳精準處方與病蟲害比對結果</text>
+
+  <!-- 17. PredictionService to PlantDiary (Persistence) -->
+  <path d="M 370 485 L 370 560" class="dep-line" />
+  <text x="325" y="530" class="rel-label">&lt;&lt;create / update&gt;&gt; 持久化病歷</text>
+
+  <!-- 18. AuthService to User (Security Account Lookup) -->
+  <line x1="140" y1="485" x2="140" y2="560" class="dep-line" />
+  <text x="95" y="530" class="rel-label">&lt;&lt;query / verify&gt;&gt; 帳號身分</text>
+
+  <!-- 19. RAGService to Disease (Official Disease Knowledge Lookup) -->
+  <path d="M 1090 485 L 1090 535 L 905 535 L 905 560" class="dep-line" />
+  <text x="980" y="530" class="rel-label">&lt;&lt;query&gt;&gt; 比對病害指引</text>
+
+  <!-- 20. RAGService to Pest (Official Pest Knowledge Lookup) -->
+  <line x1="1140" y1="485" x2="1140" y2="560" class="dep-line" />
+  <text x="1195" y="530" class="rel-label">&lt;&lt;query&gt;&gt; 比對害蟲指引</text>
+
+  <!-- 21. AdminDashboard to PlantDiary (Read-only Audit & Stats - No Delete) -->
+  <path d="M 1140 235 L 1140 255 L 1238 255 L 1238 745 L 500 745 L 500 735" class="dep-line" />
+  <text x="870" y="740" class="rel-label">&lt;&lt;admin&gt;&gt; 唯讀審計與統計</text>
+
+</svg>
