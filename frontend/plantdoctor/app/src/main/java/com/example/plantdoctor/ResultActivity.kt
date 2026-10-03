@@ -149,10 +149,16 @@ class ResultActivity : AppCompatActivity() {
             tvDiseaseName.text = "診斷：${data.status_name ?: "未知"}"
 
             val fullAdvice = StringBuilder().apply {
-                append("【專家建議】\n${data.suggestion ?: "尚無建議"}\n\n")
-                append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
+                append(formatDiagnosisMetadata(
+                    data.confidence, data.category, data.requires_review,
+                    data.grounding_source, data.reference_source,
+                    data.reference_url, data.reference_record_id
+                ))
+                append("\n\n【原始診斷參考建議】\n${data.suggestion ?: "尚無建議"}\n\n")
+                append("【原始診斷處理參考】\n${data.treatment ?: "請諮詢專業人員"}")
             }.toString()
             tvAdvice.text = fullAdvice
+            tvAdvice.setTextIsSelectable(true)
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "報告內容解析失敗", Toast.LENGTH_SHORT).show()
@@ -246,13 +252,13 @@ class ResultActivity : AppCompatActivity() {
                 }
             }
 
-            // 3️⃣ 第三步：AI 醫生處方箋說明
+            // 第三步：診斷參考資訊
             startStep3 = {
                 if (currentStep == 3) {
                     SoundManager.playBubblePop()
                     targetView3 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
                         com.getkeepsafe.taptargetview.TapTarget.forView(
-                            tvAdvice, "第三步：AI 醫生處方箋", "這裡會顯示詳細的病害分析、澆水與除蟲建議，幫你對症下藥！"
+                            tvAdvice, "第三步：診斷參考資訊", "這裡列出模型信心值、複核提示與參考來源。照護建議僅供參考，不代表已由專業人員複核。"
                         ).outerCircleColor(targetColorRes)
                             .targetCircleColor(android.R.color.white)
                             .titleTextSize(24).descriptionTextSize(16)
@@ -281,7 +287,7 @@ class ResultActivity : AppCompatActivity() {
                     SoundManager.playBubblePop()
                     targetView2 = com.getkeepsafe.taptargetview.TapTargetView.showFor(this,
                         com.getkeepsafe.taptargetview.TapTarget.forView(
-                            viewDragHandle, "第二步：展開完整報告", "將這個卡片向上滑動，就能解鎖 AI 醫生為你準備的完整病害處方箋喔！"
+                            viewDragHandle, "第二步：展開診斷資訊", "向上滑動即可查看這次診斷的參考資訊與觀察筆記。"
                         ).outerCircleColor(targetColorRes)
                             .targetCircleColor(android.R.color.white)
                             .titleTextSize(24).descriptionTextSize(16)
@@ -386,8 +392,6 @@ class ResultActivity : AppCompatActivity() {
 
     // 🌟 將原本的網路儲存邏輯抽離出來供 Dialog 呼叫
     private fun executeSaveLogic(predictionId: String?, sharedPref: android.content.SharedPreferences) {
-        val diseaseName = tvDiseaseName.text.toString().removePrefix("診斷：")
-        val adviceText = tvAdvice.text.toString()
         val userNote = etUserNote.text.toString()
 
         val token = sharedPref.getString("token", null)
@@ -399,11 +403,8 @@ class ResultActivity : AppCompatActivity() {
         btnSave.isEnabled = false
         btnSave.text = "儲存中..."
 
-        val request = DiaryConfirmRequest(
-            user_note = userNote,
-            disease_name = diseaseName,
-            gemini_advice = adviceText
-        )
+        // The server saves the diagnosis snapshot; display labels are not input.
+        val request = DiaryConfirmRequest(user_note = userNote)
 
         val apiService = PlantApiService.create(token)
         apiService.confirmDiary(predictionId!!, request).enqueue(object : retrofit2.Callback<DiaryConfirmResponse> {

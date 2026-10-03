@@ -396,22 +396,30 @@ class HistoryDetailActivity : AppCompatActivity() {
 
                     tvPlantName.text = "植物：${data.crop_name ?: "無法辨識"}"
 
-                    if (!data.user_corrected_status.isNullOrEmpty()) {
-                        tvDiseaseName.text = "診斷：${data.user_corrected_status}"
-                        tvDiseaseName.setTextColor(Color.parseColor("#2E7D32"))
-                        tvFeedbackLink.visibility = View.GONE
-                    } else {
-                        tvDiseaseName.text = "診斷：${data.status_name ?: "未知"}"
-                        tvDiseaseName.setTextColor(Color.RED)
-                        tvFeedbackLink.visibility = View.VISIBLE
+                    tvDiseaseName.text = buildString {
+                        append("原始診斷：${data.status_name ?: "未知"}")
+                        data.user_corrected_status?.takeIf { it.isNotBlank() }?.let {
+                            append("\n使用者修正：$it")
+                        }
                     }
+                    tvDiseaseName.setTextColor(tvPlantName.currentTextColor)
+                    tvFeedbackLink.visibility = View.VISIBLE
 
                     val fullAdvice = StringBuilder().apply {
-                        append("【病症狀態】\n${data.suggestion ?: "病症狀態"}\n\n")
-                        append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
+                        if (!data.user_corrected_status.isNullOrBlank()) {
+                            append("使用者修正是個人註記，並非重新診斷或專業複核；以下信心值、來源與建議仍屬原始診斷。\n\n")
+                        }
+                        append(formatDiagnosisMetadata(
+                            data.confidence, data.category, data.requires_review,
+                            data.grounding_source, data.reference_source,
+                            data.reference_url, data.reference_record_id
+                        ))
+                        append("\n\n【原始診斷參考建議】\n${data.suggestion ?: "尚無建議"}\n\n")
+                        append("【原始診斷處理參考】\n${data.treatment ?: "請諮詢專業人員"}\n\n")
                         append("【過往筆記】")
                     }.toString()
                     tvAdvice.text = fullAdvice
+                    tvAdvice.setTextIsSelectable(true)
                     currentImageUrl = fixImageUrl(data.image_url ?: "")
 
                     Glide.with(this@HistoryDetailActivity).load(currentImageUrl).placeholder(android.R.drawable.ic_menu_gallery).into(imgPlant)
@@ -535,12 +543,13 @@ class HistoryDetailActivity : AppCompatActivity() {
                                 override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
                                     if (response.isSuccessful) {
                                         Toast.makeText(this@HistoryDetailActivity, "回饋已提交！", Toast.LENGTH_LONG).show()
-                                        tvDiseaseName.text = "診斷：$selectedDiagnosis"
-                                        tvDiseaseName.setTextColor(Color.parseColor("#2E7D32"))
-                                        tvFeedbackLink.visibility = View.GONE
+                                        setResult(RESULT_OK)
+                                        fetchData()
                                     }
                                 }
-                                override fun onFailure(call: Call<GenericResponse>, t: Throwable) {}
+                                override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
+                                    Toast.makeText(this@HistoryDetailActivity, "修正未儲存，請稍後再試", Toast.LENGTH_SHORT).show()
+                                }
                             })
                         }.setNegativeButton("取消", null).show()
                 }

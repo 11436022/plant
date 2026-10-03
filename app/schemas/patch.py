@@ -11,5 +11,6 @@ class DiaryUpdate(BaseModel):
 class DiaryConfirm(BaseModel):
     """確認日記時，從前端傳送過來的資料模型。"""
     user_note: Optional[str] = Field(None)
-    disease_name: str
-    gemini_advice: str
+    # Kept optional for older clients; the server never trusts these fields.
+    disease_name: Optional[str] = None
+    gemini_advice: Optional[str] = None

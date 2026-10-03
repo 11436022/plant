@@ -74,10 +74,11 @@ class RegisterActivity : AppCompatActivity() {
                 full_name = username
             )
 
+            btnSubmit.isEnabled = false
             apiService.register(regData).enqueue(object : Callback<GenericResponse> {
                 override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
-                    if (response.isSuccessful) {
-                        val body = response.body()
+                    val body = response.body()
+                    if (response.isSuccessful && body?.status == "success") {
                         Log.d("RegisterActivity", "Success: ${body?.message}")
 
                         val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
@@ -86,16 +87,23 @@ class RegisterActivity : AppCompatActivity() {
                             apply()
                         }
 
-                        showVerificationDialog(email)
+                        showVerificationDialog(email, body.email_sent)
 
                     } else {
+                        btnSubmit.isEnabled = true
                         val errorBody = response.errorBody()?.string()
                         Log.e("RegisterActivity", "Error: $errorBody")
-                        Toast.makeText(this@RegisterActivity, "註冊失敗：帳號或 Email 已被使用", Toast.LENGTH_LONG).show()
+                        val message = if (response.code() == 400) {
+                            "註冊失敗：帳號或 Email 已被使用"
+                        } else {
+                            "未能確認註冊結果，請稍後再試"
+                        }
+                        Toast.makeText(this@RegisterActivity, message, Toast.LENGTH_LONG).show()
                     }
                 }
 
                 override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
+                    btnSubmit.isEnabled = true
                     Log.e("RegisterActivity", "Failure: ${t.message}")
                     Toast.makeText(this@RegisterActivity, "連線失敗，請確認後端已啟動", Toast.LENGTH_SHORT).show()
                 }
@@ -146,7 +154,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     // 顯示對話框，提醒使用者去驗證信箱（動態對齊當前主題色彩）
-    private fun showVerificationDialog(email: String) {
+    private fun showVerificationDialog(email: String, emailSent: Boolean?) {
         val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
         val currentTheme = sharedPref.getInt("THEME_COLOR_ID", 0)
 
@@ -174,7 +182,11 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         val tvMessage = TextView(this).apply {
-            text = "我們已發送驗證信至：\n$email\n\n請先前往信箱點擊驗證連結，再回來登入喔！"
+            text = when (emailSent) {
+                true -> "驗證信已提交寄送至：\n$email\n\n請檢查信箱與垃圾郵件，完成驗證後再登入。寄送成功不代表已送達。"
+                false -> "帳號已建立，但驗證信寄送失敗：\n$email\n\n請補寄驗證信，完成驗證後再登入；不需重新註冊。"
+                null -> "帳號已建立：\n$email\n\n未取得驗證信寄送狀態。請檢查信箱或提出補寄要求，完成驗證後再登入。"
+            }
             textSize = 16f
             setTextColor(textColor)
             setPadding(0, 0, 0, 20)
@@ -190,9 +202,34 @@ class RegisterActivity : AppCompatActivity() {
                 SoundManager.playBubblePop()
                 finish()
             }
+            .setNeutralButton("補寄驗證信", null)
             .create()
 
         alertDialog.show()
+        val resendButton = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+        resendButton.setOnClickListener {
+            resendButton.isEnabled = false
+            PlantApiService.create(null)
+                .requestEmailVerification(EmailVerificationRequest(email))
+                .enqueue(object : Callback<GenericResponse> {
+                    override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
+                        if (isFinishing || isDestroyed) return
+                        resendButton.isEnabled = true
+                        val message = if (response.isSuccessful && response.body()?.status == "success") {
+                            "已提出補寄要求，請檢查信箱與垃圾郵件；此回應不代表信件已送達。"
+                        } else {
+                            "補寄要求未完成，請稍後再試。"
+                        }
+                        tvMessage.text = message
+                    }
+
+                    override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
+                        if (isFinishing || isDestroyed) return
+                        resendButton.isEnabled = true
+                        tvMessage.text = "連線失敗，請稍後重新提出補寄要求。"
+                    }
+                })
+        }
 
         alertDialog.window?.let { window ->
             val background = android.graphics.drawable.GradientDrawable().apply {
@@ -201,6 +238,7 @@ class RegisterActivity : AppCompatActivity() {
             }
             window.setBackgroundDrawable(background)
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(textColor)
+            resendButton.setTextColor(textColor)
         }
     }
 

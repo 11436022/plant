@@ -58,6 +58,7 @@
 
         <!-- 導覽列 -->
         <div class="nav">
+            <form action="/admin/logout" method="post" style="float:right"><button type="submit">登出</button></form>
             <a href="/admin/" class="active">診斷紀錄管理</a>
             <a href="/admin/users/">使用者管理</a>
         </div>
@@ -131,7 +132,7 @@
                     <td>{{ diary.username or 'N/A' }}</td>
                     <td>
                         <form action="/admin/update/{{ diary.id }}" method="post" class="edit-group">
-                            <input type="text" name="status_name" value="{{ diary.status_name }}" class="status-badge ai-status" style="width: 150px; background: white;">
+                            <input type="text" name="status_name" value="{{ diary.user_corrected_status or diary.status_name }}" aria-label="修正註記" class="status-badge ai-status" style="width: 150px; background: white;">
                             <button type="submit" class="btn-save">💾 儲存</button>
                         </form>
                     </td>

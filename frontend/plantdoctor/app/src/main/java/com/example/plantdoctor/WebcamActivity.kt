@@ -51,6 +51,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -60,6 +61,8 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.IdentityHashMap
+import java.util.UUID
 import java.util.concurrent.Executors
 
 class WebcamActivity : AppCompatActivity() {
@@ -95,7 +98,16 @@ class WebcamActivity : AppCompatActivity() {
     // 策略與數據
     private lateinit var singleStrategy: SinglePlantMonitorStrategy
     private val cropZoneList = mutableListOf<CropZone>()
-    @Volatile private var latestFrameBitmap: Bitmap? = null
+    private var monitoringSessionId: String? = null
+    private val regionIds = IdentityHashMap<CropZone, String>()
+    private val pendingUploads = mutableMapOf<String, Call<WebcamAnalyzeResponse>>()
+    private val notifiedAlertIds = mutableSetOf<Int>()
+    private data class PendingAlertNotification(val sessionId: String, val diagnosisName: String)
+    private val pendingAlertNotifications = linkedMapOf<Int, PendingAlertNotification>()
+    private var notificationPermissionRequestInFlight = false
+    private var notificationPermissionSessionId: String? = null
+    private val notificationPermissionPreferenceKey = "WEBCAM_NOTIFICATION_PERMISSION_REQUESTED"
+    private var backendStatusText = ""
 
     // 狀態變數
     private var isMonitoring = false
@@ -130,6 +142,25 @@ class WebcamActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "需要相機權限才能進行即時監控", Toast.LENGTH_SHORT).show()
             finish()
+        }
+    }
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        val requestedSessionId = notificationPermissionSessionId
+        notificationPermissionRequestInFlight = false
+        notificationPermissionSessionId = null
+        val queuedAlerts = pendingAlertNotifications.toMap()
+        pendingAlertNotifications.clear()
+        if (isGranted && isMonitoring && requestedSessionId != null &&
+            monitoringSessionId == requestedSessionId && !isFinishing && !isDestroyed) {
+            for ((alertId, pending) in queuedAlerts) {
+                if (pending.sessionId == requestedSessionId && alertId !in notifiedAlertIds &&
+                    postAlertNotification(pending.diagnosisName, alertId, pending.sessionId)) {
+                    notifiedAlertIds.add(alertId)
+                }
+            }
         }
     }
 
@@ -219,10 +250,7 @@ class WebcamActivity : AppCompatActivity() {
                 tvStatus.text = "狀態：已暫停"
                 Log.d("WEBCAM_PROD", "🛑 [點擊按鈕] 停止監控！")
 
-                monitorJob?.cancel()
-
-                // 🌟 2. 停止時也立刻更新 UI 畫面顯示 0 次 (或歸零)
-                updateDiagnosisUI("已暫停", totalCaptureCount)
+                stopMonitoring()
             }
         }
 
@@ -252,6 +280,7 @@ class WebcamActivity : AppCompatActivity() {
                     addNewCropZone()
                 }
             }
+            if (isMonitoring) startMonitoringLoop()
         }
 
         btnPowerSave.setOnClickListener {
@@ -274,63 +303,57 @@ class WebcamActivity : AppCompatActivity() {
     /**
      * 🌟 監控主循環 (使用 Coroutine 輪詢)
      */
-    private fun startMonitoringLoop() {
+    private fun cancelMonitoringRequests() {
         monitorJob?.cancel()
+        monitorJob = null
+        monitoringSessionId = null
+        pendingAlertNotifications.clear()
+        notifiedAlertIds.clear()
+        // Keep the in-flight flag until the OS returns the outstanding request.
+        notificationPermissionSessionId = null
+        val calls = pendingUploads.values.toList()
+        pendingUploads.clear()
+        calls.forEach { it.cancel() }
+        regionIds.clear()
+    }
 
-        // 每次重新啟動輪詢時，將計數器歸零
+    private fun stopMonitoring() {
+        isMonitoring = false
+        cancelMonitoringRequests()
         totalCaptureCount = 0
+        backendStatusText = ""
+        btnToggleMonitor.text = "開始即時監控"
+        updateDiagnosisUI("已暫停", totalCaptureCount)
+    }
 
-        monitorJob = lifecycleScope.launch(Dispatchers.Default) {
-            Log.d("WEBCAM_PROD", "🔄 輪詢 Coroutine 已成功啟動！")
+    private fun startMonitoringLoop() {
+        cancelMonitoringRequests()
+        if (!isMonitoring) return
+        monitoringSessionId = UUID.randomUUID().toString()
+        totalCaptureCount = 0
+        backendStatusText = ""
+        currentSession?.cropZones?.forEach { it.lastCapturedTime = 0L }
+        updateDiagnosisUI("準備中...", totalCaptureCount)
 
+        // Keep mutable zones, request bookkeeping and UI on the main thread.
+        monitorJob = lifecycleScope.launch {
             while (isActive && isMonitoring) {
-                val isSingleMode = withContext(Dispatchers.Main) {
-                    rgMode.checkedRadioButtonId == R.id.rbSingleMode
-                }
-
-                if (isSingleMode) {
-                    val intervalSec = withContext(Dispatchers.Main) {
-                        etSingleInterval.text.toString().toIntOrNull() ?: 120
-                    }
-
-                    Log.d("WEBCAM_PROD", "⏳ [單植物] 開始等待 $intervalSec 秒...")
-
+                if (rgMode.checkedRadioButtonId == R.id.rbSingleMode) {
+                    val intervalSec = (etSingleInterval.text.toString().toIntOrNull() ?: 120)
+                        .coerceIn(30, 600)
                     delay(intervalSec * 1000L)
-
-                    Log.d("WEBCAM_PROD", "📸 [單植物] 時間到！準備拍照上傳...")
-                    withContext(Dispatchers.Main) {
-                        updateDiagnosisUI("拍照中...", totalCaptureCount)
-                        captureSinglePlant()
-
-                    }
-
+                    captureSinglePlant()
                 } else {
-                    val session = currentSession
-                    val zones = session?.cropZones ?: emptyList()
-
-                    if (zones.isEmpty()) {
-                        Log.w("WEBCAM_PROD", "⚠️ [多植物] 當前組別沒有設定任何區域！等待 5 秒後重試...")
-                        delay(5000L)
-                        continue
-                    }
-
                     val currentTime = System.currentTimeMillis()
+                    val zones = currentSession?.cropZones?.toList().orEmpty()
                     for (zone in zones) {
-                        val intervalMs = zone.intervalMinutes * 1000L
-
+                        if (!zone.isEnabled) continue
+                        val intervalMs = zone.intervalMinutes.coerceIn(30L, 600L) * 1000L
                         if (currentTime - zone.lastCapturedTime >= intervalMs) {
-                            Log.d("WEBCAM_PROD", "📸 [多植物] 區域 [${zone.name}] 時間到！(設定間隔: ${zone.intervalMinutes}秒)")
-
-                            withContext(Dispatchers.Main) {
-                                updateDiagnosisUI("拍照中...", totalCaptureCount)
-
-                                captureAndAnalyzeCropZone(zone)
-                            }
+                            captureAndAnalyzeCropZone(zone)
                             zone.lastCapturedTime = currentTime
-                            saveSessionsToStorage()
                         }
                     }
-
                     delay(1000L)
                 }
             }
@@ -338,6 +361,7 @@ class WebcamActivity : AppCompatActivity() {
     }
 
     private fun captureSinglePlant() {
+        if (!isMonitoring || pendingUploads.containsKey("single")) return
         val bitmap = previewView.bitmap
         if (bitmap == null) {
             Log.e("WEBCAM_PROD", "❌ 單植物模式拍照失敗：PreviewView 為空")
@@ -354,13 +378,13 @@ class WebcamActivity : AppCompatActivity() {
         val croppedFile = cropBitmapToTempFile(bitmap, centerRect, 0)
 
         if (croppedFile != null && croppedFile.exists()) {
-            uploadCropZoneImageToBackend(croppedFile, fileName)
+            uploadCropZoneImageToBackend(croppedFile, fileName, "single", "單植物")
         }
     }
 
     private fun addNewCropZone() {
         val session = currentSession ?: return
-        val nextId = cropZoneList.size + 1
+        val nextId = (cropZoneList.maxOfOrNull { it.id } ?: 0) + 1
         val offset = ((nextId - 1) % 3) * 0.12f
         val newZone = CropZone(
             id = nextId,
@@ -477,10 +501,14 @@ class WebcamActivity : AppCompatActivity() {
         boxOverlay.updateZones(cropZoneList, editable = true)
         multiRegionAdapter.notifyDataSetChanged()
         saveSessionsToStorage()
+        if (isMonitoring) startMonitoringLoop()
         Toast.makeText(this, "已刪除區域", Toast.LENGTH_SHORT).show()
     }
 
     private fun captureAndAnalyzeCropZone(zone: CropZone) {
+        if (!isMonitoring || !zone.isEnabled) return
+        val regionId = regionIds.getOrPut(zone) { UUID.randomUUID().toString() }
+        if (pendingUploads.containsKey(regionId)) return
         val currentBitmap = previewView.bitmap ?: return
 
         val sessionName = currentSession?.name ?: "組別一"
@@ -492,104 +520,121 @@ class WebcamActivity : AppCompatActivity() {
         val plantStr = "plant%02d".format(zone.id)
         val customFileName = "${username}_${sessionName}_${timeStamp}_${plantStr}.jpg"
 
-        uploadCropZoneImageToBackend(croppedFile, customFileName)
+        uploadCropZoneImageToBackend(croppedFile, customFileName, regionId, zone.name)
     }
 
     /**
      * 🚀 正式上線：將照片發送給 PlantApiService analyzeWebcamFrame
      */
-    private fun uploadCropZoneImageToBackend(file: File, customFileName: String) {
-        // 1. 🔒 即時讀取並驗證 Token
+    private fun uploadCropZoneImageToBackend(
+        file: File,
+        customFileName: String,
+        regionId: String,
+        regionName: String
+    ) {
+        val requestSessionId = monitoringSessionId
+        if (!isMonitoring || requestSessionId == null || pendingUploads.containsKey(regionId)) {
+            file.delete()
+            return
+        }
         val token = getValidSavedToken()
-
-        // 🛡️ 防禦線：如果沒有拿到 Token，直接中斷發送，避免觸發 401
         if (token.isNullOrEmpty()) {
-            Log.e("WEBCAM_PROD", "❌ 缺少 Token，取消發送上傳 Request，避免觸發 401 Unauthorized！")
-            Toast.makeText(this@WebcamActivity, "請先登入以使用即時監控", Toast.LENGTH_SHORT).show()
-
-            if (isMonitoring) {
-                btnToggleMonitor.performClick()
-            }
-
-            if (file.exists()) file.delete()
+            file.delete()
+            stopMonitoring()
+            Toast.makeText(this, "請先登入以使用即時監控", Toast.LENGTH_SHORT).show()
             return
         }
 
-
-
-        // 2. 打包圖片與建立 ApiService
-        val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
-        val body = MultipartBody.Part.createFormData("file", customFileName, requestFile)
-        val apiService = PlantApiService.create(token)
-
-        Log.d("WEBCAM_PROD", "📡 [第 $totalCaptureCount 次發送] 開始上傳照片至後端：$customFileName (大小: ${file.length() / 1024} KB)")
-        // 🌟 關鍵一：不論單植物、多植物或手動拍照，只要開始上傳，總次數立刻 +1！
+        val body = MultipartBody.Part.createFormData(
+            "file", customFileName, file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+        )
+        val textType = "text/plain".toMediaTypeOrNull()
+        val request = PlantApiService.create(token).analyzeWebcamFrame(
+            body,
+            requestSessionId.toRequestBody(textType),
+            regionId.toRequestBody(textType)
+        )
+        pendingUploads[regionId] = request
         totalCaptureCount++
+        updateDiagnosisUI("$regionName：分析中...", totalCaptureCount)
 
-        // 即時更新 UI，先顯示最新計數
-        updateDiagnosisUI("分析中...", totalCaptureCount)
-
-        // 3. 發送 API Request
-        apiService.analyzeWebcamFrame(body).enqueue(object : Callback<WebcamAnalyzeResponse> {
+        request.enqueue(object : Callback<WebcamAnalyzeResponse> {
             override fun onResponse(
                 call: Call<WebcamAnalyzeResponse>,
                 response: Response<WebcamAnalyzeResponse>
             ) {
-                when (response.code()) {
-                    200 -> {
-                        val result = response.body()
-                        val diagnosis = result?.diagnosis
-                        val statusText = diagnosis?.status_name ?: "正常"
-                        val streak = result?.monitoring?.streak ?: 0
-                        val isTriggered = result?.monitoring?.triggered == true
-
-                        Log.d("WEBCAM_PROD", "✅ 上傳成功！診斷結果：$statusText, 當前 Streak: $streak")
-
-                        // 🌟 關鍵二：收到 200 回傳後，傳入【totalCaptureCount】更新 UI，絕對不傳後端的 streak！
-                        updateDiagnosisUI(statusText, totalCaptureCount)
-
-                        // 單植物模式下的警報邏輯依然 100% 完整保留！
-                        if (isTriggered || result?.alert != null) {
-                            sendAlertNotification(statusText)
-                            Toast.makeText(
-                                this@WebcamActivity,
-                                "🚨 連續診斷異常！已自動記錄並觸發警報！",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        } else {
-                            Toast.makeText(this@WebcamActivity, "分析完成：$statusText", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-
-                    401 -> {
-                        Log.e("WEBCAM_PROD", "❌ 收到 401 Unauthorized！Token 可能已過期或無效")
+                if (pendingUploads[regionId] === call) pendingUploads.remove(regionId)
+                file.delete()
+                if (!isMonitoring || monitoringSessionId != requestSessionId || isDestroyed) return
+                val result = response.body()
+                when {
+                    response.isSuccessful && result != null && result.status == "success" ->
+                        handleWebcamResult(result, requestSessionId, regionId, regionName)
+                    response.code() == 401 -> {
+                        stopMonitoring()
                         Toast.makeText(this@WebcamActivity, "登入已過期，請重新登入", Toast.LENGTH_SHORT).show()
-
-                        if (isMonitoring) {
-                            btnToggleMonitor.performClick()
-                        }
                     }
-
-                    502 -> {
-                        Log.e("WEBCAM_PROD", "⚠️ 收到 502 Bad Gateway！(通常為後端 Gemini API 額度超限 429)")
-                        Toast.makeText(this@WebcamActivity, "AI 診斷服務繁忙中，請稍後再試", Toast.LENGTH_SHORT).show()
-                    }
-
                     else -> {
-                        val errorDetail = response.errorBody()?.string()
-                        Log.e("WEBCAM_PROD", "❌ 上傳失敗，HTTP 狀態碼：${response.code()}，後端原因：$errorDetail")
+                        Log.w("WEBCAM_PROD", "Frame analysis failed: HTTP ${response.code()}")
+                        updateDiagnosisUI("$regionName：分析失敗", totalCaptureCount)
                     }
                 }
-
-                // 清理暫存檔案
-                if (file.exists()) file.delete()
             }
 
             override fun onFailure(call: Call<WebcamAnalyzeResponse>, t: Throwable) {
-                Log.e("WEBCAM_PROD", "❌ 網路連線或伺服器異常：${t.message}")
-                if (file.exists()) file.delete()
+                if (pendingUploads[regionId] === call) pendingUploads.remove(regionId)
+                file.delete()
+                if (call.isCanceled || !isMonitoring || monitoringSessionId != requestSessionId || isDestroyed) return
+                Log.e("WEBCAM_PROD", "Frame analysis failed", t)
+                updateDiagnosisUI("$regionName：連線失敗", totalCaptureCount)
             }
         })
+    }
+
+    private fun handleWebcamResult(
+        result: WebcamAnalyzeResponse,
+        sessionId: String,
+        regionId: String,
+        regionName: String
+    ) {
+        if (!isMonitoring || monitoringSessionId != sessionId || isFinishing || isDestroyed) return
+        val monitoring = result.monitoring
+        if (!monitoring.matchesScope(sessionId, regionId)) return
+        val alert = result.alert
+        if (alert?.session_id != null && alert.session_id != sessionId) return
+        if (alert?.region_id != null && alert.region_id != regionId) return
+        val statusText = result.diagnosis.status_name?.takeIf { it.isNotBlank() } ?: "無法判定"
+        val reviewText = when (result.diagnosis.requires_review) {
+            true -> "（需要人工複核）"
+            false -> ""
+            null -> "（複核狀態未提供）"
+        }
+        backendStatusText = "$regionName：連續判定 ${monitoring.streak} 次；${monitoring.statusLabel()}"
+        updateDiagnosisUI("$regionName：$statusText$reviewText", totalCaptureCount)
+
+        // Only a newly created backend alert can produce a phone notification.
+        if (monitoring.triggered && alert != null &&
+            alert.id !in notifiedAlertIds && alert.id !in pendingAlertNotifications) {
+            sendAlertNotification("$regionName：$statusText", alert.id)
+            Toast.makeText(this, "後端已建立監控警報", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    fun uploadSinglePlantFrame(jpegBytes: ByteArray) {
+        runOnUiThread {
+            if (!isMonitoring || rgMode.checkedRadioButtonId != R.id.rbSingleMode ||
+                pendingUploads.containsKey("single")) return@runOnUiThread
+            var file: File? = null
+            try {
+                val frameFile = File.createTempFile("webcam_single_", ".jpg", cacheDir)
+                file = frameFile
+                frameFile.outputStream().use { it.write(jpegBytes) }
+                uploadCropZoneImageToBackend(frameFile, "webcam_single.jpg", "single", "單植物")
+            } catch (e: Exception) {
+                file?.delete()
+                Log.e("WEBCAM_PROD", "Could not prepare single-plant frame", e)
+            }
+        }
     }
 
     private fun getUserSavedToken(): String? {
@@ -633,7 +678,7 @@ class WebcamActivity : AppCompatActivity() {
                 croppedBitmap = Bitmap.createScaledBitmap(croppedBitmap, targetWidth, targetHeight, true)
             }
 
-            val outputFile = File(cacheDir, "webcam_crop_$plantIndex.jpg")
+            val outputFile = File.createTempFile("webcam_crop_${plantIndex}_", ".jpg", cacheDir)
             FileOutputStream(outputFile).use { out ->
                 croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 92, out)
             }
@@ -742,70 +787,92 @@ class WebcamActivity : AppCompatActivity() {
     }
 
     private fun processFrame(image: ImageProxy) {
-        latestFrameBitmap = image.toBitmap()
-
-        val isSingleMode = rgMode.checkedRadioButtonId == R.id.rbSingleMode
-        if (isSingleMode) {
-            singleStrategy.processFrame(image, isMonitoring, sampleIntervalSeconds)
-        } else {
-            image.close()
-        }
+        // startMonitoringLoop owns capture scheduling in both modes.
+        image.close()
     }
 
-    private fun ImageProxy.toBitmap(): Bitmap? {
-        val yBuffer = planes[0].buffer
-        val uBuffer = planes[1].buffer
-        val vBuffer = planes[2].buffer
+    fun sendAlertNotification(diagnosisName: String, notificationId: Int = 1001) {
+        runOnUiThread {
+            val sessionId = monitoringSessionId ?: return@runOnUiThread
+            if (!isMonitoring || isFinishing || isDestroyed ||
+                notificationId in notifiedAlertIds || notificationId in pendingAlertNotifications) {
+                return@runOnUiThread
+            }
 
-        val ySize = yBuffer.remaining()
-        val uSize = uBuffer.remaining()
-        val vSize = vBuffer.remaining()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                if (notificationPermissionRequestInFlight) {
+                    if (notificationPermissionSessionId == sessionId) {
+                        pendingAlertNotifications[notificationId] =
+                            PendingAlertNotification(sessionId, diagnosisName)
+                    }
+                    return@runOnUiThread
+                }
 
-        val nv21 = ByteArray(ySize + uSize + vSize)
-        yBuffer.get(nv21, 0, ySize)
-        vBuffer.get(nv21, ySize, vSize)
-        uBuffer.get(nv21, ySize + vSize, uSize)
+                val preferences = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
+                if (preferences.getBoolean(notificationPermissionPreferenceKey, false)) {
+                    return@runOnUiThread
+                }
 
-        val yuvImage = YuvImage(nv21, ImageFormat.NV21, this.width, this.height, null)
-        val out = ByteArrayOutputStream()
-        yuvImage.compressToJpeg(Rect(0, 0, yuvImage.width, yuvImage.height), 90, out)
-        val imageBytes = out.toByteArray()
-        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-    }
+                // Queue before launching: the permission result can arrive immediately.
+                pendingAlertNotifications[notificationId] =
+                    PendingAlertNotification(sessionId, diagnosisName)
+                notificationPermissionSessionId = sessionId
+                notificationPermissionRequestInFlight = true
+                preferences.edit().putBoolean(notificationPermissionPreferenceKey, true).apply()
+                try {
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                } catch (e: IllegalStateException) {
+                    notificationPermissionRequestInFlight = false
+                    notificationPermissionSessionId = null
+                    pendingAlertNotifications.clear()
+                    Log.w("WEBCAM_PROD", "Could not request notification permission", e)
+                }
+                return@runOnUiThread
+            }
 
-
-
-    fun sendAlertNotification(diagnosisName: String) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
-                return
+            if (postAlertNotification(diagnosisName, notificationId, sessionId)) {
+                notifiedAlertIds.add(notificationId)
             }
         }
+    }
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channelId = "webcam_alert_channel"
+    private fun postAlertNotification(
+        diagnosisName: String,
+        notificationId: Int,
+        sessionId: String
+    ): Boolean {
+        if (!isMonitoring || monitoringSessionId != sessionId || isFinishing || isDestroyed) return false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED) return false
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "植物監控警報",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            notificationManager.createNotificationChannel(channel)
+        return try {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            if (!notificationManager.areNotificationsEnabled()) return false
+            val channelId = "webcam_alert_channel"
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                notificationManager.createNotificationChannel(
+                    NotificationChannel(channelId, "植物監控警報", NotificationManager.IMPORTANCE_HIGH)
+                )
+                if (notificationManager.getNotificationChannel(channelId)?.importance ==
+                    NotificationManager.IMPORTANCE_NONE) return false
+            }
+
+            val notification = NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.drawable.ic_camera)
+                .setContentTitle("植物監控警報")
+                .setContentText("即時監控診斷異常：$diagnosisName")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .build()
+            notificationManager.notify(notificationId, notification)
+            true
+        } catch (e: SecurityException) {
+            Log.w("WEBCAM_PROD", "Notification permission is unavailable", e)
+            false
         }
-
-        val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_camera)
-            .setContentTitle("🚨 植物健康警告！")
-            .setContentText("即時監控診斷異常：$diagnosisName")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .build()
-
-        notificationManager.notify(1001, notification)
     }
 
     /**
@@ -813,6 +880,7 @@ class WebcamActivity : AppCompatActivity() {
      */
     fun onCropZonesChanged() {
         saveSessionsToStorage()
+        if (isMonitoring) startMonitoringLoop()
     }
 
     override fun onResume() {
@@ -870,11 +938,13 @@ class WebcamActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+        stopMonitoring()
         SoundManager.stopWind()
         windHandler.removeCallbacks(windRunnable)
     }
 
     override fun onDestroy() {
+        cancelMonitoringRequests()
         super.onDestroy()
         powerSaveHandler.removeCallbacksAndMessages(null)
         windHandler.removeCallbacksAndMessages(null)
@@ -935,6 +1005,7 @@ class WebcamActivity : AppCompatActivity() {
             boxOverlay.updateZones(cropZoneList, editable = true)
             multiRegionAdapter.notifyDataSetChanged()
         }
+        if (isMonitoring) startMonitoringLoop()
     }
 
     private fun updateSessionButtonText() {
@@ -1196,7 +1267,8 @@ class WebcamActivity : AppCompatActivity() {
         runOnUiThread {
             tvStatus.text = if (isMonitoring) "狀態：監控中..." else "狀態：已暫停"
             tvDiagnosis.text = "最新診斷：$statusText"
-            tvStreak.text = "本次偵測次數：$captureCount 次"
+            tvStreak.text = "本次偵測次數：$captureCount 次" +
+                if (backendStatusText.isNotEmpty()) "\n$backendStatusText" else ""
         }
     }
 
