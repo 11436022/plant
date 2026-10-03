@@ -1,4 +1,4 @@
-from update_reference_data import build_reference_data
+from update_reference_data import PEST_SOURCE_URL, build_reference_data
 
 
 def test_build_reference_data_filters_and_labels_official_records():
@@ -67,10 +67,16 @@ def test_build_reference_data_filters_and_labels_official_records():
 
     disease = next(row for row in updated["diseases"] if row.get("crop_name") == "榕樹")
     assert disease["disease_name"] == "褐根病"
-    assert disease["source_record_id"].startswith("tree-")
+    assert disease["source_record_id"].startswith("tree-local-")
     assert "不直接回傳該舊處方" in disease["treatment"]
 
     pest = updated["pests"][0]
     assert pest["pest_name"] == "粉蝨"
     assert pest["source_record_id"] == "diag-1"
-    assert pest["source_url"] == "https://data.moa.gov.tw/pest/diag-1"
+    assert pest["source_url"] == PEST_SOURCE_URL
+    assert len(updated["reference_sync"]["tree_payload_sha256"]) == 64
+    original_id = disease["source_record_id"]
+    tree_rows[0]["symptom"] = "不同的原始案例內容"
+    changed, _ = build_reference_data(existing, pest_rows, tree_rows)
+    changed_id = next(row["source_record_id"] for row in changed["diseases"] if row.get("crop_name") == "榕樹")
+    assert changed_id != original_id

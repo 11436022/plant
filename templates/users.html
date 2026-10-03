@@ -43,6 +43,7 @@
 
         <!-- 導覽列 -->
         <div class="nav">
+            <form action="/admin/logout" method="post" style="float:right"><button type="submit">登出</button></form>
             <a href="/admin/" class="{% if 'users' not in request.url.path and 'feedback' not in request.url.path %}active{% endif %}">診斷紀錄管理</a>
             <a href="/admin/users/" class="{% if 'users' in request.url.path %}active{% endif %}">使用者管理</a>
             <a href="/admin/feedback/">使用者回饋</a>

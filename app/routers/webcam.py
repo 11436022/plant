@@ -10,12 +10,18 @@ from sqlalchemy.orm import Session, joinedload
 from app.core.config import settings
 from app.db import models
 from app.db.session import get_db
-from app.services.ai import diagnostic_plant, process_and_update_diagnosis
+from app.services.ai import (
+    diagnostic_plant,
+    get_reference_lists,
+    ground_diagnosis_in_database,
+    process_and_update_diagnosis,
+)
 from app.services.auth import get_current_user
 from app.services.webcam import (
     alert_consensus,
     create_webcam_alert,
     save_alert_image,
+    send_webcam_alert_email,
     serialize_webcam_alert,
     validate_webcam_frame,
 )
@@ -51,6 +57,8 @@ async def get_webcam_settings(current_user: models.User = Depends(get_current_us
 async def analyze_webcam_frame(
     file: UploadFile = File(...),
     crop_name: Optional[str] = Form(None),
+    session_id: str = Form("legacy", min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$"),
+    region_id: str = Form("full-frame", min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$"),
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -61,14 +69,19 @@ async def analyze_webcam_frame(
     temp_path.write_bytes(content)
 
     saved_alert_path = None
+    preserve_alert_image = False
     try:
         # 使用階層式診斷
-        raw_ai_result = diagnostic_plant(str(temp_path), crop_hint=crop_name, db=db)
+        crops, diseases, pests = get_reference_lists(db)
+        if crop_name:
+            crops = [crop_name]
+        raw_ai_result = diagnostic_plant(str(temp_path), crops, diseases, pests)
         if not raw_ai_result:
             raise HTTPException(status_code=502, detail="AI analysis service failed.")
 
-        diagnosis = process_and_update_diagnosis(raw_ai_result, db)
-        monitoring = alert_consensus.evaluate(current_user.user_id, diagnosis)
+        diagnosis = ground_diagnosis_in_database(raw_ai_result, db)
+        monitoring = alert_consensus.evaluate(current_user.user_id, diagnosis, session_id=session_id, region_id=region_id)
+        monitoring.update(session_id=session_id, region_id=region_id)
         alert_data = None
 
         if monitoring["triggered"]:
@@ -79,8 +92,18 @@ async def analyze_webcam_frame(
                 diagnosis=diagnosis,
                 image_path=saved_alert_path,
                 consecutive_matches=monitoring["streak"],
+                session_id=session_id,
+                region_id=region_id,
             )
             alert_data = serialize_webcam_alert(alert)
+            recipient = current_user.email
+            # A failed COMMIT can have an uncertain outcome; never delete its image.
+            preserve_alert_image = True
+            db.commit()
+            alert_data["email_sent"] = send_webcam_alert_email(
+                db=db, alert_id=alert_data["id"], recipient=recipient,
+                diagnosis=diagnosis, consecutive_matches=monitoring["streak"],
+            )
 
         return {
             "status": "success",
@@ -93,13 +116,13 @@ async def analyze_webcam_frame(
                 "format": metadata.image_format,
             },
         }
-    except HTTPException:
-        raise
     except Exception as exc:
         db.rollback()
-        if saved_alert_path and saved_alert_path.exists():
+        if not preserve_alert_image and saved_alert_path and saved_alert_path.exists():
             saved_alert_path.unlink()
-        raise HTTPException(status_code=500, detail=f"Webcam analysis failed: {exc}") from exc
+        if isinstance(exc, HTTPException):
+            raise
+        raise HTTPException(status_code=500, detail="Webcam analysis failed.") from exc
     finally:
         if temp_path.exists():
             temp_path.unlink()

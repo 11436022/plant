@@ -1,5 +1,6 @@
 import base64
 import json
+import math
 import os
 from datetime import datetime
 from pathlib import Path
@@ -38,7 +39,7 @@ def _coerce_confidence(value) -> float:
         confidence = float(value)
     except (TypeError, ValueError):
         return 0.0
-    return max(0.0, min(1.0, confidence))
+    return max(0.0, min(1.0, confidence)) if math.isfinite(confidence) else 0.0
 
 
 def _uncertain_diagnosis(crop_name: str | None = None, confidence: float = 0.0) -> dict:
@@ -53,6 +54,89 @@ def _uncertain_diagnosis(crop_name: str | None = None, confidence: float = 0.0) 
         "treatment": "1. 暫時隔離疑似受害植株並持續觀察。\n2. 補拍清晰照片後重新診斷。\n3. 若症狀持續擴大，請諮詢農業專家或更新知識庫。",
         "grounding_source": "safety_fallback",
         "requires_review": True,
+    }
+
+
+def _normalize_name(value: str | None) -> str:
+    """Normalize names for exact matching without trusting model wording."""
+
+    return "".join(str(value or "").strip().lower().split())
+
+
+def _match_known_name(value: str | None, known_names: list[str]) -> str | None:
+    """Return the canonical database name only when the AI output matches it."""
+
+    normalized_value = _normalize_name(value)
+    if not normalized_value:
+        return None
+
+    for known_name in known_names:
+        if _normalize_name(known_name) == normalized_value:
+            return known_name
+    return None
+
+
+def _safe_text(value: str | None, fallback: str) -> str:
+    """Use fallback text when model output is missing."""
+
+    text = str(value or "").strip()
+    return text if text else fallback
+
+
+def validate_diagnosis_result(data, crops: list[str], diseases: list[str], pests: list[str]) -> dict:
+    """Constrain AI diagnosis to database-backed crop and disease/pest names."""
+
+    if not isinstance(data, dict):
+        return _uncertain_diagnosis()
+
+    confidence = _coerce_confidence(data.get("confidence"))
+    crop_name = _match_known_name(data.get("crop_name"), crops)
+    if not crop_name:
+        return _uncertain_diagnosis(confidence=confidence)
+
+    category = str(data.get("category", "")).strip().lower()
+    if category == "healthy":
+        if confidence < MIN_HEALTHY_CONFIDENCE:
+            return _uncertain_diagnosis(crop_name, confidence)
+        return {
+            "crop_name": crop_name,
+            "category": "healthy",
+            "status_name": HEALTHY_STATUS_NAME,
+            "confidence": confidence,
+            "suggestion": _safe_text(
+                data.get("suggestion"),
+                "- 目前未觀察到明顯病蟲害特徵\n- 建議維持通風、光照與適當澆水",
+            ),
+            "treatment": _safe_text(
+                data.get("treatment"),
+                "1. 維持目前照護方式。\n2. 定期觀察葉片正反面是否出現新斑點或蟲害。",
+            ),
+            "grounding_source": "model_pending_database_check",
+            "requires_review": False,
+        }
+
+    if confidence < MIN_DIAGNOSIS_CONFIDENCE:
+        return _uncertain_diagnosis(crop_name, confidence)
+
+    if category == "disease":
+        status_name = _match_known_name(data.get("status_name"), diseases)
+    elif category == "pest":
+        status_name = _match_known_name(data.get("status_name"), pests)
+    else:
+        return _uncertain_diagnosis(crop_name, confidence)
+
+    if not status_name:
+        return _uncertain_diagnosis(crop_name, confidence)
+
+    return {
+        "crop_name": crop_name,
+        "category": category,
+        "status_name": status_name,
+        "confidence": confidence,
+        "suggestion": _safe_text(data.get("suggestion"), "- 已比對到資料庫中的病蟲害名稱，請搭配症狀持續觀察。"),
+        "treatment": _safe_text(data.get("treatment"), "1. 依資料庫建議處理。\n2. 若症狀擴大，請重新拍攝並再次診斷。"),
+        "grounding_source": "model_pending_database_check",
+        "requires_review": False,
     }
 
 
@@ -415,6 +499,9 @@ def _call_gemini_fallback(
 
 def diagnostic_plant(
     image_path: str,
+    crops: list[str] | None = None,
+    diseases: list[str] | None = None,
+    pests: list[str] | None = None,
     crop_hint: str | None = None,
     mock_convnext_result: dict | None = None,
     mock_gemini_result: dict | None = None,
@@ -427,6 +514,12 @@ def diagnostic_plant(
     步驟 2: Gemini 多模態兜底 (已知植物定向診斷，或未知植物自動識別長尾病徵)
     步驟 3: 精準 RAG 檢索 (強制 Query: [植物名稱] + [確診病名] -> 100% 精準處方箋)
     """
+    if crop_hint is None and crops:
+        if isinstance(crops, str):
+            crop_hint = crops
+        elif len(crops) == 1:
+            crop_hint = crops[0]
+
     clean_crop = (
         crop_hint.strip()
         if crop_hint and crop_hint.strip() not in ["未知", "未知作物", "未知植物", "無法判定"]
@@ -543,104 +636,71 @@ def _get_standardized_name(new_name: str, existing_names: list[str]) -> str:
         return new_name
 
 
-def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
-    """
-    新流程的核心：接收原始 AI 結果，與資料庫交叉比對，然後更新或新增記錄。
-    最終永遠以 AI 的最新建議為準。
-    """
-    if not isinstance(raw_ai_data, dict):
-        return _uncertain_diagnosis()
+def ground_diagnosis_in_database(data: dict, db: Session) -> dict:
+    """Cross-check crop ownership and replace generated advice with database facts."""
 
-    # 從原始 AI 資料中提取資訊
-    crop_name = raw_ai_data.get("crop_name")
-    status_name = raw_ai_data.get("status_name")
-    category = str(raw_ai_data.get("category", "")).lower()
-    confidence = _coerce_confidence(raw_ai_data.get("confidence"))
-    ai_suggestion = raw_ai_data.get("suggestion", "AI 未提供建議。")
-    ai_treatment = raw_ai_data.get("treatment", "AI 未提供處理方法。")
-
-    # 基本的合理性檢查
-    if not all([crop_name, status_name, category]):
+    crop_name = data.get("crop_name")
+    confidence = _coerce_confidence(data.get("confidence"))
+    crop = db.query(models.Crop).filter(models.Crop.crop_name == crop_name).first()
+    if not crop:
         return _uncertain_diagnosis(confidence=confidence)
 
-    # 如果是健康的，直接回傳 AI 結果，不寫入病蟲害資料庫
+    category = str(data.get("category", "")).strip().lower()
+    if category == "unknown":
+        return _uncertain_diagnosis(crop.crop_name, confidence)
+    if confidence < MIN_DIAGNOSIS_CONFIDENCE:
+        return _uncertain_diagnosis(crop.crop_name, confidence)
+
     if category == "healthy":
+        if confidence < MIN_HEALTHY_CONFIDENCE:
+            return _uncertain_diagnosis(crop.crop_name, confidence)
         return {
-            "crop_name": crop_name,
+            "crop_name": crop.crop_name,
             "category": "healthy",
             "status_name": HEALTHY_STATUS_NAME,
             "confidence": confidence,
-            "suggestion": ai_suggestion,
-            "treatment": ai_treatment,
-            "grounding_source": raw_ai_data.get("grounding_source") or "ai_direct_result",
-            "requires_review": raw_ai_data.get("requires_review", False),
+            "suggestion": "- 目前影像未比對到資料庫已知病蟲害的明顯特徵",
+            "treatment": "1. 維持現行照護\\n2. 定期從相同角度拍攝並比對變化",
+            "grounding_source": "crop_database",
+            "requires_review": False,
         }
 
-    # 確定要操作的資料庫模型和欄位
-    if category == "disease":
-        model_class = models.Disease
-        name_column = models.Disease.disease_name
-        crop_relation = models.Disease.crop
-    elif category == "pest":
-        model_class = models.Pest
-        name_column = models.Pest.pest_name
-        crop_relation = models.Pest.crop
-    else:
-        return _uncertain_diagnosis(crop_name, confidence)
+    model_class = models.Disease if category == "disease" else models.Pest if category == "pest" else None
+    name_column = models.Disease.disease_name if category == "disease" else models.Pest.pest_name if category == "pest" else None
+    if model_class is None or name_column is None:
+        return _uncertain_diagnosis(crop.crop_name, confidence)
 
-    # 尋找對應的作物 ID
-    crop = db.query(models.Crop).filter(models.Crop.crop_name == crop_name).first()
-    if not crop:
-        # 作物不存在於本地資料庫中，自動為其建立作物記錄，避免覆蓋丟棄 AI 的可信診斷結果
-        print(f"🌱 作物 '{crop_name}' 尚未存在於資料庫，自動新增作物記錄。")
-        crop = models.Crop(crop_name=crop_name)
-        db.add(crop)
-        db.commit()
-        db.refresh(crop)
+    record = (
+        db.query(model_class)
+        .filter(name_column == data.get("status_name"), model_class.crop_id == crop.crop_id)
+        .first()
+    )
+    if not record:
+        return _uncertain_diagnosis(crop.crop_name, confidence)
 
-    # --- 名稱標準化流程 ---
-    # 1. 取得該作物所有已知的病害/害蟲名稱
-    existing_records = db.query(name_column).filter(model_class.crop_id == crop.crop_id).all()
-    existing_names = [record[0] for record in existing_records]
-
-    # 2. 呼叫 AI 進行同義詞比對，取得標準化名稱
-    standardized_status_name = _get_standardized_name(status_name, existing_names)
-    # --- 標準化結束 ---
-
-    # 在對應的病蟲害資料表中查詢記錄 (使用標準化後的名稱)
-    record = db.query(model_class).filter(name_column == standardized_status_name, model_class.crop_id == crop.crop_id).first()
-
-    if record:
-        # 情況 A：找到了！更新記錄
-        print(f"🔄 更新資料庫記錄: {crop_name} - {standardized_status_name}")
-        record.description = ai_suggestion
-        record.treatment = ai_treatment
-        db.commit()
-    else:
-        # 情況 B：沒找到！新增記錄 (使用標準化後的名稱)
-        print(f"✨ 新增資料庫記錄: {crop_name} - {standardized_status_name}")
-        new_record = model_class(
-            crop_id=crop.crop_id,
-            description=ai_suggestion,
-            treatment=ai_treatment
-        )
-        # 動態設定名稱欄位
-        setattr(new_record, name_column.name, standardized_status_name)
-        db.add(new_record)
-        db.commit()
-
-    # 無論更新或新增，都回傳以 AI 最新內容為準的結果
-    final_result = {
-        "crop_name": crop_name,
+    description = str(record.description or "").strip()
+    treatment = str(record.treatment or "").strip()
+    source_name = str(getattr(record, "source_name", None) or "").strip() or None
+    source_url = str(getattr(record, "source_url", None) or "").strip() or None
+    source_record_id = str(getattr(record, "source_record_id", None) or "").strip() or None
+    has_traceable_source = bool(
+        source_name and source_url and source_record_id
+    )
+    return {
+        "crop_name": crop.crop_name,
         "category": category,
-        "status_name": standardized_status_name, # 回傳標準化後的名稱
+        "status_name": getattr(record, "disease_name" if category == "disease" else "pest_name"),
         "confidence": confidence,
-        "suggestion": ai_suggestion,
-        "treatment": ai_treatment,
-        "grounding_source": raw_ai_data.get("grounding_source") or ("ai_updated_database" if record else "ai_created_database"),
-        "requires_review": raw_ai_data.get("requires_review", False),
+        "suggestion": description or "- 已比對到此作物資料庫中的病蟲害紀錄",
+        "treatment": treatment or "1. 資料庫尚無處置參考內容，請諮詢農業專業人員",
+        "grounding_source": "disease_database" if category == "disease" else "pest_database",
+        "reference_source": source_name,
+        "reference_url": source_url,
+        "reference_record_id": source_record_id,
+        "requires_review": not bool(description and treatment and has_traceable_source),
     }
-    return final_result
+
+process_and_update_diagnosis = ground_diagnosis_in_database
 
 
 def get_reference_lists(db: Session) -> tuple[list[str], list[str], list[str]]:
@@ -714,19 +774,30 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
     try:
         # 只接受既有資料庫中的病蟲害名稱，避免 AI 幻覺資料被寫入知識庫。
         if category == "disease":
-            disease = db.query(models.Disease).filter(models.Disease.disease_name == status_name).first()
+            disease = db.query(models.Disease).filter(
+                models.Disease.disease_name == status_name,
+                models.Disease.crop_id == target_crop_id,
+            ).first() if target_crop_id is not None else None
             if disease:
                 disease_id = disease.disease_id
             else:
                 category = "unknown"
                 status_name = UNKNOWN_STATUS_NAME
         elif category == "pest":
-            pest = db.query(models.Pest).filter(models.Pest.pest_name == status_name).first()
+            pest = db.query(models.Pest).filter(
+                models.Pest.pest_name == status_name,
+                models.Pest.crop_id == target_crop_id,
+            ).first() if target_crop_id is not None else None
             if pest:
                 pest_id = pest.pest_id
             else:
                 category = "unknown"
                 status_name = UNKNOWN_STATUS_NAME
+
+        if category == "unknown":
+            data = _uncertain_diagnosis(crop_name, _coerce_confidence(data.get("confidence")))
+            final_suggestion = data["suggestion"]
+            final_treatment = data["treatment"]
 
         new_diary = models.PlantDiary()
         new_diary.user_id = user_id
@@ -736,6 +807,12 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
         new_diary.disease_id = disease_id
         new_diary.pest_id = pest_id
         new_diary.confidence = data.get("confidence")
+        new_diary.category = category
+        new_diary.requires_review = data.get("requires_review", True)
+        new_diary.grounding_source = data.get("grounding_source") or "legacy_unverified"
+        new_diary.reference_source = data.get("reference_source")
+        new_diary.reference_url = data.get("reference_url")
+        new_diary.reference_record_id = data.get("reference_record_id")
 
         # 🌟 這裡使用手動賦值，避免建構子屬性名稱混淆
         # 如果您的資料庫欄位是 suggestion，這會正確運作
@@ -746,9 +823,10 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
         new_diary.created_at = datetime.now()
 
         db.add(new_diary)
+        db.flush()
+        diary_id = new_diary.id
         db.commit()
-        db.refresh(new_diary)
-        return new_diary.id
+        return diary_id
     except Exception as exc:
         db.rollback()
         print(f"CRITICAL DATABASE ERROR: {str(exc)}") # 🌟 這行會把真正的錯誤原因印在後端視窗

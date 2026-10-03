@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1150" viewBox="0 0 1600 1150">
   <defs>
     <style>
       .title { font: 700 44px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
@@ -22,101 +22,113 @@
       <path d="M0 0 L10 5 L0 10 Z" fill="#8a9b8e"/>
     </marker>
   </defs>
-
-  <rect width="1600" height="900" fill="#ffffff"/>
-  <text x="60" y="60" class="title">現行系統架構圖</text>
-  <text x="60" y="92" class="subtitle">前端介面、FastAPI 服務、安全校驗、資料層與外部服務</text>
-
-  <rect x="50" y="126" width="380" height="690" rx="8" class="lane-box"/>
-  <rect x="470" y="126" width="650" height="690" rx="8" class="lane-box"/>
-  <rect x="1160" y="126" width="390" height="690" rx="8" class="lane-box"/>
+  <style>.text {font-size:16px} .small {font-size:14px}</style>
+  <rect width="1600" height="1150" fill="#ffffff"/>
+  <text x="60" y="60" text-anchor="start" class="title">現行系統架構圖</text>
+  <text x="60" y="94" text-anchor="start" class="subtitle">現行開發連線為 HTTP；HTTPS 反向代理為規劃，尚未部署。圖示程式流程，不代表整合驗收。</text>
+  <rect x="50" y="126" width="380" height="820" rx="8" class="lane-box"/>
+  <rect x="470" y="126" width="650" height="820" rx="8" class="lane-box"/>
+  <rect x="1160" y="126" width="390" height="820" rx="8" class="lane-box"/>
   <text x="240" y="166" text-anchor="middle" class="lane">使用介面</text>
   <text x="795" y="166" text-anchor="middle" class="lane">FastAPI 後端</text>
   <text x="1355" y="166" text-anchor="middle" class="lane">資料與外部服務</text>
-
-  <!-- Clients -->
-  <rect x="86" y="205" width="308" height="132" rx="8" class="client"/>
-  <text x="240" y="244" text-anchor="middle" class="head">Android App</text>
-  <text x="240" y="277" text-anchor="middle" class="text">帳號、拍照診斷、歷史紀錄</text>
-  <text x="240" y="306" text-anchor="middle" class="small">Kotlin / Retrofit / JWT</text>
-
-  <rect x="86" y="385" width="308" height="132" rx="8" class="client"/>
-  <text x="240" y="424" text-anchor="middle" class="head">Webcam 監控介面</text>
-  <text x="240" y="457" text-anchor="middle" class="text">單株、多區域、定時擷取</text>
-  <text x="240" y="486" text-anchor="middle" class="small">Android CameraX / Browser</text>
-
-  <rect x="86" y="565" width="308" height="132" rx="8" class="client"/>
-  <text x="240" y="604" text-anchor="middle" class="head">管理後台</text>
-  <text x="240" y="637" text-anchor="middle" class="text">統計、紀錄、使用者查詢</text>
-  <text x="240" y="666" text-anchor="middle" class="small">Jinja2 / HTML</text>
-
-  <!-- Backend -->
-  <rect x="510" y="205" width="570" height="94" rx="8" class="service"/>
-  <text x="795" y="243" text-anchor="middle" class="head">API 與身分驗證層</text>
-  <text x="795" y="274" text-anchor="middle" class="text">Auth / Predict / Diaries / Webcam / Knowledge / Admin</text>
-
-  <rect x="510" y="337" width="270" height="142" rx="8" class="service"/>
-  <text x="645" y="375" text-anchor="middle" class="head">圖片診斷服務</text>
-  <text x="645" y="407" text-anchor="middle" class="text">圖片品質與格式檢查</text>
-  <text x="645" y="436" text-anchor="middle" class="text">Gemini 影像初判</text>
-
-  <rect x="810" y="337" width="270" height="142" rx="8" class="service"/>
-  <text x="945" y="375" text-anchor="middle" class="head">Webcam 警報服務</text>
-  <text x="945" y="407" text-anchor="middle" class="text">連續影格一致判定</text>
-  <text x="945" y="436" text-anchor="middle" class="text">警報、Email、確認與刪除</text>
-
-  <rect x="510" y="520" width="570" height="132" rx="8" class="safety"/>
-  <text x="795" y="559" text-anchor="middle" class="head">防幻覺安全校驗閘門</text>
-  <text x="795" y="591" text-anchor="middle" class="text">名稱清單 → 作物關聯 → 信心門檻 → 官方來源</text>
-  <text x="795" y="621" text-anchor="middle" class="small">未通過：requires_review=true，不建立 Webcam 自動警報</text>
-
-  <rect x="510" y="694" width="570" height="88" rx="8" class="service"/>
-  <text x="795" y="729" text-anchor="middle" class="head">日誌與管理服務</text>
-  <text x="795" y="758" text-anchor="middle" class="text">確認儲存、查詢、備註、修正、刪除、統計</text>
-
-  <!-- Data and external services -->
-  <rect x="1196" y="205" width="318" height="140" rx="8" class="external"/>
-  <text x="1355" y="244" text-anchor="middle" class="head">MySQL</text>
-  <text x="1355" y="276" text-anchor="middle" class="text">user / plant_diary / webcam_alert</text>
-  <text x="1355" y="305" text-anchor="middle" class="small">crop / disease / pests / tokens</text>
-
-  <rect x="1196" y="385" width="318" height="126" rx="8" class="external"/>
-  <text x="1355" y="424" text-anchor="middle" class="head">知識庫與官方資料</text>
-  <text x="1355" y="456" text-anchor="middle" class="text">農業部公開資料 / RAG</text>
-  <text x="1355" y="485" text-anchor="middle" class="small">來源網址與紀錄編號可追溯</text>
-
-  <rect x="1196" y="551" width="150" height="128" rx="8" class="external"/>
-  <text x="1271" y="591" text-anchor="middle" class="head">Gemini</text>
-  <text x="1271" y="623" text-anchor="middle" class="text">圖片初判</text>
-  <text x="1271" y="650" text-anchor="middle" class="small">不直接當事實</text>
-
-  <rect x="1364" y="551" width="150" height="128" rx="8" class="external"/>
-  <text x="1439" y="591" text-anchor="middle" class="head">SMTP</text>
-  <text x="1439" y="623" text-anchor="middle" class="text">驗證與警報</text>
-  <text x="1439" y="650" text-anchor="middle" class="small">未設定不影響紀錄</text>
-
-  <!-- Main flows -->
-  <path d="M394 271 H510" class="line"/>
-  <path d="M394 451 H510" class="line"/>
-  <path d="M394 631 H510" class="line"/>
-  <text x="451" y="255" text-anchor="middle" class="small">HTTPS / JSON</text>
-
-  <path d="M645 299 V337" class="line"/>
-  <path d="M945 299 V337" class="line"/>
-  <path d="M645 479 V520" class="line"/>
-  <path d="M945 479 V520" class="line"/>
-  <path d="M795 652 V694" class="line"/>
-
-  <path d="M1080 251 H1196" class="line"/>
-  <path d="M1080 586 H1196 V448" class="line"/>
-  <path d="M780 408 H1150 V615 H1196" class="line"/>
-  <path d="M1080 408 H1130 V615 H1364" class="line"/>
-  <path d="M1080 738 H1138 V275 H1196" class="line"/>
-
-  <path d="M1196 318 H1100 V285 H1080" class="return"/>
-  <path d="M1196 475 H1108 V610 H1080" class="return"/>
-  <path d="M1196 642 H1120 V445 H780" class="return"/>
-
-  <rect x="50" y="838" width="1500" height="36" rx="6" fill="#eef5ee" stroke="#b1c6b1"/>
-  <text x="800" y="862" text-anchor="middle" class="small">診斷結果在寫入日誌或觸發警報前，必須先通過資料庫校驗；Gemini 僅提供候選結果。</text>
+  <rect x="86" y="205" width="308" height="136" rx="7" class="client"/>
+  <text x="240" y="235" text-anchor="middle" class="head">Android App</text>
+  <text x="240" y="260" text-anchor="middle" class="text">帳號、拍照／選圖、確認保存</text>
+  <text x="240" y="283" text-anchor="middle" class="text">歷史、備註與使用者修正</text>
+  <text x="240" y="306" text-anchor="middle" class="text">信心、來源與複核標記</text>
+  <text x="240" y="329" text-anchor="middle" class="text">Kotlin / Retrofit / JWT</text>
+  <rect x="86" y="402" width="308" height="136" rx="7" class="client"/>
+  <text x="240" y="432" text-anchor="middle" class="head">Webcam 監控介面</text>
+  <text x="240" y="457" text-anchor="middle" class="text">Android：單株／多區域</text>
+  <text x="240" y="480" text-anchor="middle" class="text">瀏覽器：僅全畫面擷取</text>
+  <text x="240" y="503" text-anchor="middle" class="text">定時影格與個人警報</text>
+  <rect x="86" y="615" width="308" height="136" rx="7" class="client"/>
+  <text x="240" y="645" text-anchor="middle" class="head">管理後台</text>
+  <text x="240" y="670" text-anchor="middle" class="text">/admin/login 瀏覽器登入</text>
+  <text x="240" y="693" text-anchor="middle" class="text">統計、日誌手動新增／改／刪</text>
+  <text x="240" y="716" text-anchor="middle" class="text">使用者查詢；Jinja2 / HTML</text>
+  <text x="240" y="818" text-anchor="middle" class="small">維護者另行執行資料同步／建庫腳本</text>
+  <text x="240" y="844" text-anchor="middle" class="small">update_reference_data.py</text>
+  <text x="240" y="870" text-anchor="middle" class="small">seed.py / build_knowledge_base.py</text>
+  <rect x="510" y="205" width="570" height="118" rx="7" class="service"/>
+  <text x="795" y="235" text-anchor="middle" class="head">API 與身分驗證層</text>
+  <text x="795" y="260" text-anchor="middle" class="text">Auth / Predict / Diaries / Webcam / Knowledge / Admin</text>
+  <text x="795" y="283" text-anchor="middle" class="text">上傳與確認：JWT；管理員：已驗證信箱＋role=admin</text>
+  <text x="795" y="306" text-anchor="middle" class="text">管理後台支援 Cookie / Bearer；角色查核取自資料庫</text>
+  <rect x="510" y="371" width="270" height="124" rx="7" class="service"/>
+  <text x="645" y="401" text-anchor="middle" class="head">圖片診斷服務</text>
+  <text x="645" y="426" text-anchor="middle" class="text">格式、解碼與畫面品質檢查</text>
+  <text x="645" y="449" text-anchor="middle" class="text">Gemini 候選分析</text>
+  <text x="645" y="472" text-anchor="middle" class="text">POST /api/v1/predict/</text>
+  <rect x="810" y="371" width="270" height="124" rx="7" class="service"/>
+  <text x="945" y="401" text-anchor="middle" class="head">Webcam 警報服務</text>
+  <text x="945" y="426" text-anchor="middle" class="text">使用者／session／region 分組</text>
+  <text x="945" y="449" text-anchor="middle" class="text">連續一致、信心門檻與冷卻</text>
+  <text x="945" y="472" text-anchor="middle" class="text">合格病蟲害才建立警報</text>
+  <rect x="510" y="551" width="570" height="113" rx="7" class="safety"/>
+  <text x="795" y="581" text-anchor="middle" class="head">資料庫校驗與複核標記</text>
+  <text x="795" y="606" text-anchor="middle" class="text">名稱與作物關聯、信心門檻、來源完整性</text>
+  <text x="795" y="629" text-anchor="middle" class="text">unknown／需複核可確認存檔，但不得觸發自動警報</text>
+  <rect x="510" y="714" width="270" height="131" rx="7" class="service"/>
+  <text x="645" y="744" text-anchor="middle" class="head">待確認診斷暫存</text>
+  <text x="645" y="769" text-anchor="middle" class="text">prediction_cache：記憶體</text>
+  <text x="645" y="792" text-anchor="middle" class="text">user_id＋有效期限 15 分鐘</text>
+  <text x="645" y="815" text-anchor="middle" class="text">static/tmp：暫存圖片</text>
+  <rect x="810" y="714" width="270" height="131" rx="7" class="service"/>
+  <text x="945" y="744" text-anchor="middle" class="head">日誌與管理服務</text>
+  <text x="945" y="769" text-anchor="middle" class="text">確認本人暫存後建立日誌</text>
+  <text x="945" y="792" text-anchor="middle" class="text">來源快照、信心與複核標記</text>
+  <text x="945" y="815" text-anchor="middle" class="text">管理員可另行手動新增</text>
+  <text x="795" y="893" text-anchor="middle" class="small">確認：POST /api/v1/diaries/confirm/{prediction_id}</text>
+  <text x="795" y="921" text-anchor="middle" class="small">使用者修正是註記，不等於專業複核或建議重新核准。</text>
+  <rect x="1196" y="205" width="318" height="141" rx="7" class="external"/>
+  <text x="1355" y="235" text-anchor="middle" class="head">MySQL</text>
+  <text x="1355" y="260" text-anchor="middle" class="text">帳號／Token／日誌／警報</text>
+  <text x="1355" y="283" text-anchor="middle" class="text">作物／病害／蟲害與參考來源</text>
+  <text x="1355" y="306" text-anchor="middle" class="text">紀錄、來源快照、圖片路徑</text>
+  <text x="1355" y="329" text-anchor="middle" class="text">不保存圖片檔案</text>
+  <rect x="1196" y="395" width="318" height="138" rx="7" class="external"/>
+  <text x="1355" y="425" text-anchor="middle" class="head">農業知識與 RAG</text>
+  <text x="1355" y="450" text-anchor="middle" class="text">data.json 可追溯農業紀錄</text>
+  <text x="1355" y="473" text-anchor="middle" class="text">FAISS＋來源 manifest／雜湊</text>
+  <text x="1355" y="496" text-anchor="middle" class="text">不讀取專題手冊 DOCX</text>
+  <text x="1355" y="519" text-anchor="middle" class="text">索引缺失／不相容時跳過檢索</text>
+  <rect x="1196" y="582" width="150" height="122" rx="7" class="external"/>
+  <text x="1271" y="612" text-anchor="middle" class="head">Gemini</text>
+  <text x="1271" y="637" text-anchor="middle" class="text">影像候選</text>
+  <text x="1271" y="660" text-anchor="middle" class="text">非診斷事實</text>
+  <rect x="1364" y="582" width="150" height="122" rx="7" class="external"/>
+  <text x="1439" y="612" text-anchor="middle" class="head">SMTP</text>
+  <text x="1439" y="637" text-anchor="middle" class="text">驗證／重設信</text>
+  <text x="1439" y="660" text-anchor="middle" class="text">警報 Email</text>
+  <rect x="1196" y="767" width="318" height="121" rx="7" class="external"/>
+  <text x="1355" y="797" text-anchor="middle" class="head">圖片檔案系統</text>
+  <text x="1355" y="822" text-anchor="middle" class="text">static/tmp：待確認圖片</text>
+  <text x="1355" y="845" text-anchor="middle" class="text">static/uploads：日誌／警報圖片</text>
+  <text x="1355" y="868" text-anchor="middle" class="text">MySQL 僅保存對應路徑</text>
+  <path d="M394 266 H510" class="line"/>
+  <text x="451" y="251" text-anchor="middle" class="small">HTTP</text>
+  <path d="M394 469 H450 V284 H510" class="line"/>
+  <path d="M394 682 H438 V309 H510" class="line"/>
+  <path d="M645 323 V371" class="line"/>
+  <path d="M945 323 V371" class="line"/>
+  <path d="M645 495 V551" class="line"/>
+  <path d="M945 495 V551" class="line"/>
+  <path d="M645 664 V714" class="line"/>
+  <path d="M780 780 H810" class="line"/>
+  <text x="795" y="702" text-anchor="middle" class="small">使用者確認＋歸屬／效期檢查</text>
+  <path d="M1080 258 H1196" class="line"/>
+  <path d="M1080 795 H1140 V292 H1196" class="line"/>
+  <path d="M1080 614 H1150 V465 H1196" class="line"/>
+  <path d="M780 426 H795 V517 H1176 V640 H1196" class="line"/>
+  <path d="M1080 435 H1130 V561 H1439 V582" class="line"/>
+  <path d="M1080 310 H1158 V561 H1439 V582" class="line"/>
+  <path d="M1080 829 H1196" class="line"/>
+  <rect x="50" y="970" width="1500" height="157" rx="6" fill="#eef5ee" stroke="#b1c6b1"/>
+  <text x="800" y="1000" text-anchor="middle" class="text">SMTP：驗證信失敗會妨礙新帳號完成驗證與登入；警報先保存，寄送失敗不刪除已存紀錄。</text>
+  <text x="800" y="1030" text-anchor="middle" class="small">RAG 建庫由維護者執行，manifest 記載來源、版本、建庫時間與雜湊；部署中的索引仍須實際核對。</text>
+  <text x="800" y="1055" text-anchor="middle" class="small">來源欄位完整不代表辨識準確或處方經專業核准；SMTP 寄送成功不代表收件成功。</text>
+  <text x="800" y="1082" text-anchor="middle" class="small">後端隔離測試通過，範圍與數量另見驗證報告。</text>
+  <text x="800" y="1110" text-anchor="middle" class="small">MySQL 僅 SQL 離線檢查；Android 前端已具欄位流程，但缺 SDK 未建置、未實機驗證。</text>
 </svg>

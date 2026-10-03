@@ -2,6 +2,7 @@ import argparse
 import hashlib
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -146,7 +147,7 @@ def _build_pest_records(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "description": _clean(description, 2000),
                 "treatment": _safe_treatment(None),
                 "source_name": PEST_SOURCE_NAME,
-                "source_url": _clean(row.get("Image"), 2048) or PEST_SOURCE_URL,
+                "source_url": PEST_SOURCE_URL,
                 "source_record_id": source_record_id,
             }
     return [records[key] for key in sorted(records)]
@@ -187,7 +188,8 @@ def _build_tree_records(
             details.append(f"受害描述：{injury_description}")
         details.append(f"確認方式：{_clean(row.get('DiagnosisMethod'))}")
         description = "；".join(details) + "。"
-        source_record_id = _stable_record_id("tree", injury_type, crop_name, case_name)
+        # A local content fingerprint is not an official case identifier.
+        source_record_id = _stable_record_id("tree-local", json.dumps(row, ensure_ascii=False, sort_keys=True))
         common = {
             "crop_name": crop_name,
             "description": _clean(description, 2000),
@@ -253,6 +255,10 @@ def build_reference_data(
     result["diseases"] = diseases
     result["pests"] = pests
     result["reference_sync"] = {
+        "processed_at": datetime.now(timezone.utc).isoformat(),
+        "pest_payload_sha256": hashlib.sha256(json.dumps(pest_rows, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest(),
+        "tree_payload_sha256": hashlib.sha256(json.dumps(tree_rows, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest(),
+        "tree_id_policy": "tree-local is a source-row content fingerprint, not an official case ID; source publication dates remain unknown unless provided",
         "policy": "official_records_only; historical chemical instructions suppressed",
         "pest_source": PEST_SOURCE_NAME,
         "tree_source": TREE_SOURCE_NAME,

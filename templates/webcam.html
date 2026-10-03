@@ -326,6 +326,7 @@
             stream: null,
             timer: null,
             analyzing: false,
+            sessionId: crypto.randomUUID(),
             settings: null
         };
 
@@ -463,6 +464,7 @@
         }
 
         function stopCamera() {
+            stopMonitoring();
             if (state.stream) state.stream.getTracks().forEach((track) => track.stop());
             state.stream = null;
             video.srcObject = null;
@@ -478,6 +480,7 @@
         async function captureFrame() {
             if (!state.stream || state.analyzing || video.videoWidth === 0) return;
             state.analyzing = true;
+            const sessionId = state.sessionId;
             byId("monitorError").textContent = "";
             setMonitorStatus("分析中", "live");
             canvas.width = video.videoWidth;
@@ -486,6 +489,7 @@
 
             try {
                 const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.86));
+                if (sessionId !== state.sessionId) return;
                 if (!blob) throw new Error("無法擷取攝影機影格。");
                 const form = new FormData();
                 form.append("file", blob, "webcam-frame.jpg");
@@ -493,15 +497,24 @@
                 if (selectedCrop) {
                     form.append("crop_name", selectedCrop);
                 }
+                form.append("session_id", sessionId);
+                form.append("region_id", "full-frame");
                 const payload = await api("/webcam/analyze", { method: "POST", body: form });
+                if (sessionId !== state.sessionId) return;
+                if (payload.monitoring?.session_id !== sessionId || payload.monitoring?.region_id !== "full-frame") {
+                    throw new Error("監控回應不屬於目前工作階段，已忽略。");
+                }
                 renderDiagnosis(payload);
                 byId("lastScan").textContent = new Date().toLocaleTimeString("zh-TW", { hour12: false });
-                if (payload.alert) {
+                const newAlert = payload.monitoring.triggered && payload.alert?.session_id === sessionId && payload.alert?.region_id === "full-frame";
+                if (newAlert) {
                     fireAlarm(payload.alert);
                     await loadAlerts();
                 }
-                setMonitorStatus(state.timer ? "監控中" : "攝影機已開啟", payload.alert ? "alert" : "live");
+                if (sessionId !== state.sessionId) return;
+                setMonitorStatus(state.timer ? "監控中" : "攝影機已開啟", newAlert ? "alert" : "live");
             } catch (error) {
+                if (sessionId !== state.sessionId) return;
                 byId("monitorError").textContent = error.message;
                 setMonitorStatus(state.timer ? "等待下次掃描" : "攝影機已開啟", "live");
             } finally {
@@ -521,10 +534,12 @@
             byId("streakBar").style.width = `${Math.min(100, monitoring.streak / monitoring.required_matches * 100)}%`;
             byId("suggestion").textContent = diagnosis.suggestion || "--";
             byId("treatment").textContent = diagnosis.treatment || "--";
+            const source = [diagnosis.reference_source, diagnosis.reference_record_id, diagnosis.reference_url].filter(Boolean).join("\n");
+            byId("treatment").textContent += `\n\n${diagnosis.requires_review ? "需要人工複核；尚未經專業人員確認。" : "影像辨識僅供參考，信心值不代表實測準確率。"}\n${source || "此結果沒有參考資料來源。"}`;
 
             const badge = byId("diagnosisBadge");
-            badge.textContent = diagnosis.category === "healthy" ? "健康" : diagnosis.category === "unknown" ? "待確認" : "異常";
-            badge.className = `badge ${diagnosis.category === "healthy" ? "good" : diagnosis.category === "unknown" ? "warning" : "danger"}`;
+            badge.textContent = diagnosis.requires_review ? "待複核" : diagnosis.category === "healthy" ? "健康" : "異常";
+            badge.className = `badge ${diagnosis.requires_review ? "warning" : diagnosis.category === "healthy" ? "good" : "danger"}`;
 
             const sourceBadge = byId("sourceBadge");
             if (sourceBadge) {
@@ -542,11 +557,17 @@
         }
 
         async function startMonitoring() {
+            if (state.timer || state.analyzing) return;
+            state.sessionId = crypto.randomUUID();
+            const sessionId = state.sessionId;
+            byId("monitorButton").disabled = true;
             const interval = Math.max(10, Math.min(600, Number(byId("intervalInput").value) || 30));
             byId("intervalInput").value = interval;
             byId("intervalSummary").textContent = `每 ${interval} 秒`;
             if ("Notification" in window && Notification.permission === "default") await Notification.requestPermission();
+            if (sessionId !== state.sessionId || !state.stream) return;
             await captureFrame();
+            if (sessionId !== state.sessionId) return;
             state.timer = window.setInterval(captureFrame, interval * 1000);
             byId("monitorButton").disabled = true;
             byId("cameraButton").disabled = true;
@@ -554,6 +575,7 @@
         }
 
         function stopMonitoring() {
+            state.sessionId = crypto.randomUUID();
             if (state.timer) window.clearInterval(state.timer);
             state.timer = null;
             byId("cameraButton").disabled = false;

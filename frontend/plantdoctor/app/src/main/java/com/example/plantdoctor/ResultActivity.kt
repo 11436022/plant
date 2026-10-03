@@ -104,10 +104,16 @@ class ResultActivity : AppCompatActivity() {
             binding.tvDiseaseName.text = "診斷：${diseaseName ?: "未知"}"
 
             val fullAdvice = StringBuilder().apply {
-                append("【專家建議】\n${data.suggestion ?: "尚無建議"}\n\n")
-                append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
+                append(formatDiagnosisMetadata(
+                    data.confidence, data.category, data.requires_review,
+                    data.grounding_source, data.reference_source,
+                    data.reference_url, data.reference_record_id
+                ))
+                append("\n\n【原始診斷參考建議】\n${data.suggestion ?: "尚無建議"}\n\n")
+                append("【原始診斷處理參考】\n${data.treatment ?: "請諮詢專業人員"}")
             }.toString()
             binding.tvAdvice.text = fullAdvice
+            binding.tvAdvice.setTextIsSelectable(true)
 
             isUnknownResult = (plantName.isNullOrEmpty() || plantName in listOf("未知作物", "未知", "無法判定")
                     || diseaseName.isNullOrEmpty() || diseaseName in listOf("無法判定", "未知")
@@ -173,6 +179,13 @@ class ResultActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        ThemeManager.applyTheme(
+            context = this,
+            rootLayout = binding.root,
+            titles = listOf(binding.tvTitle),
+            mainButtons = listOf(binding.btnSave),
+            imageButtons = listOf(binding.btnBackHome)
+        )
         windHandler.postDelayed(windRunnable, 500)
     }
 
@@ -284,22 +297,12 @@ class ResultActivity : AppCompatActivity() {
         }
 
         val userNote = binding.etUserNote.text.toString()
-        val adviceText = binding.tvAdvice.text.toString()
-        val currentDiseaseName = diseaseName
-
-        if (currentDiseaseName.isNullOrEmpty()) {
-            Toast.makeText(this, "診斷結果不完整，無法儲存", Toast.LENGTH_SHORT).show()
-            return
-        }
 
         binding.btnSave.isEnabled = false
         binding.btnSave.text = "儲存中..."
 
-        val request = DiaryConfirmRequest(
-            user_note = userNote,
-            disease_name = currentDiseaseName,
-            gemini_advice = adviceText
-        )
+        // The server saves the diagnosis snapshot; display labels are not input.
+        val request = DiaryConfirmRequest(user_note = userNote)
 
         val apiService = PlantApiService.create(token)
         apiService.confirmDiary(predictionId, request).enqueue(object : Callback<DiaryConfirmResponse> {
@@ -405,40 +408,4 @@ class ResultActivity : AppCompatActivity() {
             }
         })
     }
-
-    /*
-    private fun saveDiagnosisResult() {
-        val userNote = "" // 筆記功能已在新版介面移除，暫時傳入空字串
-
-        if (plantName == null || diseaseName == null || advice == null || imageUrl == null) {
-            Toast.makeText(this, "診斷結果不完整，無法儲存", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val request = DiaryEntry.DiaryEntryRequest(
-            plant_name = plantName!!,
-            disease = diseaseName!!,
-            treatment_suggestion = advice!!,
-            notes = userNote,
-            image_url = imageUrl!!
-        )
-
-        plantApiService.addDiaryEntry(request).enqueue(object : Callback<DiaryEntry> {
-            override fun onResponse(call: Call<DiaryEntry>, response: Response<DiaryEntry>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(this@ResultActivity, "成功儲存至日記", Toast.LENGTH_SHORT).show()
-                    finish() // 關閉此 Activity，返回主畫面
-                } else {
-                    Toast.makeText(this@ResultActivity, "儲存失敗: ${response.errorBody()?.string()}", Toast.LENGTH_LONG).show()
-                }
-            }
-
-            override fun onFailure(call: Call<DiaryEntry>, t: Throwable) {
-                Toast.makeText(this@ResultActivity, "網路錯誤: ${t.message}", Toast.LENGTH_LONG).show()
-            }
-        })
-    }
-    */
-
-
-}
+}
