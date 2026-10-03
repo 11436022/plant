@@ -15,6 +15,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_PATH = settings.STATIC_DIR
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+templates.env.auto_reload = True
+templates.env.cache = None
 
 
 def create_app() -> FastAPI:
