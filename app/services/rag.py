@@ -5,8 +5,11 @@ from pathlib import Path
 
 import faiss
 import numpy as np
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+
+load_dotenv()
 
 # --- 設定 ---
 FAISS_INDEX_PATH = Path("knowledge_base.faiss")
@@ -28,7 +31,7 @@ def load_knowledge_base():
     print("--- 載入 RAG 知識庫 ---")
 
     if not FAISS_INDEX_PATH.exists() or not CONTENT_PATH.exists():
-        print("⚠️ 警告：找不到知識庫檔案 (knowledge_base.faiss 或 knowledge_content.json)。")
+        print("[WARN] 警告：找不到知識庫檔案 (knowledge_base.faiss 或 knowledge_content.json)。")
         print("   請先執行 build_knowledge_base.py 來建立知識庫。")
         print("   RAG 功能將無法使用。")
         faiss_index = None
@@ -54,13 +57,13 @@ def load_knowledge_base():
             faiss_index.d != EMBEDDING_DIMENSION
             or faiss_index.metric_type != faiss.METRIC_INNER_PRODUCT
         ):
-            print("⚠️ RAG 索引版本不相容，請重新執行 build_knowledge_base.py。")
+            print("[WARN] RAG 索引版本不相容，請重新執行 build_knowledge_base.py。")
             faiss_index = None
             knowledge_content = []
             return
-        print(f"✅ 知識庫載入成功！索引中有 {faiss_index.ntotal} 個向量。")
+        print(f"[OK] 知識庫載入成功！索引中有 {faiss_index.ntotal} 個向量。")
     except Exception as e:
-        print(f"❌ 載入知識庫時發生錯誤：{e}")
+        print(f"[ERROR] 載入知識庫時發生錯誤：{e}")
         faiss_index = None
         knowledge_content = []
 
@@ -106,5 +109,5 @@ def search_knowledge_base(query: str, k: int = 3) -> str:
         return "\n\n".join(context)
 
     except Exception as e:
-        print(f"❌ 在搜尋知識庫時發生錯誤：{e}")
+        print(f"[ERROR] 在搜尋知識庫時發生錯誤：{e}")
         return ""

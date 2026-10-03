@@ -5,9 +5,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-for _k, _v in dict(GEMINI_API_KEY="test-key", DB_USER="test", DB_PASSWORD="test", DB_HOST="127.0.0.1",
-                  DB_NAME="isolated_test", JWT_SECRET_KEY="isolated-test-only-secret-do-not-use-in-production").items():
-    os.environ.setdefault(_k, _v)
+os.environ.update(GEMINI_API_KEY="test-key", DB_USER="test", DB_PASSWORD="test", DB_HOST="127.0.0.1",
+                  DB_NAME="isolated_test", JWT_SECRET_KEY="isolated-test-only-secret-do-not-use-in-production")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import pytest
