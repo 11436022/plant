@@ -122,10 +122,10 @@ async def admin_dashboard(request: Request, search: str = None, page: int = Quer
             cursor.execute(main_sql, paged_params)
             rows = cursor.fetchall()
             
-            # 4. 圖片縮圖顯示 (URL 處理)
+            # 4. 圖片縮圖顯示 (URL 處理，Web 後台使用相對路徑自適應 IP)
             for row in rows:
                 if row.get("image_url"):
-                    row["image_url"] = build_public_image_url(row["image_url"])
+                    row["image_url"] = build_public_image_url(row["image_url"], relative=True)
 
             templates_engine = request.app.state.templates
             template = templates_engine.get_template("dashboard.html")
@@ -241,10 +241,10 @@ async def admin_feedback_list(request: Request, page: int = Query(1, ge=1)):
             cursor.execute(sql, (ITEMS_PER_PAGE, offset))
             feedbacks = cursor.fetchall()
 
-            # 將圖片路徑轉換為可公開存取的 URL
+            # 將圖片路徑轉換為可公開存取的 URL (Web 後台使用相對路徑自適應 IP)
             for feedback in feedbacks:
                 if feedback.get("image_url"):
-                    feedback["image_url"] = build_public_image_url(feedback["image_url"])
+                    feedback["image_url"] = build_public_image_url(feedback["image_url"], relative=True)
 
             templates_engine = request.app.state.templates
             template = templates_engine.get_template("feedback.html")
@@ -315,7 +315,7 @@ async def admin_get_all_diaries():
             rows = cursor.fetchall()
             for row in rows:
                 if row.get("image_url"):
-                    row["image_url"] = build_public_image_url(row["image_url"])
+                    row["image_url"] = build_public_image_url(row["image_url"], relative=True)
             return {"status": "success", "total_records": len(rows), "data": rows}
     finally:
         conn.close()

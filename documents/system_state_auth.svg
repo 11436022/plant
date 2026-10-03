@@ -1,27 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 680" width="1100" height="680">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1210 680" width="1210" height="680">
   <defs>
     <style>
-      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 20px; font-weight: bold; fill: #0f172a; }
-      .group-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #1e293b; }
-      .state-name { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
-      .action-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #475569; }
-      .transition-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #1d4ed8; font-weight: 500; }
-      .guard-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 9px; fill: #b91c1c; font-style: italic; }
+      <![CDATA[
+      .title { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 22px; font-weight: bold; fill: #0f172a; }
+      .group-title { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 14.5px; font-weight: bold; fill: #1e293b; }
+      .state-name { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 14px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .action-text { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 12px; fill: #000000; }
+      .transition-text { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', serif; font-size: 11.5px; fill: #1e40af; font-weight: bold; }
+      .guard-text { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', serif; font-size: 11.5px; fill: #b91c1c; font-style: italic; font-weight: bold; }
       
+      /* Subtle Academic Composite Group */
       .composite-bg { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 6,4; rx: 8; ry: 8; }
       .composite-header { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.5; }
       
+      /* Standard States (Crisp Refreshing Blue) - ONLY STATES HAVE BOXES */
       .state-box { fill: #ffffff; stroke: #2563eb; stroke-width: 1.5; rx: 6; ry: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
       .state-header { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.5; }
       
+      /* Error States (Warning Coral Red) */
       .error-state-box { fill: #fef2f2; stroke: #dc2626; stroke-width: 1.5; rx: 6; ry: 6; }
       .error-state-header { fill: #fee2e2; stroke: #dc2626; stroke-width: 1.5; }
       
-      .line { stroke: #334155; stroke-width: 1.3; fill: none; marker-end: url(#arrow); }
-      .line-back { stroke: #64748b; stroke-width: 1.2; stroke-dasharray: 4,3; fill: none; marker-end: url(#arrow); }
+      /* Lines and Connectors - 100% UNBROKEN */
+      .line { stroke: #1e293b; stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+      .line-inter { stroke: #2563eb; stroke-width: 1.5; fill: none; stroke-dasharray: 6,4; marker-end: url(#blue-arrow); }
+      .line-back { stroke: #dc2626; stroke-width: 1.4; stroke-dasharray: 5,4; fill: none; marker-end: url(#red-arrow); }
+      ]]>
     </style>
+
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b" />
+    </marker>
+    <marker id="blue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#2563eb" />
+    </marker>
+    <marker id="red-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#dc2626" />
     </marker>
   </defs>
 
@@ -29,182 +43,208 @@
   <rect width="100%" height="100%" fill="#ffffff" />
 
   <!-- Diagram Title -->
-  <text x="550" y="32" class="title" text-anchor="middle">圖 7-4-1 帳號註冊與認證登入 狀態圖 (State Diagram)</text>
+  <text x="605" y="32" class="title" text-anchor="middle">圖 7-4-1 帳號註冊與認證登入 狀態圖 (State Diagram)</text>
 
-  <!-- Initial State -->
-  <circle cx="50" cy="180" r="8" fill="#0f172a" />
-  <line x1="58" y1="180" x2="95" y2="180" class="line" />
+  <!-- ========================================================================= -->
+  <!-- 1. COMPOSITE STATE 1: REGISTRATION & VERIFICATION (x=25, y=55, w=560)     -->
+  <!-- ========================================================================= -->
+  <g transform="translate(25, 55)">
+    <rect width="560" height="605" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 552 0 Q 560 0 560 8 L 560 30 L 0 30 Z" class="composite-header" />
+    <text x="14" y="20" class="group-title">狀態群組 1：帳號註冊與信箱驗證 (Registration &amp; Verification)</text>
 
-  <!-- ================= COMPOSITE STATE 1: REGISTRATION ================= -->
-  <g transform="translate(100, 60)">
-    <rect width="450" height="580" class="composite-bg" />
-    <path d="M 0 8 Q 0 0 8 0 L 442 0 Q 450 0 450 8 L 450 30 L 0 30 Z" class="composite-header" />
-    <text x="15" y="20" class="group-title">狀態群組 1：帳號註冊與信箱驗證狀態 (Registration &amp; Verification)</text>
+    <!-- Initial State -->
+    <circle cx="126" cy="48" r="8" fill="#0f172a" />
+    <line x1="126" y1="56" x2="126" y2="70" class="line" />
 
-    <!-- State 1: 未註冊 -->
-    <g transform="translate(30, 50)">
-      <rect width="170" height="65" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 164 0 Q 170 0 170 6 L 170 24 L 0 24 Z" class="state-header" />
-      <text x="85" y="17" class="state-name">未註冊 (Unregistered)</text>
-      <text x="10" y="42" class="action-text">entry / 載入註冊表單</text>
-      <text x="10" y="56" class="action-text">do / 輸入帳號、信箱、密碼</text>
+    <!-- State S1: 未註冊 (Unregistered) -->
+    <g transform="translate(18, 70)">
+      <rect width="216" height="78" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 210 0 Q 216 0 216 6 L 216 24 L 0 24 Z" class="state-header" />
+      <text x="108" y="17" class="state-name">未註冊 (Unregistered)</text>
+      <text x="10" y="44" class="action-text">entry / 載入註冊表單介面</text>
+      <text x="10" y="64" class="action-text">do / 輸入帳號、信箱與密碼</text>
     </g>
 
-    <!-- Transition 1 -> 2 -->
-    <line x1="200" y1="82" x2="255" y2="82" class="line" />
-    <text x="228" y="75" class="transition-text" text-anchor="middle">點擊註冊</text>
+    <!-- Transition S1 -> S2: Unbroken Vertical Line at x=75, Pure Text at right -->
+    <line x1="75" y1="148" x2="75" y2="183" class="line" />
+    <text x="90" y="170" class="transition-text">點擊註冊 [格式正確]</text>
 
-    <!-- State 2: 驗證碼寄送中 -->
-    <g transform="translate(260, 50)">
-      <rect width="165" height="75" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 159 0 Q 165 0 165 6 L 165 24 L 0 24 Z" class="state-header" />
-      <text x="82" y="17" class="state-name">寄送驗證碼 (Sending_OTP)</text>
-      <text x="8" y="42" class="action-text">do / 查核信箱與帳號唯一性</text>
-      <text x="8" y="56" class="action-text">do / 生成 6 位數安全 OTP</text>
-      <text x="8" y="69" class="action-text">do / Gmail SMTP 發送驗證信</text>
+    <!-- State S2: 註冊處理與寄信 (Registering) -->
+    <g transform="translate(18, 185)">
+      <rect width="216" height="102" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 210 0 Q 216 0 216 6 L 216 24 L 0 24 Z" class="state-header" />
+      <text x="108" y="17" class="state-name">註冊處理與寄信 (Registering)</text>
+      <text x="10" y="42" class="action-text">do / 查核帳號與信箱唯一性 (DB)</text>
+      <text x="10" y="60" class="action-text">do / Bcrypt 密碼安全雜湊演算</text>
+      <text x="10" y="78" class="action-text">do / 產生 URL-safe Token (32 Bytes)</text>
+      <text x="10" y="96" class="action-text">do / SMTP 寄出專屬郵件啟用連結</text>
     </g>
 
-    <!-- Transition: 2 -> Error (Conflict) -->
-    <line x1="342" y1="125" x2="342" y2="185" class="line" />
-    <text x="348" y="160" class="guard-text">[信箱或帳號已存在]</text>
+    <!-- Transition S2 -> Error E1: Unbroken Horizontal Line at y=236, Pure Guard text ABOVE line -->
+    <line x1="234" y1="236" x2="348" y2="236" class="line" />
+    <text x="291" y="216" class="guard-text" text-anchor="middle">[帳號/信箱重複]</text>
 
-    <!-- State: 註冊失敗 -->
-    <g transform="translate(260, 185)">
-      <rect width="165" height="60" class="error-state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 159 0 Q 165 0 165 6 L 165 22 L 0 22 Z" class="error-state-header" />
-      <text x="82" y="16" class="state-name" fill="#991b1b">註冊失敗 (Reg_Failed)</text>
-      <text x="10" y="38" class="action-text" fill="#b91c1c">entry / 顯示帳號衝突訊息</text>
-      <text x="10" y="52" class="action-text" fill="#b91c1c">do / 提示使用者更換</text>
+    <!-- Error State E1: 註冊失敗 (Reg_Failed) -->
+    <g transform="translate(350, 202)">
+      <rect width="195" height="78" class="error-state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 189 0 Q 195 0 195 6 L 195 24 L 0 24 Z" class="error-state-header" />
+      <text x="97" y="17" class="state-name" fill="#991b1b">註冊失敗 (Reg_Failed)</text>
+      <text x="10" y="43" class="action-text" fill="#b91c1c">entry / 回傳 400 Bad Request</text>
+      <text x="10" y="63" class="action-text" fill="#b91c1c">do / 提示帳號或信箱已被使用</text>
     </g>
 
-    <!-- Loop back from Error to Unregistered -->
-    <path d="M 260 215 L 115 215 L 115 115" class="line-back" />
-    <text x="180" y="208" class="transition-text" text-anchor="middle">返回修正表單</text>
+    <!-- Loop back from E1 to S1: Unbroken Red dashed line, Pure Guard text ABOVE horizontal line -->
+    <path d="M 448 202 L 448 109 L 236 109" class="line-back" />
+    <text x="342" y="95" class="guard-text" text-anchor="middle">返回修正表單</text>
 
-    <!-- Transition: 2 -> 3 (Success) -->
-    <path d="M 342 50 L 342 35 L 115 35 L 115 270 L 115 295" class="line" />
-    <text x="210" y="45" class="transition-text" text-anchor="middle">[驗證碼發送成功]</text>
+    <!-- Transition S2 -> S3: Unbroken Vertical Line at x=75, Pure Text at right -->
+    <line x1="75" y1="287" x2="75" y2="323" class="line" />
+    <text x="90" y="310" class="transition-text">[驗證郵件寄出成功]</text>
 
-    <!-- State 3: 等待信箱驗證 -->
-    <g transform="translate(30, 295)">
-      <rect width="170" height="75" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 164 0 Q 170 0 170 6 L 170 24 L 0 24 Z" class="state-header" />
-      <text x="85" y="17" class="state-name">等待驗證 (Awaiting_OTP)</text>
-      <text x="10" y="42" class="action-text">entry / 彈出 OTP 輸入框</text>
-      <text x="10" y="56" class="action-text">do / 啟動 15 分鐘有效倒數</text>
-      <text x="10" y="70" class="action-text">do / 填入 6 位數代碼送出</text>
+    <!-- State S3: 等待信箱驗證 (Awaiting_Verify) -->
+    <g transform="translate(18, 325)">
+      <rect width="216" height="102" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 210 0 Q 216 0 216 6 L 216 24 L 0 24 Z" class="state-header" />
+      <text x="108" y="17" class="state-name">等待信箱驗證 (Awaiting_Verify)</text>
+      <text x="10" y="42" class="action-text">entry / 提示查收驗證信 (24h有效)</text>
+      <text x="10" y="60" class="action-text">do / 使用者於信箱點擊啟用連結</text>
+      <text x="10" y="78" class="action-text">do / 發送 GET verify-email 請求</text>
+      <text x="10" y="96" class="action-text">do / (可選) 申請重新補寄驗證信</text>
     </g>
 
-    <!-- Transition: 3 -> Error OTP -->
-    <line x1="200" y1="332" x2="260" y2="332" class="line" />
-    <text x="230" y="325" class="guard-text" text-anchor="middle">[過期或錯誤]</text>
+    <!-- Transition S3 -> Error E2: Unbroken Horizontal Line at y=375, Pure Guard text ABOVE line -->
+    <line x1="234" y1="375" x2="348" y2="375" class="line" />
+    <text x="291" y="355" class="guard-text" text-anchor="middle">[連結失效]</text>
 
-    <!-- State: OTP 驗證失敗 -->
-    <g transform="translate(260, 305)">
-      <rect width="165" height="55" class="error-state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 159 0 Q 165 0 165 6 L 165 22 L 0 22 Z" class="error-state-header" />
-      <text x="82" y="16" class="state-name" fill="#991b1b">驗證失敗 (Token_Invalid)</text>
-      <text x="10" y="38" class="action-text" fill="#b91c1c">do / 提示代碼不正確</text>
-      <text x="10" y="50" class="action-text" fill="#b91c1c">do / 允許重新發送或輸入</text>
+    <!-- Error State E2: 驗證失敗 (Verify_Failed) -->
+    <g transform="translate(350, 342)">
+      <rect width="195" height="78" class="error-state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 189 0 Q 195 0 195 6 L 195 24 L 0 24 Z" class="error-state-header" />
+      <text x="97" y="17" class="state-name" fill="#991b1b">驗證失敗 (Verify_Failed)</text>
+      <text x="10" y="43" class="action-text" fill="#b91c1c">entry / 回傳 400 (Token失效或逾期)</text>
+      <text x="10" y="63" class="action-text" fill="#b91c1c">do / 提示重新申請補寄驗證信</text>
     </g>
-    <path d="M 342 360 L 342 390 L 115 390 L 115 370" class="line-back" />
 
-    <!-- Transition: 3 -> 4 (Activated) -->
-    <line x1="115" y1="370" x2="115" y2="440" class="line" />
-    <text x="120" y="410" class="transition-text">[Token 核對成功]</text>
+    <!-- Loop back from E2 to S3: Unbroken Red dashed line, Pure Guard text ABOVE horizontal line -->
+    <path d="M 448 420 L 448 442 L 280 442 L 280 395 L 236 395" class="line-back" />
+    <text x="364" y="428" class="guard-text" text-anchor="middle">申請重發信件</text>
 
-    <!-- State 4: 帳號已啟用 -->
-    <g transform="translate(30, 440)">
-      <rect width="170" height="75" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 164 0 Q 170 0 170 6 L 170 24 L 0 24 Z" class="state-header" />
-      <text x="85" y="17" class="state-name">帳號已啟用 (Activated)</text>
-      <text x="10" y="42" class="action-text">entry / 更新 user.is_active=1</text>
-      <text x="10" y="56" class="action-text">do / 刪除一次性 Token 紀錄</text>
-      <text x="10" y="70" class="action-text">exit / 自動導向登入畫面</text>
+    <!-- Transition S3 -> S4: Unbroken Vertical Line at x=75, Pure Text at right -->
+    <line x1="75" y1="427" x2="75" y2="463" class="line" />
+    <text x="90" y="450" class="transition-text">[Token 驗證核對成功]</text>
+
+    <!-- State S4: 帳號已啟用 (Activated) -->
+    <g transform="translate(18, 465)">
+      <rect width="216" height="102" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 210 0 Q 216 0 216 6 L 216 24 L 0 24 Z" class="state-header" />
+      <text x="108" y="17" class="state-name">帳號已啟用 (Activated)</text>
+      <text x="10" y="42" class="action-text">entry / 更新 is_email_verified=1</text>
+      <text x="10" y="60" class="action-text">do / 記錄 email_verified_at 驗證時間</text>
+      <text x="10" y="78" class="action-text">do / 標記 used_at 作廢一次性Token</text>
+      <text x="10" y="96" class="action-text">exit / 自動導向登入介面</text>
     </g>
   </g>
 
-  <!-- Inter-Composite Transition (Registration to Login) -->
-  <path d="M 200 535 L 200 590 L 610 590 L 610 180 L 640 180" class="line" />
-  <text x="400" y="583" class="transition-text" text-anchor="middle">註冊驗證完成 / 導向登入介面</text>
 
-  <!-- ================= COMPOSITE STATE 2: AUTHENTICATION ================= -->
-  <g transform="translate(620, 60)">
-    <rect width="450" height="580" class="composite-bg" />
-    <path d="M 0 8 Q 0 0 8 0 L 442 0 Q 450 0 450 8 L 450 30 L 0 30 Z" class="composite-header" />
-    <text x="15" y="20" class="group-title">狀態群組 2：身分認證與會話授權狀態 (Authentication &amp; Session)</text>
+  <!-- ========================================================================= -->
+  <!-- INTER-COMPOSITE TRANSITION: Group 1 -> Group 2 (Planar, ZERO Crossing)   -->
+  <!-- Unbroken Blue dashed line along y=642; Pure Text placed cleanly ABOVE line -->
+  <!-- ========================================================================= -->
+  <path d="M 151 622 L 151 642 L 605 642 L 605 164 L 641 164" class="line-inter" />
+  <text x="378" y="630" class="transition-text" text-anchor="middle">帳號啟用成功 / 導向登入介面</text>
 
-    <!-- State 5: 未登入 -->
-    <g transform="translate(25, 80)">
-      <rect width="170" height="65" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 164 0 Q 170 0 170 6 L 170 24 L 0 24 Z" class="state-header" />
-      <text x="85" y="17" class="state-name">未登入 (Logged_Out)</text>
-      <text x="10" y="42" class="action-text">entry / 呈現登入表單介面</text>
-      <text x="10" y="56" class="action-text">do / 輸入帳號與密碼</text>
+
+  <!-- ========================================================================= -->
+  <!-- 2. COMPOSITE STATE 2: AUTHENTICATION & SESSION (x=625, y=55, w=560)      -->
+  <!-- ========================================================================= -->
+  <g transform="translate(625, 55)">
+    <rect width="560" height="605" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 552 0 Q 560 0 560 8 L 560 30 L 0 30 Z" class="composite-header" />
+    <text x="14" y="20" class="group-title">狀態群組 2：身分認證與會話授權 (Authentication &amp; Session)</text>
+
+    <!-- Initial State -->
+    <circle cx="126" cy="48" r="8" fill="#0f172a" />
+    <line x1="126" y1="56" x2="126" y2="70" class="line" />
+
+    <!-- State S5: 未登入 (Logged_Out) -->
+    <g transform="translate(18, 70)">
+      <rect width="216" height="78" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 210 0 Q 216 0 216 6 L 216 24 L 0 24 Z" class="state-header" />
+      <text x="108" y="17" class="state-name">未登入 (Logged_Out)</text>
+      <text x="10" y="44" class="action-text">entry / 呈現登入表單介面</text>
+      <text x="10" y="64" class="action-text">do / 輸入帳號與密碼</text>
     </g>
 
-    <!-- Transition 5 -> 6 -->
-    <line x1="195" y1="112" x2="255" y2="112" class="line" />
-    <text x="225" y="105" class="transition-text" text-anchor="middle">點擊登入</text>
+    <!-- Transition S5 -> S6: Unbroken Vertical Line at x=75, Pure Text at right -->
+    <line x1="75" y1="148" x2="75" y2="183" class="line" />
+    <text x="90" y="170" class="transition-text">點擊登入 [表單已填寫]</text>
 
-    <!-- State 6: 憑證校驗中 -->
-    <g transform="translate(260, 80)">
-      <rect width="165" height="75" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 159 0 Q 165 0 165 6 L 165 24 L 0 24 Z" class="state-header" />
-      <text x="82" y="17" class="state-name">憑證校驗中 (Verifying)</text>
-      <text x="8" y="42" class="action-text">do / 查詢帳號是否存在</text>
-      <text x="8" y="56" class="action-text">do / Bcrypt 密碼雜湊比對</text>
-      <text x="8" y="69" class="action-text">do / 查驗 is_active 啟用標記</text>
+    <!-- State S6: 憑證校驗中 (Verifying) -->
+    <g transform="translate(18, 185)">
+      <rect width="216" height="102" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 210 0 Q 216 0 216 6 L 216 24 L 0 24 Z" class="state-header" />
+      <text x="108" y="17" class="state-name">憑證校驗中 (Verifying)</text>
+      <text x="10" y="42" class="action-text">do / 查詢帳號使用者是否存在</text>
+      <text x="10" y="60" class="action-text">do / Bcrypt 密碼雜湊安全核對</text>
+      <text x="10" y="78" class="action-text">do / 查核 is_email_verified 驗證標記</text>
+      <text x="10" y="96" class="action-text">do / 未驗證信箱者拋出 403 拒絕</text>
     </g>
 
-    <!-- Transition: 6 -> Login Failed -->
-    <line x1="342" y1="155" x2="342" y2="215" class="line" />
-    <text x="348" y="190" class="guard-text">[密碼錯誤或未啟用]</text>
+    <!-- Transition S6 -> Error E3: Unbroken Horizontal Line at y=236, Pure Guard text ABOVE line -->
+    <line x1="234" y1="236" x2="348" y2="236" class="line" />
+    <text x="291" y="216" class="guard-text" text-anchor="middle">[驗證未過]</text>
 
-    <!-- State: 登入失敗 -->
-    <g transform="translate(260, 215)">
-      <rect width="165" height="60" class="error-state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 159 0 Q 165 0 165 6 L 165 22 L 0 22 Z" class="error-state-header" />
-      <text x="82" y="16" class="state-name" fill="#991b1b">登入失敗 (Login_Failed)</text>
-      <text x="10" y="38" class="action-text" fill="#b91c1c">entry / 顯示憑證錯誤警告</text>
-      <text x="10" y="52" class="action-text" fill="#b91c1c">do / 鎖定保護與重試限制</text>
-    </g>
-    <path d="M 260 245 L 110 245 L 110 145" class="line-back" />
-    <text x="175" y="238" class="transition-text" text-anchor="middle">返回登入介面</text>
-
-    <!-- Transition: 6 -> 7 (Success) -->
-    <path d="M 342 80 L 342 45 L 110 45 L 110 295" class="line" />
-    <text x="225" y="40" class="transition-text" text-anchor="middle">[密碼符合且已啟用]</text>
-
-    <!-- State 7: 簽發 JWT Token -->
-    <g transform="translate(25, 295)">
-      <rect width="170" height="75" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 164 0 Q 170 0 170 6 L 170 24 L 0 24 Z" class="state-header" />
-      <text x="85" y="17" class="state-name">簽發 Token (JWT_Issued)</text>
-      <text x="10" y="42" class="action-text">do / 生成 HS256 簽署 Token</text>
-      <text x="10" y="56" class="action-text">do / 載入 user_id 與角色權限</text>
-      <text x="10" y="70" class="action-text">do / 注入 Token 效期 (7天)</text>
+    <!-- Error State E3: 登入失敗 (Login_Failed) -->
+    <g transform="translate(350, 202)">
+      <rect width="195" height="78" class="error-state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 189 0 Q 195 0 195 6 L 195 24 L 0 24 Z" class="error-state-header" />
+      <text x="97" y="17" class="state-name" fill="#991b1b">登入失敗 (Login_Failed)</text>
+      <text x="10" y="43" class="action-text" fill="#b91c1c">entry / 回傳 400 帳密錯 / 403 未驗</text>
+      <text x="10" y="63" class="action-text" fill="#b91c1c">do / 提示重新輸入或前往信箱啟用</text>
     </g>
 
-    <!-- Transition: 7 -> 8 -->
-    <line x1="110" y1="370" x2="110" y2="430" class="line" />
-    <text x="115" y="405" class="transition-text">客戶端保存憑證</text>
+    <!-- Loop back from E3 to S5: Unbroken Red dashed line, Pure Guard text ABOVE horizontal line -->
+    <path d="M 448 202 L 448 109 L 236 109" class="line-back" />
+    <text x="342" y="95" class="guard-text" text-anchor="middle">返回重新輸入</text>
 
-    <!-- State 8: 已授權就緒 (Authenticated_Active) -->
-    <g transform="translate(25, 430)">
-      <rect width="210" height="90" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 204 0 Q 210 0 210 6 L 210 24 L 0 24 Z" class="state-header" />
-      <text x="105" y="17" class="state-name">已授權就緒 (Auth_Active)</text>
+    <!-- Transition S6 -> S7: Unbroken Vertical Line at x=75, Pure Text at right -->
+    <line x1="75" y1="287" x2="75" y2="323" class="line" />
+    <text x="90" y="310" class="transition-text">[密碼相符且信箱已驗證]</text>
+
+    <!-- State S7: 簽發 Token (JWT_Issued) -->
+    <g transform="translate(18, 325)">
+      <rect width="216" height="102" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 210 0 Q 216 0 216 6 L 216 24 L 0 24 Z" class="state-header" />
+      <text x="108" y="17" class="state-name">簽發 Token (JWT_Issued)</text>
+      <text x="10" y="42" class="action-text">do / 生成 HS256 簽署 Access Token</text>
+      <text x="10" y="60" class="action-text">do / 寫入 sub, user_id 與 role 權限</text>
+      <text x="10" y="78" class="action-text">do / 設定過期時間 (24小時 / 1440分)</text>
+      <text x="10" y="96" class="action-text">do / 回傳 Bearer Access Token</text>
+    </g>
+
+    <!-- Transition S7 -> S8: Unbroken Vertical Line at x=75, Pure Text at right -->
+    <line x1="75" y1="427" x2="75" y2="463" class="line" />
+    <text x="90" y="450" class="transition-text">客戶端安全儲存憑證</text>
+
+    <!-- State S8: 已授權就緒 (Auth_Active) -->
+    <g transform="translate(18, 465)">
+      <rect width="216" height="102" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 210 0 Q 216 0 216 6 L 216 24 L 0 24 Z" class="state-header" />
+      <text x="108" y="17" class="state-name">已授權就緒 (Auth_Active)</text>
       <text x="10" y="42" class="action-text">entry / 存入安全 SharedPreferences</text>
-      <text x="10" y="56" class="action-text">do / 進入 App 主儀表板畫面</text>
-      <text x="10" y="70" class="action-text">do / 開啟拍照診斷、日誌歷史功能</text>
-      <text x="10" y="84" class="action-text">exit / 登出時註銷本機憑證</text>
+      <text x="10" y="60" class="action-text">do / 進入 App 主畫面 (拍照/歷史/筆記)</text>
+      <text x="10" y="78" class="action-text">do / 請求自動附加 Bearer Token</text>
+      <text x="10" y="96" class="action-text">exit / 登出時清除本機憑證</text>
     </g>
 
-    <!-- Final State inside composite -->
-    <line x1="235" y1="475" x2="310" y2="475" class="line" />
-    <circle cx="330" cy="475" r="10" stroke="#0f172a" stroke-width="1.5" fill="none" />
-    <circle cx="330" cy="475" r="5" fill="#0f172a" />
-    <text x="350" y="480" class="action-text">會話就緒 [*]</text>
+    <!-- Transition S8 -> Final State [*]: Unbroken Horizontal Line at y=516, Pure Text ABOVE line -->
+    <line x1="234" y1="516" x2="433" y2="516" class="line" />
+    <text x="334" y="502" class="transition-text" text-anchor="middle">會話建立就緒</text>
+
+    <!-- Final State -->
+    <circle cx="448" cy="516" r="11" stroke="#0f172a" stroke-width="1.8" fill="none" />
+    <circle cx="448" cy="516" r="6" fill="#0f172a" />
+    <text x="448" y="542" class="action-text" text-anchor="middle" font-weight="bold">會話就緒 [*]</text>
   </g>
 </svg>

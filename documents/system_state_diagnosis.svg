@@ -26,7 +26,7 @@
   </defs>
 
   <rect width="100%" height="100%" fill="#ffffff" />
-  <text x="575" y="32" class="title" text-anchor="middle">圖 7-4-2 影像上傳與雙模型並行診斷 狀態圖 (State Diagram)</text>
+  <text x="575" y="32" class="title" text-anchor="middle">圖 7-4-2 影像上傳與階層式推論診斷 狀態圖 (State Diagram)</text>
 
   <!-- Initial State -->
   <circle cx="40" cy="120" r="8" fill="#0f172a" />
@@ -97,87 +97,74 @@
   <g transform="translate(420, 60)">
     <rect width="690" height="620" class="composite-bg" />
     <path d="M 0 8 Q 0 0 8 0 L 682 0 Q 690 0 690 8 L 690 30 L 0 30 Z" class="composite-header" />
-    <text x="15" y="20" class="group-title">伺服器端雙模型並行推論與決策仲裁狀態 (Backend Inference Engine)</text>
+    <text x="15" y="20" class="group-title">伺服器端階層式推論與處方生成狀態 (Cascade Inference Engine)</text>
 
     <!-- State 4: 暫存影像並分配唯一 ID -->
-    <g transform="translate(200, 45)">
-      <rect width="280" height="65" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 24 L 0 24 Z" class="state-header" />
-      <text x="140" y="17" class="state-name">暫存與分配 ID (Cached_With_ID)</text>
+    <g transform="translate(195, 45)">
+      <rect width="300" height="65" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 294 0 Q 300 0 300 6 L 300 24 L 0 24 Z" class="state-header" />
+      <text x="150" y="17" class="state-name">暫存與分配 ID (Cached_With_ID)</text>
       <text x="10" y="42" class="action-text">do / 影像寫入暫存目錄 static/temp/</text>
       <text x="10" y="56" class="action-text">do / 生成 UUID prediction_id，存入 10 分鐘快取</text>
     </g>
 
-    <!-- Transition to Fork Bar -->
-    <line x1="340" y1="110" x2="340" y2="140" class="line" />
-    <text x="348" y="128" class="transition-text">非同步並行派發</text>
+    <!-- Transition from State 4 to State 5a -->
+    <path d="M 270 110 L 270 126 L 175 126 L 175 145" class="line" />
+    <text x="222" y="122" class="transition-text" text-anchor="middle">優先啟動本地快篩</text>
 
-    <!-- Fork Bar -->
-    <line x1="70" y1="140" x2="610" y2="140" class="fork-join" />
-
-    <!-- Branch A: Gemini 2.5 Flash -->
-    <line x1="120" y1="140" x2="120" y2="175" class="line" />
-    <g transform="translate(20, 175)">
-      <rect width="200" height="90" class="ai-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 194 0 Q 200 0 200 6 L 200 24 L 0 24 Z" class="ai-header" />
-      <text x="100" y="17" class="state-name" fill="#15803d">Gemini 2.5 Flash 雲端分析</text>
-      <text x="8" y="42" class="action-text">do / google-genai 官方 SDK</text>
-      <text x="8" y="56" class="action-text">do / 多模態病理特徵描述</text>
-      <text x="8" y="70" class="action-text">do / 全局病徵辨識與語意理解</text>
-      <text x="8" y="84" class="action-text">do / JSON Schema 結構化輸出</text>
+    <!-- State 5a: 本地自訓 ConvNet 優先快篩 (Step 1) -->
+    <g transform="translate(35, 145)">
+      <rect width="280" height="95" class="ai-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 24 L 0 24 Z" class="ai-header" fill="#dcfce7" stroke="#16a34a" />
+      <text x="140" y="17" class="state-name" fill="#15803d">本地 ConvNeXt 優先快篩 (Step 1)</text>
+      <text x="8" y="42" class="action-text">entry / 載入 PyTorch 38 類病害卷積權重</text>
+      <text x="8" y="56" class="action-text">do / 毫秒級微觀病斑特徵萃取與分類</text>
+      <text x="8" y="70" class="action-text">do / 零雲端 API 成本、計算置信度</text>
+      <text x="8" y="84" class="action-text">exit / 輸出 Top-1 預測結果與分數</text>
     </g>
 
-    <!-- Branch B: Local ConvNet -->
-    <line x1="340" y1="140" x2="340" y2="175" class="line" />
-    <g transform="translate(240, 175)">
-      <rect width="200" height="90" class="ai-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 194 0 Q 200 0 200 6 L 200 24 L 0 24 Z" class="ai-header" />
-      <text x="100" y="17" class="state-name" fill="#15803d">本地自訓 ConvNet 微觀分析</text>
-      <text x="8" y="42" class="action-text">do / PyTorch 卷積神經網路</text>
-      <text x="8" y="56" class="action-text">do / 38 種特定作物病害分類</text>
-      <text x="8" y="70" class="action-text">do / 局部病斑紋理特徵擷取</text>
-      <text x="8" y="84" class="action-text">do / 零雲端託管費用、即時推論</text>
+    <!-- Transition from State 5a to State 5b (Fallback Branch) -->
+    <line x1="315" y1="190" x2="375" y2="190" class="line" />
+    <text x="345" y="176" class="guard-text" text-anchor="middle">[未命中 / 信心度 &lt; 70%]</text>
+    <text x="345" y="187" class="transition-text" text-anchor="middle">啟動雲端兜底</text>
+
+    <!-- State 5b: Gemini 2.5 Flash 雲端多模態兜底 (Step 2) -->
+    <g transform="translate(375, 145)">
+      <rect width="280" height="95" class="ai-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 24 L 0 24 Z" class="ai-header" fill="#ede9fe" stroke="#8b5cf6" />
+      <text x="140" y="17" class="state-name" fill="#6d28d9">Gemini 2.5 Flash 雲端兜底 (Step 2)</text>
+      <text x="8" y="42" class="action-text">entry / 呼叫 google-genai 官方 SDK</text>
+      <text x="8" y="56" class="action-text">do / 全局多模態病徵辨識與語意理解</text>
+      <text x="8" y="70" class="action-text">do / JSON Schema 結構化輸出規格</text>
+      <text x="8" y="84" class="action-text">exit / 回傳多模態分析與臨床初判值</text>
     </g>
 
-    <!-- Branch C: FAISS RAG -->
-    <line x1="560" y1="140" x2="560" y2="175" class="line" />
-    <g transform="translate(460, 175)">
-      <rect width="210" height="90" class="ai-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 204 0 Q 210 0 210 6 L 210 24 L 0 24 Z" class="ai-header" />
-      <text x="105" y="17" class="state-name" fill="#15803d">FAISS 向量檢索 (RAG)</text>
-      <text x="8" y="42" class="action-text">do / 農業部開放病害知識庫檢索</text>
-      <text x="8" y="56" class="action-text">do / 語意相似度校驗防幻覺</text>
-      <text x="8" y="70" class="action-text">do / 提取權威用藥與處置建議</text>
-      <text x="8" y="84" class="action-text">do / 毫秒級高維向量索引查詢</text>
+    <!-- Transition from State 5a to State 6 (Hit Branch: Zero Cost) -->
+    <path d="M 175 240 L 175 262 L 250 262 L 250 285" class="line" />
+    <text x="212" y="258" class="guard-text" fill="#059669" text-anchor="middle">[快篩命中 ≥ 70%] 0 元成本直達處方</text>
+
+    <!-- Transition from State 5b to State 6 (Fallback Complete) -->
+    <path d="M 515 240 L 515 262 L 440 262 L 440 285" class="line" />
+    <text x="477" y="258" class="transition-text" text-anchor="middle">雲端兜底完成</text>
+
+    <!-- State 6: FAISS 官方檢索與決策整合 (Step 3) -->
+    <g transform="translate(155, 285)">
+      <rect width="380" height="120" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 374 0 Q 380 0 380 6 L 380 24 L 0 24 Z" class="state-header" />
+      <text x="190" y="17" class="state-name">FAISS 官方檢索與決策整合 (Step 3)</text>
+      <text x="10" y="42" class="action-text">entry / 查詢農業部開放病蟲害高維向量索引 (FlatIP)</text>
+      <text x="10" y="56" class="action-text">do / 提取權威推薦用藥、稀釋倍數與防治指引</text>
+      <text x="10" y="70" class="action-text">do / 嚴格執行 70% 信心度閾值檢查與防幻覺過濾</text>
+      <text x="10" y="86" class="guard-text">[信心度 &lt; 70%] 判定為未知植物/無法判定 (安全防禦煞車)</text>
+      <text x="10" y="100" class="guard-text" fill="#059669">[信心度 ≥ 70%] 整合生成精準圖文處方箋</text>
     </g>
 
-    <!-- Join Bar -->
-    <line x1="120" y1="265" x2="120" y2="300" class="line" />
-    <line x1="340" y1="265" x2="340" y2="300" class="line" />
-    <line x1="560" y1="265" x2="560" y2="300" class="line" />
-    <line x1="70" y1="300" x2="610" y2="300" class="fork-join" />
+    <!-- Transition from State 6 to State 7 -->
+    <line x1="345" y1="405" x2="345" y2="455" class="line" />
+    <text x="355" y="432" class="transition-text">生成結構化回應</text>
 
-    <!-- Transition from Join to Arbitration -->
-    <line x1="340" y1="300" x2="340" y2="335" class="line" />
-    <text x="348" y="322" class="transition-text">三路推論匯流</text>
-
-    <!-- State 5: 決策仲裁與防幻覺過濾 -->
-    <g transform="translate(180, 335)">
-      <rect width="320" height="100" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 314 0 Q 320 0 320 6 L 320 24 L 0 24 Z" class="state-header" />
-      <text x="160" y="17" class="state-name">多模型決策仲裁 (Arbitration)</text>
-      <text x="10" y="42" class="action-text">do / 雙模型標籤一致性交叉核對</text>
-      <text x="10" y="56" class="action-text">do / 廣域描述與微觀特徵互補加權</text>
-      <text x="10" y="70" class="action-text">do / 嚴格執行 70% 信心度閾值檢查</text>
-      <text x="10" y="84" class="guard-text">[信心度 &lt; 70%] 標記為需人工專家覆核</text>
-      <text x="10" y="96" class="guard-text">[信心度 &gt;= 70%] 判定為高信度有效診斷</text>
-    </g>
-
-    <line x1="340" y1="435" x2="340" y2="480" class="line" />
-    <text x="348" y="460" class="transition-text">生成結構化回應</text>
-
-    <!-- State 6: 診斷結果暫存就緒 -->
-    <g transform="translate(180, 480)">
+    <!-- State 7: 診斷結果暫存就緒 -->
+    <g transform="translate(185, 455)">
       <rect width="320" height="80" class="state-box" />
       <path d="M 0 6 Q 0 0 6 0 L 314 0 Q 320 0 320 6 L 320 24 L 0 24 Z" class="state-header" />
       <text x="160" y="17" class="state-name">結果暫存就緒 (Diagnosis_Ready)</text>

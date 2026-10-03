@@ -44,29 +44,34 @@ def validate_image_content(content: bytes, content_type: str | None) -> FrameMet
     return FrameMetadata(width, height, image_format)
 
 
-def build_public_image_url(image_path: str) -> str:
+def build_public_image_url(image_path: str, relative: bool = False) -> str:
     """
     將資料庫中儲存的相對路徑轉為公開網址。
     這個版本更加健壯，不再依賴呼叫者傳遞 folder 參數。
+    當 relative=True 時，回傳像 /uploads/xxx.jpg 的相對路徑，適用於瀏覽器 Web 後台渲染；
+    當 relative=False 時，拼接 settings.PUBLIC_BASE_URL。
     """
     if not image_path:
         return ""
 
-    # 1. 從可能包含路徑的字串中，僅取出檔名部分
-    filename = Path(image_path).name
+    # 1. 統一斜線並僅取出檔名部分
+    clean_path = str(image_path).replace("\\", "/")
+    filename = Path(clean_path).name
 
     # 2. 根據檔名本身來判斷它屬於哪個資料夾
     #    - 回饋圖片的檔名被設計為以 "feedback_" 開頭
     if filename.startswith("feedback_"):
         folder = "feedback_uploads"
     else:
-        # 其他所有情況，都視為舊的診斷紀錄圖片
+        # 其他所有情況，都視為診斷紀錄圖片
         folder = "uploads"
 
-    # 3. 確保基底 URL 結尾沒有斜線
-    base_url = settings.PUBLIC_BASE_URL.rstrip('/')
+    # 3. 相對路徑模式（瀏覽器後台自動相容任意主機與 IP）
+    if relative:
+        return f"/{folder}/{filename}"
 
-    # 4. 拼接成一個絕對正確的 URL
+    # 4. 確保基底 URL 結尾沒有斜線並拼接絕對 URL
+    base_url = settings.PUBLIC_BASE_URL.rstrip('/')
     return f"{base_url}/{folder}/{filename}"
 
 
