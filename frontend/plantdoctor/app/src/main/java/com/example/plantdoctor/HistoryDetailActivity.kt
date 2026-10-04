@@ -39,7 +39,6 @@ class HistoryDetailActivity : AppCompatActivity() {
     private lateinit var tvAdvice: TextView
     private lateinit var btnAction: Button
     private lateinit var btnBack: ImageButton
-    private lateinit var tvFeedbackLink: TextView
     private lateinit var tvMainTitle: TextView
 
     private lateinit var historyRoot: CoordinatorLayout
@@ -90,7 +89,6 @@ class HistoryDetailActivity : AppCompatActivity() {
         tvAdvice = findViewById(R.id.tv_advice)
         btnAction = findViewById(R.id.btn_save_report)
         btnBack = findViewById(R.id.btn_back_home)
-        tvFeedbackLink = findViewById(R.id.tv_feedback_link)
 
         cvImageContainer = findViewById(R.id.cv_image_container)
         cvPipContainer = findViewById(R.id.cv_pip_container)
@@ -167,11 +165,6 @@ class HistoryDetailActivity : AppCompatActivity() {
 
         imgPlant.setOnClickListener { openImagePreview() }
         cvPipContainer.setOnClickListener { openImagePreview() }
-
-        tvFeedbackLink.setOnClickListener {
-            SoundManager.playBubblePop()
-            showDiagnosesSelectionDialog()
-        }
 
         ivEditNote.setOnClickListener { switchToEditMode() }
         btnSaveNote.setOnClickListener { handleSaveNote() }
@@ -398,7 +391,6 @@ class HistoryDetailActivity : AppCompatActivity() {
 
                     tvDiseaseName.text = "患病：${data.status_name ?: "未知"}"
                     tvDiseaseName.setTextColor(tvPlantName.currentTextColor)
-                    tvFeedbackLink.visibility = View.GONE
 
                     val fullAdvice = StringBuilder().apply {
                         append("【病症狀態】\n${data.suggestion ?: "病症狀態"}\n\n")
@@ -505,45 +497,7 @@ class HistoryDetailActivity : AppCompatActivity() {
         windHandler.removeCallbacksAndMessages(null)
     }
 
-    private fun showDiagnosesSelectionDialog() {
-        val loadingDialog = AlertDialog.Builder(this).setView(R.layout.dialog_loading).setCancelable(false).create()
-        loadingDialog.show()
 
-        val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
-        val token = sharedPref.getString("token", "") ?: ""
-
-        PlantApiService.create(token).getDiagnoses().enqueue(object : Callback<DiagnosesResponse> {
-            override fun onResponse(call: Call<DiagnosesResponse>, response: Response<DiagnosesResponse>) {
-                loadingDialog.dismiss()
-                if (response.isSuccessful) {
-                    val diagnoses = response.body()?.data ?: emptyList()
-                    if (diagnoses.isEmpty()) return
-                    val items = diagnoses.map { it.name }.toTypedArray()
-
-                    AlertDialog.Builder(this@HistoryDetailActivity)
-                        .setTitle("回報診斷結果")
-                        .setItems(items) { dialog, which ->
-                            val selectedDiagnosis = items[which]
-
-                            val request = PatchDiaryRequest(user_corrected_status = selectedDiagnosis)
-                            PlantApiService.create(token).patchDiary(diaryId, request).enqueue(object : Callback<GenericResponse> {
-                                override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
-                                    if (response.isSuccessful) {
-                                        Toast.makeText(this@HistoryDetailActivity, "回饋已提交！", Toast.LENGTH_LONG).show()
-                                        setResult(RESULT_OK)
-                                        fetchData()
-                                    }
-                                }
-                                override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
-                                    Toast.makeText(this@HistoryDetailActivity, "修正未儲存，請稍後再試", Toast.LENGTH_SHORT).show()
-                                }
-                            })
-                        }.setNegativeButton("取消", null).show()
-                }
-            }
-            override fun onFailure(call: Call<DiagnosesResponse>, t: Throwable) { loadingDialog.dismiss() }
-        })
-    }
 
     // 🌟 全新新增：刪除確認對話框（直接套用儲存確認的樣式與 ThemeManager 變色機制）
     private fun showDeleteConfirmationDialog() {

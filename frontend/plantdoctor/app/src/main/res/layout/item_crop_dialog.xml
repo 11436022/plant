@@ -9,6 +9,7 @@
     android:paddingVertical="12dp"
     android:clickable="false"
     android:focusable="false"
+    android:descendantFocusability="blocksDescendants"
     android:background="?attr/selectableItemBackground">
 
     <TextView

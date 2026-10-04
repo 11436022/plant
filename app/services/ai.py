@@ -878,7 +878,12 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
     final_treatment = data.get("treatment")
 
     try:
-        # 只接受既有資料庫中的病蟲害名稱，避免 AI 幻覺資料被寫入知識庫。
+        if target_crop_id is None and crop_name and crop_name != UNKNOWN_CROP_NAME:
+            crop = models.Crop(crop_name=crop_name)
+            db.add(crop)
+            db.flush()
+            target_crop_id = crop.crop_id
+
         if category == "disease":
             disease = db.query(models.Disease).filter(
                 models.Disease.disease_name == status_name,
@@ -886,9 +891,16 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
             ).first() if target_crop_id is not None else None
             if disease:
                 disease_id = disease.disease_id
-            else:
-                category = "unknown"
-                status_name = UNKNOWN_STATUS_NAME
+            elif target_crop_id is not None and status_name not in [UNKNOWN_STATUS_NAME, "未知", "無法判定"]:
+                new_disease = models.Disease(
+                    crop_id=target_crop_id,
+                    disease_name=status_name,
+                    description=final_suggestion,
+                    treatment=final_treatment,
+                )
+                db.add(new_disease)
+                db.flush()
+                disease_id = new_disease.disease_id
         elif category == "pest":
             pest = db.query(models.Pest).filter(
                 models.Pest.pest_name == status_name,
@@ -896,11 +908,18 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
             ).first() if target_crop_id is not None else None
             if pest:
                 pest_id = pest.pest_id
-            else:
-                category = "unknown"
-                status_name = UNKNOWN_STATUS_NAME
+            elif target_crop_id is not None and status_name not in [UNKNOWN_STATUS_NAME, "未知", "無法判定"]:
+                new_pest = models.Pest(
+                    crop_id=target_crop_id,
+                    pest_name=status_name,
+                    description=final_suggestion,
+                    treatment=final_treatment,
+                )
+                db.add(new_pest)
+                db.flush()
+                pest_id = new_pest.pest_id
 
-        if category == "unknown":
+        if category == "unknown" or status_name in [UNKNOWN_STATUS_NAME, "無法判定", "未知"]:
             data = _uncertain_diagnosis(crop_name, _coerce_confidence(data.get("confidence")))
             final_suggestion = data["suggestion"]
             final_treatment = data["treatment"]

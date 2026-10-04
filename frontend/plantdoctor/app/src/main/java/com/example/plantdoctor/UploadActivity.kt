@@ -54,8 +54,15 @@ class UploadActivity : AppCompatActivity() {
 
     // 🌟 作物下拉選單相關
     private var selectedCropName: String = "未知"
-    private val cropList: MutableList<String> = mutableListOf("未知")
+    private val defaultCommonCrops = listOf(
+        "未知", "檸檬", "草莓", "番茄", "水稻", "玉米", "胡瓜", "柑橘", "葡萄",
+        "蓮霧", "芒果", "木瓜", "西瓜", "茄子", "甜椒", "茶", "香蕉", "馬鈴薯",
+        "甘藍", "青花菜", "洋蔥", "蘋果", "梨", "桃"
+    )
+    private val cropList: MutableList<String> = defaultCommonCrops.toMutableList()
     private var cropDialog: androidx.appcompat.app.AlertDialog? = null
+    private var cropAdapter: android.widget.ArrayAdapter<String>? = null
+    private var cropDisplayList: ArrayList<String>? = null
     private lateinit var layoutCropSelector: LinearLayout
     private lateinit var tvCropLabel: TextView
     private lateinit var tvSelectedCrop: TextView
@@ -134,6 +141,7 @@ class UploadActivity : AppCompatActivity() {
             showCropSelectionDialog()
         }
 
+        loadCachedCrops()
         fetchCropsList()
 
         imgPreview.setOnClickListener {
@@ -235,6 +243,17 @@ class UploadActivity : AppCompatActivity() {
         }
     }
 
+    private fun loadCachedCrops() {
+        val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+        val cached = sharedPref.getStringSet("CACHED_CROPS", null)
+        if (!cached.isNullOrEmpty()) {
+            cropList.clear()
+            cropList.add("未知")
+            val sortedList = cached.filter { it != "未知" }.sorted()
+            cropList.addAll(sortedList)
+        }
+    }
+
     private fun fetchCropsList() {
         val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
         val token = sharedPref.getString("token", null)
@@ -253,7 +272,16 @@ class UploadActivity : AppCompatActivity() {
                             cropList.add("未知")
                         }
                         cropList.addAll(filtered)
+                        sharedPref.edit().putStringSet("CACHED_CROPS", cropList.toSet()).apply()
                         Log.d("UPLOAD_CROP", "成功自後端載入 ${cropList.size} 種作物！")
+
+                        runOnUiThread {
+                            cropDisplayList?.let { list ->
+                                list.clear()
+                                list.addAll(cropList)
+                                cropAdapter?.notifyDataSetChanged()
+                            }
+                        }
                     }
                 }
             }
@@ -284,6 +312,7 @@ class UploadActivity : AppCompatActivity() {
         tvDialogTitle.setTextColor(themeColor)
 
         val displayList = ArrayList(cropList)
+        cropDisplayList = displayList
         val adapter = object : android.widget.ArrayAdapter<String>(this, R.layout.item_crop_dialog, R.id.tv_crop_item_name, displayList) {
             override fun getView(position: Int, convertView: android.view.View?, parent: android.view.ViewGroup): android.view.View {
                 val view = super.getView(position, convertView, parent)
@@ -318,6 +347,7 @@ class UploadActivity : AppCompatActivity() {
                 return view
             }
         }
+        cropAdapter = adapter
         lvCrops.adapter = adapter
 
         lvCrops.setOnItemClickListener { _, _, position, _ ->
@@ -361,6 +391,8 @@ class UploadActivity : AppCompatActivity() {
         dialog.setOnDismissListener {
             if (cropDialog === dialog) {
                 cropDialog = null
+                cropAdapter = null
+                cropDisplayList = null
             }
         }
 
