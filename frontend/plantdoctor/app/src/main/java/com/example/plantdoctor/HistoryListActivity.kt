@@ -215,11 +215,9 @@ class HistoryAdapter(
         holder.tvStatus.text = buildString {
             append("原始診斷：${item.status_name ?: "無法判定"}")
             item.user_corrected_status?.takeIf { it.isNotBlank() }?.let {
-                append("
-使用者修正：$it（非重新診斷）")
+                append("\n使用者修正：$it（非重新診斷）")
             }
-            if (item.requires_review == true) append("
-需要人工複核")
+            if (item.requires_review == true) append("\n需要人工複核")
         }
 
         val finalUrl = fixImageUrl(item.image_url)

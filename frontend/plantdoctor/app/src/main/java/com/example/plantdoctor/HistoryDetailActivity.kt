@@ -39,6 +39,7 @@ class HistoryDetailActivity : AppCompatActivity() {
     private lateinit var tvAdvice: TextView
     private lateinit var btnAction: Button
     private lateinit var btnBack: ImageButton
+    private lateinit var tvFeedbackLink: TextView
     private lateinit var tvMainTitle: TextView
 
     private lateinit var historyRoot: CoordinatorLayout
@@ -89,7 +90,7 @@ class HistoryDetailActivity : AppCompatActivity() {
         tvAdvice = findViewById(R.id.tv_advice)
         btnAction = findViewById(R.id.btn_save_report)
         btnBack = findViewById(R.id.btn_back_home)
-        
+        tvFeedbackLink = findViewById(R.id.tv_feedback_link)
 
         cvImageContainer = findViewById(R.id.cv_image_container)
         cvPipContainer = findViewById(R.id.cv_pip_container)
@@ -167,7 +168,10 @@ class HistoryDetailActivity : AppCompatActivity() {
         imgPlant.setOnClickListener { openImagePreview() }
         cvPipContainer.setOnClickListener { openImagePreview() }
 
-        
+        tvFeedbackLink.setOnClickListener {
+            SoundManager.playBubblePop()
+            showDiagnosesSelectionDialog()
+        }
 
         ivEditNote.setOnClickListener { switchToEditMode() }
         btnSaveNote.setOnClickListener { handleSaveNote() }
@@ -393,10 +397,9 @@ class HistoryDetailActivity : AppCompatActivity() {
                     tvPlantName.text = "植物：${data.crop_name ?: "無法辨識"}"
 
                     tvDiseaseName.text = buildString {
-                        append("原始診斷：${data.status_name ?: \"未知\"}")
+                        append("原始診斷：${data.status_name ?: "未知"}")
                         data.user_corrected_status?.takeIf { it.isNotBlank() }?.let {
-                            append("
-使用者修正：$it")
+                            append("\n使用者修正：$it")
                         }
                     }
                     tvDiseaseName.setTextColor(tvPlantName.currentTextColor)

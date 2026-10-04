@@ -572,7 +572,6 @@ class WebcamActivity : AppCompatActivity() {
             file.delete()
             return
         }
->>>>>>> main
         val token = getValidSavedToken()
         if (token.isNullOrEmpty()) {
             file.delete()
