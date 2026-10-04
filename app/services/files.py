@@ -18,8 +18,15 @@ class FrameMetadata:
 
 def validate_image_content(content: bytes, content_type: str | None) -> FrameMetadata:
     """Decode bounded images before any AI call, regardless of upload entry point."""
-    mime_formats = {"image/jpeg": "JPEG", "image/png": "PNG", "image/webp": "WEBP"}
-    if content_type not in mime_formats or not content:
+    mime_formats = {
+        "image/jpeg": "JPEG",
+        "image/jpg": "JPEG",
+        "image/png": "PNG",
+        "image/webp": "WEBP",
+    }
+    allowed_types = set(mime_formats.keys()) | {"image/*", "application/octet-stream"}
+    normalized_type = content_type.lower() if content_type else None
+    if not content or (normalized_type and normalized_type not in allowed_types):
         raise HTTPException(status_code=400, detail="A nonempty JPEG, PNG, or WebP image is required.")
     if len(content) > settings.WEBCAM_MAX_IMAGE_BYTES:
         raise HTTPException(status_code=413, detail="Image exceeds the upload size limit.")
@@ -29,9 +36,11 @@ def validate_image_content(content: bytes, content_type: str | None) -> FrameMet
         with Image.open(io.BytesIO(content)) as image:
             width, height = image.size
             image_format = str(image.format or "").upper()
+            if image_format not in ("JPEG", "PNG", "WEBP"):
+                raise HTTPException(status_code=400, detail="A nonempty JPEG, PNG, or WebP image is required.")
             if width * height > 20_000_000:
                 raise HTTPException(status_code=400, detail="Image resolution is too large.")
-            if image_format != mime_formats[content_type]:
+            if normalized_type in mime_formats and image_format != mime_formats[normalized_type]:
                 raise HTTPException(status_code=400, detail="Image format does not match its content type.")
             if width < settings.WEBCAM_MIN_IMAGE_WIDTH or height < settings.WEBCAM_MIN_IMAGE_HEIGHT:
                 raise HTTPException(status_code=400, detail=f"Minimum image size is {settings.WEBCAM_MIN_IMAGE_WIDTH}x{settings.WEBCAM_MIN_IMAGE_HEIGHT}.")

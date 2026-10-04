@@ -142,7 +142,7 @@ class DiagnoseProgressActivity : AppCompatActivity() {
         }
 
         val file = uriToFile(uri)
-        val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+        val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
         val imagePart = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
         val cropPart = if (selectedCropName.isNotEmpty() && selectedCropName != "未知") {
