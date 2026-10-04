@@ -96,6 +96,13 @@ def ratio(numerator, denominator):
             'value': numerator / denominator if denominator else None}
 
 
+def generation_config(thinking_level=None):
+    if thinking_level not in (None, 'minimal', 'low', 'medium', 'high'):
+        raise ValueError('Unsupported thinking level')
+    thinking = {'thinking_level': thinking_level} if thinking_level else {'thinking_budget': 0}
+    return {'temperature': 0, 'max_output_tokens': 4096, 'thinking_config': thinking}
+
+
 def summarize(cases, rows, model):
     selected = [r for r in rows if r['model'] == model]
     by_id = {c['id']: c for c in cases}
@@ -200,6 +207,8 @@ def main():
     parser.add_argument('--report',type=Path,required=True)
     parser.add_argument('--key-file',type=Path)
     parser.add_argument('--models',nargs='+',default=['gemini-2.5-flash','gemini-2.5-flash-lite'])
+    parser.add_argument('--thinking-level',choices=['minimal','low','medium','high'],
+        help='Explicit newer-model setting; replaces legacy budget=0 and is recorded as a protocol difference')
     parser.add_argument('--max-calls-per-model',type=int,default=18)
     parser.add_argument('--interval',type=float,default=13)
     parser.add_argument('--free-tier-confirmed',action='store_true')
@@ -243,7 +252,7 @@ def main():
     db = Session(engine)
     upsert_reference_data(db, reference_data)
     names = ai.get_reference_lists(db)
-    config = {'temperature':0, 'max_output_tokens':4096, 'thinking_config':{'thinking_budget':0}}
+    config = generation_config(args.thinking_level)
     # The unavailable production index is not replaced with fabricated retrieval.
     if (root/'knowledge_base.faiss').exists() or (root/'knowledge_content.json').exists():
         raise RuntimeError('This preregistered pilot expects no RAG index; define a separate RAG protocol before testing')
@@ -256,7 +265,7 @@ def main():
         'environment':{'python':sys.version, 'packages':{p:importlib.metadata.version(p) for p in ('google-genai','Pillow','SQLAlchemy','fastapi')}},
         'mode':'preflight' if args.preflight_only else 'live-paired-service-pilot',
         'protocol':{'models':args.models,'config_overrides':config,'repetitions':1,
-            'order':'case order fixed; model order reversed on alternating cases',
+            'order':'case order fixed; model order reversed on alternating cases' if len(args.models)>1 else 'case order fixed; single-model run, not interleaved',
             'rag':'No index present; real service empty-context fallback; not a RAG evaluation',
             'database':'Isolated SQLite seeded from unchanged data.json; no production DB connection',
             'scope':'Image gate + real preliminary and diagnosis calls + validation + DB grounding; not HTTP/auth/device/SMTP acceptance',
