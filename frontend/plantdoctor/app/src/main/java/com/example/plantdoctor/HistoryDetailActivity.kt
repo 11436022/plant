@@ -396,26 +396,13 @@ class HistoryDetailActivity : AppCompatActivity() {
 
                     tvPlantName.text = "植物：${data.crop_name ?: "無法辨識"}"
 
-                    tvDiseaseName.text = buildString {
-                        append("原始診斷：${data.status_name ?: "未知"}")
-                        data.user_corrected_status?.takeIf { it.isNotBlank() }?.let {
-                            append("\n使用者修正：$it")
-                        }
-                    }
+                    tvDiseaseName.text = "患病：${data.status_name ?: "未知"}"
                     tvDiseaseName.setTextColor(tvPlantName.currentTextColor)
-                    tvFeedbackLink.visibility = View.VISIBLE
+                    tvFeedbackLink.visibility = View.GONE
 
                     val fullAdvice = StringBuilder().apply {
-                        if (!data.user_corrected_status.isNullOrBlank()) {
-                            append("使用者修正是個人註記，並非重新診斷或專業複核；以下信心值、來源與建議仍屬原始診斷。\n\n")
-                        }
-                        append(formatDiagnosisMetadata(
-                            data.confidence, data.category, data.requires_review,
-                            data.grounding_source, data.reference_source,
-                            data.reference_url, data.reference_record_id
-                        ))
-                        append("\n\n【原始診斷參考建議】\n${data.suggestion ?: "尚無建議"}\n\n")
-                        append("【原始診斷處理參考】\n${data.treatment ?: "請諮詢專業人員"}\n\n")
+                        append("【病症狀態】\n${data.suggestion ?: "病症狀態"}\n\n")
+                        append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}\n\n")
                         append("【過往筆記】")
                     }.toString()
                     tvAdvice.text = fullAdvice

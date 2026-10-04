@@ -24,7 +24,7 @@ def validate_image_content(content: bytes, content_type: str | None) -> FrameMet
         "image/png": "PNG",
         "image/webp": "WEBP",
     }
-    allowed_types = set(mime_formats.keys()) | {"image/*", "application/octet-stream"}
+    allowed_types = set(mime_formats.keys()) | {"image/*"}
     normalized_type = content_type.lower() if content_type else None
     if not content or (normalized_type and normalized_type not in allowed_types):
         raise HTTPException(status_code=400, detail="A nonempty JPEG, PNG, or WebP image is required.")

@@ -55,6 +55,7 @@ class UploadActivity : AppCompatActivity() {
     // 🌟 作物下拉選單相關
     private var selectedCropName: String = "未知"
     private val cropList: MutableList<String> = mutableListOf("未知")
+    private var cropDialog: androidx.appcompat.app.AlertDialog? = null
     private lateinit var layoutCropSelector: LinearLayout
     private lateinit var tvCropLabel: TextView
     private lateinit var tvSelectedCrop: TextView
@@ -169,11 +170,13 @@ class UploadActivity : AppCompatActivity() {
                     return@setOnClickListener
                 }
 
+                cropDialog?.dismiss()
                 val intent = Intent(this, DiagnoseProgressActivity::class.java)
                 intent.putExtra("IMAGE_URI", selectedImageUri.toString())
                 intent.putExtra("CROP_NAME", selectedCropName)
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 startActivity(intent)
+                finish()
             } else {
                 Toast.makeText(this, "請先選擇一張照片", Toast.LENGTH_SHORT).show()
             }
@@ -262,10 +265,12 @@ class UploadActivity : AppCompatActivity() {
     }
 
     private fun showCropSelectionDialog() {
+        cropDialog?.dismiss()
         val dialogView = layoutInflater.inflate(R.layout.dialog_select_crop, null)
         val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
             .setView(dialogView)
             .create()
+        cropDialog = dialog
 
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
@@ -302,6 +307,14 @@ class UploadActivity : AppCompatActivity() {
                     tvName.setTextColor(Color.parseColor("#333333"))
                     tvName.typeface = android.graphics.Typeface.DEFAULT
                 }
+
+                view.setOnClickListener {
+                    selectedCropName = item
+                    tvSelectedCrop.text = item
+                    SoundManager.playBubblePop()
+                    dialog.dismiss()
+                }
+
                 return view
             }
         }
@@ -343,6 +356,12 @@ class UploadActivity : AppCompatActivity() {
         btnClose.setOnClickListener {
             SoundManager.playBubblePop()
             dialog.dismiss()
+        }
+
+        dialog.setOnDismissListener {
+            if (cropDialog === dialog) {
+                cropDialog = null
+            }
         }
 
         dialog.show()
@@ -508,12 +527,14 @@ class UploadActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+        cropDialog?.dismiss()
         SoundManager.stopWind()
         windHandler.removeCallbacks(windRunnable)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        cropDialog?.dismiss()
         windHandler.removeCallbacksAndMessages(null)
     }
 }

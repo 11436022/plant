@@ -192,8 +192,7 @@ class HomeActivity : AppCompatActivity() {
                 if (location != null) {
                     // 成功獲取最後位置，直接使用
                     Log.d("LocationDebug", "getLastLocation: Success! Got last known location.")
-                    val city = getCityNameFromLocation(location.latitude, location.longitude)
-                    loadWeatherForCity(city)
+                    resolveCityAndLoadWeather(location.latitude, location.longitude)
                 } else {
                     // 最後位置為 null，啟動 Plan B：請求即時位置更新
                     Log.w("LocationDebug", "getLastLocation: Success, but last location is null. Requesting fresh location.")
@@ -205,6 +204,16 @@ class HomeActivity : AppCompatActivity() {
                 Log.e("LocationDebug", "getLastLocation: Failed to get last location.", e)
                 requestFreshLocation()
             }
+    }
+
+    private fun resolveCityAndLoadWeather(latitude: Double, longitude: Double) {
+        Thread {
+            val city = getCityNameFromLocation(latitude, longitude)
+            runOnUiThread {
+                loadWeatherForCity(city)
+                isLocationLoaded = true
+            }
+        }.start()
     }
 
     private fun requestFreshLocation() {
@@ -242,13 +251,12 @@ class HomeActivity : AppCompatActivity() {
             val location = locationResult.lastLocation
             if (location != null) {
                 Log.d("LocationDebug", "onLocationResult: SUCCESS! Got fresh location.")
-                val city = getCityNameFromLocation(location.latitude, location.longitude)
-                loadWeatherForCity(city)
+                resolveCityAndLoadWeather(location.latitude, location.longitude)
             } else {
                 Log.w("LocationDebug", "onLocationResult: Fresh location result is null. Using default city.")
                 loadWeatherForCity("臺北市")
+                isLocationLoaded = true
             }
-            isLocationLoaded = true // 無論成功或失敗，都標記為已載入
             // 收到結果後，立刻停止監聽，避免耗電
             stopLocationUpdates()
         }

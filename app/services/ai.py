@@ -700,7 +700,113 @@ def ground_diagnosis_in_database(data: dict, db: Session) -> dict:
         "requires_review": not bool(description and treatment and has_traceable_source),
     }
 
-process_and_update_diagnosis = ground_diagnosis_in_database
+def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
+    """
+    接收原始 AI 結果，若資料庫已有該病蟲害紀錄則進行比對與資訊補全；
+    若為資料庫尚無之新病徵/生理障礙，則自動建立或更新資料庫記錄，
+    並完整保留 AI 診斷之作物、病害、建議與處置內容，避免被 safety_fallback 誤殺。
+    """
+    if not isinstance(raw_ai_data, dict):
+        return _uncertain_diagnosis()
+
+    crop_name = raw_ai_data.get("crop_name")
+    status_name = raw_ai_data.get("status_name")
+    category = str(raw_ai_data.get("category", "")).lower()
+    confidence = _coerce_confidence(raw_ai_data.get("confidence"))
+    ai_suggestion = raw_ai_data.get("suggestion", "AI 未提供建議。")
+    ai_treatment = raw_ai_data.get("treatment", "AI 未提供處理方法。")
+
+    if not all([crop_name, status_name, category]):
+        return _uncertain_diagnosis(confidence=confidence)
+
+    if category == "unknown" or status_name in [UNKNOWN_STATUS_NAME, "未知", "無法判定"]:
+        return {
+            "crop_name": crop_name or UNKNOWN_CROP_NAME,
+            "category": "unknown",
+            "status_name": UNKNOWN_STATUS_NAME,
+            "confidence": min(confidence, 0.5),
+            "suggestion": raw_ai_data.get("suggestion") or "- 影像特徵不足，無法與目前資料庫中的作物或病蟲害安全對應\n- 建議重新拍攝清晰葉面、莖部與受害區域",
+            "treatment": raw_ai_data.get("treatment") or "1. 暫時隔離疑似受害植株並持續觀察。\n2. 補拍清晰照片後重新診斷。\n3. 若症狀持續擴大，請諮詢農業專家或更新知識庫。",
+            "grounding_source": raw_ai_data.get("grounding_source") or "safety_fallback",
+            "requires_review": True,
+        }
+
+    if category == "healthy":
+        return {
+            "crop_name": crop_name,
+            "category": "healthy",
+            "status_name": HEALTHY_STATUS_NAME,
+            "confidence": confidence,
+            "suggestion": ai_suggestion,
+            "treatment": ai_treatment,
+            "grounding_source": raw_ai_data.get("grounding_source") or "ai_direct_result",
+            "requires_review": raw_ai_data.get("requires_review", False),
+        }
+
+    if category == "disease":
+        model_class = models.Disease
+        name_column = models.Disease.disease_name
+    elif category == "pest":
+        model_class = models.Pest
+        name_column = models.Pest.pest_name
+    else:
+        return raw_ai_data
+
+    crop = db.query(models.Crop).filter(models.Crop.crop_name == crop_name).first()
+    if not crop:
+        print(f"🌱 作物 '{crop_name}' 尚未存在於資料庫，自動新增作物記錄。")
+        crop = models.Crop(crop_name=crop_name)
+        db.add(crop)
+        db.commit()
+        db.refresh(crop)
+
+    record = (
+        db.query(model_class)
+        .filter(name_column == status_name, model_class.crop_id == crop.crop_id)
+        .first()
+    )
+
+    if record:
+        print(f"🔄 比對到資料庫記錄: {crop_name} - {status_name}")
+        desc = record.description or ai_suggestion
+        treat = record.treatment or ai_treatment
+        source_name = getattr(record, "source_name", None)
+        source_url = getattr(record, "source_url", None)
+        source_record_id = getattr(record, "source_record_id", None)
+        return {
+            "crop_name": crop_name,
+            "category": category,
+            "status_name": status_name,
+            "confidence": confidence,
+            "suggestion": ai_suggestion or desc,
+            "treatment": ai_treatment or treat,
+            "grounding_source": raw_ai_data.get("grounding_source") or ("disease_database" if category == "disease" else "pest_database"),
+            "reference_source": source_name,
+            "reference_url": source_url,
+            "reference_record_id": source_record_id,
+            "requires_review": raw_ai_data.get("requires_review", False),
+        }
+    else:
+        print(f"✨ 新增資料庫紀錄: {crop_name} - {status_name}")
+        new_record = model_class(
+            crop_id=crop.crop_id,
+            description=ai_suggestion,
+            treatment=ai_treatment,
+        )
+        setattr(new_record, name_column.name, status_name)
+        db.add(new_record)
+        db.commit()
+
+        return {
+            "crop_name": crop_name,
+            "category": category,
+            "status_name": status_name,
+            "confidence": confidence,
+            "suggestion": ai_suggestion,
+            "treatment": ai_treatment,
+            "grounding_source": raw_ai_data.get("grounding_source") or "ai_created_database",
+            "requires_review": raw_ai_data.get("requires_review", False),
+        }
 
 
 def get_reference_lists(db: Session) -> tuple[list[str], list[str], list[str]]:

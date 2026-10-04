@@ -1403,6 +1403,19 @@ class WebcamActivity : AppCompatActivity() {
                     tvName.setTextColor(Color.parseColor("#333333"))
                     tvName.typeface = android.graphics.Typeface.DEFAULT
                 }
+
+                view.setOnClickListener {
+                    if (onCropSelected != null) {
+                        onCropSelected(item)
+                    } else {
+                        selectedCropName = item
+                        tvSelectedCrop.text = item
+                        Toast.makeText(this@WebcamActivity, "目標植物已設為：$item", Toast.LENGTH_SHORT).show()
+                    }
+                    SoundManager.playBubblePop()
+                    dialog.dismiss()
+                }
+
                 return view
             }
         }

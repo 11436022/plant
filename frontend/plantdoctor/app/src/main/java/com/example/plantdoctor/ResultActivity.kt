@@ -104,13 +104,8 @@ class ResultActivity : AppCompatActivity() {
             binding.tvDiseaseName.text = "診斷：${diseaseName ?: "未知"}"
 
             val fullAdvice = StringBuilder().apply {
-                append(formatDiagnosisMetadata(
-                    data.confidence, data.category, data.requires_review,
-                    data.grounding_source, data.reference_source,
-                    data.reference_url, data.reference_record_id
-                ))
-                append("\n\n【原始診斷參考建議】\n${data.suggestion ?: "尚無建議"}\n\n")
-                append("【原始診斷處理參考】\n${data.treatment ?: "請諮詢專業人員"}")
+                append("【專家建議】\n${data.suggestion ?: "尚無建議"}\n\n")
+                append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
             }.toString()
             binding.tvAdvice.text = fullAdvice
             binding.tvAdvice.setTextIsSelectable(true)
@@ -272,7 +267,7 @@ class ResultActivity : AppCompatActivity() {
         dialogBinding.dialogBtnDontSave.setOnClickListener {
             alertDialog.dismiss()
             SoundManager.playBubblePop()
-            showFeedbackDialog(predictionId)
+            goToHome()
         }
     }
 
@@ -356,8 +351,9 @@ class ResultActivity : AppCompatActivity() {
     }
 
     private fun goToHome() {
-        val intent = Intent(this, HomeActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        val intent = Intent(this, HomeActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
         startActivity(intent)
         finish()
     }
