@@ -11,5 +11,5 @@ from app.main import app  # 這裡會自動觸發 app/main.py 裡的設定
 
 if __name__ == "__main__":
     import uvicorn
-    # 啟動從 app.main 匯入的 app 實例
-    uvicorn.run(app, host=settings.API_HOST, port=settings.API_PORT)
+    # 啟動從 app.main 匯入的 app 實例，開啟 reload=True 支援熱重載
+    uvicorn.run("main:app", host=settings.API_HOST, port=settings.API_PORT, reload=True)
