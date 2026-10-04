@@ -128,11 +128,13 @@ async def predict_plant_status(
 
         return response_data
 
-    except HTTPException:
+    except HTTPException as e:
+        print(f"❌ [PREDICT HTTP ERROR] code={e.status_code}, detail={e.detail}")
         if temp_file_path and temp_file_path.exists():
             temp_file_path.unlink()
         raise
     except Exception as e:
+        print(f"❌ [PREDICT SERVER ERROR] error={e}")
         if temp_file_path and temp_file_path.exists():
             temp_file_path.unlink()
         raise HTTPException(status_code=500, detail="Image analysis failed.") from e
