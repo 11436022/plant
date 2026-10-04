@@ -1,0 +1,777 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-10-04T14:18:56.120482+00:00",
+  "code_commit": "a429b2852ea0f7ce9edc8032e0976105320d2e94",
+  "ai_service_sha256": "4ecedbb6fc697ea76e7c953f9a319c529fcc712c4ae7a487beec2dbc18e1a960",
+  "reference_data_sha256": "cc556f782f81dcb0402f30e16753dcda60057e41458d47c5f124ce98022e6bd1",
+  "manifest_sha256": "1aa631daea513f62efca86536dc9a9ad25830b043703f122e88df36d262f7155",
+  "manifest": {
+    "schema_version": 1,
+    "created_at": "2026-10-04T13:34:21.531258+00:00",
+    "seed": "plant-second-review-20261004-v1",
+    "source_revision": "5467f6012d78d1c446145d5f582da6096f852ae8",
+    "dataset_url": "https://github.com/pratikkayal/PlantDoc-Dataset",
+    "license": "CC-BY-4.0 (repository declaration)",
+    "label_basis": "Dataset test-folder labels; no independent expert confirmation; not clinical ground truth",
+    "selection": "Per-class SHA256(seed + path) ascending; first original files passing unchanged upload gate and pre-inference visual screening for label leakage or conflicting rights notices; no resizing; all examined exclusions retained",
+    "training_overlap": "Unknown overlap with foundation model training; pilot only",
+    "cases": [
+      {
+        "id": "plant-01",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Tomato%20Early%20blight%20leaf/bugs-and-blight-061.jpg",
+        "source_path": "test/Tomato Early blight leaf/bugs-and-blight-061.jpg",
+        "dataset_label": "Tomato Early blight leaf",
+        "image": {
+          "width": 2576,
+          "height": 1932,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "55570c32bf51ea713ee2dc293078ce3008986ad281a8cce626fbb264e0b44679",
+          "bytes": 1434983
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "supported",
+        "expected_crop": "番茄",
+        "expected_category": "disease",
+        "expected_status": "早疫病 (Early Blight)",
+        "target_policy": "known_label_or_abstain"
+      },
+      {
+        "id": "plant-02",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Tomato%20Early%20blight%20leaf/Shoemaker_7068.JPG.jpg",
+        "source_path": "test/Tomato Early blight leaf/Shoemaker_7068.JPG.jpg",
+        "dataset_label": "Tomato Early blight leaf",
+        "image": {
+          "width": 600,
+          "height": 450,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "7885910ac8d584a706d6448390c24f77e4e36ada4a75ae58b354a5642d0448b4",
+          "bytes": 50718
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "supported",
+        "expected_crop": "番茄",
+        "expected_category": "disease",
+        "expected_status": "早疫病 (Early Blight)",
+        "target_policy": "known_label_or_abstain"
+      },
+      {
+        "id": "plant-03",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Tomato%20leaf%20late%20blight/LateBlt09_06.jpg",
+        "source_path": "test/Tomato leaf late blight/LateBlt09_06.jpg",
+        "dataset_label": "Tomato leaf late blight",
+        "image": {
+          "width": 400,
+          "height": 268,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "69526a0f4413d8f8e786650a8264e460496e41e0a794747b8358c7d4074dfee6",
+          "bytes": 15801
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "supported",
+        "expected_crop": "番茄",
+        "expected_category": "disease",
+        "expected_status": "晚疫病 (Late Blight)",
+        "target_policy": "known_label_or_abstain"
+      },
+      {
+        "id": "plant-04",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Tomato%20leaf%20late%20blight/E%2529Tomato-late-blight-foliar.jpg",
+        "source_path": "test/Tomato leaf late blight/E%29Tomato-late-blight-foliar.jpg",
+        "dataset_label": "Tomato leaf late blight",
+        "image": {
+          "width": 400,
+          "height": 300,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "1146802ff74c97a511dedcb6bf204d3029e13734bb2d0fcc9a44bce50d2311f2",
+          "bytes": 17319
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "supported",
+        "expected_crop": "番茄",
+        "expected_category": "disease",
+        "expected_status": "晚疫病 (Late Blight)",
+        "target_policy": "known_label_or_abstain"
+      },
+      {
+        "id": "plant-05",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Tomato%20leaf/IMG_1246.jpg",
+        "source_path": "test/Tomato leaf/IMG_1246.jpg",
+        "dataset_label": "Tomato leaf",
+        "image": {
+          "width": 1600,
+          "height": 1200,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "d119deb0673b049551857318a686c6ecab5c2aa2607fc349ac25424d4ce636c2",
+          "bytes": 527789
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "supported",
+        "expected_crop": "番茄",
+        "expected_category": "healthy",
+        "expected_status": "健康",
+        "target_policy": "known_label_or_abstain"
+      },
+      {
+        "id": "plant-06",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Bell_pepper%20leaf/RnGnC.jpg",
+        "source_path": "test/Bell_pepper leaf/RnGnC.jpg",
+        "dataset_label": "Bell_pepper leaf",
+        "image": {
+          "width": 2147,
+          "height": 1432,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "13b8b10d2b5ac884239a21da79d04911ea3128094aed4ee22a52b7a85c05e893",
+          "bytes": 414381
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "supported",
+        "expected_crop": "甜椒",
+        "expected_category": "healthy",
+        "expected_status": "健康",
+        "target_policy": "known_label_or_abstain"
+      },
+      {
+        "id": "plant-07",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Potato%20leaf%20early%20blight/earlyblightpotato.jpg",
+        "source_path": "test/Potato leaf early blight/earlyblightpotato.jpg",
+        "dataset_label": "Potato leaf early blight",
+        "image": {
+          "width": 465,
+          "height": 350,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "c339100d52667a90c43b2f7f36d969e5894849f621b1bbc4a5ba5cf6817b8cbe",
+          "bytes": 158063
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "out_of_scope",
+        "expected_crop": "馬鈴薯",
+        "expected_category": "disease",
+        "expected_status": "Early blight",
+        "target_policy": "abstain"
+      },
+      {
+        "id": "plant-08",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Apple%20Scab%20Leaf/apple-scab-5366820.jpg",
+        "source_path": "test/Apple Scab Leaf/apple-scab-5366820.jpg",
+        "dataset_label": "Apple Scab Leaf",
+        "image": {
+          "width": 460,
+          "height": 373,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "1eaebcb9926515196f0e5499ed932bffe2dd1897e8bad55da41c4100cbc4f1b2",
+          "bytes": 80592
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "out_of_scope",
+        "expected_crop": "蘋果",
+        "expected_category": "disease",
+        "expected_status": "Apple scab",
+        "target_policy": "abstain"
+      },
+      {
+        "id": "nonplant-checkerboard",
+        "fixture": "640x480 black-white 40px checkerboard generated with Pillow",
+        "image": {
+          "width": 640,
+          "height": 480,
+          "format": "PNG",
+          "mime": "image/png",
+          "sha256": "6a2c400842ec6f0c3c97dd6cc0ecb982f474faba60e32a70546e419b5c859100",
+          "bytes": 2167
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "nonplant",
+        "expected_crop": null,
+        "expected_category": "unknown",
+        "expected_status": null,
+        "target_policy": "abstain"
+      }
+    ],
+    "screened": [
+      {
+        "path": "test/Tomato Early blight leaf/bugs-and-blight-061.jpg",
+        "image": {
+          "width": 2576,
+          "height": 1932,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "55570c32bf51ea713ee2dc293078ce3008986ad281a8cce626fbb264e0b44679",
+          "bytes": 1434983
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Tomato Early blight leaf/early_blight1-150x150.jpg",
+        "image": {
+          "width": 150,
+          "height": 150,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "9650bd867d436b35710a6c8e5142baf3744910eee250372efe547f23d514980a",
+          "bytes": 8704
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "selected": false,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Tomato Early blight leaf/039b47d574bc4bb8a14259a1cd96a741.jpg",
+        "image": {
+          "width": 638,
+          "height": 479,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "7d9c5c6947554d5fc6e98df5fbc1beb6363255128bd56446960e29a73242c02e",
+          "bytes": 37998
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": false,
+        "visual_exclusion": "Before inference: embedded disease-name captions leak the expected answer; multi-panel illustration"
+      },
+      {
+        "path": "test/Tomato Early blight leaf/tomato_early-blight_01_zoom.jpg",
+        "image": {
+          "width": 257,
+          "height": 378,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "7571d72639461cc8de512dd2087c63cc1877322ae1954f7b4521756789c362c9",
+          "bytes": 31316
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "selected": false,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Tomato Early blight leaf/Shoemaker_7068.JPG.jpg",
+        "image": {
+          "width": 600,
+          "height": 450,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "7885910ac8d584a706d6448390c24f77e4e36ada4a75ae58b354a5642d0448b4",
+          "bytes": 50718
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Tomato leaf late blight/LateBlt09_06.jpg",
+        "image": {
+          "width": 400,
+          "height": 268,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "69526a0f4413d8f8e786650a8264e460496e41e0a794747b8358c7d4074dfee6",
+          "bytes": 15801
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Tomato leaf late blight/E%29Tomato-late-blight-foliar.jpg",
+        "image": {
+          "width": 400,
+          "height": 300,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "1146802ff74c97a511dedcb6bf204d3029e13734bb2d0fcc9a44bce50d2311f2",
+          "bytes": 17319
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Tomato leaf/IMG_1246.jpg",
+        "image": {
+          "width": 1600,
+          "height": 1200,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "d119deb0673b049551857318a686c6ecab5c2aa2607fc349ac25424d4ce636c2",
+          "bytes": 527789
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Bell_pepper leaf/e33155.jpg",
+        "image": {
+          "width": 800,
+          "height": 600,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "dd6526f15640c67223a9d40b4cd34e9522732deea2b09df09dc9c2eb08099047",
+          "bytes": 111556
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": false,
+        "visual_exclusion": "Before inference: visible Unauthorized Use Prohibited notice conflicts with repository-level license; not sent to API"
+      },
+      {
+        "path": "test/Bell_pepper leaf/RnGnC.jpg",
+        "image": {
+          "width": 2147,
+          "height": 1432,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "13b8b10d2b5ac884239a21da79d04911ea3128094aed4ee22a52b7a85c05e893",
+          "bytes": 414381
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Potato leaf early blight/potato-blight-phytophthora-infestans-close-up-of-upper-surface-of-BMMRXC.jpg",
+        "image": {
+          "width": 1300,
+          "height": 956,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "908640f63872eb893ca69db7ddd5297a1f7e5489f2fd9dcd5e3192efefe0f28c",
+          "bytes": 108060
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": false,
+        "visual_exclusion": "Before inference: visible stock-photo watermark and filename/folder disease-label conflict; not sent to API"
+      },
+      {
+        "path": "test/Potato leaf early blight/potatobd001.jpg",
+        "image": {
+          "width": 230,
+          "height": 150,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "01431bdbb52ca18d4dfb15f10b99d1b3370f0ac00650b0afdad8a00be24e11b3",
+          "bytes": 12143
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "selected": false,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Potato leaf early blight/earlyblightpotato.jpg",
+        "image": {
+          "width": 465,
+          "height": 350,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "c339100d52667a90c43b2f7f36d969e5894849f621b1bbc4a5ba5cf6817b8cbe",
+          "bytes": 158063
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Apple Scab Leaf/apples_apple-scab_02_thm.jpg",
+        "image": {
+          "width": 115,
+          "height": 85,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "f91a6ba2e60144bd62175891872170b57a3e1bfd642a7816b018b86db76257f7",
+          "bytes": 7806
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "selected": false,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Apple Scab Leaf/apple-scab-5366820.jpg",
+        "image": {
+          "width": 460,
+          "height": 373,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "1eaebcb9926515196f0e5499ed932bffe2dd1897e8bad55da41c4100cbc4f1b2",
+          "bytes": 80592
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      }
+    ],
+    "upload_controls": [
+      {
+        "id": "legacy-tomato-early-blight",
+        "url": "https://raw.githubusercontent.com/spMohanty/PlantVillage-Dataset/7f7ecc7e1eaca78107e3affe7cb5abd9427e139a/raw/color/Tomato___Early_blight/0012b9d2-2130-4a06-a834-b1f3af34f57e___RS_Erly.B%208389.JPG",
+        "image": {
+          "width": 256,
+          "height": 256,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "29b79036b67724f6a76895d17ef1b863ad7a7134e03141b1feb601a591336123",
+          "bytes": 18261
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "expected_rejection": true,
+        "reason": "Original dimensions below configured minimum"
+      },
+      {
+        "id": "legacy-tomato-late-blight",
+        "url": "https://raw.githubusercontent.com/spMohanty/PlantVillage-Dataset/7f7ecc7e1eaca78107e3affe7cb5abd9427e139a/raw/color/Tomato___Late_blight/0003faa8-4b27-4c65-bf42-6d9e352ca1a5___RS_Late.B%204946.JPG",
+        "image": {
+          "width": 256,
+          "height": 256,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "355d9ed5d0212dfc72eeda78118c55966febe086b60ff46fd7702766e92827d3",
+          "bytes": 11714
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "expected_rejection": true,
+        "reason": "Original dimensions below configured minimum"
+      },
+      {
+        "id": "legacy-tomato-healthy",
+        "url": "https://raw.githubusercontent.com/spMohanty/PlantVillage-Dataset/7f7ecc7e1eaca78107e3affe7cb5abd9427e139a/raw/color/Tomato___healthy/000146ff-92a4-4db6-90ad-8fce2ae4fddd___GH_HL%20Leaf%20259.1.JPG",
+        "image": {
+          "width": 256,
+          "height": 256,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "a294299b0518a50ebc275c0ec4519b022cab8b34735039f6c2a089a911f6964e",
+          "bytes": 15646
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "expected_rejection": true,
+        "reason": "Original dimensions below configured minimum"
+      },
+      {
+        "id": "empty",
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "A nonempty JPEG, PNG, or WebP image is required."
+        },
+        "expected_rejection": true
+      },
+      {
+        "id": "corrupt-jpeg",
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Image data is invalid or damaged."
+        },
+        "expected_rejection": true
+      },
+      {
+        "id": "blank-white",
+        "gate": {
+          "accepted": false,
+          "status": 422,
+          "detail": "Image lacks enough visual detail for diagnosis."
+        },
+        "expected_rejection": true
+      }
+    ]
+  },
+  "environment": {
+    "python": "3.10.5 (tags/v3.10.5:f377153, Jun  6 2022, 16:14:13) [MSC v.1929 64 bit (AMD64)]",
+    "packages": {
+      "google-genai": "1.72.0",
+      "Pillow": "12.2.0",
+      "SQLAlchemy": "2.0.49",
+      "fastapi": "0.135.3"
+    }
+  },
+  "mode": "live-paired-service-pilot",
+  "protocol": {
+    "models": [
+      "gemini-3.5-flash-lite"
+    ],
+    "config_overrides": {
+      "temperature": 0,
+      "max_output_tokens": 4096,
+      "thinking_config": {
+        "thinking_budget": 0
+      }
+    },
+    "repetitions": 1,
+    "order": "case order fixed; model order reversed on alternating cases",
+    "rag": "No index present; real service empty-context fallback; not a RAG evaluation",
+    "database": "Isolated SQLite seeded from unchanged data.json; no production DB connection",
+    "scope": "Image gate + real preliminary and diagnosis calls + validation + DB grounding; not HTTP/auth/device/SMTP acceptance",
+    "raw_definition": "Final diagnosis JSON before name/confidence validation; not unconstrained base-model accuracy",
+    "image_handling": "Original decoded by production Pillow loader, no resize/crop; SDK serializes image; filenames and expected labels are not included in prompts",
+    "latency": "Two sequential model calls plus local processing, excluding deliberate rate-limit sleep; not deployment SLA",
+    "labels": "Dataset folder labels only; no expert confirmation; small selected pilot, no population inference",
+    "professional_advice_review": "Not performed; source presence and dosage patterns are mechanical risk indicators only",
+    "request_limit_per_model": 18,
+    "retry_attempts": 1
+  },
+  "input_checks": [
+    {
+      "case_id": "plant-01",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-02",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-03",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-04",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-05",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-06",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-07",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-08",
+      "accepted": true
+    },
+    {
+      "case_id": "nonplant-checkerboard",
+      "accepted": true
+    }
+  ],
+  "rows": [
+    {
+      "case_id": "plant-01",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:18:56.413355+00:00",
+      "status": "error",
+      "raw": null,
+      "validated": null,
+      "final": null,
+      "calls": [
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:18:56.416546+00:00",
+          "prompt_sha256": "df5039f2f48745cfc4d37b74588111cde6a167b8e1c7d6ae87abf0cd5ccbe39f",
+          "prompt": "You are an agricultural expert. Briefly describe the main subject and any visible symptoms in this image in a few keywords (e.g., 'tomato, leaf spots, yellowing'). This will be used to search a knowledge base. Respond in Traditional Chinese.",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_budget": 0
+            }
+          },
+          "error": {
+            "type": "ClientError",
+            "code": 400,
+            "message": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+          },
+          "seconds": 0.7428974998183548
+        }
+      ],
+      "raw_score": {
+        "outcome": "no_structured_result",
+        "crop_correct": null
+      },
+      "final_score": {
+        "outcome": "no_structured_result",
+        "crop_correct": null
+      },
+      "advice": {
+        "applicable": false
+      },
+      "wall_seconds": 0.7442457000724971,
+      "intentional_sleep_seconds": 0.0,
+      "inference_seconds": 0.7442457000724971
+    },
+    {
+      "case_id": "plant-02",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:18:57.164532+00:00",
+      "status": "not_run",
+      "reason": "Model stopped after HTTP 400; no automatic retry or key rotation"
+    },
+    {
+      "case_id": "plant-03",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:18:57.170229+00:00",
+      "status": "not_run",
+      "reason": "Model stopped after HTTP 400; no automatic retry or key rotation"
+    },
+    {
+      "case_id": "plant-04",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:18:57.174882+00:00",
+      "status": "not_run",
+      "reason": "Model stopped after HTTP 400; no automatic retry or key rotation"
+    },
+    {
+      "case_id": "plant-05",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:18:57.179052+00:00",
+      "status": "not_run",
+      "reason": "Model stopped after HTTP 400; no automatic retry or key rotation"
+    },
+    {
+      "case_id": "plant-06",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:18:57.184167+00:00",
+      "status": "not_run",
+      "reason": "Model stopped after HTTP 400; no automatic retry or key rotation"
+    },
+    {
+      "case_id": "plant-07",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:18:57.188343+00:00",
+      "status": "not_run",
+      "reason": "Model stopped after HTTP 400; no automatic retry or key rotation"
+    },
+    {
+      "case_id": "plant-08",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:18:57.192586+00:00",
+      "status": "not_run",
+      "reason": "Model stopped after HTTP 400; no automatic retry or key rotation"
+    },
+    {
+      "case_id": "nonplant-checkerboard",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:18:57.196759+00:00",
+      "status": "not_run",
+      "reason": "Model stopped after HTTP 400; no automatic retry or key rotation"
+    }
+  ],
+  "summary": {
+    "gemini-3.5-flash-lite": {
+      "planned": 9,
+      "attempted": 1,
+      "structured_results": 0,
+      "not_run": 8,
+      "input_rejected": 0,
+      "service_or_parse_errors": 1,
+      "crop_agreement_received": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null
+      },
+      "supported_status_agreement_received": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null
+      },
+      "supported_status_yield_attempted_including_errors": {
+        "numerator": 0,
+        "denominator": 1,
+        "value": 0.0
+      },
+      "supported_abstentions": 0,
+      "supported_incorrect_known": 0,
+      "guard_abstention_received": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null
+      },
+      "raw_to_final": [],
+      "unverified_advice": 0,
+      "advice_with_dosage_pattern": 0,
+      "inference_seconds": {
+        "n": 0,
+        "median": null,
+        "p95_nearest_rank": null
+      },
+      "api_requests": 1,
+      "api_request_errors": 1,
+      "usage": {
+        "prompt_token_count": 0,
+        "candidates_token_count": 0,
+        "thoughts_token_count": 0,
+        "total_token_count": 0
+      }
+    }
+  },
+  "completed_at": "2026-10-04T14:18:57.202990+00:00"
+}
