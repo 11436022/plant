@@ -18,6 +18,26 @@ CASE = {'id':'case-1','group':'supported','expected_crop':'tomato',
 MATCH = {'crop_name':'tomato','category':'disease','status_name':'early-blight','confidence':.1}
 
 
+def test_default_generation_config_preserves_original_pilot():
+    assert benchmark.generation_config() == {
+        'temperature': 0, 'max_output_tokens': 4096,
+        'thinking_config': {'thinking_budget': 0},
+    }
+
+
+@pytest.mark.parametrize('level', ['minimal', 'low', 'medium', 'high'])
+def test_explicit_thinking_level_replaces_budget(level):
+    config = benchmark.generation_config(level)
+    assert config['thinking_config'] == {'thinking_level': level}
+    assert config['temperature'] == 0
+    assert config['max_output_tokens'] == 4096
+
+
+def test_generation_config_rejects_unknown_level():
+    with pytest.raises(ValueError, match='Unsupported'):
+        benchmark.generation_config('unrecognized')
+
+
 @pytest.mark.parametrize('text,expected', [
     ('{"category":"unknown"}',{'category':'unknown'}),
     ('```json\n{"category":"unknown"}\n```',{'category':'unknown'}),
