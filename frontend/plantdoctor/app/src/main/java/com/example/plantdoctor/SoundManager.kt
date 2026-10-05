@@ -146,67 +146,99 @@ object SoundManager : DefaultLifecycleObserver {
     }
 
     fun startBGM() {
-        isFirstLaunch = false
-        if (bgmPlayer != null && !bgmPlayer!!.isPlaying) {
-            bgmPlayer?.setVolume(volBgm, volBgm)
-            bgmPlayer?.start()
+        try {
+            isFirstLaunch = false
+            if (bgmPlayer != null && !bgmPlayer!!.isPlaying) {
+                bgmPlayer?.setVolume(volBgm, volBgm)
+                bgmPlayer?.start()
+            }
+        } catch (e: Exception) {
+            Log.w("SoundManager", "startBGM failed: ${e.message}")
         }
     }
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
-        if (isFirstLaunch) return
-        if (bgmPlayer != null && !bgmPlayer!!.isPlaying) {
-            bgmPlayer?.setVolume(volBgm, volBgm)
-            bgmPlayer?.start()
+        try {
+            if (isFirstLaunch) return
+            if (bgmPlayer != null && !bgmPlayer!!.isPlaying) {
+                bgmPlayer?.setVolume(volBgm, volBgm)
+                bgmPlayer?.start()
+            }
+        } catch (e: Exception) {
+            Log.w("SoundManager", "onStart failed: ${e.message}")
         }
     }
 
     override fun onStop(owner: LifecycleOwner) {
         super.onStop(owner)
-        isFirstLaunch = false
-        if (bgmPlayer != null && bgmPlayer!!.isPlaying) {
-            bgmPlayer?.pause()
+        try {
+            isFirstLaunch = false
+            if (bgmPlayer != null && bgmPlayer!!.isPlaying) {
+                bgmPlayer?.pause()
+            }
+        } catch (e: Exception) {
+            Log.w("SoundManager", "onStop failed: ${e.message}")
         }
     }
 
     fun playBubblePop() {
-        if (isSoundPoolLoaded && soundPool != null) {
-            val randomIndex = random.nextInt(4)
-            soundPool?.play(popSoundIds[randomIndex], volBubble, volBubble, 1, 0, 1.0f)
+        try {
+            if (isSoundPoolLoaded && soundPool != null) {
+                val randomIndex = random.nextInt(4)
+                soundPool?.play(popSoundIds[randomIndex], volBubble, volBubble, 1, 0, 1.0f)
+            }
+        } catch (e: Exception) {
+            Log.w("SoundManager", "playBubblePop failed: ${e.message}")
         }
     }
 
     fun startWind() {
-        if (windPlayer != null && !windPlayer!!.isPlaying) {
-            windPlayer?.setVolume(volWind, volWind)
-            windPlayer?.start()
+        try {
+            if (windPlayer != null && !windPlayer!!.isPlaying) {
+                windPlayer?.setVolume(volWind, volWind)
+                windPlayer?.start()
+            }
+        } catch (e: Exception) {
+            Log.w("SoundManager", "startWind failed: ${e.message}")
         }
     }
 
     fun stopWind() {
-        if (windPlayer != null && windPlayer!!.isPlaying) {
-            windPlayer?.pause()
-            windPlayer?.seekTo(0)
+        try {
+            if (windPlayer != null && windPlayer!!.isPlaying) {
+                windPlayer?.pause()
+                windPlayer?.seekTo(0)
+            }
+        } catch (e: Exception) {
+            Log.w("SoundManager", "stopWind failed: ${e.message}")
         }
     }
 
     fun release() {
-        soundPool?.release()
-        soundPool = null
-        windPlayer?.release()
-        windPlayer = null
-        bgmPlayer?.release()
-        bgmPlayer = null
-        isSoundPoolLoaded = false
-        isFirstLaunch = true
+        try {
+            soundPool?.release()
+            soundPool = null
+            windPlayer?.release()
+            windPlayer = null
+            bgmPlayer?.release()
+            bgmPlayer = null
+            isSoundPoolLoaded = false
+            isFirstLaunch = true
+        } catch (e: Exception) {
+            Log.w("SoundManager", "release failed: ${e.message}")
+        }
     }
 
     fun stopBGM() {
-        bgmPlayer?.let {
-            if (it.isPlaying) {
-                it.pause() // 或使用 it.stop()
+        try {
+            bgmPlayer?.let {
+                if (it.isPlaying) {
+                    it.pause() // 或使用 it.stop()
+                }
             }
+        } catch (e: Exception) {
+            Log.w("SoundManager", "stopBGM failed: ${e.message}")
         }
     }
 }

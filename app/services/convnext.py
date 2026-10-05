@@ -177,6 +177,19 @@ def predict_convnext_fast_screen(
             crop_name and crop_name.strip() not in ["未知", "未知作物", "未知植物", "無法判定"]
         )
 
+        if not is_crop_specified:
+            # 🌟 未限定作物時：本地閉集模型（僅 14 種作物）無法進行開集植物品種辨識。
+            # 必須交由 Gemini 多模態大模型進行全域開集辨識，避免將香蕉、檸檬等外來作物誤判為桃子或番茄。
+            return None
+
+        clean_crop = crop_name.strip()
+        # 檢查使用者指定之作物是否為本地 ConvNeXt 支援的作物
+        is_supported = any(match_crop_to_class(clean_crop, label) for label in idx_mapping.values())
+        if not is_supported:
+            # 使用者指定之作物（如香蕉、檸檬、芭樂等）不在本地模型訓練集內，
+            # 安全交棒給 Gemini 多模態進行專屬長尾診斷，絕不強行反轉覆蓋為桃子。
+            return None
+
         # 1. 取得全體 38 類別中整體信心最高者 (Global Top-1)
         top_prob, top_idx = torch.max(probs, dim=0)
         global_best_score = float(top_prob.item())
@@ -187,49 +200,40 @@ def predict_convnext_fast_screen(
         is_override = False
         final_crop = None
 
-        if is_crop_specified:
-            clean_crop = crop_name.strip()
-            user_crop_best_score = 0.0
-            user_crop_best_label = None
+        user_crop_best_score = 0.0
+        user_crop_best_label = None
 
-            # 限定搜尋與使用者指定作物相符的標籤
-            for idx, label in idx_mapping.items():
-                if match_crop_to_class(clean_crop, label):
-                    score = float(probs[idx].item())
-                    if score > user_crop_best_score:
-                        user_crop_best_score = score
-                        user_crop_best_label = label
+        # 限定搜尋與使用者指定作物相符的標籤
+        for idx, label in idx_mapping.items():
+            if match_crop_to_class(clean_crop, label):
+                score = float(probs[idx].item())
+                if score > user_crop_best_score:
+                    user_crop_best_score = score
+                    user_crop_best_label = label
 
-            # 情況 A：使用者指定的作物命中 (信心度 >= 0.75)
-            if user_crop_best_label and user_crop_best_score >= settings.CONVNEXT_MIN_CONFIDENCE:
-                best_score = user_crop_best_score
-                best_label = user_crop_best_label
-                final_crop = clean_crop
+        # 情況 A：使用者指定的作物命中 (信心度 >= 0.75)
+        if user_crop_best_label and user_crop_best_score >= settings.CONVNEXT_MIN_CONFIDENCE:
+            best_score = user_crop_best_score
+            best_label = user_crop_best_label
+            final_crop = clean_crop
 
-            # 情況 B：⚡ 壓倒性信心反轉機制 (Overwhelming Confidence Override)
-            # 使用者指定作物信心度極低 (< 0.30)，但全局 Top-1 具有壓倒性信心 (>= 0.85)
-            elif (
-                global_best_label
-                and global_best_score >= settings.CONVNEXT_OVERWHELMING_CONFIDENCE
-                and user_crop_best_score < 0.30
-                and not match_crop_to_class(clean_crop, global_best_label)
-            ):
-                best_score = global_best_score
-                best_label = global_best_label
-                parsed_c, parsed_s, _ = parse_convnext_prediction(global_best_label)
-                final_crop = parsed_c
-                is_override = True
-                print(
-                    f"⚡ 本地 ConvNeXt 觸發壓倒性信心反轉：使用者選定【{clean_crop}】(信心度僅 {user_crop_best_score:.2f})，"
-                    f"模型對【{final_crop} - {parsed_s}】具備壓倒性信心 ({global_best_score:.2f})，自動校正！"
-                )
-        else:
-            # 未限定作物：取整體信心最高者
-            if global_best_label and global_best_score >= settings.CONVNEXT_MIN_CONFIDENCE:
-                best_score = global_best_score
-                best_label = global_best_label
-                parsed_c, _, _ = parse_convnext_prediction(best_label)
-                final_crop = parsed_c
+        # 情況 B：⚡ 壓倒性信心反轉機制 (Overwhelming Confidence Override)
+        # 使用者指定作物信心度極低 (< 0.30)，但全局 Top-1 具有壓倒性信心 (>= 0.85)
+        elif (
+            global_best_label
+            and global_best_score >= settings.CONVNEXT_OVERWHELMING_CONFIDENCE
+            and user_crop_best_score < 0.30
+            and not match_crop_to_class(clean_crop, global_best_label)
+        ):
+            best_score = global_best_score
+            best_label = global_best_label
+            parsed_c, parsed_s, _ = parse_convnext_prediction(global_best_label)
+            final_crop = parsed_c
+            is_override = True
+            print(
+                f"⚡ 本地 ConvNeXt 觸發壓倒性信心反轉：使用者選定【{clean_crop}】(信心度僅 {user_crop_best_score:.2f})，"
+                f"模型對【{final_crop} - {parsed_s}】具備壓倒性信心 ({global_best_score:.2f})，自動校正！"
+            )
 
         if best_label and best_score >= settings.CONVNEXT_MIN_CONFIDENCE:
             parsed_crop, parsed_status, category = parse_convnext_prediction(best_label)

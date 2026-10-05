@@ -254,10 +254,14 @@ class WebcamActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        layoutCropSelector.setOnClickListener {
+        val openCropDialog = View.OnClickListener {
             SoundManager.playBubblePop()
             showCropSelectionDialog()
         }
+        layoutCropSelector.setOnClickListener(openCropDialog)
+        tvCropLabel.setOnClickListener(openCropDialog)
+        tvSelectedCrop.setOnClickListener(openCropDialog)
+        ivCropArrow.setOnClickListener(openCropDialog)
 
         btnToggleMonitor.setOnClickListener {
             SoundManager.playBubblePop()

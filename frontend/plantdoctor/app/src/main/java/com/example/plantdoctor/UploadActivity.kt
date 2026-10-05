@@ -15,6 +15,7 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
+import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -136,10 +137,14 @@ class UploadActivity : AppCompatActivity() {
         )
         applyCropTheme()
 
-        layoutCropSelector.setOnClickListener {
+        val openCropDialog = View.OnClickListener {
             SoundManager.playBubblePop()
             showCropSelectionDialog()
         }
+        layoutCropSelector.setOnClickListener(openCropDialog)
+        tvCropLabel.setOnClickListener(openCropDialog)
+        tvSelectedCrop.setOnClickListener(openCropDialog)
+        ivCropDropdownArrow.setOnClickListener(openCropDialog)
 
         loadCachedCrops()
         fetchCropsList()

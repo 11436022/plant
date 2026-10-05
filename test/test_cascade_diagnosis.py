@@ -258,3 +258,18 @@ def test_unknown_diagnosis_cannot_be_saved_to_diary():
     assert "不可存入病歷日記" in exc_info.value.detail
 
 
+def test_convnext_delegates_banana_to_gemini():
+    """驗證當使用者上傳香蕉（非 PlantVillage 閉集作物）時，ConvNeXt 快篩安全放棄，交由 Gemini 診斷。"""
+    result = predict_convnext_fast_screen("dummy.jpg", crop_name="香蕉")
+    assert result is None
+
+
+def test_convnext_delegates_unknown_crop_to_gemini():
+    """驗證當使用者未指定作物（未知）時，ConvNeXt 快篩不隨意瞎猜閉集桃子/番茄，安全交由 Gemini 進行開集辨識。"""
+    result_none = predict_convnext_fast_screen("dummy.jpg", crop_name=None)
+    assert result_none is None
+
+    result_unknown = predict_convnext_fast_screen("dummy.jpg", crop_name="未知")
+    assert result_unknown is None
+
+
