@@ -1,28 +1,30 @@
-# Generate system_sequence_diagnosis.svg (圖 6-1-1 植物診斷循序圖)
-svg_content = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+import os
+
+svg_content = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 1180" width="1300" height="1180">
   <defs>
     <style>
-      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 20px; font-weight: bold; fill: #0f172a; }
-      .lifeline-box { fill: #f1f5f9; stroke: #334155; stroke-width: 1.5; rx: 6; ry: 6; }
-      .lifeline-ai { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 6; ry: 6; }
-      .lifeline-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 13px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
-      .lifeline-sub { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 10px; fill: #64748b; text-anchor: middle; }
-      .lifeline-line { stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 4,4; }
-      .activation { fill: #e2e8f0; stroke: #475569; stroke-width: 1.2; rx: 3; ry: 3; }
-      .msg-line { stroke: #1e293b; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
-      .return-line { stroke: #2563eb; stroke-width: 1.5; stroke-dasharray: 4,4; fill: none; marker-end: url(#blue-arrow); }
-      .msg-text { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 11px; fill: #1e293b; }
-      .return-text { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 11px; fill: #1d4ed8; }
-      .frame-box { fill: none; stroke: #64748b; stroke-width: 1.2; stroke-dasharray: 6,3; }
-      .frame-header { fill: #f1f5f9; stroke: #64748b; stroke-width: 1.2; }
-      .frame-text { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 11px; font-weight: bold; fill: #334155; }
-      .divider-line { stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4,4; }
+      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 25px; font-weight: bold; fill: #000000; }
+      .lifeline-box { fill: #FFFFFF; stroke: #2D5837; stroke-width: 1.8; rx: 6; ry: 6; }
+      .lifeline-local { fill: #E2EFE0; stroke: #2D5837; stroke-width: 1.8; rx: 6; ry: 6; }
+      .lifeline-cloud { fill: #F0F6EE; stroke: #2D5837; stroke-dasharray: 5,3; stroke-width: 1.8; rx: 6; ry: 6; }
+      .lifeline-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 17px; font-weight: bold; fill: #000000; text-anchor: middle; }
+      .lifeline-line { stroke: #374151; stroke-width: 1.6; stroke-dasharray: 6,4; }
+      .activation { fill: #E2EFE0; stroke: #2D5837; stroke-width: 1.6; rx: 3; ry: 3; }
+      
+      .msg-line { stroke: #000000; stroke-width: 1.8; fill: none; marker-end: url(#arrow); }
+      .return-line { stroke: #1F2937; stroke-width: 1.8; stroke-dasharray: 6,4; fill: none; marker-end: url(#arrow); }
+      .msg-text { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 15px; font-weight: bold; fill: #000000; paint-order: stroke fill; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
+      .return-text { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 15px; font-weight: bold; fill: #000000; paint-order: stroke fill; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
+      
+      .frame-box { fill: none; stroke: #374151; stroke-width: 1.5; stroke-dasharray: 6,4; }
+      .frame-header { fill: #D6E4D5; stroke: #374151; stroke-width: 1.3; }
+      .frame-text { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 15px; font-weight: bold; fill: #000000; }
+      .branch-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 15px; font-weight: bold; fill: #000000; }
+      .divider-line { stroke: #374151; stroke-width: 1.5; stroke-dasharray: 6,4; }
     </style>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 10 5 L 0 9 z" fill="#1e293b" />
-    </marker>
-    <marker id="blue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+    
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#000000" />
     </marker>
   </defs>
 
@@ -30,150 +32,172 @@ svg_content = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" 
   <rect width="100%" height="100%" fill="#ffffff" />
 
   <!-- Diagram Title -->
-  <text x="600" y="32" class="title" text-anchor="middle">圖 6-1-1 植物診斷循序圖 (Sequence Diagram)</text>
+  <text x="650" y="34" class="title" text-anchor="middle">圖 6-1-1 植物診斷循序圖 (Sequence Diagram)</text>
 
-  <!-- Lifeline 1: 使用者 -->
-  <rect x="50" y="55" width="130" height="42" class="lifeline-box" />
-  <text x="115" y="73" class="lifeline-title">使用者 (User)</text>
-  <text x="115" y="88" class="lifeline-sub">園藝愛好者 / 農民</text>
-  <line x1="115" y1="97" x2="115" y2="760" class="lifeline-line" />
+  <!-- ========================================================================= -->
+  <!-- LIFELINES HEADERS & AXES (NO SUBTITLES, CENTERED)                         -->
+  <!-- ========================================================================= -->
 
-  <!-- Lifeline 2: Android App -->
-  <rect x="230" y="55" width="140" height="42" class="lifeline-box" />
-  <text x="300" y="73" class="lifeline-title">Android 客戶端</text>
-  <text x="300" y="88" class="lifeline-sub">Plant Doctor App (Kotlin)</text>
-  <line x1="300" y1="97" x2="300" y2="760" class="lifeline-line" />
+  <!-- Lifeline 1: 使用者 (User) -->
+  <rect x="15" y="55" width="130" height="44" class="lifeline-box" />
+  <text x="80" y="82" class="lifeline-title">使用者 (User)</text>
+  <line x1="80" y1="99" x2="80" y2="1150" class="lifeline-line" />
 
-  <!-- Lifeline 3: FastAPI Backend -->
-  <rect x="420" y="55" width="150" height="42" class="lifeline-box" />
-  <text x="495" y="73" class="lifeline-title">FastAPI 後端伺服器</text>
-  <text x="495" y="88" class="lifeline-sub">微服務路由與決策仲裁</text>
-  <line x1="495" y1="97" x2="495" y2="760" class="lifeline-line" />
+  <!-- Lifeline 2: Android 客戶端 -->
+  <rect x="255" y="55" width="170" height="44" class="lifeline-box" />
+  <text x="340" y="82" class="lifeline-title">Android 客戶端</text>
+  <line x1="340" y1="99" x2="340" y2="1150" class="lifeline-line" />
 
-  <!-- Lifeline 4: Gemini 2.5 Flash -->
-  <rect x="620" y="55" width="160" height="42" class="lifeline-ai" />
-  <text x="700" y="73" class="lifeline-title">Gemini 2.5 Flash</text>
-  <text x="700" y="88" class="lifeline-sub">雲端多模態大模型</text>
-  <line x1="700" y1="97" x2="700" y2="760" class="lifeline-line" />
+  <!-- Lifeline 3: FastAPI 後端伺服器 -->
+  <rect x="510" y="55" width="180" height="44" class="lifeline-box" />
+  <text x="600" y="82" class="lifeline-title">FastAPI 後端伺服器</text>
+  <line x1="600" y1="99" x2="600" y2="1150" class="lifeline-line" />
 
-  <!-- Lifeline 5: Local ConvNet -->
-  <rect x="830" y="55" width="160" height="42" class="lifeline-ai" />
-  <text x="910" y="73" class="lifeline-title">本地自訓 ConvNet</text>
-  <text x="910" y="88" class="lifeline-sub">特定作物卷積網路 (零雲端成本)</text>
-  <line x1="910" y1="97" x2="910" y2="760" class="lifeline-line" />
+  <!-- Lifeline 4: 本地自訓 ConvNeXt -->
+  <rect x="730" y="55" width="180" height="44" class="lifeline-local" />
+  <text x="820" y="82" class="lifeline-title">本地自訓 ConvNeXt</text>
+  <line x1="820" y1="99" x2="820" y2="1150" class="lifeline-line" />
 
-  <!-- Lifeline 6: FAISS RAG & DB -->
-  <rect x="1030" y="55" width="140" height="42" class="lifeline-box" />
-  <text x="1100" y="73" class="lifeline-title">FAISS &amp; MySQL</text>
-  <text x="1100" y="88" class="lifeline-sub">向量檢索與持久化庫</text>
-  <line x1="1100" y1="97" x2="1100" y2="760" class="lifeline-line" />
+  <!-- Lifeline 5: Gemini 2.5 Flash -->
+  <rect x="930" y="55" width="180" height="44" class="lifeline-cloud" />
+  <text x="1020" y="82" class="lifeline-title">Gemini 2.5 Flash</text>
+  <line x1="1020" y1="99" x2="1020" y2="1150" class="lifeline-line" />
 
-  <!-- Activations -->
-  <rect x="110" y="115" width="10" height="630" class="activation" />
-  <rect x="295" y="125" width="10" height="610" class="activation" />
-  <rect x="490" y="145" width="10" height="570" class="activation" />
-  <rect x="695" y="215" width="10" height="60" class="activation" />
-  <rect x="905" y="225" width="10" height="60" class="activation" />
-  <rect x="1095" y="325" width="10" height="50" class="activation" />
+  <!-- Lifeline 6: FAISS & MySQL -->
+  <rect x="1125" y="55" width="170" height="44" class="lifeline-box" />
+  <text x="1210" y="82" class="lifeline-title">FAISS &amp; MySQL</text>
+  <line x1="1210" y1="99" x2="1210" y2="1150" class="lifeline-line" />
 
-  <!-- Step 1: User picks photo -->
-  <line x1="120" y1="125" x2="295" y2="125" class="msg-line" />
-  <text x="135" y="120" class="msg-text">1: 選擇植物患病照片並按下「開始診斷」</text>
+  <!-- ========================================================================= -->
+  <!-- ACTIVATION BOXES                                                          -->
+  <!-- ========================================================================= -->
+  <rect x="75" y="125" width="10" height="1000" class="activation" />
+  <rect x="335" y="135" width="10" height="985" class="activation" />
+  <rect x="595" y="170" width="10" height="945" class="activation" />
+  <rect x="815" y="255" width="10" height="52" class="activation" />
+  <rect x="1015" y="370" width="10" height="58" class="activation" />
+  <rect x="1205" y="480" width="10" height="52" class="activation" />
+  <rect x="1205" y="812" width="10" height="48" class="activation" />
+  <rect x="1205" y="1035" width="10" height="48" class="activation" />
 
-  <!-- Step 2: App sends image to FastAPI -->
-  <line x1="305" y1="145" x2="490" y2="145" class="msg-line" />
-  <text x="315" y="140" class="msg-text">2: POST /api/v1/predict (multipart/form-data: image, JWT)</text>
+  <!-- ========================================================================= -->
+  <!-- SEQUENCE MESSAGES                                                         -->
+  <!-- ========================================================================= -->
 
-  <!-- Step 3: Server caches image and makes prediction_id -->
-  <path d="M 500 160 L 530 160 L 530 180 L 500 180" class="msg-line" />
-  <text x="535" y="174" class="msg-text">3: 暫存影像快取，生成 prediction_id</text>
+  <!-- Msg 1 -->
+  <line x1="85" y1="135" x2="335" y2="135" class="msg-line" />
+  <text x="95" y="126" class="msg-text">1: 選擇照片與作物，點擊「開始診斷」</text>
 
-  <!-- Parallel Frame (par) -->
-  <rect x="440" y="195" width="530" height="110" class="frame-box" />
-  <polygon points="440,195 530,195 520,215 440,215" class="frame-header" />
-  <text x="450" y="209" class="frame-text">par 雙模型並行推論</text>
+  <!-- Msg 2 -->
+  <line x1="345" y1="175" x2="595" y2="175" class="msg-line" />
+  <text x="355" y="166" class="msg-text">2: POST /predict (影像、作物、JWT)</text>
 
-  <!-- 4a: Call Gemini -->
-  <line x1="500" y1="225" x2="695" y2="225" class="msg-line" />
-  <text x="510" y="220" class="msg-text">4a: 傳送影像與結構提示詞 (Gemini 2.5 Flash)</text>
+  <!-- Msg 3: Self-call -->
+  <path d="M 605 205 L 640 205 L 640 225 L 605 225" class="msg-line" />
+  <text x="648" y="218" class="msg-text">3: 暫存影像快取，生成診斷序號</text>
 
-  <line x1="695" y1="265" x2="500" y2="265" class="return-line" />
-  <text x="515" y="260" class="return-text">5a: 回傳影像初判、病徵語意描述與信心值 (JSON)</text>
+  <!-- Msg 4: Local Screening -->
+  <line x1="605" y1="260" x2="815" y2="260" class="msg-line" />
+  <text x="615" y="251" class="msg-text">4: 執行本地卷積快篩 (ConvNeXt)</text>
 
-  <!-- 4b: Call Local ConvNet -->
-  <line x1="500" y1="240" x2="905" y2="240" class="msg-line" />
-  <text x="715" y="235" class="msg-text">4b: 載入本地權重進行卷積分類 (ConvNet)</text>
+  <!-- Msg 5: Local Result -->
+  <line x1="815" y1="298" x2="605" y2="298" class="return-line" />
+  <text x="615" y="289" class="return-text">5: 回傳快篩結果 (≥ 70% 命中)</text>
 
-  <line x1="905" y1="280" x2="500" y2="280" class="return-line" />
-  <text x="680" y="295" class="return-text">5b: 回傳特定病斑分類機率分佈 (Top-1/Top-3)</text>
+  <!-- OPT Frame: Cloud Fallback -->
+  <rect x="535" y="325" width="540" height="130" class="frame-box" />
+  <polygon points="535,325 895,325 885,352 535,352" class="frame-header" />
+  <text x="545" y="344" class="frame-text">opt [雲端兜底：快篩未命中或信心度 &lt; 70%]</text>
 
-  <!-- Step 6: Query FAISS RAG -->
-  <line x1="500" y1="330" x2="1095" y2="330" class="msg-line" />
-  <text x="515" y="325" class="msg-text">6: 查詢 FAISS 向量知識庫與農業部開放資料 (RAG 防幻覺)</text>
+  <!-- Msg 6a: Gemini Call -->
+  <line x1="605" y1="375" x2="1015" y2="375" class="msg-line" />
+  <text x="615" y="366" class="msg-text">6a: 請求雲端多模態分析 (Gemini 2.5 Flash)</text>
 
-  <line x1="1095" y1="365" x2="500" y2="365" class="return-line" />
-  <text x="515" y="360" class="return-text">7: 回傳官方作物/病害標準處置建議與歷史相似案例</text>
+  <!-- Msg 6b: Gemini Return -->
+  <line x1="1015" y1="418" x2="605" y2="418" class="return-line" />
+  <text x="615" y="409" class="return-text">6b: 回傳初判病徵描述與信心值</text>
 
-  <!-- Step 8: Multi-model arbitration -->
-  <path d="M 500 385 L 535 385 L 535 415 L 500 415" class="msg-line" />
-  <text x="540" y="398" class="msg-text">8: 多模型決策仲裁：交叉比對標籤與局部特徵，</text>
-  <text x="540" y="412" class="msg-text">   檢核信心度門檻（≥ 70%），未達標則標記需人工複核</text>
+  <!-- Msg 7: FAISS Search -->
+  <line x1="605" y1="485" x2="1205" y2="485" class="msg-line" />
+  <text x="615" y="476" class="msg-text">7: 知識庫檢索增強 (FAISS 向量比對)</text>
 
-  <!-- Step 9: Return structured result to App -->
-  <line x1="490" y1="435" x2="305" y2="435" class="return-line" />
-  <text x="315" y="430" class="return-text">9: 回傳結構化診斷結果 JSON (含 prediction_id, crop, status, advice)</text>
+  <!-- Msg 8: FAISS Return -->
+  <line x1="1205" y1="522" x2="605" y2="522" class="return-line" />
+  <text x="615" y="513" class="return-text">8: 回傳官方標準處置建議與案例</text>
 
-  <!-- Step 10: App renders report -->
-  <line x1="295" y1="455" x2="120" y2="455" class="return-line" />
-  <text x="135" y="450" class="return-text">10: 渲染並呈現圖文診斷報告與建議處置指引</text>
+  <!-- Msg 9: Self-call Arbitrate -->
+  <path d="M 605 552 L 640 552 L 640 572 L 605 572" class="msg-line" />
+  <text x="648" y="565" class="msg-text">9: 決策仲裁：組合精準處方箋 (未達標防禦煞車)</text>
 
-  <!-- Alt Frame (alt) -->
-  <rect x="70" y="480" width="1070" height="260" class="frame-box" />
-  <polygon points="70,480 230,480 220,500 70,500" class="frame-header" />
-  <text x="80" y="494" class="frame-text">alt [操作選項: 確認儲存 / 反饋糾錯]</text>
+  <!-- Msg 10: Server -> Client -->
+  <line x1="595" y1="608" x2="345" y2="608" class="return-line" />
+  <text x="355" y="599" class="return-text">10: 回傳結構化診斷報告 (處方與對策)</text>
 
-  <!-- Branch 1: Confirm & Save -->
-  <text x="85" y="520" class="frame-text" fill="#16a34a">[分支 A: 使用者確認儲存日誌]</text>
+  <!-- Msg 11: Client -> User -->
+  <line x1="335" y1="644" x2="85" y2="644" class="return-line" />
+  <text x="95" y="635" class="return-text">11: 呈現診斷報告 (未知作物隱藏儲存)</text>
 
-  <line x1="120" y1="535" x2="295" y2="535" class="msg-line" />
-  <text x="135" y="530" class="msg-text">11a: 編輯個人備忘筆記 (user_note) 並點擊「儲存紀錄」</text>
+  <!-- ALT Frame: Subsequent Operations -->
+  <rect x="40" y="675" width="1220" height="455" class="frame-box" />
+  <polygon points="40,675 210,675 200,700 40,700" class="frame-header" />
+  <text x="50" y="693" class="frame-text">alt [後續操作決策]</text>
 
-  <line x1="305" y1="550" x2="490" y2="550" class="msg-line" />
-  <text x="315" y="545" class="msg-text">12a: POST /api/v1/diaries/confirm (prediction_id, user_note)</text>
+  <!-- Branch A: Save -->
+  <text x="55" y="718" class="branch-title">[分支 A: 確診 (信心度 ≥ 70%) 且使用者確認儲存]</text>
 
-  <line x1="500" y1="565" x2="1095" y2="565" class="msg-line" />
-  <text x="515" y="560" class="msg-text">13a: 移動快取圖片至永久儲存，寫入 plant_diary 資料表</text>
+  <!-- Msg 12a -->
+  <line x1="85" y1="742" x2="335" y2="742" class="msg-line" />
+  <text x="95" y="733" class="msg-text">12a: 編輯備忘筆記，點擊「儲存紀錄」</text>
 
-  <line x1="1095" y1="585" x2="500" y2="585" class="return-line" />
-  <text x="515" y="580" class="return-text">14a: 資料庫寫入成功，回傳 diary_id</text>
+  <!-- Msg 13a -->
+  <line x1="345" y1="780" x2="595" y2="780" class="msg-line" />
+  <text x="355" y="771" class="msg-text">13a: POST /diaries/confirm (確認儲存)</text>
 
-  <line x1="490" y1="600" x2="305" y2="600" class="return-line" />
-  <text x="315" y="595" class="return-text">15a: 201 Created 回傳儲存成功，重新整理歷史紀錄清單</text>
+  <!-- Msg 14a -->
+  <line x1="605" y1="818" x2="1205" y2="818" class="msg-line" />
+  <text x="615" y="809" class="msg-text">14a: 寫入植物日誌資料表 (plant_diary)</text>
+
+  <!-- Msg 15a -->
+  <line x1="1205" y1="855" x2="605" y2="855" class="return-line" />
+  <text x="615" y="846" class="return-text">15a: 資料庫寫入成功，回傳 diary_id</text>
+
+  <!-- Msg 16a -->
+  <line x1="595" y1="892" x2="345" y2="892" class="return-line" />
+  <text x="355" y="883" class="return-text">16a: 回傳儲存成功，重新整理歷史清單</text>
 
   <!-- Divider -->
-  <line x1="70" y1="615" x2="1140" y2="615" class="divider-line" />
+  <line x1="40" y1="918" x2="1260" y2="918" class="divider-line" />
 
-  <!-- Branch 2: Submit Feedback -->
-  <text x="85" y="635" class="frame-text" fill="#d97706">[分支 B: 使用者提交診斷反饋與糾錯]</text>
+  <!-- Branch B: Feedback -->
+  <text x="55" y="942" class="branch-title">[分支 B: 判定為未知 或 使用者認為確診有誤]</text>
 
-  <line x1="120" y1="650" x2="295" y2="650" class="msg-line" />
-  <text x="135" y="645" class="msg-text">11b: 填寫糾錯病名與補充說明，點擊「送出反饋」</text>
+  <!-- Msg 12b -->
+  <line x1="85" y1="966" x2="335" y2="966" class="msg-line" />
+  <text x="95" y="957" class="msg-text">12b: 點擊「結果有誤？」，填寫修正病名</text>
 
-  <line x1="305" y1="665" x2="490" y2="665" class="msg-line" />
-  <text x="315" y="660" class="msg-text">12b: POST /api/v1/feedback (prediction_id, corrected_status, comments)</text>
+  <!-- Msg 13b -->
+  <line x1="345" y1="1004" x2="595" y2="1004" class="msg-line" />
+  <text x="355" y="995" class="msg-text">13b: POST /feedback (提交糾錯反饋)</text>
 
-  <line x1="500" y1="685" x2="1095" y2="685" class="msg-line" />
-  <text x="515" y="680" class="msg-text">13b: 寫入 diagnosis_feedback 資料表 (待管理員審核與模型複訓)</text>
+  <!-- Msg 14b -->
+  <line x1="605" y1="1042" x2="1205" y2="1042" class="msg-line" />
+  <text x="615" y="1033" class="msg-text">14b: 寫入 diagnosis_feedback 資料表</text>
 
-  <line x1="1095" y1="705" x2="500" y2="705" class="return-line" />
-  <text x="515" y="700" class="return-text">14b: 反饋記錄成功存檔</text>
+  <!-- Msg 15b -->
+  <line x1="1205" y1="1078" x2="605" y2="1078" class="return-line" />
+  <text x="615" y="1069" class="return-text">15b: 反饋記錄存檔成功</text>
 
-  <line x1="490" y1="720" x2="305" y2="720" class="return-line" />
-  <text x="315" y="715" class="return-text">15b: 回傳致謝通知「感謝您的糾錯反饋，已送交專家審核」</text>
+  <!-- Msg 16b -->
+  <line x1="595" y1="1115" x2="345" y2="1115" class="return-line" />
+  <text x="355" y="1106" class="return-text">16b: 回傳致謝通知「感謝糾錯反饋」</text>
 
 </svg>
 """
 
-with open('documents/system_sequence_diagnosis.svg', 'w', encoding='utf-8') as f:
+with open("documents/圖/圖 6-1-1 植物診斷循序圖.svg", "w", encoding="utf-8") as f:
     f.write(svg_content.strip())
-print("Created documents/system_sequence_diagnosis.svg")
+
+with open("documents/system_sequence_diagnosis.svg", "w", encoding="utf-8") as f:
+    f.write(svg_content.strip())
+
+print("Successfully updated Fig 6-1-1 SVG.")
