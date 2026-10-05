@@ -189,7 +189,7 @@ def build_chapter_11_elements():
         '# 複製環境變數範本 (Linux / macOS)',
         'cp .env.example .env'
     ]))
-    elements.append(build_normal_p('編輯 .env 檔案，填入關鍵設定（包含 GEMINI_API_KEY、DB_HOST、DB_USER、DB_PASSWORD、DB_NAME、JWT_SECRET_KEY 及 SMTP 郵件憑證等）：'))
+    elements.append(build_normal_p('編輯 .env 檔案，填入關鍵設定（包含 GEMINI_API_KEY、DB_HOST、DB_USER、DB_PASSWORD、DB_NAME、JWT_SECRET_KEY、SMTP 郵件憑證及中央氣象署金鑰等）：'))
     elements.append(build_code_p([
         'GEMINI_API_KEY=your_actual_gemini_api_key',
         'DB_HOST=127.0.0.1',
@@ -202,7 +202,9 @@ def build_chapter_11_elements():
         'SMTP_PORT=587',
         'SMTP_USERNAME=your_gmail_account@gmail.com',
         'SMTP_PASSWORD=your_gmail_app_password',
-        'SMTP_FROM_EMAIL=your_gmail_account@gmail.com'
+        'SMTP_FROM_EMAIL=your_gmail_account@gmail.com',
+        '# 中央氣象署開放資料 API 金鑰 (選填，需至 https://opendata.cwb.gov.tw/ 申請)',
+        'CWB_API_KEY=你的中央氣象署API金鑰'
     ]))
 
     elements.append(build_h3_p('11-2-5 步驟 4：本地 AI 模型權重配置'))
@@ -220,10 +222,10 @@ def build_chapter_11_elements():
     ]))
 
     elements.append(build_h3_p('11-3-2 步驟 2：執行 Alembic 資料庫版本遷移'))
-    elements.append(build_normal_p('透過 Alembic 工具將最新資料庫綱要（包含診斷來源快照、複核註記、Webcam 警報及使用者糾錯資料表）自動同步至 MySQL：'))
+    elements.append(build_normal_p('透過 Alembic 工具將最新資料庫綱要（包含診斷來源快照、複核註記、Webcam 警報及使用者糾錯資料表）自動同步至 MySQL。因具備多分支演進歷史，請使用 heads 執行全分支平滑遷移：'))
     elements.append(build_code_p([
-        '# 執行遷移至最新版本 (head)',
-        'python -m alembic upgrade head',
+        '# 執行遷移至最新版本 (heads)',
+        'python -m alembic upgrade heads',
         '',
         '# 核對目前資料庫版本狀態',
         'python -m alembic current'
@@ -240,7 +242,7 @@ def build_chapter_11_elements():
     elements.append(build_code_p([
         'python build_knowledge_base.py'
     ]))
-    elements.append(build_normal_p('建庫完成後，將於專案根目錄生成成對之向量索引檔案 knowledge_base.faiss 與清單檔案 knowledge_content.json。'))
+    elements.append(build_normal_p('建庫完成後，將於專案根目錄生成成對之向量索引檔案 knowledge_base.faiss 與清單檔案 knowledge_content.json。專案根目錄已預載建置完成之索引檔，初次啟動無須重新生成。'))
 
     # 11-4 系統啟動與服務驗證
     elements.append(build_h2_p('11-4 系統啟動與服務驗證'))
@@ -257,7 +259,7 @@ def build_chapter_11_elements():
 
     elements.append(build_h3_p('11-4-2 步驟 2：OpenAPI 互動式文件與健康檢查'))
     elements.append(build_normal_p('開啟瀏覽器測試核心端點以確認服務健康狀態：'))
-    elements.append(build_normal_p('1. 健康檢查端點：存取 http://127.0.0.1:8000/api/v1/health，應回傳 {"status": "ok", "app": "plant_diagnosis_api"}。', is_bullet=True))
+    elements.append(build_normal_p('1. 根目錄健康檢查：存取 http://127.0.0.1:8000/，應回傳 {"message": "Plant API is running. Open /docs for the API docs."}。', is_bullet=True))
     elements.append(build_normal_p('2. Swagger API 互動文件：存取 http://127.0.0.1:8000/docs，可檢視完整之 20+ 個 RESTful API 端點規格與即時測試介面。', is_bullet=True))
 
     elements.append(build_h3_p('11-4-3 步驟 3：管理員帳號初次建立與驗證'))
@@ -283,8 +285,8 @@ def build_chapter_11_elements():
         '# 檢查容器運行狀態',
         'docker compose ps',
         '',
-        '# 即時檢視容器日誌輸出',
-        'docker compose logs -f plant-backend',
+        '# 即時檢視容器日誌輸出 (服務名稱為 web)',
+        'docker compose logs -f web',
         '',
         '# 停止容器服務',
         'docker compose down'
