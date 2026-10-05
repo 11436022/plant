@@ -123,7 +123,7 @@
   <rect x="1196" y="315" width="318" height="105" rx="8" class="ai-box"/>
   <text x="1355" y="345" text-anchor="middle" class="head">本地自訓 ConvNeXt 模型</text>
   <text x="1355" y="375" text-anchor="middle" class="text">步驟 1: 特定作物病斑分類快篩</text>
-  <text x="1355" y="400" text-anchor="middle" class="small">零雲端成本 / ≥ 75% 優先命中</text>
+  <text x="1355" y="400" text-anchor="middle" class="small">雙重驗證 (信心≥75% &amp; 相似度≥0.68)</text>
 
   <!-- 3. Gemini Multimodal Fallback (Step 2) -->
   <rect x="1196" y="435" width="318" height="105" rx="8" class="ai-box"/>

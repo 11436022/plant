@@ -83,19 +83,20 @@
   <text x="750" y="257" class="node-text-bold">步驟 1：本地 ConvNeXt 優先快篩</text>
   <text x="750" y="273" class="node-subtext">微觀病斑分類與特徵萃取 (零雲端成本)</text>
 
-  <line x1="750" y1="285" x2="750" y2="310" class="line" />
+  <line x1="750" y1="285" x2="750" y2="306" class="line" />
 
-  <!-- Decision 1: 本地快篩是否命中 (信心度 >= 70%) -->
-  <polygon points="750,310 815,338 750,366 685,338" class="decision-node" />
-  <text x="750" y="342" class="node-text-bold" font-size="11">信心度 ≥ 70% ?</text>
+  <!-- Decision 1: 本地快篩雙重驗證 (信心度 >= 75% 且 特徵相似度 >= 0.68) -->
+  <polygon points="750,306 832,338 750,370 668,338" class="decision-node" />
+  <text x="750" y="333" class="node-text-bold" font-size="11">雙重驗證通過 ?</text>
+  <text x="750" y="349" class="node-subtext" font-size="9.5">信心≥75% &amp; 相似度≥0.68</text>
 
   <!-- Branch 1 [是: 快篩命中] -> 直接旁路至處方生成 (零 API 消耗) -->
-  <path d="M 815 338 L 880 338 L 880 475 L 750 475" class="bypass-line" />
-  <text x="850" y="330" class="edge-label" fill="#4F7057">[是: 快篩命中]</text>
+  <path d="M 832 338 L 888 338 L 888 475 L 750 475" class="bypass-line" />
+  <text x="860" y="328" class="edge-label" fill="#4F7057">[是: 命中]</text>
 
-  <!-- Branch 2 [否: 未命中/低置信] -> 進入步驟 2: Gemini 多模態兜底 -->
-  <line x1="750" y1="366" x2="750" y2="395" class="line" />
-  <text x="770" y="385" class="edge-label">[否: 需兜底]</text>
+  <!-- Branch 2 [否: 未命中/低置信/OOD] -> 進入步驟 2: Gemini 多模態兜底 -->
+  <line x1="750" y1="370" x2="750" y2="395" class="line" />
+  <text x="792" y="386" class="edge-label">[否: 需兜底/OOD]</text>
 
   <!-- Action 2: Gemini 2.5 Flash 雲端多模態兜底 -->
   <rect x="630" y="395" width="240" height="50" class="ai-node-cloud" />

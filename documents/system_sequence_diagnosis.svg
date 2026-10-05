@@ -113,7 +113,7 @@
 
   <!-- Step 5: Local ConvNeXt returns (y=298) -->
   <line x1="815" y1="298" x2="605" y2="298" class="return-line" />
-  <text x="615" y="290" class="return-text">5: 回傳快篩結果 (≥ 70% 命中)</text>
+  <text x="615" y="290" class="return-text">5: 回傳快篩結果 (雙重驗證命中)</text>
 
 
   <!-- ========================================================================= -->
@@ -121,7 +121,7 @@
   <!-- ========================================================================= -->
   <rect x="540" y="325" width="530" height="115" class="frame-box" />
   <polygon points="540,325 835,325 825,347 540,347" class="frame-header" />
-  <text x="550" y="342" class="frame-text">opt [雲端兜底：快篩未命中或信心度 &lt; 70%]</text>
+  <text x="550" y="342" class="frame-text">opt [雲端兜底：未達雙重門檻或特徵 OOD]</text>
 
   <!-- Step 6a: Call Gemini (y=365) -->
   <line x1="605" y1="365" x2="1015" y2="365" class="msg-line" />

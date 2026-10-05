@@ -1,134 +1,201 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1150" viewBox="0 0 1600 1150">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
   <defs>
     <style>
-      .title { font: 700 44px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
-      .subtitle { font: 400 20px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2D3748; }
-      .lane { font: 700 24px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #4F7057; }
-      .head { font: 700 21px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
-      .text { font: 400 17px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
-      .small { font: 400 15px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2D3748; }
+      .title { font: 700 42px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #1A281E; }
+      .subtitle { font: 400 18px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #2D3748; }
+      .lane { font: 700 20px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #4F7057; }
+      .lane-sub { font: 400 13px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #2D3748; }
+      .head { font: 700 17px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #1A281E; }
+      .text { font: 400 13.5px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #1A281E; }
+      .small { font: 400 11.5px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #2D3748; }
       .lane-box { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 2; }
       .client { fill: #DDEAD7; stroke: #B5C6B3; stroke-width: 2; }
       .service { fill: #ffffff; stroke: #B5C6B3; stroke-width: 2; }
       .safety { fill: #DDEAD7; stroke: #4F7057; stroke-width: 2; }
       .external { fill: #E5EDE3; stroke: #4F7057; stroke-width: 2; }
-      .line { stroke: #B5C6B3; stroke-width: 2.3; fill: none; marker-end: url(#arrow); }
-      .return { stroke: #B5C6B3; stroke-width: 1.8; stroke-dasharray: 7 5; fill: none; marker-end: url(#arrow2); }
+      .ai-box { fill: #E5EDE3; stroke: #4F7057; stroke-width: 2; }
+      .line { stroke: #B5C6B3; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .return { stroke: #B5C6B3; stroke-width: 1.6; stroke-dasharray: 5 4; fill: none; marker-end: url(#arrow2); }
+      .flow-label {
+        font: 700 12px 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+        fill: #4F7057;
+        paint-order: stroke fill;
+        stroke: #ffffff;
+        stroke-width: 4px;
+        stroke-linejoin: round;
+      }
+      .halo-text {
+        font: 400 12.5px 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+        fill: #2D3748;
+        paint-order: stroke fill;
+        stroke: #ffffff;
+        stroke-width: 4px;
+        stroke-linejoin: round;
+      }
     </style>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
-      <path d="M0 0 L10 5 L0 10 Z" fill="#B5C6B3"/>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9 Z" fill="#B5C6B3"/>
     </marker>
-    <marker id="arrow2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
-      <path d="M0 0 L10 5 L0 10 Z" fill="#B5C6B3"/>
+    <marker id="arrow2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9 Z" fill="#B5C6B3"/>
     </marker>
   </defs>
-  <style>.text {font-size:16px} .small {font-size:14px}</style>
-  <rect width="1600" height="1150" fill="#ffffff"/>
-  <text x="60" y="60" text-anchor="start" class="title">現行系統架構圖</text>
-  <text x="60" y="94" text-anchor="start" class="subtitle">現行開發連線為 HTTP；HTTPS 反向代理為規劃，尚未部署。圖示程式流程，不代表整合驗收。</text>
-  <rect x="50" y="126" width="380" height="820" rx="8" class="lane-box"/>
-  <rect x="470" y="126" width="650" height="820" rx="8" class="lane-box"/>
-  <rect x="1160" y="126" width="390" height="820" rx="8" class="lane-box"/>
-  <text x="240" y="166" text-anchor="middle" class="lane">使用介面</text>
-  <text x="795" y="166" text-anchor="middle" class="lane">FastAPI 後端</text>
-  <text x="1355" y="166" text-anchor="middle" class="lane">資料與外部服務</text>
-  <rect x="86" y="205" width="308" height="136" rx="7" class="client"/>
-  <text x="240" y="235" text-anchor="middle" class="head">Android App</text>
-  <text x="240" y="260" text-anchor="middle" class="text">帳號、拍照／選圖、確認保存</text>
-  <text x="240" y="283" text-anchor="middle" class="text">歷史、備註與使用者修正</text>
-  <text x="240" y="306" text-anchor="middle" class="text">信心、來源與複核標記</text>
-  <text x="240" y="329" text-anchor="middle" class="text">Kotlin / Retrofit / JWT</text>
-  <rect x="86" y="402" width="308" height="136" rx="7" class="client"/>
-  <text x="240" y="432" text-anchor="middle" class="head">Webcam 監控介面</text>
-  <text x="240" y="457" text-anchor="middle" class="text">Android：單株／多區域</text>
-  <text x="240" y="480" text-anchor="middle" class="text">瀏覽器：僅全畫面擷取</text>
-  <text x="240" y="503" text-anchor="middle" class="text">定時影格與個人警報</text>
-  <rect x="86" y="615" width="308" height="136" rx="7" class="client"/>
-  <text x="240" y="645" text-anchor="middle" class="head">管理後台</text>
-  <text x="240" y="670" text-anchor="middle" class="text">/admin/login 瀏覽器登入</text>
-  <text x="240" y="693" text-anchor="middle" class="text">統計、日誌手動新增／改／刪</text>
-  <text x="240" y="716" text-anchor="middle" class="text">使用者查詢；Jinja2 / HTML</text>
-  <text x="240" y="818" text-anchor="middle" class="small">維護者另行執行資料同步／建庫腳本</text>
-  <text x="240" y="844" text-anchor="middle" class="small">update_reference_data.py</text>
-  <text x="240" y="870" text-anchor="middle" class="small">seed.py / build_knowledge_base.py</text>
-  <rect x="510" y="205" width="570" height="118" rx="7" class="service"/>
-  <text x="795" y="235" text-anchor="middle" class="head">API 與身分驗證層</text>
-  <text x="795" y="260" text-anchor="middle" class="text">Auth / Predict / Diaries / Webcam / Knowledge / Admin</text>
-  <text x="795" y="283" text-anchor="middle" class="text">上傳與確認：JWT；管理員：已驗證信箱＋role=admin</text>
-  <text x="795" y="306" text-anchor="middle" class="text">管理後台支援 Cookie / Bearer；角色查核取自資料庫</text>
-  <rect x="510" y="371" width="270" height="124" rx="7" class="service"/>
-  <text x="645" y="401" text-anchor="middle" class="head">圖片診斷服務</text>
-  <text x="645" y="426" text-anchor="middle" class="text">格式、解碼與畫面品質檢查</text>
-  <text x="645" y="449" text-anchor="middle" class="text">Gemini 候選分析</text>
-  <text x="645" y="472" text-anchor="middle" class="text">POST /api/v1/predict/</text>
-  <rect x="810" y="371" width="270" height="124" rx="7" class="service"/>
-  <text x="945" y="401" text-anchor="middle" class="head">Webcam 警報服務</text>
-  <text x="945" y="426" text-anchor="middle" class="text">使用者／session／region 分組</text>
-  <text x="945" y="449" text-anchor="middle" class="text">連續一致、信心門檻與冷卻</text>
-  <text x="945" y="472" text-anchor="middle" class="text">合格病蟲害才建立警報</text>
-  <rect x="510" y="551" width="570" height="113" rx="7" class="safety"/>
-  <text x="795" y="581" text-anchor="middle" class="head">資料庫校驗與複核標記</text>
-  <text x="795" y="606" text-anchor="middle" class="text">名稱與作物關聯、信心門檻、來源完整性</text>
-  <text x="795" y="629" text-anchor="middle" class="text">unknown／需複核可確認存檔，但不得觸發自動警報</text>
-  <rect x="510" y="714" width="270" height="131" rx="7" class="service"/>
-  <text x="645" y="744" text-anchor="middle" class="head">待確認診斷暫存</text>
-  <text x="645" y="769" text-anchor="middle" class="text">prediction_cache：記憶體</text>
-  <text x="645" y="792" text-anchor="middle" class="text">user_id＋有效期限 15 分鐘</text>
-  <text x="645" y="815" text-anchor="middle" class="text">static/tmp：暫存圖片</text>
-  <rect x="810" y="714" width="270" height="131" rx="7" class="service"/>
-  <text x="945" y="744" text-anchor="middle" class="head">日誌與管理服務</text>
-  <text x="945" y="769" text-anchor="middle" class="text">確認本人暫存後建立日誌</text>
-  <text x="945" y="792" text-anchor="middle" class="text">來源快照、信心與複核標記</text>
-  <text x="945" y="815" text-anchor="middle" class="text">管理員可另行手動新增</text>
-  <text x="795" y="893" text-anchor="middle" class="small">確認：POST /api/v1/diaries/confirm/{prediction_id}</text>
-  <text x="795" y="921" text-anchor="middle" class="small">使用者修正是註記，不等於專業複核或建議重新核准。</text>
-  <rect x="1196" y="205" width="318" height="141" rx="7" class="external"/>
-  <text x="1355" y="235" text-anchor="middle" class="head">MySQL</text>
-  <text x="1355" y="260" text-anchor="middle" class="text">帳號／Token／日誌／警報</text>
-  <text x="1355" y="283" text-anchor="middle" class="text">作物／病害／蟲害與參考來源</text>
-  <text x="1355" y="306" text-anchor="middle" class="text">紀錄、來源快照、圖片路徑</text>
-  <text x="1355" y="329" text-anchor="middle" class="text">不保存圖片檔案</text>
-  <rect x="1196" y="395" width="318" height="138" rx="7" class="external"/>
-  <text x="1355" y="425" text-anchor="middle" class="head">農業知識與 RAG</text>
-  <text x="1355" y="450" text-anchor="middle" class="text">data.json 可追溯農業紀錄</text>
-  <text x="1355" y="473" text-anchor="middle" class="text">FAISS＋來源 manifest／雜湊</text>
-  <text x="1355" y="496" text-anchor="middle" class="text">不讀取專題手冊 DOCX</text>
-  <text x="1355" y="519" text-anchor="middle" class="text">索引缺失／不相容時跳過檢索</text>
-  <rect x="1196" y="582" width="150" height="122" rx="7" class="external"/>
-  <text x="1271" y="612" text-anchor="middle" class="head">Gemini</text>
-  <text x="1271" y="637" text-anchor="middle" class="text">影像候選</text>
-  <text x="1271" y="660" text-anchor="middle" class="text">非診斷事實</text>
-  <rect x="1364" y="582" width="150" height="122" rx="7" class="external"/>
-  <text x="1439" y="612" text-anchor="middle" class="head">SMTP</text>
-  <text x="1439" y="637" text-anchor="middle" class="text">驗證／重設信</text>
-  <text x="1439" y="660" text-anchor="middle" class="text">警報 Email</text>
-  <rect x="1196" y="767" width="318" height="121" rx="7" class="external"/>
-  <text x="1355" y="797" text-anchor="middle" class="head">圖片檔案系統</text>
-  <text x="1355" y="822" text-anchor="middle" class="text">static/tmp：待確認圖片</text>
-  <text x="1355" y="845" text-anchor="middle" class="text">static/uploads：日誌／警報圖片</text>
-  <text x="1355" y="868" text-anchor="middle" class="text">MySQL 僅保存對應路徑</text>
-  <path d="M394 266 H510" class="line"/>
-  <text x="451" y="251" text-anchor="middle" class="small">HTTP</text>
-  <path d="M394 469 H450 V284 H510" class="line"/>
-  <path d="M394 682 H438 V309 H510" class="line"/>
-  <path d="M645 323 V371" class="line"/>
-  <path d="M945 323 V371" class="line"/>
-  <path d="M645 495 V551" class="line"/>
-  <path d="M945 495 V551" class="line"/>
-  <path d="M645 664 V714" class="line"/>
-  <path d="M780 780 H810" class="line"/>
-  <text x="795" y="702" text-anchor="middle" class="small">使用者確認＋歸屬／效期檢查</text>
-  <path d="M1080 258 H1196" class="line"/>
-  <path d="M1080 795 H1140 V292 H1196" class="line"/>
-  <path d="M1080 614 H1150 V465 H1196" class="line"/>
-  <path d="M780 426 H795 V517 H1176 V640 H1196" class="line"/>
-  <path d="M1080 435 H1130 V561 H1439 V582" class="line"/>
-  <path d="M1080 310 H1158 V561 H1439 V582" class="line"/>
-  <path d="M1080 829 H1196" class="line"/>
-  <rect x="50" y="970" width="1500" height="157" rx="6" fill="#DDEAD7" stroke="#B5C6B3"/>
-  <text x="800" y="1000" text-anchor="middle" class="text">SMTP：驗證信失敗會妨礙新帳號完成驗證與登入；警報先保存，寄送失敗不刪除已存紀錄。</text>
-  <text x="800" y="1030" text-anchor="middle" class="small">RAG 建庫由維護者執行，manifest 記載來源、版本、建庫時間與雜湊；部署中的索引仍須實際核對。</text>
-  <text x="800" y="1055" text-anchor="middle" class="small">來源欄位完整不代表辨識準確或處方經專業核准；SMTP 寄送成功不代表收件成功。</text>
-  <text x="800" y="1082" text-anchor="middle" class="small">後端隔離測試通過，範圍與數量另見驗證報告。</text>
-  <text x="800" y="1110" text-anchor="middle" class="small">MySQL 僅 SQL 離線檢查；Android 前端已具欄位流程，但缺 SDK 未建置、未實機驗證。</text>
+
+  <!-- Background Canvas -->
+  <rect width="1600" height="900" fill="#ffffff"/>
+  <text x="60" y="56" class="title">現行系統架構圖 (System Architecture)</text>
+  <text x="60" y="86" class="subtitle">前端介面、FastAPI 核心服務、本地快篩與 Gemini 兜底階層架構、RAG 知識檢索與資料持久層</text>
+
+  <!-- Swimlanes -->
+  <rect x="50" y="115" width="380" height="712" rx="8" class="lane-box"/>
+  <rect x="470" y="115" width="650" height="712" rx="8" class="lane-box"/>
+  <rect x="1160" y="115" width="390" height="712" rx="8" class="lane-box"/>
+  <text x="240" y="145" text-anchor="middle" class="lane">使用介面</text>
+  <text x="240" y="167" text-anchor="middle" class="lane-sub">(Presentation Layer)</text>
+  <text x="795" y="145" text-anchor="middle" class="lane">FastAPI 後端核心服務</text>
+  <text x="795" y="167" text-anchor="middle" class="lane-sub">(Application Layer)</text>
+  <text x="1355" y="145" text-anchor="middle" class="lane">資料層與外部服務</text>
+  <text x="1355" y="167" text-anchor="middle" class="lane-sub">(Data &amp; External Services)</text>
+
+  <!-- ================= LANE 1: Presentation Layer ================= -->
+  <!-- 1. Android App -->
+  <rect x="86" y="185" width="308" height="145" rx="8" class="client"/>
+  <text x="240" y="218" text-anchor="middle" class="head">Android 行動端 App</text>
+  <text x="240" y="250" text-anchor="middle" class="text">拍照診斷與病害處方查閱</text>
+  <text x="240" y="276" text-anchor="middle" class="text">個人備忘筆記與糾錯反饋</text>
+  <text x="240" y="304" text-anchor="middle" class="small">Kotlin / Retrofit2 / CameraX</text>
+
+  <!-- 2. Webcam Interface -->
+  <rect x="86" y="365" width="308" height="145" rx="8" class="client"/>
+  <text x="240" y="398" text-anchor="middle" class="head">Webcam 即時監控介面</text>
+  <text x="240" y="430" text-anchor="middle" class="text">連續影像串流與定時取樣</text>
+  <text x="240" y="456" text-anchor="middle" class="text">即時病害警報響應與鈴聲提示</text>
+  <text x="240" y="484" text-anchor="middle" class="small">CameraX / OpenCV 串流</text>
+
+  <!-- 3. Web Admin Console -->
+  <rect x="86" y="545" width="308" height="145" rx="8" class="client"/>
+  <text x="240" y="578" text-anchor="middle" class="head">Web 管理者後台</text>
+  <text x="240" y="610" text-anchor="middle" class="text">統計儀表板與全站病歷維護</text>
+  <text x="240" y="636" text-anchor="middle" class="text">使用者糾錯審核與資料標註</text>
+  <text x="240" y="664" text-anchor="middle" class="small">FastAPI / Jinja2 / Bootstrap</text>
+
+  <!-- ================= LANE 2: Application Layer (FastAPI) ================= -->
+  <!-- 1. API Gateway / Routing & Security Layer -->
+  <rect x="510" y="185" width="570" height="80" rx="8" class="service"/>
+  <text x="795" y="217" text-anchor="middle" class="head">API 路由與安全層</text>
+  <text x="795" y="245" text-anchor="middle" class="text">OAuth2 / JWT 驗證與各模組端點請求分派</text>
+
+  <!-- 2A. Webcam Edge Monitoring Service (Left) -->
+  <rect x="510" y="295" width="270" height="150" rx="8" class="service"/>
+  <text x="645" y="328" text-anchor="middle" class="head">Webcam 邊緣監控服務</text>
+  <text x="645" y="360" text-anchor="middle" class="text">連續 3 影格共識判定</text>
+  <text x="645" y="386" text-anchor="middle" class="text">過濾晃動、快取異常狀態</text>
+  <text x="645" y="416" text-anchor="middle" class="small">時序平滑濾波 (防單幀誤報)</text>
+
+  <!-- 2B. Cascade Diagnosis Dispatch Service (Right) -->
+  <rect x="810" y="295" width="270" height="150" rx="8" class="service"/>
+  <text x="945" y="328" text-anchor="middle" class="head">階層式診斷調度服務</text>
+  <text x="945" y="360" text-anchor="middle" class="text">步驟 1: 優先本地快篩</text>
+  <text x="945" y="386" text-anchor="middle" class="text">步驟 2: 未命中 Gemini 兜底</text>
+  <text x="945" y="416" text-anchor="middle" class="small">瀑布流推論 (Cascade Pipeline)</text>
+
+  <!-- 3. Decision Integration & RAG Core -->
+  <rect x="510" y="480" width="570" height="130" rx="8" class="safety"/>
+  <text x="795" y="512" text-anchor="middle" class="head">決策整合與 RAG 校驗核心</text>
+  <text x="795" y="542" text-anchor="middle" class="text">步驟 3: FAISS 向量檢索比對農業部官方資料庫</text>
+  <text x="795" y="568" text-anchor="middle" class="text">動態精準處方生成；信心度門檻評估 (≥ 70%)</text>
+  <text x="795" y="594" text-anchor="middle" class="small">未達門檻判定為「無法判定」(安全防禦煞車)</text>
+
+  <!-- 4. Diary, Feedback & Training Data Operations -->
+  <rect x="510" y="645" width="570" height="105" rx="8" class="service"/>
+  <text x="795" y="675" text-anchor="middle" class="head">日誌與回饋數據管理服務</text>
+  <text x="795" y="705" text-anchor="middle" class="text">診斷病歷存檔、檢索與個人備忘筆記維護</text>
+  <text x="795" y="730" text-anchor="middle" class="small">使用者糾錯接收與模型複訓資料集匯出</text>
+
+  <!-- ================= LANE 3: Data & External Services ================= -->
+  <!-- 1. MySQL Relational DB -->
+  <rect x="1196" y="185" width="318" height="100" rx="8" class="external"/>
+  <text x="1355" y="215" text-anchor="middle" class="head">MySQL 關聯式資料庫</text>
+  <text x="1355" y="244" text-anchor="middle" class="text">帳號、診斷病歷與警報紀錄</text>
+  <text x="1355" y="268" text-anchor="middle" class="small">SQLAlchemy ORM / 糾錯反饋資料表</text>
+
+  <!-- 2. Local ConvNeXt Fast Screen (Step 1) -->
+  <rect x="1196" y="315" width="318" height="105" rx="8" class="ai-box"/>
+  <text x="1355" y="345" text-anchor="middle" class="head">本地自訓 ConvNeXt 模型</text>
+  <text x="1355" y="375" text-anchor="middle" class="text">步驟 1: 特定作物病斑分類快篩</text>
+  <text x="1355" y="400" text-anchor="middle" class="small">雙重驗證 (信心≥75% &amp; 相似度≥0.68)</text>
+
+  <!-- 3. Gemini Multimodal Fallback (Step 2) -->
+  <rect x="1196" y="435" width="318" height="105" rx="8" class="ai-box"/>
+  <text x="1355" y="465" text-anchor="middle" class="head">Gemini 2.5 Flash 雲端模型</text>
+  <text x="1355" y="495" text-anchor="middle" class="text">步驟 2: 多模態影像初判與兜底</text>
+  <text x="1355" y="520" text-anchor="middle" class="small">廣域特徵分析 (未命中或低信心時啟動)</text>
+
+  <!-- 4. Agricultural Knowledge Base & FAISS (Step 3) -->
+  <rect x="1196" y="555" width="318" height="100" rx="8" class="external"/>
+  <text x="1355" y="585" text-anchor="middle" class="head">官方知識庫與 FAISS</text>
+  <text x="1355" y="615" text-anchor="middle" class="text">步驟 3: 農業部病害知識檢索</text>
+  <text x="1355" y="638" text-anchor="middle" class="small">標準防治處方對齊 (防範 AI 幻覺)</text>
+
+  <!-- 5. External Services: SMTP, Weather & Active Learning -->
+  <rect x="1196" y="670" width="318" height="95" rx="8" class="external"/>
+  <text x="1355" y="700" text-anchor="middle" class="head">外部支援服務 (SMTP / CWA)</text>
+  <text x="1355" y="728" text-anchor="middle" class="text">Gmail SMTP 驗證與警報推播</text>
+  <text x="1355" y="748" text-anchor="middle" class="small">CWA 氣象署即時溫濕度建議</text>
+
+  <!-- ================= Connecting Flows & Arrows ================= -->
+  <!-- 1. Lane 1 -> Lane 2 -->
+  <path d="M394 225 H510" class="line"/>
+  <path d="M394 410 H510" class="line"/>
+  <path d="M394 595 H510" class="line"/>
+  <text x="452" y="216" text-anchor="middle" class="halo-text">HTTPS / JSON</text>
+  <text x="452" y="401" text-anchor="middle" class="halo-text">Frame Stream</text>
+  <text x="452" y="586" text-anchor="middle" class="halo-text">REST / Admin</text>
+
+  <!-- 2. Inside Lane 2 -->
+  <path d="M645 265 V295" class="line"/>
+  <path d="M945 265 V295" class="line"/>
+  <path d="M645 445 V480" class="line"/>
+  <path d="M945 445 V480" class="line"/>
+  <path d="M795 610 V645" class="line"/>
+
+  <!-- 3. Lane 2 <-> Lane 3 Connections -->
+  <!-- Flow 1: API Layer <-> MySQL (y=215 & y=245) -->
+  <path d="M1080 215 H1196" class="line"/>
+  <path d="M1196 245 H1080" class="return"/>
+  <text x="1138" y="204" text-anchor="middle" class="flow-label">查詢／驗證</text>
+
+  <!-- Flow 2: 診斷調度 -> 本地 ConvNeXt (y=348 & y=380) -->
+  <path d="M1080 348 H1196" class="line"/>
+  <path d="M1196 380 H1080" class="return"/>
+  <text x="1138" y="336" text-anchor="middle" class="flow-label">步驟 1: 本地快篩</text>
+  <text x="1138" y="398" text-anchor="middle" class="flow-label">回傳病斑特徵</text>
+
+  <!-- Flow 3: 診斷調度 -> Gemini 兜底 (y=468 & y=500) -->
+  <path d="M1080 468 H1196" class="line"/>
+  <path d="M1196 500 H1080" class="return"/>
+  <text x="1138" y="456" text-anchor="middle" class="flow-label">步驟 2: 雲端兜底</text>
+  <text x="1138" y="518" text-anchor="middle" class="flow-label">回傳多模態初判</text>
+
+  <!-- Flow 4: 決策整合核心 <-> FAISS RAG (y=580 & y=612) -->
+  <path d="M1080 580 H1196" class="line"/>
+  <path d="M1196 612 H1080" class="return"/>
+  <text x="1138" y="568" text-anchor="middle" class="flow-label">步驟 3: RAG 檢索</text>
+  <text x="1138" y="630" text-anchor="middle" class="flow-label">回傳官方處方</text>
+
+  <!-- Flow 5: 決策整合核心 -> SMTP 外部郵件 (x=1168 track) -->
+  <path d="M1080 600 H1168 V700 H1196" class="line"/>
+  <text x="1168" y="692" text-anchor="middle" class="flow-label">觸發警報</text>
+
+  <!-- Flow 6: 日誌管理服務 -> MySQL (x=1148 track up to MySQL) -->
+  <path d="M1080 675 H1148 V270 H1196" class="line"/>
+  <text x="1148" y="262" text-anchor="middle" class="flow-label">寫入紀錄</text>
+
+  <!-- Flow 7: CWA 氣象開放資料 -> 服務層 (y=735) -->
+  <path d="M1196 735 H1080" class="return"/>
+  <text x="1138" y="726" text-anchor="middle" class="flow-label">氣象回傳</text>
+
+  <!-- ================= Bottom System Annotation ================= -->
+  <rect x="50" y="836" width="1500" height="42" rx="6" fill="#DDEAD7" stroke="#B5C6B3"/>
+  <text x="800" y="862" text-anchor="middle" class="small">診斷架構採三層階層式設計：本地自訓 ConvNeXt 優先快篩（零雲端成本），未命中由 Gemini 雲端多模態兜底，並經 FAISS 官方知識庫校驗生成精準處方；反饋數據留存供模型增量複訓。</text>
 </svg>
