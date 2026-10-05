@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="880" viewBox="0 0 1600 880">
+import os
+
+svg_content = """<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="880" viewBox="0 0 1600 880">
   <defs>
     <style>
       .title { font: 700 36px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #000000; }
@@ -185,3 +187,15 @@
   <text x="1138" y="726" text-anchor="middle" class="flow-label">氣象回傳</text>
 
 </svg>
+"""
+
+targets = [
+    "documents/圖/圖 3-1-1 系統架構圖.svg",
+    "documents/current_system_architecture.svg",
+    "documents/current_system_architecture_1.svg",
+]
+
+for t in targets:
+    with open(t, "w", encoding="utf-8") as f:
+        f.write(svg_content.strip())
+    print(f"Written to {t}")
