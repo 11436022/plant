@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1235" viewBox="0 0 1600 1235">
   <defs>
     <style>
-      .title { font: 700 42px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
-      .subtitle { font: 400 19px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665f; }
+      .title { font: 700 42px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
+      .subtitle { font: 400 19px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2D3748; }
       .head { font: 700 21px "Segoe UI", "Microsoft JhengHei", sans-serif; fill: #ffffff; }
-      .field { font: 400 15px "Segoe UI", "Microsoft JhengHei", sans-serif; fill: #334239; }
-      .key { font: 700 14px "Segoe UI", Arial, sans-serif; fill: #98651c; }
-      .label { font: 700 14px "Segoe UI", Arial, sans-serif; fill: #53665a; }
-      .table { fill: #ffffff; stroke: #6f9075; stroke-width: 2; }
-      .header { fill: #47765a; }
-      .line { stroke: #6b7e70; stroke-width: 2.2; fill: none; }
-      .optional { stroke: #87998c; stroke-width: 1.8; stroke-dasharray: 7 5; fill: none; }
+      .field { font: 400 15px "Segoe UI", "Microsoft JhengHei", sans-serif; fill: #1A281E; }
+      .key { font: 700 14px "Segoe UI", Arial, sans-serif; fill: #4F7057; }
+      .label { font: 700 14px "Segoe UI", Arial, sans-serif; fill: #4F7057; }
+      .table { fill: #ffffff; stroke: #B5C6B3; stroke-width: 2; }
+      .header { fill: #4F7057; }
+      .line { stroke: #B5C6B3; stroke-width: 2.2; fill: none; }
+      .optional { stroke: #B5C6B3; stroke-width: 1.8; stroke-dasharray: 7 5; fill: none; }
     </style>
   </defs>
   <style>.field {font-size:15px} .key {font-size:13px} .label {font-size:13px}</style>
@@ -19,7 +19,7 @@
   <text x="52" y="86" text-anchor="start" class="subtitle">依現行 SQLAlchemy models；PK＝主鍵、FK＝外鍵、?＝可為 NULL。實體欄位不等於部署 schema 已驗證。</text>
   <rect x="50" y="150" width="300" height="260" rx="8" class="table"/>
   <rect x="50" y="150" width="300" height="48" rx="8" class="header"/>
-<rect x="50" y="190" width="300" height="8" fill="#47765a"/>
+<rect x="50" y="190" width="300" height="8" fill="#4F7057"/>
   <text x="200" y="181" text-anchor="middle" class="head">user</text>
   <text x="70" y="227" text-anchor="start" class="key">PK</text>
   <text x="128" y="227" text-anchor="start" class="field">user_id</text>
@@ -30,7 +30,7 @@
   <text x="70" y="362" text-anchor="start" class="field">created_at</text>
   <rect x="50" y="672" width="300" height="254" rx="8" class="table"/>
   <rect x="50" y="672" width="300" height="48" rx="8" class="header"/>
-<rect x="50" y="712" width="300" height="8" fill="#47765a"/>
+<rect x="50" y="712" width="300" height="8" fill="#4F7057"/>
   <text x="200" y="703" text-anchor="middle" class="head">user_one_time_tokens</text>
   <text x="70" y="749" text-anchor="start" class="key">PK</text>
   <text x="128" y="749" text-anchor="start" class="field">id</text>
@@ -41,7 +41,7 @@
   <text x="70" y="857" text-anchor="start" class="field">created_at</text>
   <rect x="470" y="130" width="455" height="430" rx="8" class="table"/>
   <rect x="470" y="130" width="455" height="48" rx="8" class="header"/>
-<rect x="470" y="170" width="455" height="8" fill="#47765a"/>
+<rect x="470" y="170" width="455" height="8" fill="#4F7057"/>
   <text x="697.5" y="161" text-anchor="middle" class="head">webcam_alert</text>
   <text x="490" y="207" text-anchor="start" class="key">PK</text>
   <text x="548" y="207" text-anchor="start" class="field">id</text>
@@ -59,7 +59,7 @@
   <text x="490" y="477" text-anchor="start" class="field">acknowledged_at · created_at</text>
   <rect x="470" y="642" width="455" height="425" rx="8" class="table"/>
   <rect x="470" y="642" width="455" height="48" rx="8" class="header"/>
-<rect x="470" y="682" width="455" height="8" fill="#47765a"/>
+<rect x="470" y="682" width="455" height="8" fill="#4F7057"/>
   <text x="697.5" y="673" text-anchor="middle" class="head">plant_diary</text>
   <text x="490" y="719" text-anchor="start" class="key">PK</text>
   <text x="548" y="719" text-anchor="start" class="field">id</text>
@@ -76,7 +76,7 @@
   <text x="490" y="962" text-anchor="start" class="field">created_at</text>
   <rect x="1040" y="130" width="235" height="194" rx="8" class="table"/>
   <rect x="1040" y="130" width="235" height="48" rx="8" class="header"/>
-<rect x="1040" y="170" width="235" height="8" fill="#47765a"/>
+<rect x="1040" y="170" width="235" height="8" fill="#4F7057"/>
   <text x="1157.5" y="161" text-anchor="middle" class="head">crop</text>
   <text x="1060" y="207" text-anchor="start" class="key">PK</text>
   <text x="1118" y="207" text-anchor="start" class="field">crop_id</text>
@@ -84,7 +84,7 @@
   <text x="1060" y="261" text-anchor="start" class="field">crop_name_en</text>
   <rect x="1320" y="130" width="230" height="308" rx="8" class="table"/>
   <rect x="1320" y="130" width="230" height="48" rx="8" class="header"/>
-<rect x="1320" y="170" width="230" height="8" fill="#47765a"/>
+<rect x="1320" y="170" width="230" height="8" fill="#4F7057"/>
   <text x="1435" y="161" text-anchor="middle" class="head">disease</text>
   <text x="1340" y="207" text-anchor="start" class="key">PK</text>
   <text x="1398" y="207" text-anchor="start" class="field">disease_id</text>
@@ -97,7 +97,7 @@
   <text x="1340" y="369" text-anchor="start" class="field">source_record_id</text>
   <rect x="1320" y="694" width="230" height="308" rx="8" class="table"/>
   <rect x="1320" y="694" width="230" height="48" rx="8" class="header"/>
-<rect x="1320" y="734" width="230" height="8" fill="#47765a"/>
+<rect x="1320" y="734" width="230" height="8" fill="#4F7057"/>
   <text x="1435" y="725" text-anchor="middle" class="head">pests</text>
   <text x="1340" y="771" text-anchor="start" class="key">PK</text>
   <text x="1398" y="771" text-anchor="start" class="field">pest_id</text>
@@ -138,7 +138,7 @@
   <text x="220" y="974" text-anchor="middle" class="field">實線：必填外鍵；虛線：可為 NULL</text>
   <text x="220" y="1004" text-anchor="middle" class="field">父端 1／0..1；子端 0..N</text>
   <text x="220" y="1034" text-anchor="middle" class="field">數字標在對應實體的一端</text>
-  <rect x="50" y="1090" width="1500" height="124" rx="6" fill="#eef5ee" stroke="#b1c6b1"/>
+  <rect x="50" y="1090" width="1500" height="124" rx="6" fill="#DDEAD7" stroke="#B5C6B3"/>
   <text x="800" y="1118" text-anchor="middle" class="field">日誌與警報均保存 category、requires_review、grounding_source 與 reference_* 來源快照；並非即時來源表的替代外鍵。</text>
   <text x="800" y="1147" text-anchor="middle" class="field">image_url 是檔案路徑；圖片存 static/uploads。診斷暫存為記憶體＋static/tmp，不是資料庫實體。</text>
   <text x="800" y="1175" text-anchor="middle" class="field">unknown／需複核可確認保存日誌；新警報須通過門檻與連續判定。requires_review 標記不表示專業複核已完成。</text>

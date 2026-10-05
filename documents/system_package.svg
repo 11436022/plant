@@ -1,33 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 820" width="1280" height="820">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 860" width="1280" height="860">
   <defs>
     <style>
-      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 20px; font-weight: bold; fill: #0f172a; }
-      .pkg-header-text { font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; font-weight: bold; fill: #1e293b; }
-      .subpkg-title { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; font-weight: bold; fill: #1e293b; }
-      .module-text { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; fill: #0f172a; }
-      .module-desc { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #64748b; }
-      .dep-label { font-family: 'Consolas', monospace; font-size: 10px; fill: #2563eb; text-anchor: middle; }
+      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 23px; font-weight: bold; fill: #1A281E; }
+      .pkg-header-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 15.5px; font-weight: bold; fill: #1A281E; }
+      .subpkg-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 14px; font-weight: bold; fill: #1A281E; }
+      .module-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #1A281E; }
+      .module-desc { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12px; fill: #2D3748; }
+      .dep-label { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12px; fill: #2D5837; font-weight: bold; text-anchor: middle; paint-order: stroke fill; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
+      .dep-label-start { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11.5px; fill: #2D5837; font-weight: bold; text-anchor: start; paint-order: stroke fill; stroke: #ffffff; stroke-width: 3px; stroke-linejoin: round; }
       
-      .pkg-tab { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.2; }
-      .pkg-body { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.2; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.04)); }
+      .pkg-tab { fill: #E5EDE3; stroke: #B5C6B3; stroke-width: 1.3; }
+      .pkg-body { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 1.3; rx: 6; ry: 6; }
       
-      .subpkg-tab { fill: #dbeafe; stroke: #3b82f6; stroke-width: 1; }
-      .subpkg-body { fill: #ffffff; stroke: #3b82f6; stroke-width: 1.2; rx: 3; ry: 3; }
+      .subpkg-tab { fill: #DDEAD7; stroke: #4F7057; stroke-width: 1.2; }
+      .subpkg-body { fill: #ffffff; stroke: #4F7057; stroke-width: 1.2; rx: 4; ry: 4; }
       
-      .service-tab { fill: #dcfce7; stroke: #10b981; stroke-width: 1; }
-      .service-body { fill: #ffffff; stroke: #10b981; stroke-width: 1.2; rx: 3; ry: 3; }
-
-      .ext-tab { fill: #fef3c7; stroke: #f59e0b; stroke-width: 1; }
-      .ext-body { fill: #ffffff; stroke: #f59e0b; stroke-width: 1.2; rx: 3; ry: 3; }
+      .ext-tab { fill: #E5EDE3; stroke: #4F7057; stroke-width: 1.2; }
+      .ext-body { fill: #ffffff; stroke: #4F7057; stroke-width: 1.2; rx: 4; ry: 4; }
       
-      .dep-line { stroke: #64748b; stroke-width: 1.3; stroke-dasharray: 4,4; fill: none; marker-end: url(#arrow); }
-      .http-line { stroke: #2563eb; stroke-width: 1.5; fill: none; marker-end: url(#blue-arrow); }
+      .dep-line { stroke: #334035; stroke-width: 1.3; stroke-dasharray: 4,3.5; fill: none; marker-end: url(#arrow); }
+      .http-line { stroke: #4F7057; stroke-width: 1.5; stroke-dasharray: 5,3.5; fill: none; marker-start: url(#green-arrow-start); marker-end: url(#green-arrow-end); }
     </style>
+
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#334035" />
     </marker>
-    <marker id="blue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+    <marker id="green-arrow-end" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#4F7057" />
+    </marker>
+    <marker id="green-arrow-start" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 10 1.5 L 0 5 L 10 8.5 z" fill="#4F7057" />
     </marker>
   </defs>
 
@@ -37,271 +39,312 @@
   <!-- Diagram Title -->
   <text x="640" y="32" class="title" text-anchor="middle">圖 7-2-1 系統軟體架構套件圖 (Package Diagram)</text>
 
-  <!-- ================= PACKAGE 1: ANDROID APP ================= -->
-  <g transform="translate(30, 60)">
+
+  <!-- ========================================================================= -->
+  <!-- 1. PACKAGE 1: ANDROID APP (x=25, y=55, w=285, h=775)                      -->
+  <!-- ========================================================================= -->
+  <g transform="translate(25, 55)">
     <!-- Package Tab -->
-    <path d="M 0 0 L 160 0 L 175 22 L 0 22 Z" class="pkg-tab" />
-    <text x="15" y="16" class="pkg-header-text">android.app</text>
+    <path d="M 0 0 L 160 0 L 175 24 L 0 24 Z" class="pkg-tab" />
+    <text x="14" y="17" class="pkg-header-text">android.app</text>
     <!-- Package Body -->
-    <rect y="22" width="300" height="710" class="pkg-body" />
-    <text x="15" y="45" class="subpkg-title" fill="#475569">package com.example.plantdoctor</text>
+    <rect y="24" width="285" height="755" class="pkg-body" />
+    <text x="14" y="47" class="subpkg-title" fill="#2D3748">package com.example.plantdoctor</text>
 
-    <!-- Subpkg: UI Activities -->
-    <g transform="translate(15, 60)">
-      <path d="M 0 0 L 110 0 L 120 18 L 0 18 Z" class="subpkg-tab" />
-      <text x="10" y="13" class="subpkg-title">.ui.activities</text>
-      <rect y="18" width="270" height="135" class="subpkg-body" />
-      <text x="12" y="38" class="module-text">• MainActivity.kt</text>
-      <text x="135" y="38" class="module-desc">(主頁與導覽)</text>
-      <text x="12" y="58" class="module-text">• DiagnosisActivity.kt</text>
-      <text x="145" y="58" class="module-desc">(拍照與雙模型預覽)</text>
-      <text x="12" y="78" class="module-text">• HistoryActivity.kt</text>
-      <text x="135" y="78" class="module-desc">(日誌歷史與搜尋)</text>
-      <text x="12" y="98" class="module-text">• AlertActivity.kt</text>
-      <text x="135" y="98" class="module-desc">(Webcam 警報列表)</text>
-      <text x="12" y="118" class="module-text">• FeedbackDialog.kt</text>
-      <text x="135" y="118" class="module-desc">(糾錯反饋互動彈窗)</text>
-      <text x="12" y="138" class="module-text">• LoginActivity.kt</text>
-      <text x="135" y="138" class="module-desc">(帳號登入與信箱驗證)</text>
+    <!-- Subpkg 1: UI Activities (y=60) -->
+    <g transform="translate(12, 60)">
+      <path d="M 0 0 L 135 0 L 145 22 L 0 22 Z" class="subpkg-tab" />
+      <text x="10" y="15" class="subpkg-title">.ui.activities</text>
+      <rect y="22" width="261" height="125" class="subpkg-body" />
+      <text x="10" y="42" class="module-text">• MainActivity.kt</text>
+      <text x="125" y="42" class="module-desc">(首頁儀表板導覽)</text>
+      <text x="10" y="63" class="module-text">• DiagnosisActivity.kt</text>
+      <text x="145" y="63" class="module-desc">(拍照診斷預覽)</text>
+      <text x="10" y="84" class="module-text">• HistoryActivity.kt</text>
+      <text x="130" y="84" class="module-desc">(病歷日誌檢視)</text>
+      <text x="10" y="105" class="module-text">• AlertActivity.kt</text>
+      <text x="120" y="105" class="module-desc">(時序警報清單)</text>
+      <text x="10" y="126" class="module-text">• LoginActivity.kt</text>
+      <text x="125" y="126" class="module-desc">(帳號認證登入)</text>
     </g>
 
-    <!-- Subpkg: UI Adapters -->
-    <g transform="translate(15, 230)">
-      <path d="M 0 0 L 105 0 L 115 18 L 0 18 Z" class="subpkg-tab" />
-      <text x="10" y="13" class="subpkg-title">.ui.adapters</text>
-      <rect y="18" width="270" height="80" class="subpkg-body" />
-      <text x="12" y="40" class="module-text">• DiaryAdapter.kt</text>
-      <text x="140" y="40" class="module-desc">(植物日誌清單渲染)</text>
-      <text x="12" y="62" class="module-text">• AlertAdapter.kt</text>
-      <text x="140" y="62" class="module-desc">(Webcam 警報項目)</text>
-      <text x="12" y="84" class="module-text">• TreatmentStepAdapter.kt</text>
-      <text x="175" y="84" class="module-desc">(防治步驟清單)</text>
+    <!-- Subpkg 2: UI Adapters (y=215) -->
+    <g transform="translate(12, 215)">
+      <path d="M 0 0 L 115 0 L 125 22 L 0 22 Z" class="subpkg-tab" />
+      <text x="10" y="15" class="subpkg-title">.ui.adapters</text>
+      <rect y="22" width="261" height="68" class="subpkg-body" />
+      <text x="10" y="43" class="module-text">• DiaryAdapter.kt</text>
+      <text x="125" y="43" class="module-desc">(植物日誌適配器)</text>
+      <text x="10" y="65" class="module-text">• AlertAdapter.kt</text>
+      <text x="125" y="65" class="module-desc">(時序警報適配器)</text>
     </g>
 
-    <!-- Subpkg: Network & API -->
-    <g transform="translate(15, 345)">
-      <path d="M 0 0 L 90 0 L 100 18 L 0 18 Z" class="subpkg-tab" />
-      <text x="10" y="13" class="subpkg-title">.network</text>
-      <rect y="18" width="270" height="100" class="subpkg-body" />
-      <text x="12" y="40" class="module-text">• PlantApiService.kt</text>
-      <text x="150" y="40" class="module-desc">(Retrofit2 介面定義)</text>
-      <text x="12" y="62" class="module-text">• NetworkClient.kt</text>
-      <text x="150" y="62" class="module-desc">(OkHttp3 單例工廠)</text>
-      <text x="12" y="84" class="module-text">• AuthInterceptor.kt</text>
-      <text x="150" y="84" class="module-desc">(JWT 標頭自動注入)</text>
-      <text x="12" y="106" class="module-text">• ErrorHandler.kt</text>
-      <text x="150" y="106" class="module-desc">(全域網路異常攔截)</text>
+    <!-- Subpkg 3: Network (y=315) -->
+    <g transform="translate(12, 315)">
+      <path d="M 0 0 L 95 0 L 105 22 L 0 22 Z" class="subpkg-tab" />
+      <text x="10" y="15" class="subpkg-title">.network</text>
+      <rect y="22" width="261" height="88" class="subpkg-body" />
+      <text x="10" y="43" class="module-text">• PlantApiService.kt</text>
+      <text x="135" y="43" class="module-desc">(Retrofit2 介面)</text>
+      <text x="10" y="65" class="module-text">• NetworkClient.kt</text>
+      <text x="130" y="65" class="module-desc">(OkHttp3 連線維護)</text>
+      <text x="10" y="87" class="module-text">• AuthInterceptor.kt</text>
+      <text x="135" y="87" class="module-desc">(JWT 權杖攔截)</text>
     </g>
 
-    <!-- Subpkg: Data Models (DTO) -->
-    <g transform="translate(15, 480)">
-      <path d="M 0 0 L 110 0 L 120 18 L 0 18 Z" class="subpkg-tab" />
-      <text x="10" y="13" class="subpkg-title">.data.models</text>
-      <rect y="18" width="270" height="100" class="subpkg-body" />
-      <text x="12" y="40" class="module-text">• AuthDTO.kt</text>
-      <text x="140" y="40" class="module-desc">(登入/註冊請求響應)</text>
-      <text x="12" y="62" class="module-text">• PredictionDTO.kt</text>
-      <text x="140" y="62" class="module-desc">(診斷推論結果封裝)</text>
-      <text x="12" y="84" class="module-text">• PlantDiaryDTO.kt</text>
-      <text x="140" y="84" class="module-desc">(日誌與備忘筆記實體)</text>
-      <text x="12" y="106" class="module-text">• FeedbackDTO.kt</text>
-      <text x="140" y="106" class="module-desc">(糾錯反饋提交物件)</text>
+    <!-- Subpkg 4: Data Models (y=435) -->
+    <g transform="translate(12, 435)">
+      <path d="M 0 0 L 115 0 L 125 22 L 0 22 Z" class="subpkg-tab" />
+      <text x="10" y="15" class="subpkg-title">.data.models</text>
+      <rect y="22" width="261" height="105" class="subpkg-body" />
+      <text x="10" y="43" class="module-text">• AuthDTO.kt</text>
+      <text x="125" y="43" class="module-desc">(帳號憑證資料)</text>
+      <text x="10" y="65" class="module-text">• PredictionDTO.kt</text>
+      <text x="135" y="65" class="module-desc">(診斷結果包裝)</text>
+      <text x="10" y="87" class="module-text">• PlantDiaryDTO.kt</text>
+      <text x="135" y="87" class="module-desc">(病歷日誌備忘)</text>
+      <text x="10" y="109" class="module-text">• FeedbackDTO.kt</text>
+      <text x="135" y="109" class="module-desc">(糾錯回饋審定)</text>
     </g>
 
-    <!-- Subpkg: Utils & Storage -->
-    <g transform="translate(15, 615)">
-      <path d="M 0 0 L 80 0 L 90 18 L 0 18 Z" class="subpkg-tab" />
-      <text x="10" y="13" class="subpkg-title">.utils</text>
-      <rect y="18" width="270" height="85" class="subpkg-body" />
-      <text x="12" y="40" class="module-text">• TokenManager.kt</text>
-      <text x="140" y="40" class="module-desc">(EncryptedSharedPref)</text>
-      <text x="12" y="62" class="module-text">• ImageCompressor.kt</text>
-      <text x="140" y="62" class="module-desc">(上傳前圖片壓縮)</text>
-      <text x="12" y="84" class="module-text">• CameraHelper.kt</text>
-      <text x="140" y="84" class="module-desc">(CameraX 相機生命週期)</text>
+    <!-- Subpkg 5: Utils (y=570) -->
+    <g transform="translate(12, 570)">
+      <path d="M 0 0 L 80 0 L 90 22 L 0 22 Z" class="subpkg-tab" />
+      <text x="10" y="15" class="subpkg-title">.utils</text>
+      <rect y="22" width="261" height="88" class="subpkg-body" />
+      <text x="10" y="43" class="module-text">• TokenManager.kt</text>
+      <text x="130" y="43" class="module-desc">(憑證加密儲存)</text>
+      <text x="10" y="65" class="module-text">• CameraHelper.kt</text>
+      <text x="125" y="65" class="module-desc">(CameraX 生命週期)</text>
+      <text x="10" y="87" class="module-text">• ImageCompressor.kt</text>
+      <text x="150" y="87" class="module-desc">(影像壓縮暫存)</text>
     </g>
+
+    <!-- Android Internal Dependencies: Unbroken vertical lines, labels beside -->
+    <!-- Activities -> Adapters -->
+    <line x1="142" y1="207" x2="142" y2="237" class="dep-line" id="dep-and-1" />
+    <text x="150" y="224" class="dep-label-start">&lt;&lt;use&gt;&gt;</text>
+
+    <!-- Adapters -> Network -->
+    <line x1="142" y1="305" x2="142" y2="337" class="dep-line" id="dep-and-2" />
+    <text x="150" y="323" class="dep-label-start">&lt;&lt;use&gt;&gt;</text>
+
+    <!-- Network -> Models -->
+    <line x1="142" y1="425" x2="142" y2="457" class="dep-line" id="dep-and-3" />
+    <text x="150" y="443" class="dep-label-start">&lt;&lt;use&gt;&gt;</text>
+
+    <!-- Models -> Utils -->
+    <line x1="142" y1="562" x2="142" y2="592" class="dep-line" id="dep-and-4" />
+    <text x="150" y="579" class="dep-label-start">&lt;&lt;use&gt;&gt;</text>
   </g>
 
-  <!-- ================= PACKAGE 2: FASTAPI BACKEND ================= -->
-  <g transform="translate(370, 60)">
+
+  <!-- ========================================================================= -->
+  <!-- 2. PACKAGE 2: PLANT_BACKEND.APP (x=345, y=55, w=590, h=775)               -->
+  <!-- ========================================================================= -->
+  <g transform="translate(345, 55)">
     <!-- Package Tab -->
-    <path d="M 0 0 L 190 0 L 205 22 L 0 22 Z" class="pkg-tab" />
-    <text x="15" y="16" class="pkg-header-text">plant_backend.app</text>
+    <path d="M 0 0 L 190 0 L 205 24 L 0 24 Z" class="pkg-tab" />
+    <text x="14" y="17" class="pkg-header-text">plant_backend.app</text>
     <!-- Package Body -->
-    <rect y="22" width="560" height="710" class="pkg-body" />
-    <text x="15" y="45" class="subpkg-title" fill="#475569">FastAPI 微服務架構核心套件 (Python 3.10)</text>
+    <rect y="24" width="590" height="755" class="pkg-body" />
+    <text x="14" y="47" class="subpkg-title" fill="#2D3748">FastAPI 伺服端核心架構 (Python 3.10)</text>
 
-    <!-- Top Core: main.py & core -->
-    <g transform="translate(15, 55)">
-      <rect width="530" height="45" fill="#f1f5f9" stroke="#cbd5e1" rx="3" />
-      <text x="15" y="27" class="module-text" font-weight="bold">main.py</text>
-      <text x="75" y="27" class="module-desc">(ASGI 應用入口、CORS 中介軟體、靜態目錄掛載、全域異常過濾器)</text>
+    <!-- Subpkg 0: main.py entry (y=58) -->
+    <g transform="translate(14, 58)">
+      <rect width="562" height="42" class="subpkg-body" />
+      <text x="14" y="26" class="module-text">main.py</text>
+      <text x="75" y="26" class="module-desc">(ASGI 入口、CORS 配置、靜態路由與全域異常處理器)</text>
     </g>
 
-    <!-- Subpkg: app.api.v1.routers -->
-    <g transform="translate(15, 115)">
-      <path d="M 0 0 L 140 0 L 150 18 L 0 18 Z" class="subpkg-tab" />
-      <text x="10" y="13" class="subpkg-title">.api.v1.routers</text>
-      <rect y="18" width="530" height="135" class="subpkg-body" />
-      
-      <!-- Router Modules (2 columns) -->
-      <text x="15" y="42" class="module-text">• auth.py</text>
-      <text x="135" y="42" class="module-desc">(註冊/登入/信箱認證/JWT)</text>
-
-      <text x="280" y="42" class="module-text">• prediction.py</text>
-      <text x="390" y="42" class="module-desc">(影像診斷與推論排程)</text>
-
-      <text x="15" y="70" class="module-text">• diaries.py</text>
-      <text x="135" y="70" class="module-desc">(日誌建立/查詢/備忘/刪除)</text>
-
-      <text x="280" y="70" class="module-text">• feedback.py</text>
-      <text x="390" y="70" class="module-desc">(使用者糾錯反饋與提報)</text>
-
-      <text x="15" y="98" class="module-text">• webcam.py</text>
-      <text x="135" y="98" class="module-desc">(即時影格接收與警報通知)</text>
-
-      <text x="280" y="98" class="module-text">• admin.py</text>
-      <text x="390" y="98" class="module-desc">(儀表板統計與審核匯出)</text>
-      
-      <text x="15" y="126" class="module-text">• crops.py</text>
-      <text x="135" y="126" class="module-desc">(作物百科與病害資訊查詢)</text>
-
-      <text x="280" y="126" class="module-text">• health.py</text>
-      <text x="390" y="126" class="module-desc">(系統健康狀態與連線探針)</text>
+    <!-- Subpkg 1: Routers (y=130) -->
+    <g transform="translate(14, 130)">
+      <path d="M 0 0 L 135 0 L 145 22 L 0 22 Z" class="subpkg-tab" />
+      <text x="10" y="15" class="subpkg-title">.api.v1.routers</text>
+      <rect y="22" width="562" height="126" class="subpkg-body" />
+      <text x="12" y="42" class="module-text">• auth.py</text>
+      <text x="130" y="42" class="module-desc">(使用者註冊登入、信箱驗證與 JWT 發放)</text>
+      <text x="12" y="63" class="module-text">• prediction.py</text>
+      <text x="130" y="63" class="module-desc">(影像診斷上傳、雙模型協同與信心度校驗)</text>
+      <text x="12" y="84" class="module-text">• diaries.py</text>
+      <text x="130" y="84" class="module-desc">(植物日誌儲存、備忘筆記編輯與歷史檢索)</text>
+      <text x="12" y="105" class="module-text">• webcam.py</text>
+      <text x="130" y="105" class="module-desc">(Webcam 即時影格串流、時序判定與警報通知)</text>
+      <text x="12" y="126" class="module-text">• feedback.py / admin.py</text>
+      <text x="175" y="126" class="module-desc">(糾錯回饋審定與後台日誌統計匯出)</text>
     </g>
 
-    <!-- Subpkg: app.services -->
-    <g transform="translate(15, 275)">
-      <path d="M 0 0 L 110 0 L 120 18 L 0 18 Z" class="service-tab" />
-      <text x="10" y="13" class="subpkg-title">.services</text>
-      <rect y="18" width="530" height="150" class="service-body" />
-      
-      <text x="15" y="42" class="module-text">• prediction_service.py</text>
-      <text x="180" y="42" class="module-desc">(多模型決策仲裁、衝突過濾、70% 信心閾值檢核)</text>
-
-      <text x="15" y="68" class="module-text">• gemini_service.py</text>
-      <text x="180" y="68" class="module-desc">(Gemini 2.5 Flash 雲端多模態推論與結構化提示詞解析)</text>
-
-      <text x="15" y="94" class="module-text">• local_convnet.py</text>
-      <text x="180" y="94" class="module-desc">(本地自訓特定作物卷積神經網路微觀特徵分類, 零雲端成本)</text>
-
-      <text x="15" y="120" class="module-text">• rag_service.py</text>
-      <text x="180" y="120" class="module-desc">(FAISS 向量知識庫檢索增強與農業部開放資料交叉驗證)</text>
-
-      <text x="15" y="146" class="module-text">• auth_service.py / email_service.py</text>
-      <text x="270" y="146" class="module-desc">(密碼安全雜湊、Token 簽署與 SMTP 驗證碼寄送)</text>
+    <!-- Subpkg 2: Services (y=286) -->
+    <g transform="translate(14, 286)">
+      <path d="M 0 0 L 95 0 L 105 22 L 0 22 Z" class="subpkg-tab" />
+      <text x="10" y="15" class="subpkg-title">.services</text>
+      <rect y="22" width="562" height="126" class="subpkg-body" />
+      <text x="12" y="42" class="module-text">• prediction_service.py</text>
+      <text x="175" y="42" class="module-desc">(決策仲裁、特徵權重校準與 70% 閾值檢驗)</text>
+      <text x="12" y="63" class="module-text">• gemini_service.py</text>
+      <text x="175" y="63" class="module-desc">(Gemini 2.5 Flash 多模態推論與病徵解析)</text>
+      <text x="12" y="84" class="module-text">• local_convnet.py</text>
+      <text x="175" y="84" class="module-desc">(自訓微觀病斑卷積網路分類，零運算成本)</text>
+      <text x="12" y="105" class="module-text">• rag_service.py</text>
+      <text x="175" y="105" class="module-desc">(FAISS 向量檢索增強與客觀防治對策校驗)</text>
+      <text x="12" y="126" class="module-text">• auth_service.py / email_service.py</text>
+      <text x="235" y="126" class="module-desc">(密碼雜湊、JWT 簽署與 SMTP 郵件發送)</text>
     </g>
 
-    <!-- Subpkg: app.db (SQLAlchemy ORM) -->
-    <g transform="translate(15, 450)">
-      <path d="M 0 0 L 70 0 L 80 18 L 0 18 Z" class="subpkg-tab" />
-      <text x="10" y="13" class="subpkg-title">.db</text>
-      <rect y="18" width="530" height="135" class="subpkg-body" />
-
-      <text x="15" y="42" class="module-text">• session.py</text>
-      <text x="120" y="42" class="module-desc">(SQLAlchemy 引擎連線池配置、SessionLocal 依賴注入工廠)</text>
-
-      <text x="15" y="68" class="module-text">• models.py</text>
-      <text x="120" y="68" class="module-desc">(定義 8 大資料表實體: user, crop, disease, pests,</text>
-      <text x="120" y="84" class="module-desc"> plant_diary, webcam_alert, diagnosis_feedback, user_one_time_tokens)</text>
-
-      <text x="15" y="110" class="module-text">• crud.py</text>
-      <text x="120" y="110" class="module-desc">(封裝日誌 CRUD、個人備忘筆記更新、糾錯回饋審核與統計查詢)</text>
-
-      <text x="15" y="132" class="module-text">• base.py</text>
-      <text x="120" y="132" class="module-desc">(Base 宣告式中繼類別)</text>
+    <!-- Subpkg 3: DB (y=442) -->
+    <g transform="translate(14, 442)">
+      <path d="M 0 0 L 60 0 L 70 22 L 0 22 Z" class="subpkg-tab" />
+      <text x="10" y="15" class="subpkg-title">.db</text>
+      <rect y="22" width="562" height="88" class="subpkg-body" />
+      <text x="12" y="43" class="module-text">• session.py</text>
+      <text x="115" y="43" class="module-desc">(SQLAlchemy 2.0 連線池、Pool Pre-Ping 重連)</text>
+      <text x="12" y="65" class="module-text">• models.py</text>
+      <text x="115" y="65" class="module-desc">(8 大關聯實體模型: user, crop, diary, alert 等)</text>
+      <text x="12" y="87" class="module-text">• crud.py</text>
+      <text x="115" y="87" class="module-desc">(日誌確認儲存、個人備忘維護與統計查詢)</text>
     </g>
 
-    <!-- Subpkg: app.core & app.schemas -->
-    <g transform="translate(15, 610)">
-      <rect width="255" height="95" fill="#f8fafc" stroke="#cbd5e1" rx="3" />
-      <text x="15" y="25" class="subpkg-title">.core (系統配置與安全性)</text>
-      <text x="15" y="48" class="module-text">• config.py (Pydantic BaseSettings)</text>
-      <text x="15" y="68" class="module-text">• security.py (bcrypt / JWT HS256)</text>
-      <text x="15" y="88" class="module-desc">支援 .env 環境設定與安全金鑰管理</text>
+    <!-- Subpkg 4: Core (Bottom Left) & Schemas (Bottom Right) (y=560) -->
+    <g transform="translate(14, 560)">
+      <!-- .core (x=0, w=272) - Tab shortened to .core, arrow lands cleanly without obstruction -->
+      <path d="M 0 0 L 75 0 L 85 22 L 0 22 Z" class="subpkg-tab" />
+      <text x="10" y="15" class="subpkg-title">.core</text>
+      <rect y="22" width="272" height="88" class="subpkg-body" />
+      <text x="10" y="43" class="module-text">• config.py</text>
+      <text x="85" y="43" class="module-desc">(BaseSettings 環境配置)</text>
+      <text x="10" y="65" class="module-text">• security.py</text>
+      <text x="85" y="65" class="module-desc">(Bcrypt 雜湊 / JWT 簽署)</text>
+      <text x="10" y="87" class="module-text">• exceptions.py</text>
+      <text x="110" y="87" class="module-desc">(全域異常捕捉處理)</text>
 
-      <g transform="translate(275, 0)">
-        <rect width="255" height="95" fill="#f8fafc" stroke="#cbd5e1" rx="3" />
-        <text x="15" y="25" class="subpkg-title">.schemas (Pydantic DTO 規格)</text>
-        <text x="15" y="48" class="module-text">• user.py / token.py / diary.py</text>
-        <text x="15" y="68" class="module-text">• prediction.py / feedback.py</text>
-        <text x="15" y="88" class="module-desc">強型別資料校驗與序列化定義</text>
+      <!-- .schemas (x=290, w=272) - Tab shortened to .schemas, arrow lands cleanly without obstruction -->
+      <g transform="translate(290, 0)">
+        <path d="M 0 0 L 90 0 L 100 22 L 0 22 Z" class="subpkg-tab" />
+        <text x="10" y="15" class="subpkg-title">.schemas</text>
+        <rect y="22" width="272" height="88" class="subpkg-body" />
+        <text x="10" y="43" class="module-text">• user.py / token.py</text>
+        <text x="140" y="43" class="module-desc">(帳號與權杖 DTO)</text>
+        <text x="10" y="65" class="module-text">• diary.py / alert.py</text>
+        <text x="140" y="65" class="module-desc">(日誌與時序警報)</text>
+        <text x="10" y="87" class="module-text">• prediction.py</text>
+        <text x="140" y="87" class="module-desc">(診斷與糾錯反饋)</text>
       </g>
     </g>
+
+    <!-- Backend Internal Dependencies: Unbroken vertical lines, labels beside -->
+    <!-- main.py -> Routers -->
+    <line x1="295" y1="100" x2="295" y2="152" class="dep-line" id="dep-be-0" />
+    <text x="303" y="128" class="dep-label-start">&lt;&lt;include&gt;&gt;</text>
+
+    <!-- Routers -> Services -->
+    <line x1="295" y1="278" x2="295" y2="308" class="dep-line" id="dep-be-1" />
+    <text x="303" y="295" class="dep-label-start">&lt;&lt;use&gt;&gt;</text>
+
+    <!-- Services -> DB -->
+    <line x1="295" y1="434" x2="295" y2="464" class="dep-line" id="dep-be-2" />
+    <text x="303" y="451" class="dep-label-start">&lt;&lt;use&gt;&gt;</text>
+
+    <!-- DB -> Core (Centered at x=136, lands cleanly on body top y=582, no tab obstruction!) -->
+    <line x1="136" y1="552" x2="136" y2="582" class="dep-line" id="dep-be-3" />
+    <text x="144" y="569" class="dep-label-start">&lt;&lt;use&gt;&gt;</text>
+
+    <!-- DB -> Schemas (Centered at x=426, lands cleanly on body top y=582, no tab obstruction!) -->
+    <line x1="426" y1="552" x2="426" y2="582" class="dep-line" id="dep-be-4" />
+    <text x="434" y="569" class="dep-label-start">&lt;&lt;use&gt;&gt;</text>
   </g>
 
-  <!-- ================= PACKAGE 3: EXTERNAL DEPENDENCIES ================= -->
-  <g transform="translate(970, 60)">
+
+  <!-- ========================================================================= -->
+  <!-- 3. PACKAGE 3: EXTERNAL_LIBS (x=980, y=55, w=280, h=775)                   -->
+  <!-- ========================================================================= -->
+  <g transform="translate(980, 55)">
     <!-- Package Tab -->
-    <path d="M 0 0 L 160 0 L 175 22 L 0 22 Z" class="pkg-tab" />
-    <text x="15" y="16" class="pkg-header-text">external_libs</text>
+    <path d="M 0 0 L 160 0 L 175 24 L 0 24 Z" class="pkg-tab" />
+    <text x="14" y="17" class="pkg-header-text">external_libs</text>
     <!-- Package Body -->
-    <rect y="22" width="280" height="710" class="pkg-body" />
-    <text x="15" y="45" class="subpkg-title" fill="#475569">核心依賴第三方函式庫群</text>
+    <rect y="24" width="280" height="755" class="pkg-body" />
+    <text x="14" y="47" class="subpkg-title" fill="#2D3748">核心依賴第三方函式庫群</text>
 
-    <!-- AI & ML Libs -->
-    <g transform="translate(15, 60)">
-      <path d="M 0 0 L 120 0 L 130 18 L 0 18 Z" class="ext-tab" />
-      <text x="10" y="13" class="subpkg-title">AI &amp; Deep Learning</text>
-      <rect y="18" width="250" height="150" class="ext-body" />
-      <text x="12" y="40" class="module-text">• google-genai</text>
-      <text x="120" y="40" class="module-desc">(官方 GenAI SDK)</text>
-      <text x="12" y="62" class="module-text">• torch</text>
-      <text x="120" y="62" class="module-desc">(PyTorch 深度學習)</text>
-      <text x="12" y="84" class="module-text">• torchvision</text>
-      <text x="120" y="84" class="module-desc">(影像特徵預處理)</text>
-      <text x="12" y="106" class="module-text">• faiss-cpu</text>
-      <text x="120" y="106" class="module-desc">(Facebook 向量索引)</text>
-      <text x="12" y="128" class="module-text">• sentence-transformers</text>
-      <text x="12" y="148" class="module-desc">(農業開放資料嵌入向量生成)</text>
+    <!-- Subpkg 1: AI & Deep Learning (y=60) -->
+    <g transform="translate(12, 60)">
+      <path d="M 0 0 L 175 0 L 185 22 L 0 22 Z" class="ext-tab" />
+      <text x="12" y="15" class="subpkg-title">AI &amp; Deep Learning</text>
+      <rect y="22" width="256" height="115" class="ext-body" />
+      <text x="10" y="43" class="module-text">• google-genai</text>
+      <text x="115" y="43" class="module-desc">(官方 Gemini SDK)</text>
+      <text x="10" y="65" class="module-text">• torch</text>
+      <text x="110" y="65" class="module-desc">(PyTorch 深度學習)</text>
+      <text x="10" y="87" class="module-text">• faiss-cpu</text>
+      <text x="110" y="87" class="module-desc">(FAISS 向量檢索)</text>
+      <text x="10" y="109" class="module-text">• torchvision</text>
+      <text x="115" y="109" class="module-desc">(影像特徵預處理)</text>
     </g>
 
-    <!-- Web & Database Libs -->
-    <g transform="translate(15, 240)">
-      <path d="M 0 0 L 120 0 L 130 18 L 0 18 Z" class="ext-tab" />
-      <text x="10" y="13" class="subpkg-title">Web &amp; Persistence</text>
-      <rect y="18" width="250" height="145" class="ext-body" />
-      <text x="12" y="40" class="module-text">• fastapi</text>
-      <text x="110" y="40" class="module-desc">(高併發非同步 API)</text>
-      <text x="12" y="62" class="module-text">• uvicorn</text>
-      <text x="110" y="62" class="module-desc">(ASGI 網頁伺服器)</text>
-      <text x="12" y="84" class="module-text">• sqlalchemy 2.0</text>
-      <text x="125" y="84" class="module-desc">(ORM 資料庫對映)</text>
-      <text x="12" y="106" class="module-text">• pymysql</text>
-      <text x="110" y="106" class="module-desc">(MySQL 純 Python 驅動)</text>
-      <text x="12" y="128" class="module-text">• pydantic v2</text>
-      <text x="120" y="128" class="module-desc">(資料模型驗證解析)</text>
-      <text x="12" y="150" class="module-text">• alembic</text>
-      <text x="110" y="150" class="module-desc">(資料庫結構遷移維護)</text>
+    <!-- Subpkg 2: Web & Persistence (y=205) -->
+    <g transform="translate(12, 205)">
+      <path d="M 0 0 L 175 0 L 185 22 L 0 22 Z" class="ext-tab" />
+      <text x="12" y="15" class="subpkg-title">Web &amp; Persistence</text>
+      <rect y="22" width="256" height="115" class="ext-body" />
+      <text x="10" y="43" class="module-text">• fastapi</text>
+      <text x="105" y="43" class="module-desc">(高效非同步 Web)</text>
+      <text x="10" y="65" class="module-text">• sqlalchemy 2.0</text>
+      <text x="120" y="65" class="module-desc">(關聯連線池 ORM)</text>
+      <text x="10" y="87" class="module-text">• pydantic v2</text>
+      <text x="115" y="87" class="module-desc">(資料模型型別校驗)</text>
+      <text x="10" y="109" class="module-text">• uvicorn / alembic</text>
+      <text x="135" y="109" class="module-desc">(ASGI 結構遷移)</text>
     </g>
 
-    <!-- Security & Utility Libs -->
-    <g transform="translate(15, 415)">
-      <path d="M 0 0 L 120 0 L 130 18 L 0 18 Z" class="ext-tab" />
-      <text x="10" y="13" class="subpkg-title">Security &amp; Utility</text>
-      <rect y="18" width="250" height="110" class="ext-body" />
-      <text x="12" y="40" class="module-text">• passlib[bcrypt]</text>
-      <text x="135" y="40" class="module-desc">(密碼加密雜湊)</text>
-      <text x="12" y="62" class="module-text">• python-jose[cryptography]</text>
-      <text x="12" y="78" class="module-desc">(JWT 權杖簽發與驗證)</text>
-      <text x="12" y="98" class="module-text">• pillow (PIL)</text>
-      <text x="120" y="98" class="module-desc">(影像格式轉換與快取)</text>
-      <text x="12" y="118" class="module-text">• jinja2</text>
-      <text x="120" y="118" class="module-desc">(後台儀表板樣板引擎)</text>
+    <!-- Subpkg 3: Security & Utility (y=350) -->
+    <g transform="translate(12, 350)">
+      <path d="M 0 0 L 165 0 L 175 22 L 0 22 Z" class="ext-tab" />
+      <text x="12" y="15" class="subpkg-title">Security &amp; Utility</text>
+      <rect y="22" width="256" height="115" class="ext-body" />
+      <text x="10" y="43" class="module-text">• python-jose</text>
+      <text x="115" y="43" class="module-desc">(JWT 權杖簽署發放)</text>
+      <text x="10" y="65" class="module-text">• passlib[bcrypt]</text>
+      <text x="120" y="65" class="module-desc">(密碼安全雜湊演算)</text>
+      <text x="10" y="87" class="module-text">• pillow (PIL)</text>
+      <text x="115" y="87" class="module-desc">(影像格式轉換縮放)</text>
+      <text x="10" y="109" class="module-text">• jinja2</text>
+      <text x="110" y="109" class="module-desc">(管理後台模板引擎)</text>
+    </g>
+
+    <!-- Subpkg 4: Mobile & Networking (y=495) -->
+    <g transform="translate(12, 495)">
+      <path d="M 0 0 L 185 0 L 195 22 L 0 22 Z" class="ext-tab" />
+      <text x="12" y="15" class="subpkg-title">Mobile &amp; Networking</text>
+      <rect y="22" width="256" height="115" class="ext-body" />
+      <text x="10" y="43" class="module-text">• retrofit2</text>
+      <text x="105" y="43" class="module-desc">(RESTful 通訊抽象)</text>
+      <text x="10" y="65" class="module-text">• okhttp3</text>
+      <text x="105" y="65" class="module-desc">(連線池與 JWT 攔截)</text>
+      <text x="10" y="87" class="module-text">• camerax</text>
+      <text x="105" y="87" class="module-desc">(相機硬體生命週期)</text>
+      <text x="10" y="109" class="module-text">• security-crypto</text>
+      <text x="125" y="109" class="module-desc">(憑證安全加密儲存)</text>
     </g>
   </g>
 
-  <!-- ================= INTER-PACKAGE CONNECTIONS ================= -->
-  <!-- Android Network to FastAPI Routers -->
-  <line x1="330" y1="420" x2="370" y2="215" class="http-line" />
-  <text x="350" y="310" class="dep-label" transform="rotate(-65 350 310)">&lt;&lt;HTTPS / JSON&gt;&gt;</text>
 
-  <!-- FastAPI Services to External AI -->
-  <line x1="930" y1="365" x2="970" y2="175" class="dep-line" />
-  <text x="955" y="270" class="dep-label" transform="rotate(-65 955 270)">&lt;&lt;import&gt;&gt;</text>
+  <!-- ========================================================================= -->
+  <!-- 4. INTER-PACKAGE ARCHITECTURAL DEPENDENCIES (WITH WHITE HALO LABELS)       -->
+  <!-- ========================================================================= -->
 
-  <!-- FastAPI DB to External Persistence -->
-  <line x1="930" y1="520" x2="970" y2="330" class="dep-line" />
-  <text x="955" y="425" class="dep-label" transform="rotate(-65 955 425)">&lt;&lt;import&gt;&gt;</text>
+  <!-- 1. Android App -> Backend App (HTTPS / JSON API) (Gutter x=310 to x=345) -->
+  <line x1="310" y1="400" x2="345" y2="240" class="http-line" id="line136" />
+  <text x="327" y="320" class="dep-label" transform="rotate(-77.5, 327, 320)">&lt;&lt;HTTPS / JSON&gt;&gt;</text>
+
+  <!-- 2. Backend Services -> External AI Libs (Gutter x=935 to x=980) -->
+  <line x1="935" y1="380" x2="980" y2="175" class="dep-line" id="line137" />
+  <text x="957" y="277" class="dep-label" transform="rotate(-77.6, 957, 277)">&lt;&lt;import&gt;&gt;</text>
+
+  <!-- 3. Backend DB -> External Web & Persistence (Gutter x=935 to x=980) -->
+  <line x1="935" y1="520" x2="980" y2="320" class="dep-line" id="line138" />
+  <text x="957" y="420" class="dep-label" transform="rotate(-77.3, 957, 420)">&lt;&lt;import&gt;&gt;</text>
+
+  <!-- 4. Backend Core/Schemas -> External Security & Utility (Gutter x=935 to x=980) -->
+  <line x1="935" y1="670" x2="980" y2="470" class="dep-line" id="dep-ext-3" />
+  <text x="957" y="570" class="dep-label" transform="rotate(-77.3, 957, 570)">&lt;&lt;import&gt;&gt;</text>
 
 </svg>

@@ -180,6 +180,7 @@ def predict_convnext_fast_screen(
         if not is_crop_specified:
             # 🌟 未限定作物時：本地閉集模型（僅 14 種作物）無法進行開集植物品種辨識。
             # 必須交由 Gemini 多模態大模型進行全域開集辨識，避免將香蕉、檸檬等外來作物誤判為桃子或番茄。
+            print("🔍 [步驟 1 ConvNeXt 快篩] 作物未指定 (未知)，為避免閉集誤判，安全交由步驟 2 Gemini 進行開集識別")
             return None
 
         clean_crop = crop_name.strip()
@@ -188,6 +189,7 @@ def predict_convnext_fast_screen(
         if not is_supported:
             # 使用者指定之作物（如香蕉、檸檬、芭樂等）不在本地模型訓練集內，
             # 安全交棒給 Gemini 多模態進行專屬長尾診斷，絕不強行反轉覆蓋為桃子。
+            print(f"🔍 [步驟 1 ConvNeXt 快篩] 指定作物【{clean_crop}】非本地模型訓練集 (38類)，安全交由步驟 2 Gemini 專屬診斷")
             return None
 
         # 1. 取得全體 38 類別中整體信心最高者 (Global Top-1)
@@ -249,6 +251,10 @@ def predict_convnext_fast_screen(
                 "requires_review": False,
                 "is_confidence_override": is_override,
             }
+        else:
+            evaluated_lbl = user_crop_best_label or "無相符標籤"
+            print(f"🔍 [步驟 1 ConvNeXt 快篩未達門檻] 作物【{clean_crop}】最高匹配【{evaluated_lbl}】信心度僅 {user_crop_best_score:.2f} (< {settings.CONVNEXT_MIN_CONFIDENCE:.2f} 門檻)，交由步驟 2 兜底")
+            return None
 
         return None
     except Exception as exc:

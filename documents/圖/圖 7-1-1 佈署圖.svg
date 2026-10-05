@@ -14,12 +14,12 @@
   <sodipodi:namedview
      id="namedview80"
      pagecolor="#ffffff"
-     bordercolor="#000000"
+     bordercolor="#1A281E"
      borderopacity="0.25"
      inkscape:showpageshadow="2"
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
+     inkscape:deskcolor="#B5C6B3"
      inkscape:zoom="1.076"
      inkscape:cx="599.90706"
      inkscape:cy="375"
@@ -33,23 +33,23 @@
      id="defs1">
     <style
        id="style1">
-      .title { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 21px; font-weight: bold; fill: #0f172a; }
-      .node-header { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 14px; font-weight: bold; fill: #1e293b; }
-      .node-sub { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 11px; font-style: italic; fill: #64748b; }
-      .artifact-title { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 12px; font-weight: bold; fill: #0f172a; }
-      .artifact-desc { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 11px; fill: #475569; }
-      .protocol-label { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 12px; font-weight: bold; fill: #2563eb; text-anchor: middle; }
-      .protocol-sub { font-family: 'Times New Roman', 'DFKai-SB', '標楷體', 'BiauKai', serif; font-size: 10px; fill: #64748b; text-anchor: middle; }
+      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 21px; font-weight: bold; fill: #1A281E; }
+      .node-header { font-family: 'Microsoft JhengHei', sans-serif; font-size: 14px; font-weight: bold; fill: #1A281E; }
+      .node-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; font-style: italic; fill: #2D3748; }
+      .artifact-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12px; font-weight: bold; fill: #1A281E; }
+      .artifact-desc { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #2D3748; }
+      .protocol-label { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12px; font-weight: bold; fill: #2D5837; text-anchor: middle; }
+      .protocol-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #2D3748; text-anchor: middle; }
       
-      .device-box { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.5; rx: 6; ry: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
-      .device-header { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.5; }
-      .container-box { fill: #ffffff; stroke: #3b82f6; stroke-width: 1.5; rx: 4; ry: 4; }
-      .ai-box { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 4; ry: 4; }
-      .db-box { fill: #fffbeb; stroke: #d97706; stroke-width: 1.5; rx: 4; ry: 4; }
-      .cloud-box { fill: #f5f3ff; stroke: #8b5cf6; stroke-width: 1.5; rx: 6; ry: 6; }
+      .device-box { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 1.5; rx: 6; ry: 6; ); }
+      .device-header { fill: #E5EDE3; stroke: #B5C6B3; stroke-width: 1.5; }
+      .container-box { fill: #ffffff; stroke: #4F7057; stroke-width: 1.5; rx: 4; ry: 4; }
+      .ai-box { fill: #FFFFFF; stroke: #4F7057; stroke-width: 1.5; rx: 4; ry: 4; }
+      .db-box { fill: #FFFFFF; stroke: #4F7057; stroke-width: 1.5; rx: 4; ry: 4; }
+      .cloud-box { fill: #F8FAF7; stroke: #4F7057; stroke-width: 1.5; rx: 6; ry: 6; }
       
-      .conn-line { stroke: #334155; stroke-width: 1.5; fill: none; }
-      .bidir-line { stroke: #334155; stroke-width: 1.5; fill: none; }
+      .conn-line { stroke: #334035; stroke-width: 1.5; fill: none; }
+      .bidir-line { stroke: #334035; stroke-width: 1.5; fill: none; }
     </style>
   </defs>
   <!-- Background -->
@@ -95,7 +95,7 @@
        width="220"
        height="200"
        fill="#ffffff"
-       stroke="#cbd5e1"
+       stroke="#B5C6B3"
        stroke-width="1.2"
        rx="4"
        id="rect3" />
@@ -112,7 +112,7 @@
        height="80"
        class="container-box"
        id="rect4"
-       style="stroke:#cbd5e1" />
+       style="stroke:#B5C6B3" />
     <text
        x="77.050301"
        y="93"
@@ -144,8 +144,8 @@
        y="165"
        width="200"
        height="65"
-       fill="#f8fafc"
-       stroke="#cbd5e1"
+       fill="#F8FAF7"
+       stroke="#B5C6B3"
        rx="4"
        id="rect8" />
     <text
@@ -194,7 +194,7 @@
        width="220"
        height="180"
        fill="#ffffff"
-       stroke="#cbd5e1"
+       stroke="#B5C6B3"
        stroke-width="1.2"
        rx="4"
        id="rect13" />
@@ -211,7 +211,7 @@
        height="65"
        class="container-box"
        id="rect14"
-       style="stroke:#cbd5e1" />
+       style="stroke:#B5C6B3" />
     <text
        x="80.539032"
        y="93"
@@ -234,7 +234,7 @@
        height="65"
        class="container-box"
        id="rect17"
-       style="stroke:#cbd5e1" />
+       style="stroke:#B5C6B3" />
     <text
        x="57.304832"
        y="168.92937"
@@ -306,8 +306,8 @@
        y="90"
        width="370"
        height="60"
-       fill="#f8fafc"
-       stroke="#93c5fd"
+       fill="#F8FAF7"
+       stroke="#B5C6B3"
        rx="4"
        id="rect24" />
     <text
@@ -330,8 +330,8 @@
        y="160"
        width="370"
        height="70"
-       fill="#f8fafc"
-       stroke="#93c5fd"
+       fill="#F8FAF7"
+       stroke="#B5C6B3"
        rx="4"
        id="rect27" />
     <text
@@ -354,8 +354,8 @@
        y="240"
        width="370"
        height="65"
-       fill="#f8fafc"
-       stroke="#93c5fd"
+       fill="#F8FAF7"
+       stroke="#B5C6B3"
        rx="4"
        id="rect30" />
     <text
@@ -397,7 +397,7 @@
        width="370"
        height="55"
        fill="#ffffff"
-       stroke="#86efac"
+       stroke="#B5C6B3"
        rx="4"
        id="rect35" />
     <text
@@ -421,7 +421,7 @@
        width="370"
        height="55"
        fill="#ffffff"
-       stroke="#86efac"
+       stroke="#B5C6B3"
        rx="4"
        id="rect38" />
     <text
@@ -452,8 +452,8 @@
        id="rect41" />
     <path
        d="M 0 6 Q 0 0 6 0 L 224 0 Q 230 0 230 6 L 230 30 L 0 30 Z"
-       fill="#ede9fe"
-       stroke="#8b5cf6"
+       fill="#E5EDE3"
+       stroke="#4F7057"
        stroke-width="1.5"
        id="path41" />
     <text
@@ -503,8 +503,8 @@
        id="rect48" />
     <path
        d="M 0 6 Q 0 0 6 0 L 224 0 Q 230 0 230 6 L 230 30 L 0 30 Z"
-       fill="#ede9fe"
-       stroke="#8b5cf6"
+       fill="#E5EDE3"
+       stroke="#4F7057"
        stroke-width="1.5"
        id="path48" />
     <text
@@ -719,8 +719,8 @@
     <rect
        width="1120"
        height="95"
-       fill="#f8fafc"
-       stroke="#cbd5e1"
+       fill="#F8FAF7"
+       stroke="#B5C6B3"
        stroke-width="1.2"
        rx="6"
        id="rect76" />

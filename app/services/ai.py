@@ -556,6 +556,7 @@ def diagnostic_plant(
 
     # --- 步驟 2：Gemini 多模態兜底 (若步驟 1 未命中) ---
     if not chosen_crop:
+        print("➡️ 步驟 1 本地模型未命中，啟動步驟 2 Gemini 多模態兜底...")
         gemini_res = _call_gemini_fallback(
             image_path=image_path,
             crop_hint=clean_crop,

@@ -1,22 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
   <defs>
     <style>
-      .title { font: 700 42px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
-      .subtitle { font: 400 19px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665f; }
-      .group { font: 700 18px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #315942; }
-      .uc { font: 400 16px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2f3d35; }
-      .actor { font: 700 18px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
-      .small { font: 400 14px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665f; }
-      .boundary { fill: #f8fbf8; stroke: #52745d; stroke-width: 2.5; }
-      .case { fill: #ffffff; stroke: #82a284; stroke-width: 2; }
-      .shared { fill: #f2f7f0; stroke: #63856d; stroke-width: 2; }
-      .support { fill: #fff7e6; stroke: #d1a154; stroke-width: 1.7; stroke-dasharray: 7 5; }
-      .line { stroke: #829087; stroke-width: 1.8; fill: none; }
-      .actor-line { stroke: #3f5548; stroke-width: 3; fill: none; }
-      .include { stroke: #9b7a3e; stroke-width: 1.6; stroke-dasharray: 7 5; fill: none; }
+      .title { font: 700 42px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
+      .subtitle { font: 400 19px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2D3748; }
+      .group { font: 700 18px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #4F7057; }
+      .uc { font: 400 16px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
+      .actor { font: 700 18px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
+      .small { font: 400 14px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2D3748; }
+      .boundary { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 2.5; }
+      .case { fill: #ffffff; stroke: #B5C6B3; stroke-width: 2; }
+      .shared { fill: #DDEAD7; stroke: #B5C6B3; stroke-width: 2; }
+      .support { fill: #DDEAD7; stroke: #4F7057; stroke-width: 1.7; stroke-dasharray: 7 5; }
+      .line { stroke: #B5C6B3; stroke-width: 1.8; fill: none; }
+      .actor-line { stroke: #4F7057; stroke-width: 3; fill: none; }
+      .include { stroke: #4F7057; stroke-width: 1.6; stroke-dasharray: 7 5; fill: none; }
     </style>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
-      <path d="M0 0 L10 5 L0 10 Z" fill="#9b7a3e"/>
+      <path d="M0 0 L10 5 L0 10 Z" fill="#4F7057"/>
     </marker>
   </defs>
 
@@ -30,14 +30,14 @@
   <!-- Actors -->
   <!-- Actor 1: 一般使用者 (Left) -->
   <g transform="translate(95,350)">
-    <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#3f5548" stroke-width="3"/>
+    <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#4F7057" stroke-width="3"/>
     <path d="M0 23 V94 M-40 49 H40 M0 94 L-34 141 M0 94 L34 141" class="actor-line"/>
     <text x="0" y="176" text-anchor="middle" class="actor">一般使用者</text>
   </g>
 
   <!-- Actor 2: 管理員 (Right) -->
   <g transform="translate(1505,350)">
-    <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#3f5548" stroke-width="3"/>
+    <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#4F7057" stroke-width="3"/>
     <path d="M0 23 V94 M-40 49 H40 M0 94 L-34 141 M0 94 L34 141" class="actor-line"/>
     <text x="0" y="176" text-anchor="middle" class="actor">管理員</text>
   </g>
@@ -130,6 +130,6 @@
   <text x="1180" y="691" text-anchor="middle" class="uc">UC-14 審核回饋與模型標註</text>
 
   <!-- Bottom Annotation -->
-  <rect x="278" y="772" width="1044" height="44" rx="6" fill="#eef5ee" stroke="#b2c6b3"/>
+  <rect x="278" y="772" width="1044" height="44" rx="6" fill="#DDEAD7" stroke="#B5C6B3"/>
   <text x="800" y="800" text-anchor="middle" class="small">F5 是 F2 與 F4 的共用支援功能：同步官方資料、執行雙模型決策校驗與 RAG 檢索，並保留可追溯來源。</text>
 </svg>

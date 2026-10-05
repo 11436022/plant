@@ -1,21 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="850" viewBox="0 0 1600 850">
   <defs>
     <style>
-      .title { font: 700 40px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
-      .subtitle { font: 400 18px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665f; }
+      .title { font: 700 40px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
+      .subtitle { font: 400 18px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2D3748; }
       .root { font: 700 27px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #ffffff; }
-      .module { font: 700 21px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
-      .code { font: 700 14px "Segoe UI", Arial, sans-serif; fill: #8b5b16; }
-      .item { font: 400 15px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #34443b; }
-      .note { font: 400 15px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #4e5d54; }
-      .root-box { fill: #3f6f55; stroke: #315942; stroke-width: 2; }
-      .module-box { fill: #dcefdc; stroke: #73966f; stroke-width: 2; }
-      .item-box { fill: #ffffff; stroke: #b3c9af; stroke-width: 1.5; }
-      .line { stroke: #6c876e; stroke-width: 2.5; fill: none; }
+      .module { font: 700 21px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
+      .code { font: 700 14px "Segoe UI", Arial, sans-serif; fill: #4F7057; }
+      .item { font: 400 15px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
+      .note { font: 400 15px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2D3748; }
+      .root-box { fill: #4F7057; stroke: #4F7057; stroke-width: 2; }
+      .module-box { fill: #DDEAD7; stroke: #B5C6B3; stroke-width: 2; }
+      .item-box { fill: #ffffff; stroke: #B5C6B3; stroke-width: 1.5; }
+      .line { stroke: #B5C6B3; stroke-width: 2.5; fill: none; }
     </style>
   </defs>
 
-  <rect width="1600" height="850" fill="#f7faf7"/>
+  <rect width="1600" height="850" fill="#F8FAF7"/>
   <text x="64" y="55" class="title">FDD 功能分解圖 (Functional Decomposition Diagram)</text>
   <text x="64" y="85" class="subtitle">依系統六大核心業務模組（F1–F6）劃分，完全對應 DFD Level 1 與資料庫實體結構</text>
 
@@ -149,7 +149,7 @@
   </g>
 
   <!-- Bottom Academic Principles & Guidance -->
-  <rect x="54" y="628" width="1492" height="150" rx="8" fill="#fff7e6" stroke="#d6aa61" stroke-width="1.5"/>
+  <rect x="54" y="628" width="1492" height="150" rx="8" fill="#DDEAD7" stroke="#4F7057" stroke-width="1.5"/>
   <text x="82" y="662" class="note" font-weight="700">架構一致性原則：</text>
   <text x="235" y="662" class="note">F1–F6 為唯一之一級業務功能分類；Android 端、Web 端與 FastAPI 技術元件屬於系統架構，不重複列入功能層級。</text>
   

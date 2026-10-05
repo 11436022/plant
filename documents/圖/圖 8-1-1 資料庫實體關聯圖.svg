@@ -14,12 +14,12 @@
   <sodipodi:namedview
      id="namedview92"
      pagecolor="#ffffff"
-     bordercolor="#000000"
+     bordercolor="#1A281E"
      borderopacity="0.25"
      inkscape:showpageshadow="2"
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
+     inkscape:deskcolor="#B5C6B3"
      inkscape:zoom="0.840625"
      inkscape:cx="800"
      inkscape:cy="480"
@@ -33,22 +33,22 @@
      id="defs1">
     <style
        id="style1">
-      .title { font: 700 40px 'Microsoft JhengHei', 'Noto Sans TC', Arial, sans-serif; fill: #26352d; }
-      .subtitle { font: 400 18px 'Microsoft JhengHei', 'Noto Sans TC', Arial, sans-serif; fill: #59665f; }
+      .title { font: 700 40px 'Microsoft JhengHei', 'Noto Sans TC', Arial, sans-serif; fill: #1A281E; }
+      .subtitle { font: 400 18px 'Microsoft JhengHei', 'Noto Sans TC', Arial, sans-serif; fill: #2D3748; }
       .head { font: 700 20px 'Segoe UI', 'Microsoft JhengHei', sans-serif; fill: #ffffff; }
-      .field { font: 400 15px 'Segoe UI', 'Microsoft JhengHei', sans-serif; fill: #334239; }
-      .key { font: 700 14px 'Segoe UI', Arial, sans-serif; fill: #98651c; }
-      .label { font: 700 14px 'Segoe UI', Arial, sans-serif; fill: #53665a; }
-      .table { fill: #ffffff; stroke: #6f9075; stroke-width: 2; }
-      .header { fill: #47765a; }
-      .line { stroke: #6b7e70; stroke-width: 2.2; fill: none; }
-      .optional { stroke: #87998c; stroke-width: 1.8; stroke-dasharray: 7 5; fill: none; }
+      .field { font: 400 15px 'Segoe UI', 'Microsoft JhengHei', sans-serif; fill: #1A281E; }
+      .key { font: 700 14px 'Segoe UI', Arial, sans-serif; fill: #4F7057; }
+      .label { font: 700 14px 'Segoe UI', Arial, sans-serif; fill: #4F7057; }
+      .table { fill: #ffffff; stroke: #B5C6B3; stroke-width: 2; }
+      .header { fill: #4F7057; }
+      .line { stroke: #B5C6B3; stroke-width: 2.2; fill: none; }
+      .optional { stroke: #B5C6B3; stroke-width: 1.8; stroke-dasharray: 7 5; fill: none; }
     </style>
   </defs>
   <rect
      width="1600"
      height="960"
-     fill="#f8faf8"
+     fill="#F8FAF7"
      id="rect1"
      x="7.1375465"
      y="-3.5687733" />
@@ -86,7 +86,7 @@
        y="168"
        width="320"
        height="8"
-       fill="#47765a"
+       fill="#4F7057"
        id="rect4" />
     <text
        x="210"
@@ -154,7 +154,7 @@
        y="448"
        width="320"
        height="8"
-       fill="#47765a"
+       fill="#4F7057"
        id="rect13" />
     <text
        x="210"
@@ -223,7 +223,7 @@
        y="693"
        width="320"
        height="8"
-       fill="#47765a"
+       fill="#4F7057"
        id="rect22" />
     <text
        x="210"
@@ -320,7 +320,7 @@
        y="168"
        width="370"
        height="8"
-       fill="#47765a"
+       fill="#4F7057"
        id="rect33" />
     <text
        x="645"
@@ -394,7 +394,7 @@
        y="513"
        width="370"
        height="8"
-       fill="#47765a"
+       fill="#4F7057"
        id="rect43" />
     <text
        x="645"
@@ -488,7 +488,7 @@
        y="158"
        width="250"
        height="8"
-       fill="#47765a"
+       fill="#4F7057"
        id="rect55" />
     <text
        x="1055"
@@ -541,7 +541,7 @@
        y="158"
        width="280"
        height="8"
-       fill="#47765a"
+       fill="#4F7057"
        id="rect61" />
     <text
        x="1410"
@@ -619,7 +619,7 @@
        y="513"
        width="280"
        height="8"
-       fill="#47765a"
+       fill="#4F7057"
        id="rect72" />
     <text
        x="1410"
@@ -781,8 +781,8 @@
      width="1500"
      height="32"
      rx="6"
-     fill="#eef5ee"
-     stroke="#b1c6b1"
+     fill="#DDEAD7"
+     stroke="#B5C6B3"
      id="rect91" />
   <text
      x="800"

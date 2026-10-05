@@ -1,24 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
   <defs>
     <style>
-      .title { font: 700 42px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #26352d; }
-      .subtitle { font: 400 18px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #59665f; }
-      .lane { font: 700 20px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #315942; }
-      .lane-sub { font: 400 13px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #5a695f; }
-      .head { font: 700 17px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #26352d; }
-      .text { font: 400 13.5px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #3d4d43; }
-      .small { font: 400 11.5px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #5a695f; }
-      .lane-box { fill: #f7faf7; stroke: #9fb5a0; stroke-width: 2; }
-      .client { fill: #e7f2e4; stroke: #789879; stroke-width: 2; }
-      .service { fill: #ffffff; stroke: #73966f; stroke-width: 2; }
-      .safety { fill: #fff7e6; stroke: #d3a354; stroke-width: 2; }
-      .external { fill: #eef3f7; stroke: #7b929f; stroke-width: 2; }
-      .ai-box { fill: #eaf4fc; stroke: #6b93af; stroke-width: 2; }
-      .line { stroke: #667b6b; stroke-width: 2; fill: none; marker-end: url(#arrow); }
-      .return { stroke: #8a9b8e; stroke-width: 1.6; stroke-dasharray: 5 4; fill: none; marker-end: url(#arrow2); }
+      .title { font: 700 42px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #1A281E; }
+      .subtitle { font: 400 18px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #2D3748; }
+      .lane { font: 700 20px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #4F7057; }
+      .lane-sub { font: 400 13px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #2D3748; }
+      .head { font: 700 17px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #1A281E; }
+      .text { font: 400 13.5px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #1A281E; }
+      .small { font: 400 11.5px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #2D3748; }
+      .lane-box { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 2; }
+      .client { fill: #DDEAD7; stroke: #B5C6B3; stroke-width: 2; }
+      .service { fill: #ffffff; stroke: #B5C6B3; stroke-width: 2; }
+      .safety { fill: #DDEAD7; stroke: #4F7057; stroke-width: 2; }
+      .external { fill: #E5EDE3; stroke: #4F7057; stroke-width: 2; }
+      .ai-box { fill: #E5EDE3; stroke: #4F7057; stroke-width: 2; }
+      .line { stroke: #B5C6B3; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .return { stroke: #B5C6B3; stroke-width: 1.6; stroke-dasharray: 5 4; fill: none; marker-end: url(#arrow2); }
       .flow-label {
         font: 700 12px 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-        fill: #2d5e3f;
+        fill: #4F7057;
         paint-order: stroke fill;
         stroke: #ffffff;
         stroke-width: 4px;
@@ -26,7 +26,7 @@
       }
       .halo-text {
         font: 400 12.5px 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-        fill: #5a695f;
+        fill: #2D3748;
         paint-order: stroke fill;
         stroke: #ffffff;
         stroke-width: 4px;
@@ -34,10 +34,10 @@
       }
     </style>
     <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
-      <path d="M0 0 L9 4.5 L0 9 Z" fill="#667b6b"/>
+      <path d="M0 0 L9 4.5 L0 9 Z" fill="#B5C6B3"/>
     </marker>
     <marker id="arrow2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
-      <path d="M0 0 L9 4.5 L0 9 Z" fill="#8a9b8e"/>
+      <path d="M0 0 L9 4.5 L0 9 Z" fill="#B5C6B3"/>
     </marker>
   </defs>
 
@@ -196,6 +196,6 @@
   <text x="1138" y="726" text-anchor="middle" class="flow-label">氣象回傳</text>
 
   <!-- ================= Bottom System Annotation ================= -->
-  <rect x="50" y="836" width="1500" height="42" rx="6" fill="#eef5ee" stroke="#b1c6b1"/>
+  <rect x="50" y="836" width="1500" height="42" rx="6" fill="#DDEAD7" stroke="#B5C6B3"/>
   <text x="800" y="862" text-anchor="middle" class="small">診斷架構採三層階層式設計：本地自訓 ConvNeXt 優先快篩（零雲端成本），未命中由 Gemini 雲端多模態兜底，並經 FAISS 官方知識庫校驗生成精準處方；反饋數據留存供模型增量複訓。</text>
 </svg>

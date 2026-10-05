@@ -1,26 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750">
   <defs>
     <style>
-      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 20px; font-weight: bold; fill: #0f172a; }
-      .node-header { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 13px; font-weight: bold; fill: #1e293b; }
-      .node-sub { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 10px; font-style: italic; fill: #64748b; }
-      .artifact-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 11px; font-weight: bold; fill: #0f172a; }
-      .artifact-desc { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 10px; fill: #475569; }
-      .protocol-label { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; font-weight: bold; fill: #2563eb; text-anchor: middle; }
-      .protocol-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 9px; fill: #64748b; text-anchor: middle; }
+      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 20px; font-weight: bold; fill: #1A281E; }
+      .node-header { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 13px; font-weight: bold; fill: #1A281E; }
+      .node-sub { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 10px; font-style: italic; fill: #2D3748; }
+      .artifact-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 11px; font-weight: bold; fill: #1A281E; }
+      .artifact-desc { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 10px; fill: #2D3748; }
+      .protocol-label { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; font-weight: bold; fill: #2D5837; text-anchor: middle; }
+      .protocol-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 9px; fill: #2D3748; text-anchor: middle; }
       
-      .device-box { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.5; rx: 6; ry: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
-      .device-header { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.5; }
-      .container-box { fill: #ffffff; stroke: #3b82f6; stroke-width: 1.5; rx: 4; ry: 4; }
-      .ai-box { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 4; ry: 4; }
-      .db-box { fill: #fffbeb; stroke: #d97706; stroke-width: 1.5; rx: 4; ry: 4; }
-      .cloud-box { fill: #f5f3ff; stroke: #8b5cf6; stroke-width: 1.5; rx: 6; ry: 6; }
+      .device-box { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 1.5; rx: 6; ry: 6; ); }
+      .device-header { fill: #E5EDE3; stroke: #B5C6B3; stroke-width: 1.5; }
+      .container-box { fill: #ffffff; stroke: #4F7057; stroke-width: 1.5; rx: 4; ry: 4; }
+      .ai-box { fill: #FFFFFF; stroke: #4F7057; stroke-width: 1.5; rx: 4; ry: 4; }
+      .db-box { fill: #FFFFFF; stroke: #4F7057; stroke-width: 1.5; rx: 4; ry: 4; }
+      .cloud-box { fill: #F8FAF7; stroke: #4F7057; stroke-width: 1.5; rx: 6; ry: 6; }
       
-      .conn-line { stroke: #334155; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
-      .bidir-line { stroke: #334155; stroke-width: 1.5; fill: none; }
+      .conn-line { stroke: #334035; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
+      .bidir-line { stroke: #334035; stroke-width: 1.5; fill: none; }
     </style>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334035" />
     </marker>
   </defs>
 
@@ -39,7 +39,7 @@
     <text x="15" y="28" class="node-header">行動終端設備 (Android 智慧型手機)</text>
     
     <!-- Environment -->
-    <rect x="15" y="45" width="220" height="200" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" rx="4" />
+    <rect x="15" y="45" width="220" height="200" fill="#ffffff" stroke="#B5C6B3" stroke-width="1.2" rx="4" />
     <text x="25" y="62" class="node-sub">&lt;&lt;execution environment&gt;&gt; Android 12+</text>
     
     <!-- Artifact -->
@@ -49,7 +49,7 @@
     <text x="35" y="125" class="artifact-desc">• Network: Retrofit2 + OkHttp3</text>
     <text x="35" y="140" class="artifact-desc">• Hardware: 相機模組 (CameraX)</text>
 
-    <rect x="25" y="165" width="200" height="65" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+    <rect x="25" y="165" width="200" height="65" fill="#F8FAF7" stroke="#B5C6B3" rx="4" />
     <text x="35" y="183" class="artifact-title">«artifact» Client Cache</text>
     <text x="35" y="200" class="artifact-desc">• SharedPreferences (JWT Token)</text>
     <text x="35" y="215" class="artifact-desc">• 本地暫存影像快取</text>
@@ -63,7 +63,7 @@
     <text x="15" y="28" class="node-header">監控與管理終端 (PC 工作站)</text>
     
     <!-- Environment -->
-    <rect x="15" y="45" width="220" height="180" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" rx="4" />
+    <rect x="15" y="45" width="220" height="180" fill="#ffffff" stroke="#B5C6B3" stroke-width="1.2" rx="4" />
     <text x="25" y="62" class="node-sub">&lt;&lt;execution environment&gt;&gt; Web Browser</text>
     
     <!-- Artifacts -->
@@ -91,17 +91,17 @@
     <text x="25" y="65" class="artifact-title">«container» FastAPI Application Server (Port 8000)</text>
     <text x="25" y="80" class="artifact-desc">執行環境: Python 3.10 / Uvicorn ASGI 高併發伺服器</text>
     
-    <rect x="25" y="90" width="370" height="60" fill="#f8fafc" stroke="#93c5fd" rx="4" />
+    <rect x="25" y="90" width="370" height="60" fill="#F8FAF7" stroke="#B5C6B3" rx="4" />
     <text x="35" y="108" class="artifact-title">«component» RESTful API 路由群組 (APIRouter)</text>
     <text x="35" y="125" class="artifact-desc">• AuthRouter / PredictionRouter / DiariesRouter</text>
     <text x="35" y="140" class="artifact-desc">• FeedbackRouter / WebcamRouter / AdminDashboard</text>
 
-    <rect x="25" y="160" width="370" height="70" fill="#f8fafc" stroke="#93c5fd" rx="4" />
+    <rect x="25" y="160" width="370" height="70" fill="#F8FAF7" stroke="#B5C6B3" rx="4" />
     <text x="35" y="178" class="artifact-title">«component» 多模型決策仲裁核心 (Arbitration Core)</text>
     <text x="35" y="195" class="artifact-desc">• 雙模型推論協同調度 (Parallel Async Orchestrator)</text>
     <text x="35" y="210" class="artifact-desc">• 置信度 70% 檢核閾值與防幻覺多重校驗演算法</text>
 
-    <rect x="25" y="240" width="370" height="65" fill="#f8fafc" stroke="#93c5fd" rx="4" />
+    <rect x="25" y="240" width="370" height="65" fill="#F8FAF7" stroke="#B5C6B3" rx="4" />
     <text x="35" y="258" class="artifact-title">«component» 資料持久化存取層 (Data Access Layer)</text>
     <text x="35" y="275" class="artifact-desc">• SQLAlchemy 2.0 ORM 連線池管理</text>
     <text x="35" y="290" class="artifact-desc">• PyMySQL 資料庫驅動與連線複用</text>
@@ -111,12 +111,12 @@
     <text x="25" y="350" class="artifact-title">«execution environment» 本地 AI 推論環境 (Local Inference Engine)</text>
     <text x="25" y="365" class="artifact-desc">零雲端端點託管成本，確保高隱私與離線微觀病斑分類</text>
 
-    <rect x="25" y="375" width="370" height="55" fill="#ffffff" stroke="#86efac" rx="4" />
+    <rect x="25" y="375" width="370" height="55" fill="#ffffff" stroke="#B5C6B3" rx="4" />
     <text x="35" y="393" class="artifact-title">«artifact» 本地自訓特定作物 ConvNet 權重庫</text>
     <text x="35" y="410" class="artifact-desc">• PyTorch / TorchVision 卷積神經網路 (weights/convnet.pth)</text>
     <text x="35" y="423" class="artifact-desc">• 38 類植物葉片病害特徵萃取分類器</text>
 
-    <rect x="25" y="440" width="370" height="55" fill="#ffffff" stroke="#86efac" rx="4" />
+    <rect x="25" y="440" width="370" height="55" fill="#ffffff" stroke="#B5C6B3" rx="4" />
     <text x="35" y="458" class="artifact-title">«artifact» FAISS 向量知識庫與檢索增強索引</text>
     <text x="35" y="475" class="artifact-desc">• 農業部官方病蟲害開放資料高維向量索引 (FlatIP Index)</text>
     <text x="35" y="488" class="artifact-desc">• 毫米級語意相似度檢索 (RAG 防幻覺驗證核心)</text>
@@ -126,7 +126,7 @@
   <!-- Cloud Node: Google Gemini API -->
   <g transform="translate(930, 65)">
     <rect width="230" height="135" class="cloud-box" />
-    <path d="M 0 6 Q 0 0 6 0 L 224 0 Q 230 0 230 6 L 230 30 L 0 30 Z" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5" />
+    <path d="M 0 6 Q 0 0 6 0 L 224 0 Q 230 0 230 6 L 230 30 L 0 30 Z" fill="#E5EDE3" stroke="#4F7057" stroke-width="1.5" />
     <text x="15" y="15" class="node-sub">&lt;&lt;cloud service&gt;&gt;</text>
     <text x="15" y="26" class="node-header">Google Cloud AI</text>
     
@@ -140,7 +140,7 @@
   <!-- Cloud Node: SMTP Mail Service -->
   <g transform="translate(930, 215)">
     <rect width="230" height="105" class="cloud-box" />
-    <path d="M 0 6 Q 0 0 6 0 L 224 0 Q 230 0 230 6 L 230 30 L 0 30 Z" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5" />
+    <path d="M 0 6 Q 0 0 6 0 L 224 0 Q 230 0 230 6 L 230 30 L 0 30 Z" fill="#E5EDE3" stroke="#4F7057" stroke-width="1.5" />
     <text x="15" y="15" class="node-sub">&lt;&lt;cloud service&gt;&gt;</text>
     <text x="15" y="26" class="node-header">Google SMTP 郵件服務</text>
     
@@ -198,7 +198,7 @@
 
   <!-- Legend / Highlights -->
   <g transform="translate(40, 625)">
-    <rect width="1120" height="95" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2" rx="6" />
+    <rect width="1120" height="95" fill="#F8FAF7" stroke="#B5C6B3" stroke-width="1.2" rx="6" />
     <text x="20" y="25" class="artifact-title" font-size="12">架構亮點與技術特色說明 (Deployment Highlights):</text>
     <text x="20" y="47" class="artifact-desc">• 雙模型協同推論 (Dual-Model Parallel)：FastAPI 非同步協同調度 Google Gemini 2.5 Flash (廣域多模態) 與本地自訓 ConvNet (微觀病斑分類)，兼具雲端強大推理與本地即時高隱私。</text>
     <text x="20" y="65" class="artifact-desc">• 零雲端託管成本 (Zero Cloud Hosting Cost)：完全免除 Vertex AI / AutoML 端點高昂固定租金；本地自訓特定作物卷積神經網路直接部署於主機內部，經濟且可隨時複訓迭代。</text>

@@ -1,23 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
   <defs>
     <style>
-      .title { font: 700 44px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
-      .subtitle { font: 400 20px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665f; }
+      .title { font: 700 44px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
+      .subtitle { font: 400 20px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2D3748; }
       .root { font: 700 29px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #ffffff; }
-      .module { font: 700 22px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #26352d; }
-      .code { font: 700 15px "Segoe UI", Arial, sans-serif; fill: #8b5b16; }
-      .item { font: 400 16px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #34443b; }
-      .note { font: 400 17px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #4e5d54; }
-      .root-box { fill: #3f6f55; stroke: #315942; stroke-width: 2; }
-      .module-box { fill: #dcefdc; stroke: #73966f; stroke-width: 2; }
-      .item-box { fill: #ffffff; stroke: #b3c9af; stroke-width: 1.5; }
-      .line { stroke: #6c876e; stroke-width: 2.5; fill: none; }
-      .leaf-code { font: 700 11px "Segoe UI", Arial, sans-serif; fill: #8b5b16; }
+      .module { font: 700 22px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
+      .code { font: 700 15px "Segoe UI", Arial, sans-serif; fill: #4F7057; }
+      .item { font: 400 16px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
+      .note { font: 400 17px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2D3748; }
+      .root-box { fill: #4F7057; stroke: #4F7057; stroke-width: 2; }
+      .module-box { fill: #DDEAD7; stroke: #B5C6B3; stroke-width: 2; }
+      .item-box { fill: #ffffff; stroke: #B5C6B3; stroke-width: 1.5; }
+      .line { stroke: #B5C6B3; stroke-width: 2.5; fill: none; }
+      .leaf-code { font: 700 11px "Segoe UI", Arial, sans-serif; fill: #4F7057; }
       .item.compact { font-size:14px; }
     </style>
   </defs>
 
-  <rect width="1600" height="900" fill="#f7faf7"/>
+  <rect width="1600" height="900" fill="#F8FAF7"/>
   <text x="64" y="60" class="title">FDD 功能分解圖</text>
   <text x="64" y="92" class="subtitle">以現行程式可追蹤的業務流程分解；葉節點編號供需求、案例與測試對照</text>
 
@@ -167,7 +167,7 @@
   <text x="1434" y="689" text-anchor="middle" class="item">使用者列表與查詢</text>
   </g>
 
-  <rect x="64" y="718" width="1472" height="116" rx="8" fill="#fff7e6" stroke="#d6aa61" stroke-width="1.5"/>
+  <rect x="64" y="718" width="1472" height="116" rx="8" fill="#DDEAD7" stroke="#4F7057" stroke-width="1.5"/>
   <text x="92" y="749" text-anchor="start" class="note">儲存與警報：unknown／requires_review 結果可由本人確認保存並保留標記，但不得觸發自動警報。</text>
   <text x="92" y="780" text-anchor="start" class="note">監控範圍：後端依 user_id + session_id + region_id 分開累計；瀏覽器僅 full-frame，Android 支援單株／多區域。</text>
   <text x="92" y="811" text-anchor="start" class="note">知識維護：由維護者執行同步與建庫腳本；RAG 僅讀取可追溯的 data.json 農業資料，不讀取專題手冊 DOCX。</text>

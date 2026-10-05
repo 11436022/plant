@@ -1,31 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1430" viewBox="0 0 1600 1430">
   <defs>
     <style>
-      .title { font: 700 36px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #3e4940; }
-      .subtitle { font: 400 15px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #667168; }
-      .lane-title { font: 700 14px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #708074; }
-      .heading { font: 700 19px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #344138; }
-      .body { font: 400 14px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #48544b; }
-      .small { font: 400 12px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #59665d; }
-      .flow-label { font: 600 12px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #56635a; paint-order: stroke; stroke: #fff; stroke-width: 5px; stroke-linejoin: round; }
-      .entity { fill: #f7f9f6; stroke: #77867b; stroke-width: 2.2; }
-      .process { fill: #dcefd4; stroke: #789767; stroke-width: 2.2; }
-      .store { fill: #fff; stroke: #789767; stroke-width: 2.2; }
-      .store-head { fill: #e9f4e4; }
-      .reference { fill: #f7fbf5; stroke: #789767; stroke-width: 2.2; stroke-dasharray: 8 6; }
-      .lane-a { fill: #fbfcfa; stroke: #dce4dd; stroke-width: 1; }
-      .lane-b { fill: #f6f9f5; stroke: #dce4dd; stroke-width: 1; }
-      .flow { fill: none; stroke: #66766a; stroke-width: 2.2; marker-end: url(#arrow); }
-      .data-flow { fill: none; stroke: #789767; stroke-width: 2.2; marker-end: url(#arrow-green); }
-      .note { fill: #fff9df; stroke: #c5a84c; stroke-width: 2; }
-      .note-title { font: 700 14px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #6c5920; }
-      .note-text { font: 400 12px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #6c5920; }
+      .title { font: 700 36px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
+      .subtitle { font: 400 15px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2D3748; }
+      .lane-title { font: 700 14px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2D3748; }
+      .heading { font: 700 19px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
+      .body { font: 400 14px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #1A281E; }
+      .small { font: 400 12px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2D3748; }
+      .flow-label { font: 600 12px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #2D3748; paint-order: stroke; stroke: #fff; stroke-width: 5px; stroke-linejoin: round; }
+      .entity { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 2.2; }
+      .process { fill: #DDEAD7; stroke: #B5C6B3; stroke-width: 2.2; }
+      .store { fill: #fff; stroke: #B5C6B3; stroke-width: 2.2; }
+      .store-head { fill: #DDEAD7; }
+      .reference { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 2.2; stroke-dasharray: 8 6; }
+      .lane-a { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 1; }
+      .lane-b { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 1; }
+      .flow { fill: none; stroke: #4F7057; stroke-width: 2.2; marker-end: url(#arrow); }
+      .data-flow { fill: none; stroke: #B5C6B3; stroke-width: 2.2; marker-end: url(#arrow-green); }
+      .note { fill: #DDEAD7; stroke: #4F7057; stroke-width: 2; }
+      .note-title { font: 700 14px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #4F7057; }
+      .note-text { font: 400 12px "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; fill: #4F7057; }
     </style>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
-      <path d="M1,1 L9,5 L1,9 Z" fill="#66766a"/>
+      <path d="M1,1 L9,5 L1,9 Z" fill="#4F7057"/>
     </marker>
     <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
-      <path d="M1,1 L9,5 L1,9 Z" fill="#789767"/>
+      <path d="M1,1 L9,5 L1,9 Z" fill="#B5C6B3"/>
     </marker>
   </defs>
   <style>.flow-label {font-size:12px} .small {font-size:13px}</style>
@@ -51,7 +51,7 @@
   <text x="427.5" y="207" text-anchor="middle" class="body">未驗證信箱不核發 JWT</text>
   <rect x="655" y="138" width="285" height="80" rx="5" class="store"/>
   <rect x="655" y="138" width="285" height="27" rx="5" class="store-head"/>
-<path d="M655 165 H940" stroke="#789767" stroke-width="2"/>
+<path d="M655 165 H940" stroke="#B5C6B3" stroke-width="2"/>
   <text x="797.5" y="157" text-anchor="middle" class="body">D1 帳號與一次性 Token</text>
   <text x="797.5" y="189" text-anchor="middle" class="small">user / user_one_time_tokens</text>
   <rect x="1070" y="138" width="220" height="80" rx="7" class="entity"/>
@@ -83,14 +83,14 @@
   <text x="760" y="366" text-anchor="middle" class="body">影像候選結果</text>
   <rect x="970" y="311" width="265" height="113" rx="5" class="store"/>
   <rect x="970" y="311" width="265" height="27" rx="5" class="store-head"/>
-<path d="M970 338 H1235" stroke="#789767" stroke-width="2"/>
+<path d="M970 338 H1235" stroke="#B5C6B3" stroke-width="2"/>
   <text x="1102.5" y="330" text-anchor="middle" class="body">D5 診斷暫存</text>
   <text x="1102.5" y="362" text-anchor="middle" class="small">prediction_cache（記憶體）</text>
   <text x="1102.5" y="383" text-anchor="middle" class="small">prediction_id / user_id / result</text>
   <text x="1102.5" y="404" text-anchor="middle" class="small">expires_at；TTL 15 分鐘</text>
   <rect x="1315" y="311" width="230" height="113" rx="5" class="store"/>
   <rect x="1315" y="311" width="230" height="27" rx="5" class="store-head"/>
-<path d="M1315 338 H1545" stroke="#789767" stroke-width="2"/>
+<path d="M1315 338 H1545" stroke="#B5C6B3" stroke-width="2"/>
   <text x="1430" y="330" text-anchor="middle" class="body">D6 暫存圖片檔案</text>
   <text x="1430" y="362" text-anchor="middle" class="small">static/tmp</text>
   <text x="1430" y="383" text-anchor="middle" class="small">圖片不存入 MySQL</text>
@@ -100,13 +100,13 @@
   <text x="825" y="652" text-anchor="middle" class="body">確認保存、查詢、註記與刪除</text>
   <rect x="1085" y="567" width="260" height="100" rx="5" class="store"/>
   <rect x="1085" y="567" width="260" height="27" rx="5" class="store-head"/>
-<path d="M1085 594 H1345" stroke="#789767" stroke-width="2"/>
+<path d="M1085 594 H1345" stroke="#B5C6B3" stroke-width="2"/>
   <text x="1215" y="586" text-anchor="middle" class="body">D3 正式診斷紀錄</text>
   <text x="1215" y="618" text-anchor="middle" class="small">plant_diary（MySQL）</text>
   <text x="1215" y="639" text-anchor="middle" class="small">來源快照、複核標記、圖片路徑</text>
   <rect x="1385" y="567" width="170" height="100" rx="5" class="store"/>
   <rect x="1385" y="567" width="170" height="27" rx="5" class="store-head"/>
-<path d="M1385 594 H1555" stroke="#789767" stroke-width="2"/>
+<path d="M1385 594 H1555" stroke="#B5C6B3" stroke-width="2"/>
   <text x="1470" y="586" text-anchor="middle" class="body">D7 正式圖片</text>
   <text x="1470" y="618" text-anchor="middle" class="small">static/uploads</text>
   <text x="1470" y="639" text-anchor="middle" class="small">檔案系統</text>
@@ -155,14 +155,14 @@
   <text x="557.5" y="734" text-anchor="middle" class="body">來源欄位完整不等於專業核准</text>
   <rect x="825" y="656" width="300" height="117" rx="5" class="store"/>
   <rect x="825" y="656" width="300" height="27" rx="5" class="store-head"/>
-<path d="M825 683 H1125" stroke="#789767" stroke-width="2"/>
+<path d="M825 683 H1125" stroke="#B5C6B3" stroke-width="2"/>
   <text x="975" y="675" text-anchor="middle" class="body">D2 作物、病蟲害與來源</text>
   <text x="975" y="707" text-anchor="middle" class="small">crop / disease / pests（MySQL）</text>
   <text x="975" y="728" text-anchor="middle" class="small">data.json（建庫語料檔案）</text>
   <text x="975" y="749" text-anchor="middle" class="small">source_name / url / record_id</text>
   <rect x="1240" y="656" width="310" height="117" rx="5" class="store"/>
   <rect x="1240" y="656" width="310" height="27" rx="5" class="store-head"/>
-<path d="M1240 683 H1550" stroke="#789767" stroke-width="2"/>
+<path d="M1240 683 H1550" stroke="#B5C6B3" stroke-width="2"/>
   <text x="1395" y="675" text-anchor="middle" class="body">D8 RAG 索引與 manifest</text>
   <text x="1395" y="707" text-anchor="middle" class="small">knowledge_base.faiss</text>
   <text x="1395" y="728" text-anchor="middle" class="small">knowledge_content.json</text>
@@ -189,7 +189,7 @@
   <text x="595" y="964" text-anchor="middle" class="body">個人警報查詢、確認與刪除</text>
   <rect x="895" y="875" width="330" height="105" rx="5" class="store"/>
   <rect x="895" y="875" width="330" height="27" rx="5" class="store-head"/>
-<path d="M895 902 H1225" stroke="#789767" stroke-width="2"/>
+<path d="M895 902 H1225" stroke="#B5C6B3" stroke-width="2"/>
   <text x="1060" y="894" text-anchor="middle" class="body">D4 警報資料＋D7 圖片</text>
   <text x="1060" y="926" text-anchor="middle" class="small">webcam_alert：來源快照／區域／路徑</text>
   <text x="1060" y="947" text-anchor="middle" class="small">static/uploads：圖片檔案</text>
@@ -221,7 +221,7 @@
   <text x="592.5" y="1191" text-anchor="middle" class="body">紀錄與使用者查詢、分頁</text>
   <rect x="915" y="1100" width="345" height="91" rx="5" class="store"/>
   <rect x="915" y="1100" width="345" height="27" rx="5" class="store-head"/>
-<path d="M915 1127 H1260" stroke="#789767" stroke-width="2"/>
+<path d="M915 1127 H1260" stroke="#B5C6B3" stroke-width="2"/>
   <text x="1087.5" y="1119" text-anchor="middle" class="body">D1 帳號＋D3 診斷紀錄（同上）</text>
   <text x="1087.5" y="1151" text-anchor="middle" class="small">user：查詢與統計</text>
   <text x="1087.5" y="1172" text-anchor="middle" class="small">plant_diary：查詢／新增／修改／刪除</text>

@@ -1,23 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 580" width="1020" height="580">
   <defs>
     <style>
-      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 18px; font-weight: bold; fill: #0f172a; }
-      .class-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 13.5px; font-weight: bold; fill: #ffffff; text-anchor: middle; }
-      .member-text { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; fill: #1e293b; }
-      .cardinality { font-family: 'Consolas', monospace; font-size: 11px; font-weight: bold; fill: #334155; }
-      .rel-label { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10.5px; font-weight: bold; fill: #475569; text-anchor: middle; }
+      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 18px; font-weight: bold; fill: #1A281E; }
+      .class-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 13.5px; font-weight: bold; fill: #1A281E; text-anchor: middle; }
+      .member-text { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; fill: #2D3748; }
+      .cardinality { font-family: 'Consolas', monospace; font-size: 11px; font-weight: bold; fill: #1A281E; }
+      .rel-label { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10.5px; font-weight: bold; fill: #223827; text-anchor: middle; }
       
-      .class-box { fill: #ffffff; stroke: #2563eb; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
-      .class-header { fill: #2563eb; }
+      .class-box { fill: #FFFFFF; stroke: #4F7057; stroke-width: 1.5; rx: 4; ry: 4; ); }
+      .class-header { fill: #DDEAD7; }
       
-      .core-box { fill: #ffffff; stroke: #059669; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
-      .core-header { fill: #059669; }
+      .core-box { fill: #FFFFFF; stroke: #4F7057; stroke-width: 1.8; stroke-width: 1.5; rx: 4; ry: 4; ); }
+      .core-header { fill: #DDEAD7; }
       
-      .feedback-box { fill: #ffffff; stroke: #d97706; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
-      .feedback-header { fill: #d97706; }
+      .feedback-box { fill: #FFFFFF; stroke: #4F7057; stroke-dasharray: 4,3; stroke-width: 1.5; rx: 4; ry: 4; ); }
+      .feedback-header { fill: #E5EDE3; }
 
-      .assoc-line { stroke: #334155; stroke-width: 1.5; fill: none; }
-      .divider { stroke: #e2e8f0; stroke-width: 1; }
+      .assoc-line { stroke: #334035; stroke-width: 1.5; fill: none; }
+      .divider { stroke: #B5C6B3; stroke-width: 1; }
     </style>
   </defs>
 
@@ -149,10 +149,10 @@
 
   <!-- Notes (Clean 2-line wrapped text with comfortable padding, zero overflow) -->
   <g transform="translate(40, 495)">
-    <rect width="935" height="68" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2" rx="6" />
-    <text x="15" y="22" font-family="'Microsoft JhengHei', sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">分析類別說明：</text>
-    <text x="15" y="42" font-family="'Microsoft JhengHei', sans-serif" font-size="11" font-weight="500" fill="#334155">本圖展現系統分析階段之核心領域實體，以植物日誌 (PlantDiary) 為核心樞紐，關聯使用者 (User)、</text>
-    <text x="15" y="58" font-family="'Microsoft JhengHei', sans-serif" font-size="11" font-weight="500" fill="#334155">診斷結果 (DiagnosisResult)、病害圖片 (Image)、糾錯反饋 (Feedback) 與監控警報 (WebcamAlert)。</text>
+    <rect width="935" height="68" fill="#F8FAF7" stroke="#B5C6B3" stroke-width="1.2" rx="6" />
+    <text x="15" y="22" font-family="'Microsoft JhengHei', sans-serif" font-size="11.5" font-weight="bold" fill="#1A281E">分析類別說明：</text>
+    <text x="15" y="42" font-family="'Microsoft JhengHei', sans-serif" font-size="11" font-weight="500" fill="#334035">本圖展現系統分析階段之核心領域實體，以植物日誌 (PlantDiary) 為核心樞紐，關聯使用者 (User)、</text>
+    <text x="15" y="58" font-family="'Microsoft JhengHei', sans-serif" font-size="11" font-weight="500" fill="#334035">診斷結果 (DiagnosisResult)、病害圖片 (Image)、糾錯反饋 (Feedback) 與監控警報 (WebcamAlert)。</text>
   </g>
 
 </svg>
