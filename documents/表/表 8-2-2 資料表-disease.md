@@ -7,7 +7,8 @@
 | disease_id | 疾病ID | int | - | V |
 | crop_id | 農作物ID | int | - | V |
 | disease_name | 疾病中文名 | varchar | 100 |  |
-| description | 疾病形容 | text | - |  |
-| treatment | 解決方法 | varchar | 100 |  |
-
----
+| description | 病徵病理描述 | text | - |  |
+| treatment | 防治建議處方 | text | - |  |
+| source_name | 資料來源單位 | varchar | 100 |  |
+| source_url | 官方來源網址 | varchar | 2048 |  |
+| source_record_id | 官方來源紀錄編號 | varchar | 128 |  |
