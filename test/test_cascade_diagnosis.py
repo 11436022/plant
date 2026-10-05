@@ -273,3 +273,50 @@ def test_convnext_delegates_unknown_crop_to_gemini():
     assert result_unknown is None
 
 
+def test_convnext_method_c_cosine_similarity_ood_interception():
+    """
+    方法 C 測試：驗證特徵空間餘弦相似度 OOD 攔截機制。
+    當 Softmax 偽高置信 (99%) 但特徵相似度低於門檻 (0.45 < 0.55) 時，判定為果實/異物，安全拒絕快篩；
+    當特徵相似度達標 (0.75 >= 0.55) 時，正常命中。
+    """
+    import torch
+    from PIL import Image
+
+    dummy_image = Image.new("RGB", (224, 224), color="green")
+    idx_map = load_class_index()
+    strawberry_scorch_idx = [i for i, label in idx_map.items() if label == "Strawberry___Leaf_scorch"][0]
+
+    fake_probs = torch.zeros(38)
+    fake_probs[strawberry_scorch_idx] = 0.99  # Softmax 偽高分 99%
+
+    # 模擬 1：果實/異物（特徵餘弦相似度僅 0.45，低於 0.55 門檻）
+    fake_low_cos = torch.full((38,), 0.20)
+    fake_low_cos[strawberry_scorch_idx] = 0.45
+
+    with patch("app.services.convnext.Image.open", return_value=dummy_image):
+        with patch("app.services.convnext.torch.softmax", return_value=fake_probs.unsqueeze(0)):
+            res_ood = predict_convnext_fast_screen(
+                "dummy.jpg",
+                crop_name="草莓",
+                mock_cosine_similarity=fake_low_cos,
+            )
+            assert res_ood is None  # 成功觸發 OOD 攔截，安全交由 Gemini！
+
+    # 模擬 2：真正的葉焦病葉片（特徵餘弦相似度高達 0.78，達標）
+    fake_high_cos = torch.full((38,), 0.20)
+    fake_high_cos[strawberry_scorch_idx] = 0.78
+
+    with patch("app.services.convnext.Image.open", return_value=dummy_image):
+        with patch("app.services.convnext.torch.softmax", return_value=fake_probs.unsqueeze(0)):
+            res_leaf = predict_convnext_fast_screen(
+                "dummy.jpg",
+                crop_name="草莓",
+                mock_cosine_similarity=fake_high_cos,
+            )
+            assert res_leaf is not None
+            assert res_leaf["crop_name"] == "草莓"
+            assert res_leaf["status_name"] == "葉焦病"
+            assert res_leaf["cosine_similarity"] == pytest.approx(0.78, abs=0.01)
+
+
+

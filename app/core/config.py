@@ -74,6 +74,7 @@ class Settings(BaseSettings):
     CONVNEXT_CLASS_INDEX_PATH: str = "idx_to_class.json"
     CONVNEXT_MIN_CONFIDENCE: float = 0.75
     CONVNEXT_OVERWHELMING_CONFIDENCE: float = 0.85
+    CONVNEXT_MIN_COSINE_SIMILARITY: float = 0.55
 
     def __init__(self, **values):
         super().__init__(**values)

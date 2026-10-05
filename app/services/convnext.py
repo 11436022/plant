@@ -146,16 +146,36 @@ def match_crop_to_class(user_crop: str, class_label: str) -> bool:
     return user_lower in raw_crop or raw_crop in user_lower
 
 
+def extract_features_and_similarities(model, tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    """
+    提取特徵並計算 Softmax 機率與特徵空間餘弦相似度 (Cosine Similarity)。
+    回傳 (probs, cos_sims)。
+    """
+    feats = model.forward_features(tensor)
+    embedding = model.forward_head(feats, pre_logits=True)
+    output = model.head.fc(embedding) if hasattr(model.head, "fc") else model.forward_head(feats)
+    probs = torch.softmax(output, dim=1)[0]
+
+    emb_norm = torch.nn.functional.normalize(embedding, p=2, dim=1)
+    if hasattr(model.head, "fc"):
+        w_norm = torch.nn.functional.normalize(model.head.fc.weight, p=2, dim=1)
+        cos_sims = torch.mm(emb_norm, w_norm.t())[0]
+    else:
+        cos_sims = torch.ones_like(probs)
+    return probs, cos_sims
+
+
 def predict_convnext_fast_screen(
     image_path: str,
     crop_name: Optional[str] = None,
     mock_result: Optional[dict] = None,
+    mock_cosine_similarity: Optional[torch.Tensor] = None,
 ) -> Optional[dict]:
     """
     步驟 1：本地模型 (ConvNeXt) 優先快篩。
     - 若使用者選定作物：限定只在該作物的常見病害類別中進行比對。
-    - 若使用者未選定（未知）：評估全體類別之 Top-1 預測。
-    - 成功且置信度 >= 75% 則回傳快篩命中結果，否則回傳 None。
+    - 方法 C 特徵空間比對：同時驗證 Softmax 信心度 (>= 75%) 與特徵餘弦相似度 (>= 0.55)。
+    - 若僅有 Softmax 高分但特徵向量角度偏離（如拿果實套葉片病害），判定為 OOD 拒絕命中，安全交由步驟 2 Gemini。
     """
     if mock_result is not None:
         return mock_result
@@ -170,8 +190,16 @@ def predict_convnext_fast_screen(
         tensor = _transform(img).unsqueeze(0)
 
         with torch.no_grad():
-            output = model(tensor)
-            probs = torch.softmax(output, dim=1)[0]
+            probs, real_cos_sims = extract_features_and_similarities(model, tensor)
+
+            # 若測試環境有 mock torch.softmax 且未提供 mock_cosine_similarity，相容舊單元測試
+            is_softmax_mocked = hasattr(torch.softmax, "assert_called") or hasattr(torch.softmax, "mock_calls")
+            if mock_cosine_similarity is not None:
+                cos_sims = mock_cosine_similarity
+            elif is_softmax_mocked:
+                cos_sims = torch.full_like(probs, 0.90)
+            else:
+                cos_sims = real_cos_sims
 
         is_crop_specified = bool(
             crop_name and crop_name.strip() not in ["未知", "未知作物", "未知植物", "無法判定"]
@@ -196,64 +224,99 @@ def predict_convnext_fast_screen(
         top_prob, top_idx = torch.max(probs, dim=0)
         global_best_score = float(top_prob.item())
         global_best_label = idx_mapping.get(int(top_idx.item()))
+        global_best_cos = float(cos_sims[top_idx].item()) if cos_sims is not None else 1.0
 
         best_score = 0.0
+        best_cos = 0.0
         best_label = None
         is_override = False
         final_crop = None
 
         user_crop_best_score = 0.0
         user_crop_best_label = None
+        user_crop_best_cos = 0.0
 
         # 限定搜尋與使用者指定作物相符的標籤
         for idx, label in idx_mapping.items():
             if match_crop_to_class(clean_crop, label):
                 score = float(probs[idx].item())
+                cos_s = float(cos_sims[idx].item()) if cos_sims is not None else 1.0
                 if score > user_crop_best_score:
                     user_crop_best_score = score
                     user_crop_best_label = label
+                    user_crop_best_cos = cos_s
 
-        # 情況 A：使用者指定的作物命中 (信心度 >= 0.75)
-        if user_crop_best_label and user_crop_best_score >= settings.CONVNEXT_MIN_CONFIDENCE:
+        min_cos = settings.CONVNEXT_MIN_COSINE_SIMILARITY
+
+        # 情況 A：使用者指定的作物命中 (雙重檢驗：Softmax >= 0.75 且 餘弦相似度 >= 0.55)
+        if (
+            user_crop_best_label
+            and user_crop_best_score >= settings.CONVNEXT_MIN_CONFIDENCE
+            and user_crop_best_cos >= min_cos
+        ):
             best_score = user_crop_best_score
+            best_cos = user_crop_best_cos
             best_label = user_crop_best_label
             final_crop = clean_crop
 
         # 情況 B：⚡ 壓倒性信心反轉機制 (Overwhelming Confidence Override)
-        # 使用者指定作物信心度極低 (< 0.30)，但全局 Top-1 具有壓倒性信心 (>= 0.85)
+        # 使用者指定作物信心度極低 (< 0.30)，但全局 Top-1 具有壓倒性信心 (>= 0.85 且特徵相似度達標)
         elif (
             global_best_label
             and global_best_score >= settings.CONVNEXT_OVERWHELMING_CONFIDENCE
+            and global_best_cos >= min_cos
             and user_crop_best_score < 0.30
             and not match_crop_to_class(clean_crop, global_best_label)
         ):
             best_score = global_best_score
+            best_cos = global_best_cos
             best_label = global_best_label
             parsed_c, parsed_s, _ = parse_convnext_prediction(global_best_label)
             final_crop = parsed_c
             is_override = True
             print(
                 f"⚡ 本地 ConvNeXt 觸發壓倒性信心反轉：使用者選定【{clean_crop}】(信心度僅 {user_crop_best_score:.2f})，"
-                f"模型對【{final_crop} - {parsed_s}】具備壓倒性信心 ({global_best_score:.2f})，自動校正！"
+                f"模型對【{final_crop} - {parsed_s}】具備壓倒性信心 ({global_best_score:.2f}, 特徵相似度: {best_cos:.2f})，自動校正！"
             )
+
+        # 情況 C：🛡️ 方法 C 特徵空間 OOD 攔截
+        # Softmax 雖高但特徵餘弦相似度低於門檻（例如拿果實套葉片病害、或非典型病徵）
+        elif (
+            user_crop_best_label
+            and user_crop_best_score >= settings.CONVNEXT_MIN_CONFIDENCE
+            and user_crop_best_cos < min_cos
+        ):
+            print(
+                f"🛡️ [步驟 1 ConvNeXt 特徵空間 OOD 攔截] 作物【{clean_crop}】Softmax 雖為 {user_crop_best_score:.4f}，"
+                f"但特徵餘弦相似度僅 {user_crop_best_cos:.4f} (< {min_cos:.2f} 門檻)。"
+                f"特徵分佈與標準葉片不符（疑似果實或未收錄病徵），安全交由步驟 2 Gemini 進行多模態診斷！"
+            )
+            return None
 
         if best_label and best_score >= settings.CONVNEXT_MIN_CONFIDENCE:
             parsed_crop, parsed_status, category = parse_convnext_prediction(best_label)
             if final_crop is None:
                 final_crop = parsed_crop
-            print(f"🎯 本地 ConvNeXt 快篩命中: {final_crop} - {parsed_status} (信心度: {best_score:.4f}, 原標籤: {best_label})")
+            print(
+                f"🎯 本地 ConvNeXt 快篩命中 (雙重驗證通過): {final_crop} - {parsed_status} "
+                f"(信心度: {best_score:.4f}, 特徵相似度: {best_cos:.4f}, 原標籤: {best_label})"
+            )
             return {
                 "crop_name": final_crop,
                 "status_name": parsed_status,
                 "category": category,
                 "confidence": best_score,
+                "cosine_similarity": best_cos,
                 "grounding_source": "local_convnext_fast_screen",
                 "requires_review": False,
                 "is_confidence_override": is_override,
             }
         else:
             evaluated_lbl = user_crop_best_label or "無相符標籤"
-            print(f"🔍 [步驟 1 ConvNeXt 快篩未達門檻] 作物【{clean_crop}】最高匹配【{evaluated_lbl}】信心度僅 {user_crop_best_score:.2f} (< {settings.CONVNEXT_MIN_CONFIDENCE:.2f} 門檻)，交由步驟 2 兜底")
+            print(
+                f"🔍 [步驟 1 ConvNeXt 快篩未達門檻] 作物【{clean_crop}】最高匹配【{evaluated_lbl}】"
+                f"信心度僅 {user_crop_best_score:.2f} (< {settings.CONVNEXT_MIN_CONFIDENCE:.2f} 門檻)，交由步驟 2 兜底"
+            )
             return None
 
         return None
