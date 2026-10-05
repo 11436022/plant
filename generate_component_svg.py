@@ -301,3 +301,4 @@ for t in targets:
     with open(t, "w", encoding="utf-8") as f:
         f.write(svg_content.strip())
     print(f"Written to {t}")
+

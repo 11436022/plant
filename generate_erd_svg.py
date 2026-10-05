@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1660 980" width="1660" height="980">
+import os
+
+svg_content = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1660 980" width="1660" height="980">
   <defs>
     <style>
       .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 26px; font-weight: bold; fill: #000000; }
@@ -230,3 +232,14 @@
   <text x="1140" y="730" class="card-label" text-anchor="middle">0..1 : N</text>
 
 </svg>
+"""
+
+targets = [
+    "documents/圖/圖 8-1-1 資料庫實體關聯圖.svg",
+    "documents/system_erd.svg",
+]
+
+for t in targets:
+    with open(t, "w", encoding="utf-8") as f:
+        f.write(svg_content.strip())
+    print(f"Written to {t}")
