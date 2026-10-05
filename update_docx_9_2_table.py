@@ -5,104 +5,49 @@ import docx
 from docx.oxml import parse_xml
 from docx.oxml.ns import qn
 
-HEADERS_9_2 = ['類別', '元件 / 檔案名稱', '規格描述與功能職責']
+HEADERS_9_2 = ['類別', '元件 / 檔案', '規格描述與功能職責']
 COL_WIDTHS_9_2 = [2200, 2600, 4668]  # dxa, total = 9468 dxa
 
 ROWS_9_2 = [
     [
-        '容器部署與環境配置',
-        'Dockerfile',
-        '基於 Python 3.11-slim 輕量鏡像建構，整合 OpenMP（FAISS 必需）、虛擬環境隔離與非 root 安全使用者執行環境。'
+        '容器部署環境',
+        'Dockerfile、docker-compose.yml',
+        '封裝 Python 3.11 輕量化執行環境與非 root 安全使用者，提供後端與資料庫服務之一鍵容器化部署與網路映射。'
     ],
     [
-        '容器部署與環境配置',
-        'docker-compose.yml',
-        '定義後端服務與端口映射（8000:8000）、掛載持久化目錄、配置重啟策略與跨主機通訊網路（host-gateway）。'
+        '環境組態設定',
+        '.env.example',
+        '集中規範系統全域環境變數範本，包含資料庫連線、JWT 金鑰、Gemini API Key、SMTP 憑證與氣象開放資料設定。'
     ],
     [
-        '容器部署與環境配置',
-        '.env / .env.example',
-        '集中管理資料庫連線（DB）、JWT 加密金鑰、Gemini API Key、SMTP 郵箱憑證、Webcam 警報門檻與 CWA 氣象金鑰。'
+        '套件依賴管理',
+        'requirements.txt、build.gradle.kts',
+        '嚴格規範後端 Python（FastAPI, PyTorch, FAISS）與 Android 端（Retrofit, CameraX, Glide）之相依函式庫與版本。'
     ],
     [
-        '容器部署與環境配置',
-        'requirements.txt',
-        '規範後端 Python 套件版本（包含 FastAPI, PyTorch, FAISS-CPU, SQLAlchemy, Pydantic, google-genai 等）。'
+        '資料庫遷移工具',
+        'init_db.sql、alembic/',
+        '提供系統首次安裝的基礎結構與農業百科種子資料建置，並透過 Alembic 腳本支援資料庫版本的平滑演進與熱修補。'
     ],
     [
-        '資料庫遷移與初始腳本',
-        'init_db.sql',
-        '初始化資料庫結構，預載基礎作物（crop）、病害（disease）與蟲害（pests）圖庫知識庫種子資料。'
+        '本地 AI 快篩模型',
+        'convnext_plant_best.pth、idx_to_class.json',
+        '包含本地端 PyTorch ConvNeXt-Tiny 卷積神經網路訓練權重與類別雙向映射表，提供毫秒級即時病害邊緣快篩。'
     ],
     [
-        '資料庫遷移與初始腳本',
-        'alembic.ini 及 alembic/versions/',
-        'Alembic 資料庫版本控制遷移腳本，記錄資料庫歷史演進並支援平滑熱修補（如 feedback、webcam_alert 等欄位更新）。'
+        'RAG 向量檢索資產',
+        'knowledge_base.faiss、knowledge_content.json',
+        '整合 FAISS 密集特徵向量索引庫與農業部文獻文本庫，支援語意相似度檢索以生成專業可追溯之防治建議。'
     ],
     [
-        'AI 模型權重與向量資產',
-        'convnext_plant_best.pth',
-        '本地端 PyTorch 輕量化 ConvNeXt-Tiny 深度學習模型訓練權重，提供毫秒級作物病蟲害邊緣快篩辨識能力。'
+        '後台模板與靜態存儲',
+        'templates/*.html、static/uploads/',
+        '提供管理者儀表板、使用者回饋審查網頁模板，以及使用者植物診斷快照圖檔之持久化儲存目錄。'
     ],
     [
-        'AI 模型權重與向量資產',
-        'idx_to_class.json',
-        '模型預測輸出類別索引（Index）與中文作物病蟲害標準名稱之雙向映射字典。'
-    ],
-    [
-        'AI 模型權重與向量資產',
-        'knowledge_base.faiss',
-        'FAISS 密集向量索引庫，儲存農業知識條目特徵向量，支援語意相似度檢索以實現 RAG 增強生成。'
-    ],
-    [
-        'AI 模型權重與向量資產',
-        'knowledge_content.json',
-        '農業部開放資料與專家知識庫對應文本庫，提供檢索命中文獻之處置建議與可追溯出處。'
-    ],
-    [
-        'Web 管理後台模板',
-        'templates/dashboard.html',
-        '系統管理總覽儀表板，提供診斷日誌統計圖表、警報狀態監控與伺服器健康狀況。'
-    ],
-    [
-        'Web 管理後台模板',
-        'templates/feedback.html',
-        '使用者回饋與主動學習標註審核頁面，供專家審視農友回報的誤判快照並納入微調數據集。'
-    ],
-    [
-        'Web 管理後台模板',
-        'templates/users.html',
-        '使用者帳號管理頁面，支援管理者查詢會員清單、信箱驗證狀態與權限角色調整。'
-    ],
-    [
-        'Web 管理後台模板',
-        'templates/webcam.html',
-        'Webcam 即時串流監控調試介面，提供自訂檢驗區域與排程測試。'
-    ],
-    [
-        '靜態資源與持久化目錄',
-        'static/uploads/',
-        '持久化儲存使用者拍照上傳的植物診斷快照圖檔。'
-    ],
-    [
-        '靜態資源與持久化目錄',
-        'static/feedback_uploads/',
-        '持久化儲存使用者回報誤判更正時所上傳之原始比對圖檔。'
-    ],
-    [
-        '靜態資源與持久化目錄',
-        'static/reset_password.html',
-        '密碼重設前端靜態響應頁面，接收信箱一次性權杖進行安全密碼更新。'
-    ],
-    [
-        'Android 端配置與資源',
-        'build.gradle.kts',
-        '定義 Android 編譯版本（SDK 26~36）、ViewBinding、Retrofit2、CameraX、Glide 與各項第三方支援庫依賴。'
-    ],
-    [
-        'Android 端配置與資源',
-        'res/layout/ 及 res/drawable/',
-        '包含所有 Activity/Dialog XML 版面設計檔、向量圖示、圓角卡片背景與診斷狀態視覺化標籤樣式。'
+        'Android 介面資源',
+        'res/layout/、res/drawable/',
+        '定義 Android 前端所有 Activity 與 Dialog 之 XML 版面佈局、自訂互動監控框、向量圖示與狀態標籤樣式。'
     ]
 ]
 
@@ -193,50 +138,9 @@ def build_table_9_2_element(headers, rows):
     return parse_xml(''.join(xml_parts))
 
 
-def build_caption_9_2_element():
-    """Builds the Caption paragraph element for 表 9-2-1."""
-    xml = """<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:pPr>
-    <w:pStyle w:val="af7"/>
-    <w:keepNext/>
-    <w:ind w:left="280" w:right="280"/>
-    <w:jc w:val="center"/>
-    <w:rPr>
-      <w:color w:val="000000"/>
-      <w:sz w:val="28"/>
-      <w:szCs w:val="28"/>
-      <w:lang w:eastAsia="zh-TW"/>
-    </w:rPr>
-  </w:pPr>
-  <w:r>
-    <w:rPr>
-      <w:rFonts w:ascii="微軟正黑體" w:hAnsi="微軟正黑體" w:eastAsia="微軟正黑體"/>
-      <w:color w:val="000000"/>
-      <w:sz w:val="28"/>
-      <w:szCs w:val="28"/>
-      <w:lang w:eastAsia="zh-TW"/>
-    </w:rPr>
-    <w:t>表 9-2-1 附屬元件與依附項目清單</w:t>
-  </w:r>
-</w:p>"""
-    return parse_xml(xml)
-
-
-def build_empty_p():
-    """Builds a single blank line paragraph."""
-    xml = """<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:pPr>
-    <w:pStyle w:val="af7"/>
-    <w:ind w:left="280" w:right="280"/>
-    <w:rPr><w:lang w:eastAsia="zh-TW"/></w:rPr>
-  </w:pPr>
-</w:p>"""
-    return parse_xml(xml)
-
-
-def update_section_9_2_in_doc(docx_path):
+def update_table_9_2_to_core8(docx_path):
     print(f"\n=======================================================")
-    print(f"Processing Section 9-2 in: {docx_path}")
+    print(f"Streamlining Table 9-2-1 in: {docx_path}")
     if not os.path.exists(docx_path):
         print("  File not found! Skipping.")
         return False
@@ -244,33 +148,8 @@ def update_section_9_2_in_doc(docx_path):
     doc = docx.Document(docx_path)
     body_el = doc._body._element
 
-    # 1. Update Table of Tables (表目錄)
-    p911_toc = None
-    has_921_toc = False
-    for el in body_el:
-        if el.tag.endswith('}p'):
-            t_txt = ''.join([n.text or '' for n in el.iter(qn('w:t'))])
-            has_tab = '\t' in t_txt or any(n.tag.endswith('}tab') for n in el.iter())
-            if has_tab:
-                if '9-2-1' in t_txt or '附屬元件' in t_txt:
-                    has_921_toc = True
-                if '9-1-1' in t_txt or ('9-1' in t_txt and '元件清單' in t_txt):
-                    p911_toc = el
-
-    if p911_toc is not None and not has_921_toc:
-        print("  Adding 表 9-2-1 into Table of Tables (表目錄)...")
-        clone_921 = copy.deepcopy(p911_toc)
-        for tn in clone_921.iter(qn('w:t')):
-            if tn.text and ('9-1-1' in tn.text or '9-1' in tn.text):
-                tn.text = tn.text.replace('9-1-1', '9-2-1').replace('9-1', '9-2-1')
-            elif tn.text and '元件清單及規格描述' in tn.text:
-                tn.text = tn.text.replace('元件清單及規格描述', '附屬元件與依附項目清單')
-        p_parent = p911_toc.getparent()
-        p_parent.insert(p_parent.index(p911_toc) + 1, clone_921)
-        print("  Successfully added 表 9-2-1 to 表目錄.")
-
-    # 2. Check if Table 9-2-1 already exists in body
-    has_table_9_2 = False
+    # Find Table 9-2-1
+    target_table = None
     for el in body_el:
         if el.tag.endswith('}tbl'):
             cells_txt = []
@@ -279,43 +158,18 @@ def update_section_9_2_in_doc(docx_path):
                 if len(cells_txt) >= 3:
                     break
             if len(cells_txt) >= 3 and cells_txt[0] == '類別' and '檔案' in cells_txt[1]:
-                has_table_9_2 = True
+                target_table = el
                 break
 
-    # Find the paragraph mentioning Dockerfile
-    docker_para = None
-    for i, el in enumerate(body_el):
-        if el.tag.endswith('}p'):
-            t_txt = ''.join([n.text or '' for n in el.iter(qn('w:t'))])
-            if 'Dockerfile' in t_txt and ('附屬元件' in t_txt or '依附' in t_txt or '本系統除核心' in t_txt):
-                docker_para = el
-            elif '本系統除核心程式模組外' in t_txt:
-                docker_para = el
-
-    if docker_para is not None:
-        intro_text = '本系統除核心程式模組外，亦包含各項附屬之依附性軟體、容器化配置、資料庫遷移腳本、AI模型與向量索引資產、Web管理後台模板及Android端資源，整體清單如表 9-2-1 所示。'
-        t_nodes = list(docker_para.iter(qn('w:t')))
-        if t_nodes:
-            t_nodes[0].text = intro_text
-            for tn in t_nodes[1:]:
-                tn.text = ''
-        print("  Updated 9-2 introduction paragraph.")
-
-        if not has_table_9_2:
-            parent = docker_para.getparent()
-            idx = parent.index(docker_para)
-            caption_el = build_caption_9_2_element()
-            table_el = build_table_9_2_element(HEADERS_9_2, ROWS_9_2)
-            parent.insert(idx + 1, caption_el)
-            parent.insert(idx + 2, table_el)
-            parent.insert(idx + 3, build_empty_p())
-            print(f"  Inserted 表 9-2-1 caption and table ({len(ROWS_9_2)} rows).")
-        else:
-            print("  Table 9-2-1 already present in body.")
-
-    doc.save(docx_path)
-    print(f"  Successfully saved: {docx_path}")
-    return True
+    if target_table is not None:
+        new_tbl = build_table_9_2_element(HEADERS_9_2, ROWS_9_2)
+        target_table.getparent().replace(target_table, new_tbl)
+        doc.save(docx_path)
+        print(f"  Successfully updated Table 9-2-1 to 8 core items in {docx_path}")
+        return True
+    else:
+        print(f"  Table 9-2-1 not found in {docx_path}!")
+        return False
 
 
 if __name__ == '__main__':
@@ -328,7 +182,7 @@ if __name__ == '__main__':
     ]
     for tf in target_files:
         try:
-            update_section_9_2_in_doc(tf)
+            update_table_9_2_to_core8(tf)
         except Exception as e:
             print(f"  Error: {e}")
             import traceback
