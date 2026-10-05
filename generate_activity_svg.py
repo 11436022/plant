@@ -1,203 +1,184 @@
-import os
-
-svg_content = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 880" width="1260" height="880">
+# Create system_activity_diagnosis.svg (圖 5-3-1 診斷流程活動圖)
+svg_content = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 860" width="1200" height="860">
   <defs>
     <style>
-      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 22px; font-weight: bold; fill: #000000; }
-      .swimlane-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 17px; font-weight: bold; fill: #000000; text-anchor: middle; }
-      .node-text { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 14px; fill: #000000; text-anchor: middle; }
-      .node-text-bold { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 14px; font-weight: bold; fill: #000000; text-anchor: middle; }
-      .node-subtext { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 12px; font-weight: 500; fill: #000000; text-anchor: middle; }
-      .edge-label { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 13px; font-weight: bold; fill: #000000; }
-      .swimlane-bg { fill: #F8FAF7; stroke: #8FA892; stroke-width: 1.5; }
-      .swimlane-header { fill: #D6E4D5; stroke: #8FA892; stroke-width: 1.5; }
-      .action-node { fill: #FFFFFF; stroke: #2D5837; stroke-width: 1.8; rx: 8; ry: 8; }
-      .ai-node-local { fill: #E2EFE0; stroke: #2D5837; stroke-width: 1.8; rx: 8; ry: 8; }
-      .ai-node-cloud { fill: #F0F6EE; stroke: #2D5837; stroke-dasharray: 5,3; stroke-width: 1.8; rx: 8; ry: 8; }
-      .db-node { fill: #FFFFFF; stroke: #2D5837; stroke-width: 1.8; rx: 8; ry: 8; }
-      .decision-node { fill: #E2EFE0; stroke: #2D5837; stroke-width: 1.8; }
-      .line { stroke: #1A281E; stroke-width: 1.8; fill: none; marker-end: url(#arrow); }
-      .bypass-line { stroke: #1A281E; stroke-width: 1.8; stroke-dasharray: 6,3; fill: none; marker-end: url(#arrow); }
+      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 20px; font-weight: bold; fill: #0f172a; }
+      .swimlane-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 15px; font-weight: bold; fill: #1e293b; text-anchor: middle; }
+      .node-text { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 12px; fill: #1e293b; text-anchor: middle; }
+      .node-text-bold { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 12px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .node-subtext { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 10px; fill: #64748b; text-anchor: middle; }
+      .edge-label { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 11px; fill: #334155; text-anchor: middle; }
+      .swimlane-bg { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.5; }
+      .swimlane-header { fill: #e2e8f0; stroke: #cbd5e1; stroke-width: 1.5; }
+      .action-node { fill: #ffffff; stroke: #3b82f6; stroke-width: 1.5; rx: 8; ry: 8; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+      .ai-node { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 8; ry: 8; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+      .db-node { fill: #fefce8; stroke: #ca8a04; stroke-width: 1.5; rx: 8; ry: 8; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+      .decision-node { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.5; }
+      .sync-bar { fill: #1e293b; }
+      .line { stroke: #475569; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
+      .dashed-line { stroke: #64748b; stroke-width: 1.5; stroke-dasharray: 4,4; fill: none; marker-end: url(#arrow); }
     </style>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1A281E" />
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#475569" />
     </marker>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08" />
+    </filter>
   </defs>
 
   <!-- Background -->
   <rect width="100%" height="100%" fill="#ffffff" />
   
   <!-- Diagram Title -->
-  <text x="630" y="34" class="title" text-anchor="middle">圖 5-3-1 植物病害診斷流程活動圖 (Activity Diagram)</text>
+  <text x="600" y="32" class="title" text-anchor="middle">圖 5-3-1 植物病害診斷流程活動圖 (Activity Diagram)</text>
 
   <!-- Swimlane 1: 使用者 (Android App) -->
-  <rect x="30" y="58" width="290" height="800" class="swimlane-bg" />
-  <rect x="30" y="58" width="290" height="42" class="swimlane-header" />
-  <text x="175" y="85" class="swimlane-title">使用者與 Android 端 (Client)</text>
+  <rect x="40" y="55" width="280" height="780" class="swimlane-bg" />
+  <rect x="40" y="55" width="280" height="40" class="swimlane-header" />
+  <text x="180" y="80" class="swimlane-title">使用者與 Android 端 (Client)</text>
 
   <!-- Swimlane 2: FastAPI 後端服務 -->
-  <rect x="320" y="58" width="290" height="800" class="swimlane-bg" />
-  <rect x="320" y="58" width="290" height="42" class="swimlane-header" />
-  <text x="465" y="85" class="swimlane-title">FastAPI 後端微服務 (Server)</text>
+  <rect x="320" y="55" width="280" height="780" class="swimlane-bg" />
+  <rect x="320" y="55" width="280" height="40" class="swimlane-header" />
+  <text x="460" y="80" class="swimlane-title">FastAPI 後端微服務 (Server)</text>
 
-  <!-- Swimlane 3: AI 階層式推論核心 -->
-  <rect x="610" y="58" width="320" height="800" class="swimlane-bg" />
-  <rect x="610" y="58" width="320" height="42" class="swimlane-header" />
-  <text x="770" y="85" class="swimlane-title">AI 階層式推論核心 (Cascade Pipeline)</text>
+  <!-- Swimlane 3: AI 雙模型協同推論核心 -->
+  <rect x="600" y="55" width="300" height="780" class="swimlane-bg" />
+  <rect x="600" y="55" width="300" height="40" class="swimlane-header" />
+  <text x="750" y="80" class="swimlane-title">AI 雙模型協同推論核心 (Dual-Model)</text>
 
-  <!-- Swimlane 4: 知識檢索與資料庫 -->
-  <rect x="930" y="58" width="300" height="800" class="swimlane-bg" />
-  <rect x="930" y="58" width="300" height="42" class="swimlane-header" />
-  <text x="1080" y="85" class="swimlane-title">知識檢索與資料庫 (RAG &amp; DB)</text>
+  <!-- Swimlane 4: FAISS 向量知識庫與資料庫 -->
+  <rect x="900" y="55" width="260" height="780" class="swimlane-bg" />
+  <rect x="900" y="55" width="260" height="40" class="swimlane-header" />
+  <text x="1030" y="80" class="swimlane-title">知識檢索與資料庫 (RAG &amp; DB)</text>
 
-  <!-- ==================== FLOW NODES ==================== -->
   <!-- Start Node -->
-  <circle cx="175" cy="125" r="14" fill="#1A281E" />
-  <line x1="175" y1="139" x2="175" y2="165" class="line" />
+  <circle cx="180" cy="120" r="14" fill="#0f172a" />
+  <line x1="180" y1="134" x2="180" y2="160" class="line" />
 
-  <!-- Action: 拍照或選取照片 -->
-  <rect x="80" y="165" width="190" height="52" class="action-node" />
-  <text x="175" y="187" class="node-text-bold">拍照或選取照片</text>
-  <text x="175" y="205" class="node-subtext">選取病徵照片與作物名稱</text>
+  <!-- Action: 拍照或選取植物病徵照片 -->
+  <rect x="90" y="160" width="180" height="50" class="action-node" />
+  <text x="180" y="182" class="node-text-bold">拍照或選取照片</text>
+  <text x="180" y="198" class="node-subtext">選擇患病作物葉片影像</text>
 
-  <line x1="175" y1="217" x2="175" y2="245" class="line" />
+  <line x1="180" y1="210" x2="180" y2="235" class="line" />
 
   <!-- Action: 發起診斷請求 -->
-  <rect x="80" y="245" width="190" height="52" class="action-node" />
-  <text x="175" y="267" class="node-text-bold">發起診斷分析請求</text>
-  <text x="175" y="285" class="node-subtext">POST /api/v1/predict</text>
+  <rect x="90" y="235" width="180" height="50" class="action-node" />
+  <text x="180" y="257" class="node-text-bold">發起診斷分析請求</text>
+  <text x="180" y="273" class="node-subtext">POST /api/v1/predict</text>
 
   <!-- Flow to Server -->
-  <path d="M 270 271 L 370 271" class="line" />
+  <path d="M 270 260 L 370 260" class="line" />
 
-  <!-- Action: 接收影像快取 -->
-  <rect x="370" y="245" width="190" height="52" class="action-node" />
-  <text x="465" y="267" class="node-text-bold">接收影像並暫存快取</text>
-  <text x="465" y="285" class="node-subtext">生成 prediction_id 序號</text>
+  <!-- Action: 影像接收與快取生成 -->
+  <rect x="370" y="235" width="180" height="50" class="action-node" />
+  <text x="460" y="257" class="node-text-bold">接收影像並暫存快取</text>
+  <text x="460" y="273" class="node-subtext">生成 prediction_id 追蹤號</text>
 
-  <!-- Flow to AI Step 1 -->
-  <path d="M 560 271 L 640 271" class="line" />
+  <line x1="460" y1="285" x2="460" y2="315" class="line" />
 
-  <!-- Action: Step 1 ConvNeXt 快篩 -->
-  <rect x="640" y="245" width="260" height="52" class="ai-node-local" />
-  <text x="770" y="267" class="node-text-bold">步驟 1 : 本地 ConvNeXt 快篩</text>
-  <text x="770" y="285" class="node-subtext">微觀病斑分類與特徵萃取 (零雲端成本)</text>
+  <!-- Fork Bar (並行派發) -->
+  <rect x="360" y="315" width="200" height="8" rx="4" class="sync-bar" />
 
-  <line x1="770" y1="297" x2="770" y2="325" class="line" />
+  <!-- Parallel Branch 1: Gemini 2.5 Flash -->
+  <path d="M 410 323 L 410 355 L 630 355" class="line" />
+  <rect x="630" y="330" width="240" height="50" class="ai-node" />
+  <text x="750" y="352" class="node-text-bold">Gemini 2.5 Flash 雲端多模態推論</text>
+  <text x="750" y="368" class="node-subtext">廣域視覺初判、病徵語意描述與嚴重度分析</text>
 
-  <!-- Decision 1: 信心度 >= 70% ? -->
-  <polygon points="770,325 845,353 770,381 695,353" class="decision-node" />
-  <text x="770" y="358" class="node-text-bold" font-size="13">信心度 ≥ 70% ?</text>
+  <!-- Parallel Branch 2: Local ConvNet -->
+  <path d="M 510 323 L 510 405 L 630 405" class="line" />
+  <rect x="630" y="390" width="240" height="50" class="ai-node" />
+  <text x="750" y="412" class="node-text-bold">本地自訓特定作物 ConvNet 推論</text>
+  <text x="750" y="428" class="node-subtext">局部病斑微觀分類與特定病害機率分佈 (零雲端成本)</text>
 
-  <!-- Bypass Branch [是: 快篩命中] -> 右出轉下繞過 Gemini，箭頭乾淨接合垂直幹道 -->
-  <path d="M 845 353 L 910 353 L 910 488 L 778 488" class="bypass-line" />
-  <text x="855" y="345" class="edge-label" text-anchor="start">[是: 快篩命中]</text>
+  <!-- Join Bar (推論結果聚合) -->
+  <path d="M 870 355 L 890 355 L 890 445 L 820 445" class="line" />
+  <path d="M 870 415 L 890 415 L 890 445 L 820 445" class="line" />
+  <rect x="650" y="455" width="200" height="8" rx="4" class="sync-bar" />
 
-  <!-- Downward Branch [否: 需兜底] -> 下出至 Gemini (文字靠右，完全不與垂直實線重疊) -->
-  <line x1="770" y1="381" x2="770" y2="415" class="line" />
-  <text x="785" y="402" class="edge-label" text-anchor="start">[否: 需兜底]</text>
+  <line x1="750" y1="463" x2="750" y2="485" class="line" />
 
-  <!-- Action: Step 2 Gemini 兜底 -->
-  <rect x="640" y="415" width="260" height="52" class="ai-node-cloud" />
-  <text x="770" y="437" class="node-text-bold">步驟 2 : Gemini 雲端多模態兜底</text>
-  <text x="770" y="455" class="node-subtext">廣域視覺初判與嚴重度評估</text>
+  <!-- Action: 多模型決策仲裁與衝突比對 -->
+  <rect x="630" y="485" width="240" height="50" class="action-node" />
+  <text x="750" y="507" class="node-text-bold">多模型決策仲裁核心</text>
+  <text x="750" y="523" class="node-subtext">比對雙模型分類標籤、置信權重與局部特徵互補</text>
 
-  <!-- Flow from Gemini to Step 3 -->
-  <line x1="770" y1="467" x2="770" y2="510" class="line" />
+  <!-- Query FAISS RAG and DB -->
+  <path d="M 870 510 L 930 510" class="line" />
+  <rect x="930" y="485" width="200" height="50" class="db-node" />
+  <text x="1030" y="507" class="node-text-bold">FAISS 向量檢索與知識校驗</text>
+  <text x="1030" y="523" class="node-subtext">農業部開放資料客觀比對 (防幻覺)</text>
 
-  <!-- Action: Step 3 決策整合與處方生成 -->
-  <rect x="640" y="510" width="260" height="52" class="action-node" />
-  <text x="770" y="532" class="node-text-bold">步驟 3 : 決策整合與處方生成</text>
-  <text x="770" y="550" class="node-subtext">過濾 RAG 雜訊、標記推論來源</text>
+  <!-- Back from RAG -->
+  <path d="M 1030 535 L 1030 565 L 750 565" class="line" />
 
-  <!-- Flow to FAISS DB -->
-  <path d="M 900 536 L 960 536" class="line" />
+  <!-- Decision: 置信度門檻 (70%) -->
+  <polygon points="750,580 810,610 750,640 690,610" class="decision-node" />
+  <text x="750" y="614" class="node-text-bold" font-size="11">信心度 ≥ 70% ?</text>
 
-  <!-- DB Node: FAISS & Knowledge -->
-  <rect x="960" y="510" width="240" height="52" class="db-node" />
-  <text x="1080" y="532" class="node-text-bold">FAISS 向量檢索與知識校驗</text>
-  <text x="1080" y="550" class="node-subtext">檢索農業部資料庫客觀指引</text>
+  <!-- Decision No: 標記低置信度需複核 -->
+  <path d="M 810 610 L 880 610 L 880 670 L 550 670" class="line" />
+  <text x="845" y="605" class="edge-label">[否: 低置信度]</text>
 
-  <!-- Return Flow from FAISS -->
-  <path d="M 1080 562 L 1080 592 L 770 592" class="line" />
+  <!-- Decision Yes: 標記高置信度結果 -->
+  <line x1="750" y1="640" x2="750" y2="670" class="line" />
+  <path d="M 750 670 L 550 670" class="line" />
+  <text x="765" y="658" class="edge-label">[是]</text>
 
-  <line x1="770" y1="592" x2="770" y2="605" class="line" />
-
-  <!-- Decision 2: 總信心度 >= 70% ? -->
-  <polygon points="770,605 845,633 770,661 695,633" class="decision-node" />
-  <text x="770" y="638" class="node-text-bold" font-size="13">總信心度 ≥ 70% ?</text>
-
-  <!-- Branch [否: 無法判定] -> 右出繞至整合報告 -->
-  <path d="M 845 633 L 910 633 L 910 690 L 560 690" class="line" />
-  <text x="852" y="625" class="edge-label" text-anchor="start">[否: 無法判定]</text>
-
-  <!-- Branch [是] -> 下出至整合報告 (文字靠右，完全不重疊) -->
-  <line x1="770" y1="661" x2="770" y2="690" class="line" />
-  <path d="M 770 690 L 560 690" class="line" />
-  <text x="785" y="680" class="edge-label" text-anchor="start">[是]</text>
-
-  <!-- Action: 整合診斷報告 JSON -->
-  <rect x="370" y="664" width="190" height="52" class="action-node" />
-  <text x="465" y="686" class="node-text-bold">整合診斷報告 JSON</text>
-  <text x="465" y="704" class="node-subtext">輸出病害處方與防護建議</text>
+  <!-- Action: 整合回傳結構化診斷 JSON -->
+  <rect x="370" y="645" width="180" height="50" class="action-node" />
+  <text x="460" y="667" class="node-text-bold">整合診斷報告 JSON</text>
+  <text x="460" y="683" class="node-subtext">病名/信心度/處置指引/建議</text>
 
   <!-- Send back to Client -->
-  <path d="M 370 690 L 270 690" class="line" />
+  <path d="M 370 670 L 270 670" class="line" />
 
-  <!-- Action: 呈現圖文報告 -->
-  <rect x="80" y="664" width="190" height="52" class="action-node" />
-  <text x="175" y="686" class="node-text-bold">呈現圖文診斷報告</text>
-  <text x="175" y="704" class="node-subtext">展示病斑特徵與防治指引</text>
+  <!-- Action: 客戶端呈現詳細診斷報告 -->
+  <rect x="90" y="645" width="180" height="50" class="action-node" />
+  <text x="180" y="667" class="node-text-bold">呈現圖文診斷報告</text>
+  <text x="180" y="683" class="node-subtext">展示病斑特徵與防治指引</text>
 
-  <line x1="175" y1="716" x2="175" y2="740" class="line" />
+  <line x1="180" y1="695" x2="180" y2="720" class="line" />
 
-  <!-- Decision 3: 後續操作選擇 -->
-  <polygon points="175,740 240,766 175,792 110,766" class="decision-node" />
-  <text x="175" y="771" class="node-text-bold" font-size="13">後續操作選擇</text>
+  <!-- Decision: 使用者後續操作 -->
+  <polygon points="180,720 235,745 180,770 125,745" class="decision-node" />
+  <text x="180" y="749" class="node-text-bold" font-size="11">後續操作選擇</text>
 
-  <!-- Branch 1: 確認儲存 -> 右出至 plant_diary -->
-  <path d="M 240 766 L 370 766" class="line" />
-  <text x="250" y="758" class="edge-label" text-anchor="start">[確認儲存]</text>
+  <!-- Branch 1: 確認儲存並添加筆記 -->
+  <path d="M 235 745 L 370 745" class="line" />
+  <text x="295" y="738" class="edge-label">[確認儲存]</text>
+  <rect x="370" y="725" width="180" height="42" class="action-node" />
+  <text x="460" y="744" class="node-text-bold">持久化至 plant_diary</text>
+  <text x="460" y="758" class="node-subtext">關聯使用者筆記 user_note</text>
 
-  <rect x="370" y="743" width="190" height="46" class="action-node" />
-  <text x="465" y="763" class="node-text-bold">持久化至 plant_diary</text>
-  <text x="465" y="779" class="node-subtext">關聯使用者筆記 user_note</text>
+  <path d="M 550 745 L 930 745" class="line" />
+  <rect x="930" y="725" width="200" height="42" class="db-node" />
+  <text x="1030" y="744" class="node-text-bold">MySQL 資料庫寫入</text>
+  <text x="1030" y="758" class="node-subtext">儲存病害紀錄與正式圖片路徑</text>
 
-  <path d="M 560 766 L 960 766" class="line" />
-  <rect x="960" y="743" width="200" height="46" class="db-node" />
-  <text x="1060" y="763" class="node-text-bold">MySQL 資料庫寫入</text>
-  <text x="1060" y="779" class="node-subtext">儲存病害紀錄與正式圖片路徑</text>
+  <!-- Branch 2: 提交診斷反饋糾錯 -->
+  <path d="M 125 745 L 65 745 L 65 805 L 370 805" class="line" />
+  <text x="85" y="798" class="edge-label">[反饋糾錯]</text>
+  <rect x="370" y="785" width="180" height="42" class="action-node" />
+  <text x="460" y="804" class="node-text-bold">寫入 diagnosis_feedback</text>
+  <text x="460" y="818" class="node-subtext">糾錯標籤與反饋意見存檔</text>
 
-  <!-- Final Node 1 -->
-  <path d="M 1160 766 L 1185 766" class="line" />
-  <circle cx="1200" cy="766" r="10" fill="#1A281E" />
-  <circle cx="1200" cy="766" r="15" fill="none" stroke="#1A281E" stroke-width="2" />
+  <path d="M 550 805 L 930 805" class="line" />
+  <rect x="930" y="785" width="200" height="42" class="db-node" />
+  <text x="1030" y="804" class="node-text-bold">回饋庫持久化儲存</text>
+  <text x="1030" y="818" class="node-subtext">提供管理端審核與模型複訓</text>
 
-  <!-- Branch 2: 反饋糾錯 -> 下出轉右，完全遠離左側邊界，字線完全分開 -->
-  <path d="M 175 792 L 175 832 L 370 832" class="line" />
-  <text x="185" y="818" class="edge-label" text-anchor="start">[反饋糾錯]</text>
-
-  <rect x="370" y="809" width="190" height="46" class="action-node" />
-  <text x="465" y="829" class="node-text-bold">寫入 diagnosis_feedback</text>
-  <text x="465" y="845" class="node-subtext">糾錯標籤與反饋意見存檔</text>
-
-  <path d="M 560 832 L 960 832" class="line" />
-  <rect x="960" y="809" width="200" height="46" class="db-node" />
-  <text x="1060" y="829" class="node-text-bold">回饋庫持久化儲存</text>
-  <text x="1060" y="845" class="node-subtext">提供管理端審核與模型複訓</text>
-
-  <!-- Final Node 2 -->
-  <path d="M 1160 832 L 1185 832" class="line" />
-  <circle cx="1200" cy="832" r="10" fill="#1A281E" />
-  <circle cx="1200" cy="832" r="15" fill="none" stroke="#1A281E" stroke-width="2" />
+  <!-- Flow to End -->
+  <path d="M 1030 767 L 1030 785" class="line" />
+  <circle cx="1145" cy="805" r="14" fill="#0f172a" />
+  <circle cx="1145" cy="805" r="18" fill="none" stroke="#0f172a" stroke-width="2" />
+  <path d="M 1130 805 L 1127 805" class="line" />
 
 </svg>
 """
 
-with open("documents/圖/圖 5-3-1 植物病害診斷流程活動圖.svg", "w", encoding="utf-8") as f:
+with open('documents/system_activity_diagnosis.svg', 'w', encoding='utf-8') as f:
     f.write(svg_content.strip())
-
-with open("documents/system_activity_diagnosis.svg", "w", encoding="utf-8") as f:
-    f.write(svg_content.strip())
-
-print("Successfully updated Fig 5-3-1 SVG.")
+print("Created documents/system_activity_diagnosis.svg")

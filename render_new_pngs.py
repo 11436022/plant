@@ -54,3 +54,4 @@ if __name__ == '__main__':
     render_svg("documents/圖/圖 3-1-1 系統架構圖.svg", "scratch/scale2x_3_1_1.png", width=1600, height=880, scale=2)
     render_svg("documents/圖/圖 5-3-1 植物病害診斷流程活動圖.svg", "scratch/scale2x_5_3_1.png", width=1260, height=880, scale=2)
     render_svg("documents/圖/圖 6-1-1 植物診斷循序圖.svg", "scratch/scale2x_6_1_1.png", width=1300, height=1180, scale=2)
+    render_svg("documents/圖/圖 7-3-1 元件圖.svg", "scratch/scale2x_7_3_1.png", width=1400, height=680, scale=2)

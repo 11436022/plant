@@ -1,35 +1,37 @@
-# Generate system_component.svg (圖 7-3-1 元件圖)
-svg_content = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" width="1200" height="760">
+import os
+
+svg_content = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 680" width="1400" height="680">
   <defs>
     <style>
-      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 20px; font-weight: bold; fill: #0f172a; }
-      .pkg-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 13px; font-weight: bold; fill: #1e293b; }
-      .comp-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 12px; font-weight: bold; fill: #0f172a; }
-      .comp-desc { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 10px; fill: #64748b; }
-      .stereotype { font-family: 'Consolas', 'Courier New', monospace; font-size: 10px; font-style: italic; fill: #2563eb; }
-      .interface-text { font-family: 'Consolas', monospace; font-size: 10px; fill: #475569; text-anchor: middle; }
+      .title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 24px; font-weight: bold; fill: #000000; }
+      .pkg-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 16px; font-weight: bold; fill: #000000; }
+      .comp-title { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 15px; font-weight: bold; fill: #000000; }
+      .comp-desc { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 13px; font-weight: 500; fill: #000000; }
+      .interface-text { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 13px; font-weight: bold; fill: #000000; paint-order: stroke fill; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
+      .dep-label { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; font-size: 12px; font-weight: bold; fill: #000000; paint-order: stroke fill; stroke: #ffffff; stroke-width: 3.5px; stroke-linejoin: round; }
       
-      .subsystem-bg { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.5; rx: 6; ry: 6; }
-      .subsystem-header { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.5; }
+      .subsystem-bg { fill: #F8FAF7; stroke: #8FA892; stroke-width: 1.6; rx: 6; ry: 6; }
+      .subsystem-header { fill: #D6E4D5; stroke: #8FA892; stroke-width: 1.6; }
       
-      .comp-box { fill: #ffffff; stroke: #3b82f6; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
-      .ai-comp-box { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
-      .db-comp-box { fill: #fffbeb; stroke: #d97706; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
-      .cloud-comp-box { fill: #f5f3ff; stroke: #8b5cf6; stroke-width: 1.5; rx: 4; ry: 4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+      .comp-box { fill: #FFFFFF; stroke: #2D5837; stroke-width: 1.6; rx: 5; ry: 5; }
+      .ai-comp-box { fill: #E2EFE0; stroke: #2D5837; stroke-width: 1.6; rx: 5; ry: 5; }
+      .db-comp-box { fill: #FFFFFF; stroke: #2D5837; stroke-width: 1.6; rx: 5; ry: 5; }
+      .cloud-comp-box { fill: #F0F6EE; stroke: #2D5837; stroke-dasharray: 5,3; stroke-width: 1.6; rx: 5; ry: 5; }
       
-      .comp-icon-rect { fill: #ffffff; stroke: #3b82f6; stroke-width: 1.2; }
-      
-      .line { stroke: #334155; stroke-width: 1.3; fill: none; marker-end: url(#arrow); }
-      .dash-line { stroke: #64748b; stroke-width: 1.3; stroke-dasharray: 4,4; fill: none; marker-end: url(#arrow); }
+      .line-inter { stroke: #1A281E; stroke-width: 1.6; stroke-dasharray: 6,3.5; fill: none; marker-end: url(#arrow); }
+      .line-trunk { stroke: #1A281E; stroke-width: 1.6; stroke-dasharray: 6,3.5; fill: none; }
+      .line-intra { stroke: #1A281E; stroke-width: 1.4; stroke-dasharray: 5,3; fill: none; marker-end: url(#arrow); }
     </style>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1A281E" />
     </marker>
+
     <!-- Component Icon Pattern -->
     <g id="comp-icon">
-      <rect x="0" y="0" width="16" height="14" fill="#eff6ff" stroke="#3b82f6" stroke-width="1" />
-      <rect x="-3" y="2" width="6" height="3" fill="#ffffff" stroke="#3b82f6" stroke-width="0.8" />
-      <rect x="-3" y="8" width="6" height="3" fill="#ffffff" stroke="#3b82f6" stroke-width="0.8" />
+      <rect x="0" y="0" width="16" height="13" fill="#D6E4D5" stroke="#2D5837" stroke-width="1.1" />
+      <rect x="-3" y="2" width="6" height="3" fill="#FFFFFF" stroke="#2D5837" stroke-width="0.9" />
+      <rect x="-3" y="8" width="6" height="3" fill="#FFFFFF" stroke="#2D5837" stroke-width="0.9" />
     </g>
   </defs>
 
@@ -37,221 +39,265 @@ svg_content = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" 
   <rect width="100%" height="100%" fill="#ffffff" />
 
   <!-- Diagram Title -->
-  <text x="600" y="32" class="title" text-anchor="middle">圖 7-3-1 系統架構元件圖 (Component Diagram)</text>
+  <text x="700" y="32" class="title" text-anchor="middle">圖 7-3-1 系統架構元件圖 (Component Diagram)</text>
 
-  <!-- ================= CLIENT SUBSYSTEM ================= -->
-  <g transform="translate(30, 60)">
-    <rect width="280" height="660" class="subsystem-bg" />
-    <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 30 L 0 30 Z" class="subsystem-header" />
-    <text x="15" y="20" class="pkg-title">客戶端元件 (Client Subsystem)</text>
+  <!-- ========================================================================= -->
+  <!-- 1. CLIENT SUBSYSTEM (x=30, w=246, h=600)                                  -->
+  <!-- ========================================================================= -->
+  <g transform="translate(30, 52)">
+    <rect width="246" height="600" class="subsystem-bg" />
+    <path d="M 0 6 Q 0 0 6 0 L 240 0 Q 246 0 246 6 L 246 30 L 0 30 Z" class="subsystem-header" />
+    <text x="14" y="21" class="pkg-title">客戶端元件群 (Client Subsystem)</text>
 
-    <!-- Component 1: Android UI -->
-    <g transform="translate(15, 45)">
-      <rect width="250" height="95" class="comp-box" />
-      <use href="#comp-icon" x="225" y="10" />
-      <text x="12" y="22" class="stereotype">&lt;&lt;component&gt;&gt;</text>
-      <text x="12" y="38" class="comp-title">Android UI 元件群</text>
-      <text x="12" y="55" class="comp-desc">• 診斷拍照 / 歷史瀏覽 / 備忘編輯</text>
-      <text x="12" y="70" class="comp-desc">• 糾錯反饋彈窗 / 警報推播介面</text>
-      <text x="12" y="85" class="comp-desc">• ViewModel 狀態與生命週期感知</text>
+    <!-- C1: Android UI -->
+    <g transform="translate(12, 42)">
+      <rect width="222" height="84" class="comp-box" />
+      <use href="#comp-icon" x="196" y="10" />
+      <text x="12" y="25" class="comp-title">Android UI 元件群</text>
+      <text x="12" y="50" class="comp-desc">• 診斷拍照、日誌瀏覽與備忘編輯</text>
+      <text x="12" y="70" class="comp-desc">• 糾錯反饋提報與即時警報提示</text>
     </g>
 
-    <!-- Component 2: Retrofit Network Client -->
-    <g transform="translate(15, 160)">
-      <rect width="250" height="90" class="comp-box" />
-      <use href="#comp-icon" x="225" y="10" />
-      <text x="12" y="22" class="stereotype">&lt;&lt;component&gt;&gt;</text>
-      <text x="12" y="38" class="comp-title">REST API 客戶端元件</text>
-      <text x="12" y="55" class="comp-desc">• Retrofit2 HTTP 介面抽象封裝</text>
-      <text x="12" y="70" class="comp-desc">• OkHttp 攔截器 (JWT 注入與刷新)</text>
-      <text x="12" y="85" class="comp-desc">• Multipart/form-data 影像分塊傳輸</text>
+    <!-- C2: REST API Client -->
+    <g transform="translate(12, 152)">
+      <rect width="222" height="84" class="comp-box" />
+      <use href="#comp-icon" x="196" y="10" />
+      <text x="12" y="25" class="comp-title">REST API 客戶端元件</text>
+      <text x="12" y="50" class="comp-desc">• Retrofit2 HTTP 網路通訊介面</text>
+      <text x="12" y="70" class="comp-desc">• JWT 認證權杖注入與圖檔傳輸</text>
     </g>
 
-    <!-- Component 3: Admin Web Dashboard -->
-    <g transform="translate(15, 275)">
-      <rect width="250" height="95" class="comp-box" />
-      <use href="#comp-icon" x="225" y="10" />
-      <text x="12" y="22" class="stereotype">&lt;&lt;component&gt;&gt;</text>
-      <text x="12" y="38" class="comp-title">管理者儀表板元件</text>
-      <text x="12" y="55" class="comp-desc">• HTML5 / Jinja2 / Vue 前台介面</text>
-      <text x="12" y="70" class="comp-desc">• 診斷日誌全站檢閱與單筆刪除</text>
-      <text x="12" y="85" class="comp-desc">• 糾錯回饋審查與 JSONL 標註匯出</text>
+    <!-- C3: Local Storage & Cache -->
+    <g transform="translate(12, 262)">
+      <rect width="222" height="84" class="comp-box" />
+      <use href="#comp-icon" x="196" y="10" />
+      <text x="12" y="25" class="comp-title">客戶端本機儲存元件</text>
+      <text x="12" y="50" class="comp-desc">• 本機 Token 憑證與診斷影像快取</text>
+      <text x="12" y="70" class="comp-desc">• 離線資料暫存與本機佇列同步</text>
     </g>
 
-    <!-- Component 4: Webcam Monitoring Component -->
-    <g transform="translate(15, 395)">
-      <rect width="250" height="95" class="comp-box" />
-      <use href="#comp-icon" x="225" y="10" />
-      <text x="12" y="22" class="stereotype">&lt;&lt;component&gt;&gt;</text>
-      <text x="12" y="38" class="comp-title">Webcam 串流監控元件</text>
-      <text x="12" y="55" class="comp-desc">• MediaDevices 影像串流擷取</text>
-      <text x="12" y="70" class="comp-desc">• Canvas 局部區域感興趣特徵選取</text>
-      <text x="12" y="85" class="comp-desc">• 定時自動影格上傳與警報輪詢</text>
+    <!-- C4: Admin Web Dashboard -->
+    <g transform="translate(12, 372)">
+      <rect width="222" height="84" class="comp-box" />
+      <use href="#comp-icon" x="196" y="10" />
+      <text x="12" y="25" class="comp-title">管理者儀表板元件</text>
+      <text x="12" y="50" class="comp-desc">• Web 統計圖表與全站病歷維護</text>
+      <text x="12" y="70" class="comp-desc">• 糾錯回饋審核與標註資料集匯出</text>
     </g>
 
-    <!-- Component 5: Local Cache & Storage -->
-    <g transform="translate(15, 515)">
-      <rect width="250" height="95" class="comp-box" />
-      <use href="#comp-icon" x="225" y="10" />
-      <text x="12" y="22" class="stereotype">&lt;&lt;component&gt;&gt;</text>
-      <text x="12" y="38" class="comp-title">客戶端本機儲存元件</text>
-      <text x="12" y="55" class="comp-desc">• EncryptedSharedPreferences (Token)</text>
-      <text x="12" y="70" class="comp-desc">• 拍照影像暫存目錄快取</text>
-      <text x="12" y="85" class="comp-desc">• 離線狀態快取與同步佇列</text>
+    <!-- C5: Webcam Monitor -->
+    <g transform="translate(12, 482)">
+      <rect width="222" height="84" class="comp-box" />
+      <use href="#comp-icon" x="196" y="10" />
+      <text x="12" y="25" class="comp-title">Webcam 串流監控元件</text>
+      <text x="12" y="50" class="comp-desc">• 攝影機影像串流擷取與定時取樣</text>
+      <text x="12" y="70" class="comp-desc">• 連續影格上傳與異常警報輪詢</text>
+    </g>
+
+    <!-- Intra C1 -> C2 -->
+    <line x1="123" y1="126" x2="123" y2="152" class="line-intra" />
+    <text x="131" y="142" class="dep-label" text-anchor="start">&lt;&lt;use&gt;&gt;</text>
+
+    <!-- Intra C2 -> C3 -->
+    <line x1="123" y1="236" x2="123" y2="262" class="line-intra" />
+    <text x="131" y="252" class="dep-label" text-anchor="start">&lt;&lt;read token&gt;&gt;</text>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- 2. BACKEND SUBSYSTEM (x=425, w=580, h=600)                                -->
+  <!-- ========================================================================= -->
+  <g transform="translate(425, 52)">
+    <rect width="580" height="600" class="subsystem-bg" />
+    <path d="M 0 6 Q 0 0 6 0 L 574 0 Q 580 0 580 6 L 580 30 L 0 30 Z" class="subsystem-header" />
+    <text x="14" y="21" class="pkg-title">FastAPI 後端核心服務群 (Backend Subsystem)</text>
+
+    <!-- Row 1: B1 Gateway (w=230) & B2 Auth (w=230), gap=90 -->
+    <!-- B1: API Gateway -->
+    <g transform="translate(15, 42)">
+      <rect width="230" height="84" class="comp-box" />
+      <use href="#comp-icon" x="204" y="10" />
+      <text x="12" y="25" class="comp-title">API 路由閘道元件</text>
+      <text x="12" y="50" class="comp-desc">• REST API 集中路由分派與過濾</text>
+      <text x="12" y="70" class="comp-desc">• Pydantic 請求資料型別自動校驗</text>
+    </g>
+
+    <!-- B2: Auth & Security -->
+    <g transform="translate(335, 42)">
+      <rect width="230" height="84" class="comp-box" />
+      <use href="#comp-icon" x="204" y="10" />
+      <text x="12" y="25" class="comp-title">身分認證與授權元件</text>
+      <text x="12" y="50" class="comp-desc">• Bcrypt 密碼安全雜湊與驗證</text>
+      <text x="12" y="70" class="comp-desc">• JWT 權杖簽署與 RBAC 角色控管</text>
+    </g>
+
+    <!-- B1 -> B2 Auth (gap is 90px from x=245 to x=335, perfectly spaced!) -->
+    <line x1="245" y1="84" x2="335" y2="84" class="line-intra" />
+    <text x="290" y="76" class="dep-label" text-anchor="middle">&lt;&lt;auth&gt;&gt;</text>
+
+    <!-- B1 -> B3 Dispatch -->
+    <line x1="130" y1="126" x2="130" y2="152" class="line-intra" />
+    <text x="138" y="142" class="dep-label" text-anchor="start">&lt;&lt;dispatch&gt;&gt;</text>
+
+    <!-- Row 2: B3 Dual-Model Orchestrator -->
+    <g transform="translate(15, 152)">
+      <rect width="550" height="84" class="ai-comp-box" />
+      <use href="#comp-icon" x="524" y="10" />
+      <text x="12" y="25" class="comp-title">多模型決策仲裁核心</text>
+      <text x="12" y="50" class="comp-desc">• 本地 ConvNeXt 快篩與雲端 Gemini 兜底調度</text>
+      <text x="12" y="70" class="comp-desc">• 信心度閾值仲裁 (≥ 70%) 與未達標安全防禦煞車</text>
+    </g>
+
+    <!-- B3 -> B4 ConvNeXt -->
+    <line x1="130" y1="236" x2="130" y2="262" class="line-intra" />
+    <text x="138" y="252" class="dep-label" text-anchor="start">&lt;&lt;invoke&gt;&gt;</text>
+
+    <!-- B3 -> B5 FAISS -->
+    <line x1="450" y1="236" x2="450" y2="262" class="line-intra" />
+    <text x="458" y="252" class="dep-label" text-anchor="start">&lt;&lt;query&gt;&gt;</text>
+
+    <!-- Row 3: B4 Local ConvNeXt & B5 FAISS -->
+    <!-- B4: ConvNeXt -->
+    <g transform="translate(15, 262)">
+      <rect width="230" height="84" class="ai-comp-box" />
+      <use href="#comp-icon" x="204" y="10" />
+      <text x="12" y="25" class="comp-title">本地 ConvNeXt 推論核心</text>
+      <text x="12" y="50" class="comp-desc">• 特定作物卷積病斑分類 (零成本)</text>
+      <text x="12" y="70" class="comp-desc">• 微觀病理局部特徵快速萃取</text>
+    </g>
+
+    <!-- B5: FAISS Vector RAG -->
+    <g transform="translate(335, 262)">
+      <rect width="230" height="84" class="ai-comp-box" />
+      <use href="#comp-icon" x="204" y="10" />
+      <text x="12" y="25" class="comp-title">FAISS 向量檢索核心</text>
+      <text x="12" y="50" class="comp-desc">• 農業部官方病害特徵向量索引</text>
+      <text x="12" y="70" class="comp-desc">• 檢索增強 (RAG) 與處方客觀校驗</text>
+    </g>
+
+    <!-- B4 -> B6 Diary Manager -->
+    <line x1="130" y1="346" x2="130" y2="372" class="line-intra" />
+    <text x="138" y="362" class="dep-label" text-anchor="start">&lt;&lt;save&gt;&gt;</text>
+
+    <!-- Row 4: B6 Diary & Feedback Manager -->
+    <g transform="translate(15, 372)">
+      <rect width="550" height="84" class="comp-box" />
+      <use href="#comp-icon" x="524" y="10" />
+      <text x="12" y="25" class="comp-title">植物日誌與反饋管理元件</text>
+      <text x="12" y="50" class="comp-desc">• 二階段病歷持久化 (序號快取 ➜ 使用者確認儲存)</text>
+      <text x="12" y="70" class="comp-desc">• 個人備忘筆記維護與糾錯反饋存檔</text>
+    </g>
+
+    <!-- B6 -> B7 Webcam Engine -->
+    <line x1="130" y1="456" x2="130" y2="482" class="line-intra" />
+    <text x="138" y="472" class="dep-label" text-anchor="start">&lt;&lt;monitor&gt;&gt;</text>
+
+    <!-- Row 5: B7 Webcam Alert Engine -->
+    <g transform="translate(15, 482)">
+      <rect width="550" height="84" class="comp-box" />
+      <use href="#comp-icon" x="524" y="10" />
+      <text x="12" y="25" class="comp-title">Webcam 時序警報引擎</text>
+      <text x="12" y="50" class="comp-desc">• 連續 3 影格共識判定 (過濾光影晃動誤報)</text>
+      <text x="12" y="70" class="comp-desc">• 觸發高危病害警報並非同步寫入時序記錄</text>
     </g>
   </g>
 
-  <!-- ================= BACKEND SUBSYSTEM ================= -->
-  <g transform="translate(350, 60)">
-    <rect width="520" height="660" class="subsystem-bg" />
-    <path d="M 0 6 Q 0 0 6 0 L 514 0 Q 520 0 520 6 L 520 30 L 0 30 Z" class="subsystem-header" />
-    <text x="15" y="20" class="pkg-title">FastAPI 後端核心元件群 (Backend Subsystem)</text>
+  <!-- ========================================================================= -->
+  <!-- 3. EXTERNAL SUBSYSTEM (x=1115, w=255, h=600)                             -->
+  <!-- ========================================================================= -->
+  <g transform="translate(1115, 52)">
+    <rect width="255" height="600" class="subsystem-bg" />
+    <path d="M 0 6 Q 0 0 6 0 L 249 0 Q 255 0 255 6 L 255 30 L 0 30 Z" class="subsystem-header" />
+    <text x="14" y="21" class="pkg-title">外部服務與資料庫 (External)</text>
 
-    <!-- Backend Comp 1: API Gateway & Router -->
-    <g transform="translate(15, 45)">
-      <rect width="490" height="85" class="comp-box" />
-      <use href="#comp-icon" x="465" y="10" />
-      <text x="12" y="22" class="stereotype">&lt;&lt;component&gt;&gt;</text>
-      <text x="12" y="38" class="comp-title">API 路由閘道元件 (API Gateway &amp; Router)</text>
-      <text x="12" y="55" class="comp-desc">• 集中處理 HTTP 請求路徑分發 (Auth, Prediction, Diaries, Feedback, Webcam, Admin)</text>
-      <text x="12" y="70" class="comp-desc">• CORS 跨域安全配置、全域異常捕獲與 Pydantic 請求資料型別校驗</text>
+    <!-- E1: Google SMTP -->
+    <g transform="translate(12, 42)">
+      <rect width="231" height="84" class="cloud-comp-box" />
+      <use href="#comp-icon" x="205" y="10" />
+      <text x="12" y="25" class="comp-title">Google SMTP 郵件元件</text>
+      <text x="12" y="50" class="comp-desc">• Gmail SMTP TLS 安全通訊 (埠 587)</text>
+      <text x="12" y="70" class="comp-desc">• 帳號啟用驗證碼與緊急警報發送</text>
     </g>
 
-    <!-- Backend Comp 2: Auth & Security -->
-    <g transform="translate(15, 145)">
-      <rect width="490" height="75" class="comp-box" />
-      <use href="#comp-icon" x="465" y="10" />
-      <text x="12" y="22" class="stereotype">&lt;&lt;component&gt;&gt;</text>
-      <text x="12" y="38" class="comp-title">身分認證與安全授權元件 (Auth &amp; Security)</text>
-      <text x="12" y="55" class="comp-desc">• Bcrypt 密碼雜湊安全演算、JWT (HS256) 權杖簽署與過期檢驗</text>
-      <text x="12" y="70" class="comp-desc">• RBAC 角色存取控管 (User 業務功能 vs. Admin 管理員儀表板)</text>
+    <!-- E2: Google Gemini API -->
+    <g transform="translate(12, 152)">
+      <rect width="231" height="84" class="cloud-comp-box" />
+      <use href="#comp-icon" x="205" y="10" />
+      <text x="12" y="25" class="comp-title">Google Gemini API 元件</text>
+      <text x="12" y="50" class="comp-desc">• Gemini 2.5 Flash 雲端多模態視覺初判</text>
+      <text x="12" y="70" class="comp-desc">• 廣域病理特徵分析與結構化輸出</text>
     </g>
 
-    <!-- Backend Comp 3: Dual-Model Orchestrator -->
-    <g transform="translate(15, 235)">
-      <rect width="490" height="95" class="ai-comp-box" />
-      <use href="#comp-icon" x="465" y="10" />
-      <text x="12" y="22" class="stereotype" fill="#15803d">&lt;&lt;core component&gt;&gt;</text>
-      <text x="12" y="38" class="comp-title">多模型決策仲裁元件 (Dual-Model Orchestrator)</text>
-      <text x="12" y="55" class="comp-desc">• 非同步協同調度 Gemini 2.5 Flash 雲端多模態與本地自訓 ConvNet 模型</text>
-      <text x="12" y="70" class="comp-desc">• 決策仲裁核心：標籤一致性加權、微觀病徵互補校準與衝突過濾</text>
-      <text x="12" y="85" class="comp-desc">• 嚴格執行 70% 信心度閾值檢驗，未達標自動標註「需專業人工複核」</text>
-    </g>
-
-    <!-- Backend Comp 4: Local ConvNet Inference -->
-    <g transform="translate(15, 345)">
-      <rect width="240" height="85" class="ai-comp-box" />
-      <use href="#comp-icon" x="215" y="10" />
-      <text x="10" y="22" class="stereotype" fill="#15803d">&lt;&lt;local inference&gt;&gt;</text>
-      <text x="10" y="38" class="comp-title">本地 ConvNet 推論核心</text>
-      <text x="10" y="55" class="comp-desc">• 特定作物卷積網路分類</text>
-      <text x="10" y="70" class="comp-desc">• 微觀病斑局部特徵辨識</text>
-      <text x="10" y="85" class="comp-desc">• 零雲端託管端點費用</text>
-    </g>
-
-    <!-- Backend Comp 5: FAISS Vector RAG -->
-    <g transform="translate(265, 345)">
-      <rect width="240" height="85" class="ai-comp-box" />
-      <use href="#comp-icon" x="215" y="10" />
-      <text x="10" y="22" class="stereotype" fill="#15803d">&lt;&lt;knowledge rag&gt;&gt;</text>
-      <text x="10" y="38" class="comp-title">FAISS 向量檢索核心</text>
-      <text x="10" y="55" class="comp-desc">• 農業部開放資料高維索引</text>
-      <text x="10" y="70" class="comp-desc">• 語意相似度檢索增強 (RAG)</text>
-      <text x="10" y="85" class="comp-desc">• 官方處置方針客觀校驗</text>
-    </g>
-
-    <!-- Backend Comp 6: Diary & Feedback Manager -->
-    <g transform="translate(15, 445)">
-      <rect width="490" height="80" class="comp-box" />
-      <use href="#comp-icon" x="465" y="10" />
-      <text x="12" y="22" class="stereotype">&lt;&lt;component&gt;&gt;</text>
-      <text x="12" y="38" class="comp-title">植物日誌與反饋管理元件 (Diary &amp; Feedback Manager)</text>
-      <text x="12" y="55" class="comp-desc">• 二階段日誌持久化：快取生成 (prediction_id) ➜ 使用者確認儲存</text>
-      <text x="12" y="70" class="comp-desc">• 支援個人備忘筆記 (user_note) 獨立編輯與使用者糾錯回饋提報</text>
-    </g>
-
-    <!-- Backend Comp 7: Webcam Alert Engine -->
-    <g transform="translate(15, 540)">
-      <rect width="490" height="75" class="comp-box" />
-      <use href="#comp-icon" x="465" y="10" />
-      <text x="12" y="22" class="stereotype">&lt;&lt;component&gt;&gt;</text>
-      <text x="12" y="38" class="comp-title">Webcam 時序警報引擎 (Webcam Temporal Alert Engine)</text>
-      <text x="12" y="55" class="comp-desc">• 連續影格時序一致性判定（過濾光影晃動雜訊，杜絕誤報）</text>
-      <text x="12" y="70" class="comp-desc">• 觸發高危病害警報並自動持久化至 webcam_alert 資料表</text>
+    <!-- E3: MySQL Relational DB -->
+    <g transform="translate(12, 372)">
+      <rect width="231" height="194" class="db-comp-box" />
+      <use href="#comp-icon" x="205" y="10" />
+      <text x="12" y="25" class="comp-title">MySQL 關聯式資料庫</text>
+      <text x="12" y="56" class="comp-desc">• 會員帳號、權限與認證權杖持久化</text>
+      <text x="12" y="90" class="comp-desc">• 診斷日誌、病害知識庫與備忘筆記</text>
+      <text x="12" y="124" class="comp-desc">• 時序警報記錄與糾錯反饋庫維護</text>
+      <text x="12" y="158" class="comp-desc">• SQLAlchemy 2.0 ORM 連線映射</text>
     </g>
   </g>
 
-  <!-- ================= EXTERNAL SUBSYSTEM ================= -->
-  <g transform="translate(910, 60)">
-    <rect width="260" height="660" class="subsystem-bg" />
-    <path d="M 0 6 Q 0 0 6 0 L 254 0 Q 260 0 260 6 L 260 30 L 0 30 Z" class="subsystem-header" />
-    <text x="15" y="20" class="pkg-title">資料持久化與外部雲端服務</text>
+  <!-- ========================================================================= -->
+  <!-- 4. INTER-SUBSYSTEM CONNECTORS                                             -->
+  <!-- ========================================================================= -->
 
-    <!-- Database Component -->
-    <g transform="translate(15, 45)">
-      <rect width="230" height="175" class="db-comp-box" />
-      <use href="#comp-icon" x="205" y="10" />
-      <text x="12" y="22" class="stereotype" fill="#b45309">&lt;&lt;database persistence&gt;&gt;</text>
-      <text x="12" y="38" class="comp-title">MySQL 8.0 資料庫元件</text>
-      <text x="12" y="58" class="comp-desc">8 大關聯式實體模型：</text>
-      <text x="12" y="75" class="comp-desc">• user (帳號權限)</text>
-      <text x="12" y="90" class="comp-desc">• user_one_time_tokens</text>
-      <text x="12" y="105" class="comp-desc">• crop / disease / pests</text>
-      <text x="12" y="120" class="comp-desc">• plant_diary (含 user_note)</text>
-      <text x="12" y="135" class="comp-desc">• webcam_alert (警報日誌)</text>
-      <text x="12" y="150" class="comp-desc">• diagnosis_feedback (回饋)</text>
-      <text x="12" y="168" class="comp-desc">透過 SQLAlchemy 連線池存取</text>
-    </g>
+  <!-- [A] CLIENT TO BACKEND GATEWAY (Bus at abs x = 385) -->
+  <!-- Client right edge is at abs x = 30 + 12 + 222 = 264 -->
+  <!-- Subsystem border is at x = 276. Bus is at x = 385. Labels centered at x = 330! -->
+  
+  <!-- C2: REST API (abs y = 52 + 152 + 42 = 246) -> Trunk -->
+  <line x1="264" y1="246" x2="385" y2="246" class="line-inter" />
+  <text x="330" y="238" class="interface-text" text-anchor="middle">HTTPS / REST</text>
 
-    <!-- Gemini Cloud AI Component -->
-    <g transform="translate(15, 240)">
-      <rect width="230" height="120" class="cloud-comp-box" />
-      <use href="#comp-icon" x="205" y="10" />
-      <text x="12" y="22" class="stereotype" fill="#7c3aed">&lt;&lt;cloud service&gt;&gt;</text>
-      <text x="12" y="38" class="comp-title">Google Gemini API 元件</text>
-      <text x="12" y="58" class="comp-desc">• Gemini 2.5 Flash 旗艦模型</text>
-      <text x="12" y="73" class="comp-desc">• google-genai 官方 SDK</text>
-      <text x="12" y="88" class="comp-desc">• 多模態影像病理特徵分析</text>
-      <text x="12" y="103" class="comp-desc">• JSON Schema 結構化輸出</text>
-    </g>
+  <!-- C4: Admin Dashboard (abs y = 52 + 372 + 42 = 466) -> Trunk -->
+  <line x1="264" y1="466" x2="385" y2="466" class="line-inter" />
+  <text x="330" y="458" class="interface-text" text-anchor="middle">HTTP / Web</text>
 
-    <!-- SMTP Mail Component -->
-    <g transform="translate(15, 380)">
-      <rect width="230" height="110" class="cloud-comp-box" />
-      <use href="#comp-icon" x="205" y="10" />
-      <text x="12" y="22" class="stereotype" fill="#7c3aed">&lt;&lt;cloud service&gt;&gt;</text>
-      <text x="12" y="38" class="comp-title">Google SMTP 郵件元件</text>
-      <text x="12" y="58" class="comp-desc">• Gmail SMTP TLS 通訊協定</text>
-      <text x="12" y="73" class="comp-desc">• 信箱啟用驗證碼寄送</text>
-      <text x="12" y="88" class="comp-desc">• 忘記密碼 Token 傳輸</text>
-      <text x="12" y="103" class="comp-desc">• 緊急病害警報非同步推播</text>
-    </g>
-  </g>
+  <!-- C5: Webcam Monitor (abs y = 52 + 482 + 42 = 576) -> Trunk -->
+  <line x1="264" y1="576" x2="385" y2="576" class="line-inter" />
+  <text x="330" y="568" class="interface-text" text-anchor="middle">HTTP Stream</text>
 
-  <!-- ================= INTER-SUBSYSTEM CONNECTORS ================= -->
-  <!-- Client to Backend Gateway -->
-  <line x1="280" y1="210" x2="365" y2="105" class="line" />
-  <text x="320" y="150" class="interface-text">HTTP REST</text>
+  <!-- Vertical Trunk Line from y=576 up to y=136 -->
+  <line x1="385" y1="576" x2="385" y2="136" class="line-trunk" />
 
-  <line x1="280" y1="320" x2="365" y2="105" class="line" />
+  <!-- Trunk into B1 Gateway (abs x = 425 + 15 = 440, abs y = 52 + 42 + 42 = 136) -->
+  <line x1="385" y1="136" x2="440" y2="136" class="line-inter" />
 
-  <line x1="280" y1="440" x2="365" y2="105" class="line" />
 
-  <!-- Backend to Database -->
-  <line x1="855" y1="485" x2="925" y2="135" class="line" />
-  <text x="890" y="280" class="interface-text">SQLAlchemy</text>
+  <!-- [B] BACKEND TO EXTERNAL (PURE STRAIGHT HORIZONTAL LINES) -->
+  <!-- Backend components right edge: abs x = 425 + 565 = 990 -->
+  <!-- Backend border: abs x = 1005 -->
+  <!-- External border: abs x = 1115 -->
+  <!-- External components left edge: abs x = 1115 + 12 = 1127 -->
+  <!-- Distance between borders is 110px. Labels centered at x = 1060! -->
+  
+  <!-- 1. Auth -> SMTP (abs y = 136) -->
+  <line x1="990" y1="136" x2="1127" y2="136" class="line-inter" />
+  <text x="1060" y="126" class="interface-text" text-anchor="middle">SMTP TLS</text>
 
-  <!-- Backend to Gemini -->
-  <line x1="855" y1="280" x2="925" y2="300" class="line" />
-  <text x="890" y="270" class="interface-text">HTTPS</text>
+  <!-- 2. Orchestrator -> Gemini API (abs y = 246) -->
+  <line x1="990" y1="246" x2="1127" y2="246" class="line-inter" />
+  <text x="1060" y="236" class="interface-text" text-anchor="middle">HTTPS API</text>
 
-  <!-- Backend to SMTP -->
-  <line x1="855" y1="180" x2="925" y2="435" class="line" />
-  <text x="890" y="375" class="interface-text">SMTP 587</text>
+  <!-- 3. Diary Manager -> MySQL (abs y = 466) -->
+  <line x1="990" y1="466" x2="1127" y2="466" class="line-inter" />
+  <text x="1060" y="456" class="interface-text" text-anchor="middle">SQLAlchemy ORM</text>
+
+  <!-- 4. Webcam Alert -> MySQL (abs y = 576) -->
+  <line x1="990" y1="576" x2="1127" y2="576" class="line-inter" />
+  <text x="1060" y="566" class="interface-text" text-anchor="middle">時序寫入 / ORM</text>
 
 </svg>
 """
 
-with open('documents/system_component.svg', 'w', encoding='utf-8') as f:
-    f.write(svg_content.strip())
-print("Created documents/system_component.svg")
+targets = [
+    "documents/圖/圖 7-3-1 元件圖.svg",
+    "documents/system_component.svg",
+]
+
+for t in targets:
+    with open(t, "w", encoding="utf-8") as f:
+        f.write(svg_content.strip())
+    print(f"Written to {t}")
