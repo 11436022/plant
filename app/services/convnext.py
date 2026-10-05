@@ -146,6 +146,33 @@ def match_crop_to_class(user_crop: str, class_label: str) -> bool:
     return user_lower in raw_crop or raw_crop in user_lower
 
 
+def is_likely_fruit_for_leaf_disease(img: Image.Image, label: str) -> bool:
+    """
+    方法 A 部位感知守門員：
+    若候選標籤為純葉片病害 (如草莓葉焦病 Leaf scorch)，但影像主體呈現鮮紅果肉特徵且極度缺乏綠色葉片組織，
+    判定為部位不符（果實），避免誤將果實病害套用為葉片病害。
+    """
+    if "Leaf_scorch" not in label and "scorch" not in label.lower():
+        return False
+    try:
+        import numpy as np
+        thumb = img.resize((64, 64)).convert("RGB")
+        arr = np.array(thumb).astype(float)
+        r, g, b = arr[:, :, 0], arr[:, :, 1], arr[:, :, 2]
+        valid = (r < 240) | (g < 240) | (b < 240)
+        if not np.any(valid):
+            return False
+        r_fg, g_fg, b_fg = r[valid], g[valid], b[valid]
+        red_dominant = (r_fg > 1.25 * g_fg) & (r_fg > 80)
+        green_dominant = (g_fg > r_fg) & (g_fg > b_fg)
+        red_ratio = float(red_dominant.mean())
+        green_ratio = float(green_dominant.mean())
+        # 鮮紅果肉佔比 > 25% 且綠色組織 < 12%，判定為果實部位
+        return bool(red_ratio > 0.25 and green_ratio < 0.12)
+    except Exception:
+        return False
+
+
 def extract_features_and_similarities(model, tensor) -> tuple[torch.Tensor, torch.Tensor]:
     """
     提取特徵並計算 Softmax 機率與特徵空間餘弦相似度 (Cosine Similarity)。
@@ -294,6 +321,14 @@ def predict_convnext_fast_screen(
             return None
 
         if best_label and best_score >= settings.CONVNEXT_MIN_CONFIDENCE:
+            # 🛡️ 方法 A 部位感知守門員：若候選為純葉片病害但影像呈現鮮紅果肉特徵，拒絕誤套
+            if is_likely_fruit_for_leaf_disease(img, best_label):
+                print(
+                    f"🛡️ [步驟 1 部位感知守門員] 作物【{clean_crop}】候選標籤為葉片病害【{best_label}】，"
+                    f"但影像色相分析呈現果實外觀特徵（缺乏綠色葉片組織），判定部位不符，安全交由步驟 2 Gemini！"
+                )
+                return None
+
             parsed_crop, parsed_status, category = parse_convnext_prediction(best_label)
             if final_crop is None:
                 final_crop = parsed_crop
