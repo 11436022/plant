@@ -24,3 +24,7 @@ static/uploads/*
 
 # 忽略 Office 暫存檔
 ~$*
+
+# 臨時測試與暫存腳本
+scratch/
+test_ext_*/
