@@ -213,7 +213,7 @@ class HistoryAdapter(
         holder.tvName.text = item.crop_name ?: "未知作物"
         holder.tvDate.text = item.created_at
         holder.tvStatus.text = buildString {
-            append("原始診斷：${item.status_name ?: "無法判定"}")
+            append("診斷：${item.status_name ?: "無法判定"}")
             item.user_corrected_status?.takeIf { it.isNotBlank() }?.let {
                 append("\n使用者修正：$it（非重新診斷）")
             }

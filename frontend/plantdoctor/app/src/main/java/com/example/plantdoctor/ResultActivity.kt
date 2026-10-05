@@ -104,7 +104,7 @@ class ResultActivity : AppCompatActivity() {
             binding.tvDiseaseName.text = "診斷：${diseaseName ?: "未知"}"
 
             val fullAdvice = StringBuilder().apply {
-                append("【專家建議】\n${data.suggestion ?: "尚無建議"}\n\n")
+                append("【病症狀態】\n${data.suggestion ?: "尚無建議"}\n\n")
                 append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
             }.toString()
             binding.tvAdvice.text = fullAdvice

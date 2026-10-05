@@ -389,11 +389,11 @@ class HistoryDetailActivity : AppCompatActivity() {
 
                     tvPlantName.text = "植物：${data.crop_name ?: "無法辨識"}"
 
-                    tvDiseaseName.text = "患病：${data.status_name ?: "未知"}"
+                    tvDiseaseName.text = "診斷：${data.status_name ?: "未知"}"
                     tvDiseaseName.setTextColor(tvPlantName.currentTextColor)
 
                     val fullAdvice = StringBuilder().apply {
-                        append("【病症狀態】\n${data.suggestion ?: "病症狀態"}\n\n")
+                        append("【病症狀態】\n${data.suggestion ?: "尚無建議"}\n\n")
                         append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}\n\n")
                         append("【過往筆記】")
                     }.toString()

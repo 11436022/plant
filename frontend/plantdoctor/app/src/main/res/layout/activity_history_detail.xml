@@ -131,7 +131,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            tools:text="患病：黑星病"
+                            tools:text="診斷：黑星病"
                             android:textColor="#D32F2F"
                             android:textSize="28sp"
                             android:textStyle="bold"
