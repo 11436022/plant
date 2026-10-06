@@ -100,10 +100,10 @@ def send_password_reset_email(
     )
     # 產生指向 /app-redirect 中轉站的 URL
     params = {
-        "target": "plantdoctor://reset-password",
+        "target": "plantdoctor://reset/reset-password",
         "token": token,
     }
-    reset_url = f"{settings.PUBLIC_BASE_URL}/api/v1/auth/app-redirect/?{urlencode(params)}"
+    reset_url = f"{settings.PUBLIC_BASE_URL}/api/v1/auth/app-redirect?{urlencode(params)}"
     send_email(
         to_email=email,
         subject="Plant 重設密碼通知",

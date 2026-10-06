@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.db.session import get_db
 from app.db.models import User
 from app.schemas.auth import (
@@ -191,11 +192,14 @@ async def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(
     return {"status": "success", "message": "If the email exists, a password reset link has been sent."}
 
 
-@router.get("/app-redirect")
-async def app_redirect(target: str = Query(...), token: str = Query(...)):
-    """將 HTTP 連結重新導向至 App 的深層連結。"""
-    final_url = f"{target}?token={token}"
-    return RedirectResponse(url=final_url)
+@router.get("/app-redirect", response_class=FileResponse)
+@router.get("/app-redirect/", response_class=FileResponse)
+async def app_redirect(
+    token: str | None = Query(None),
+    target: str | None = Query(None),
+):
+    """提供重設密碼中介頁面（支援自動喚醒 App 或於網頁端直接重設密碼）。"""
+    return FileResponse(str(settings.STATIC_DIR / "reset_password.html"), media_type="text/html")
 
 
 @router.post("/user/reset-password")

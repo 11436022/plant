@@ -68,7 +68,7 @@
             android:exported="true"
             android:theme="@style/Theme.PlantDoctor.NoActionBar">
 
-            <!-- Deep Link Intent Filter -->
+            <!-- Deep Link Intent Filter (格式 1: plantdoctor://reset/reset-password) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -78,6 +78,18 @@
                 <data
                     android:host="reset"
                     android:path="/reset-password"
+                    android:scheme="plantdoctor" />
+            </intent-filter>
+
+            <!-- Deep Link Intent Filter (格式 2: plantdoctor://reset-password) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="reset-password"
                     android:scheme="plantdoctor" />
             </intent-filter>
         </activity>
