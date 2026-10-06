@@ -69,19 +69,26 @@ def issue_email_verification(
         db=db,
     )
     verify_url = _build_url(settings.PUBLIC_BASE_URL, settings.EMAIL_VERIFY_PATH, token)
+    expires_str = expires_at.strftime("%Y-%m-%d %H:%M:%S")
     send_email(
         to_email=email,
         subject="Plant 帳號驗證信",
         text_body=(
             f"{username} 您好：\n\n"
-            f"請點擊以下連結完成信箱驗證：\n{verify_url}\n\n"
-            f"此連結將於 {expires_at.isoformat()} UTC 失效。"
+            f"請點擊信件內的「點此完成信箱驗證」按鈕完成信箱驗證。\n\n"
+            f"此連結將於 {expires_str} UTC 失效。"
         ),
         html_body=(
-            f"<p>{username} 您好：</p>"
-            f"<p>請點擊以下連結完成信箱驗證：</p>"
-            f'<p><a href="{verify_url}">{verify_url}</a></p>'
-            f"<p>此連結將於 {expires_at.isoformat()} UTC 失效。</p>"
+            f'<div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; border-radius: 12px; background: #ffffff;">'
+            f'<h2 style="color: #2E7D32; margin-top: 0;">🌱 植物醫生 Plant Doctor</h2>'
+            f'<p style="color: #333; font-size: 15px;">{username} 您好：</p>'
+            f'<p style="color: #555; font-size: 14px; line-height: 1.5;">感謝您註冊植物醫生！請點擊下方按鈕以完成信箱驗證：</p>'
+            f'<div style="text-align: center; margin: 28px 0;">'
+            f'<a href="{verify_url}" style="background-color: #2E7D32; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px; display: inline-block;">點此完成信箱驗證</a>'
+            f'</div>'
+            f'<hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">'
+            f'<p style="color: #999; font-size: 12px; margin-bottom: 0;">此驗證連結將於 {expires_str} UTC 失效。若非您本人註冊，請忽略此信件。</p>'
+            f'</div>'
         ),
     )
     return expires_at
@@ -104,26 +111,29 @@ def send_password_reset_email(
         "token": token,
     }
     reset_url = f"{settings.PUBLIC_BASE_URL}/api/v1/auth/app-redirect?{urlencode(params)}"
+    expires_str = expires_at.strftime("%Y-%m-%d %H:%M:%S")
     send_email(
         to_email=email,
         subject="Plant 重設密碼通知",
         text_body=(
-            f"{username} 您好：\\n\\n"
-            f"請複製並貼上以下完整連結以重設您的密碼：\\n{reset_url}\\n\\n"
-            f"若前端需要直接使用 token，也可以使用下列一次性 token：\\n{token}\\n\\n"
-            f"此連結將於 {expires_at.isoformat()} UTC 失效。"
+            f"{username} 您好：\n\n"
+            f"我們收到了重設您密碼的請求，請點擊信件中的「點此重設密碼」按鈕前往完成設定。\n\n"
+            f"若需在 App 內手動驗證，亦可使用下列一次性 Token：\n{token}\n\n"
+            f"此 Token 與連結將於 {expires_str} UTC 失效。"
         ),
         html_body=(
-            f"<p>{username} 您好：</p>"
-            f"<p>請點擊以下連結以重設您的密碼：</p>"
-            f'<p><a href="{reset_url}">點此重設密碼</a></p>'
-            f"<hr>"
-            f"<p>若您的郵件客戶端不支援點擊，請複製以下完整連結：</p>"
-            f"<p>{reset_url}</p>"
-            f"<p>若前端需要直接使用 token，也可以使用下列一次性 token：</p>"
-            f"<p><code>{token}</code></p>"
-            f"<hr>"
-            f"<p><small>此連結將於 {expires_at.isoformat()} UTC 失效。</small></p>"
+            f'<div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; border-radius: 12px; background: #ffffff;">'
+            f'<h2 style="color: #2E7D32; margin-top: 0;">🌱 植物醫生 Plant Doctor</h2>'
+            f'<p style="color: #333; font-size: 15px;">{username} 您好：</p>'
+            f'<p style="color: #555; font-size: 14px; line-height: 1.5;">我們收到了重設您密碼的請求。請點擊下方按鈕前往重設密碼：</p>'
+            f'<div style="text-align: center; margin: 28px 0;">'
+            f'<a href="{reset_url}" style="background-color: #2E7D32; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px; display: inline-block;">點此重設密碼</a>'
+            f'</div>'
+            f'<p style="color: #666; font-size: 13px; margin-bottom: 6px;">若需在 App 內手動驗證，亦可使用下列一次性 Token：</p>'
+            f'<div style="background: #f5f5f5; padding: 10px 14px; border-radius: 6px; font-family: monospace; font-size: 13px; color: #333; word-break: break-all;">{token}</div>'
+            f'<hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">'
+            f'<p style="color: #999; font-size: 12px; margin-bottom: 0;">此連結與 Token 將於 {expires_str} UTC 失效。若非您本人操作，請忽略此信件。</p>'
+            f'</div>'
         ),
     )
     return expires_at
