@@ -22,9 +22,12 @@ static/uploads/*
 # 但保留 .gitkeep，以便 Git 追蹤這個空目錄
 !static/uploads/.gitkeep
 
-# 忽略 Office 暫存檔
+# 忽略 Office 暫存檔與本地參考複本
 ~$*
+documents/* (2).docx
 
 # 臨時測試與暫存腳本
 scratch/
 test_ext_*/
+documents/test*.docx
+documents/*.bak*
