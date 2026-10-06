@@ -75,7 +75,7 @@ def issue_email_verification(
         subject="Plant 帳號驗證信",
         text_body=(
             f"{username} 您好：\n\n"
-            f"感謝您註冊植物醫生！請開啟 HTML 郵件並點擊「點此完成信箱驗證」按鈕以完成驗證。\n\n"
+            f"請點擊以下連結完成信箱驗證：\n{verify_url}\n\n"
             f"此連結將於 {expires_str} UTC 失效。"
         ),
         html_body=(
@@ -117,9 +117,9 @@ def send_password_reset_email(
         subject="Plant 重設密碼通知",
         text_body=(
             f"{username} 您好：\n\n"
-            f"我們收到了重設您密碼的請求。請開啟 HTML 郵件並點擊「點此重設密碼」按鈕。\n\n"
-            f"若需在 App 內手動輸入 token，可以使用下列一次性 Token：\n{token}\n\n"
-            f"此連結與 Token 將於 {expires_str} UTC 失效。"
+            f"請點擊以下連結以重設您的密碼：\n{reset_url}\n\n"
+            f"若前端需要直接使用 token，也可以使用下列一次性 token：\n{token}\n\n"
+            f"此連結將於 {expires_str} UTC 失效。"
         ),
         html_body=(
             f'<div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; border-radius: 12px; background: #ffffff;">'
