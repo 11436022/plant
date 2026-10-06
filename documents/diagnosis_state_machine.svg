@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="1390" viewBox="0 0 1240 1390">
+<rect width="1240" height="1390" fill="white"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#222"/></marker></defs>
+<g font-family="DFKai-SB,標楷體,serif" font-size="29" fill="#111">
+<text x="620" y="46" text-anchor="middle" font-size="34">影像診斷工作狀態機</text>
+<circle cx="320" cy="95" r="15"/>
+<g fill="#f4f6f5" stroke="#222" stroke-width="2.5">
+<rect x="140" y="210" width="370" height="150" rx="14"/>
+<rect x="140" y="580" width="370" height="150" rx="14"/>
+<rect x="140" y="1090" width="370" height="130" rx="14"/>
+<rect x="840" y="210" width="350" height="150" rx="14"/>
+<rect x="840" y="690" width="350" height="170" rx="14"/>
+</g>
+<g text-anchor="middle">
+<text x="325" y="260" font-size="33">待確認</text>
+<text x="325" y="306">本人預測結果已暫存</text>
+<text x="325" y="342">有效期限 900 秒</text>
+<text x="325" y="638" font-size="33">保存中</text>
+<text x="325" y="679">快取已取出</text>
+<text x="325" y="716">處理圖片與日誌</text>
+<text x="325" y="1145" font-size="33">已保存</text>
+<text x="325" y="1187">成功回傳正式日誌</text>
+<text x="1015" y="266" font-size="33">已失效</text>
+<text x="1015" y="313">無可確認的有效快取</text>
+<text x="1015" y="747" font-size="33">儲存結果待核對</text>
+<text x="1015" y="796">未正常完成回應</text>
+<text x="1015" y="834">可能已寫入資料庫</text>
+</g>
+<g fill="none" stroke="#222" stroke-width="2.5" marker-end="url(#arrow)">
+<path d="M320 110 V210"/>
+<path d="M325 360 V580"/>
+<path d="M510 285 H840"/>
+<path d="M325 730 V1090"/>
+<path d="M140 650 H20 V285 H140"/>
+<path d="M510 650 H680 V775 H840"/>
+<path d="M1015 860 V885 H1210 V1245 H1015 V1275"/>
+<path d="M325 1220 V1275"/>
+<path d="M1015 360 V455"/>
+</g>
+<text x="345" y="153">分析完成</text>
+<text x="345" y="187" font-size="25">/ 建立 prediction_id</text>
+<text x="350" y="412">確認儲存</text>
+<text x="350" y="451">[本人、未到期、圖片存在]</text>
+<text x="350" y="490">/ 取出快取</text>
+<text x="575" y="220">到期清理、重啟</text>
+<text x="575" y="258">或發現圖片遺失</text>
+<text x="60" y="630" transform="rotate(-90 60 630)" font-size="22">保存失敗且未取得 ID</text>
+<text x="95" y="630" transform="rotate(-90 95 630)" font-size="22">[圖片與快取還原成功]</text>
+<text x="350" y="937">資料庫寫入及回讀成功</text>
+<text x="350" y="979">/ 回傳 201</text>
+<text x="620" y="565">保存或回讀例外</text>
+<text x="620" y="608">[已取得 ID 或還原未完成]</text>
+<text x="740" y="938" font-size="27">應先人工查詢歷史紀錄。</text>
+<text x="740" y="981" font-size="27">回應失敗不等於未寫入；</text>
+<text x="740" y="1024" font-size="27">不得直接假定可安全重送。</text>
+<g stroke="#222" stroke-width="2.5" fill="white"><circle cx="325" cy="1295" r="20"/><circle cx="1015" cy="1295" r="20"/><circle cx="1015" cy="475" r="20"/></g>
+<g fill="#222"><circle cx="325" cy="1295" r="12"/><circle cx="1015" cy="1295" r="12"/><circle cx="1015" cy="475" r="12"/></g>
+<text x="620" y="1364" text-anchor="middle" font-size="25">來源：prediction.py、diaries.py；人工核對不是程式自動重試。</text>
+</g></svg>

@@ -1,0 +1,1936 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-10-04T14:22:33.273765+00:00",
+  "code_commit": "3ab9ebb7f8ff7dceff9cdcfcb603e38ae45c5b6b",
+  "ai_service_sha256": "4ecedbb6fc697ea76e7c953f9a319c529fcc712c4ae7a487beec2dbc18e1a960",
+  "reference_data_sha256": "cc556f782f81dcb0402f30e16753dcda60057e41458d47c5f124ce98022e6bd1",
+  "manifest_sha256": "1aa631daea513f62efca86536dc9a9ad25830b043703f122e88df36d262f7155",
+  "manifest": {
+    "schema_version": 1,
+    "created_at": "2026-10-04T13:34:21.531258+00:00",
+    "seed": "plant-second-review-20261004-v1",
+    "source_revision": "5467f6012d78d1c446145d5f582da6096f852ae8",
+    "dataset_url": "https://github.com/pratikkayal/PlantDoc-Dataset",
+    "license": "CC-BY-4.0 (repository declaration)",
+    "label_basis": "Dataset test-folder labels; no independent expert confirmation; not clinical ground truth",
+    "selection": "Per-class SHA256(seed + path) ascending; first original files passing unchanged upload gate and pre-inference visual screening for label leakage or conflicting rights notices; no resizing; all examined exclusions retained",
+    "training_overlap": "Unknown overlap with foundation model training; pilot only",
+    "cases": [
+      {
+        "id": "plant-01",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Tomato%20Early%20blight%20leaf/bugs-and-blight-061.jpg",
+        "source_path": "test/Tomato Early blight leaf/bugs-and-blight-061.jpg",
+        "dataset_label": "Tomato Early blight leaf",
+        "image": {
+          "width": 2576,
+          "height": 1932,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "55570c32bf51ea713ee2dc293078ce3008986ad281a8cce626fbb264e0b44679",
+          "bytes": 1434983
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "supported",
+        "expected_crop": "番茄",
+        "expected_category": "disease",
+        "expected_status": "早疫病 (Early Blight)",
+        "target_policy": "known_label_or_abstain"
+      },
+      {
+        "id": "plant-02",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Tomato%20Early%20blight%20leaf/Shoemaker_7068.JPG.jpg",
+        "source_path": "test/Tomato Early blight leaf/Shoemaker_7068.JPG.jpg",
+        "dataset_label": "Tomato Early blight leaf",
+        "image": {
+          "width": 600,
+          "height": 450,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "7885910ac8d584a706d6448390c24f77e4e36ada4a75ae58b354a5642d0448b4",
+          "bytes": 50718
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "supported",
+        "expected_crop": "番茄",
+        "expected_category": "disease",
+        "expected_status": "早疫病 (Early Blight)",
+        "target_policy": "known_label_or_abstain"
+      },
+      {
+        "id": "plant-03",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Tomato%20leaf%20late%20blight/LateBlt09_06.jpg",
+        "source_path": "test/Tomato leaf late blight/LateBlt09_06.jpg",
+        "dataset_label": "Tomato leaf late blight",
+        "image": {
+          "width": 400,
+          "height": 268,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "69526a0f4413d8f8e786650a8264e460496e41e0a794747b8358c7d4074dfee6",
+          "bytes": 15801
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "supported",
+        "expected_crop": "番茄",
+        "expected_category": "disease",
+        "expected_status": "晚疫病 (Late Blight)",
+        "target_policy": "known_label_or_abstain"
+      },
+      {
+        "id": "plant-04",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Tomato%20leaf%20late%20blight/E%2529Tomato-late-blight-foliar.jpg",
+        "source_path": "test/Tomato leaf late blight/E%29Tomato-late-blight-foliar.jpg",
+        "dataset_label": "Tomato leaf late blight",
+        "image": {
+          "width": 400,
+          "height": 300,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "1146802ff74c97a511dedcb6bf204d3029e13734bb2d0fcc9a44bce50d2311f2",
+          "bytes": 17319
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "supported",
+        "expected_crop": "番茄",
+        "expected_category": "disease",
+        "expected_status": "晚疫病 (Late Blight)",
+        "target_policy": "known_label_or_abstain"
+      },
+      {
+        "id": "plant-05",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Tomato%20leaf/IMG_1246.jpg",
+        "source_path": "test/Tomato leaf/IMG_1246.jpg",
+        "dataset_label": "Tomato leaf",
+        "image": {
+          "width": 1600,
+          "height": 1200,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "d119deb0673b049551857318a686c6ecab5c2aa2607fc349ac25424d4ce636c2",
+          "bytes": 527789
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "supported",
+        "expected_crop": "番茄",
+        "expected_category": "healthy",
+        "expected_status": "健康",
+        "target_policy": "known_label_or_abstain"
+      },
+      {
+        "id": "plant-06",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Bell_pepper%20leaf/RnGnC.jpg",
+        "source_path": "test/Bell_pepper leaf/RnGnC.jpg",
+        "dataset_label": "Bell_pepper leaf",
+        "image": {
+          "width": 2147,
+          "height": 1432,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "13b8b10d2b5ac884239a21da79d04911ea3128094aed4ee22a52b7a85c05e893",
+          "bytes": 414381
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "supported",
+        "expected_crop": "甜椒",
+        "expected_category": "healthy",
+        "expected_status": "健康",
+        "target_policy": "known_label_or_abstain"
+      },
+      {
+        "id": "plant-07",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Potato%20leaf%20early%20blight/earlyblightpotato.jpg",
+        "source_path": "test/Potato leaf early blight/earlyblightpotato.jpg",
+        "dataset_label": "Potato leaf early blight",
+        "image": {
+          "width": 465,
+          "height": 350,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "c339100d52667a90c43b2f7f36d969e5894849f621b1bbc4a5ba5cf6817b8cbe",
+          "bytes": 158063
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "out_of_scope",
+        "expected_crop": "馬鈴薯",
+        "expected_category": "disease",
+        "expected_status": "Early blight",
+        "target_policy": "abstain"
+      },
+      {
+        "id": "plant-08",
+        "url": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Dataset/5467f6012d78d1c446145d5f582da6096f852ae8/test/Apple%20Scab%20Leaf/apple-scab-5366820.jpg",
+        "source_path": "test/Apple Scab Leaf/apple-scab-5366820.jpg",
+        "dataset_label": "Apple Scab Leaf",
+        "image": {
+          "width": 460,
+          "height": 373,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "1eaebcb9926515196f0e5499ed932bffe2dd1897e8bad55da41c4100cbc4f1b2",
+          "bytes": 80592
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "out_of_scope",
+        "expected_crop": "蘋果",
+        "expected_category": "disease",
+        "expected_status": "Apple scab",
+        "target_policy": "abstain"
+      },
+      {
+        "id": "nonplant-checkerboard",
+        "fixture": "640x480 black-white 40px checkerboard generated with Pillow",
+        "image": {
+          "width": 640,
+          "height": 480,
+          "format": "PNG",
+          "mime": "image/png",
+          "sha256": "6a2c400842ec6f0c3c97dd6cc0ecb982f474faba60e32a70546e419b5c859100",
+          "bytes": 2167
+        },
+        "gate": {
+          "accepted": true
+        },
+        "group": "nonplant",
+        "expected_crop": null,
+        "expected_category": "unknown",
+        "expected_status": null,
+        "target_policy": "abstain"
+      }
+    ],
+    "screened": [
+      {
+        "path": "test/Tomato Early blight leaf/bugs-and-blight-061.jpg",
+        "image": {
+          "width": 2576,
+          "height": 1932,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "55570c32bf51ea713ee2dc293078ce3008986ad281a8cce626fbb264e0b44679",
+          "bytes": 1434983
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Tomato Early blight leaf/early_blight1-150x150.jpg",
+        "image": {
+          "width": 150,
+          "height": 150,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "9650bd867d436b35710a6c8e5142baf3744910eee250372efe547f23d514980a",
+          "bytes": 8704
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "selected": false,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Tomato Early blight leaf/039b47d574bc4bb8a14259a1cd96a741.jpg",
+        "image": {
+          "width": 638,
+          "height": 479,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "7d9c5c6947554d5fc6e98df5fbc1beb6363255128bd56446960e29a73242c02e",
+          "bytes": 37998
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": false,
+        "visual_exclusion": "Before inference: embedded disease-name captions leak the expected answer; multi-panel illustration"
+      },
+      {
+        "path": "test/Tomato Early blight leaf/tomato_early-blight_01_zoom.jpg",
+        "image": {
+          "width": 257,
+          "height": 378,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "7571d72639461cc8de512dd2087c63cc1877322ae1954f7b4521756789c362c9",
+          "bytes": 31316
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "selected": false,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Tomato Early blight leaf/Shoemaker_7068.JPG.jpg",
+        "image": {
+          "width": 600,
+          "height": 450,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "7885910ac8d584a706d6448390c24f77e4e36ada4a75ae58b354a5642d0448b4",
+          "bytes": 50718
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Tomato leaf late blight/LateBlt09_06.jpg",
+        "image": {
+          "width": 400,
+          "height": 268,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "69526a0f4413d8f8e786650a8264e460496e41e0a794747b8358c7d4074dfee6",
+          "bytes": 15801
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Tomato leaf late blight/E%29Tomato-late-blight-foliar.jpg",
+        "image": {
+          "width": 400,
+          "height": 300,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "1146802ff74c97a511dedcb6bf204d3029e13734bb2d0fcc9a44bce50d2311f2",
+          "bytes": 17319
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Tomato leaf/IMG_1246.jpg",
+        "image": {
+          "width": 1600,
+          "height": 1200,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "d119deb0673b049551857318a686c6ecab5c2aa2607fc349ac25424d4ce636c2",
+          "bytes": 527789
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Bell_pepper leaf/e33155.jpg",
+        "image": {
+          "width": 800,
+          "height": 600,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "dd6526f15640c67223a9d40b4cd34e9522732deea2b09df09dc9c2eb08099047",
+          "bytes": 111556
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": false,
+        "visual_exclusion": "Before inference: visible Unauthorized Use Prohibited notice conflicts with repository-level license; not sent to API"
+      },
+      {
+        "path": "test/Bell_pepper leaf/RnGnC.jpg",
+        "image": {
+          "width": 2147,
+          "height": 1432,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "13b8b10d2b5ac884239a21da79d04911ea3128094aed4ee22a52b7a85c05e893",
+          "bytes": 414381
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Potato leaf early blight/potato-blight-phytophthora-infestans-close-up-of-upper-surface-of-BMMRXC.jpg",
+        "image": {
+          "width": 1300,
+          "height": 956,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "908640f63872eb893ca69db7ddd5297a1f7e5489f2fd9dcd5e3192efefe0f28c",
+          "bytes": 108060
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": false,
+        "visual_exclusion": "Before inference: visible stock-photo watermark and filename/folder disease-label conflict; not sent to API"
+      },
+      {
+        "path": "test/Potato leaf early blight/potatobd001.jpg",
+        "image": {
+          "width": 230,
+          "height": 150,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "01431bdbb52ca18d4dfb15f10b99d1b3370f0ac00650b0afdad8a00be24e11b3",
+          "bytes": 12143
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "selected": false,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Potato leaf early blight/earlyblightpotato.jpg",
+        "image": {
+          "width": 465,
+          "height": 350,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "c339100d52667a90c43b2f7f36d969e5894849f621b1bbc4a5ba5cf6817b8cbe",
+          "bytes": 158063
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Apple Scab Leaf/apples_apple-scab_02_thm.jpg",
+        "image": {
+          "width": 115,
+          "height": 85,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "f91a6ba2e60144bd62175891872170b57a3e1bfd642a7816b018b86db76257f7",
+          "bytes": 7806
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "selected": false,
+        "visual_exclusion": null
+      },
+      {
+        "path": "test/Apple Scab Leaf/apple-scab-5366820.jpg",
+        "image": {
+          "width": 460,
+          "height": 373,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "1eaebcb9926515196f0e5499ed932bffe2dd1897e8bad55da41c4100cbc4f1b2",
+          "bytes": 80592
+        },
+        "gate": {
+          "accepted": true
+        },
+        "selected": true,
+        "visual_exclusion": null
+      }
+    ],
+    "upload_controls": [
+      {
+        "id": "legacy-tomato-early-blight",
+        "url": "https://raw.githubusercontent.com/spMohanty/PlantVillage-Dataset/7f7ecc7e1eaca78107e3affe7cb5abd9427e139a/raw/color/Tomato___Early_blight/0012b9d2-2130-4a06-a834-b1f3af34f57e___RS_Erly.B%208389.JPG",
+        "image": {
+          "width": 256,
+          "height": 256,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "29b79036b67724f6a76895d17ef1b863ad7a7134e03141b1feb601a591336123",
+          "bytes": 18261
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "expected_rejection": true,
+        "reason": "Original dimensions below configured minimum"
+      },
+      {
+        "id": "legacy-tomato-late-blight",
+        "url": "https://raw.githubusercontent.com/spMohanty/PlantVillage-Dataset/7f7ecc7e1eaca78107e3affe7cb5abd9427e139a/raw/color/Tomato___Late_blight/0003faa8-4b27-4c65-bf42-6d9e352ca1a5___RS_Late.B%204946.JPG",
+        "image": {
+          "width": 256,
+          "height": 256,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "355d9ed5d0212dfc72eeda78118c55966febe086b60ff46fd7702766e92827d3",
+          "bytes": 11714
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "expected_rejection": true,
+        "reason": "Original dimensions below configured minimum"
+      },
+      {
+        "id": "legacy-tomato-healthy",
+        "url": "https://raw.githubusercontent.com/spMohanty/PlantVillage-Dataset/7f7ecc7e1eaca78107e3affe7cb5abd9427e139a/raw/color/Tomato___healthy/000146ff-92a4-4db6-90ad-8fce2ae4fddd___GH_HL%20Leaf%20259.1.JPG",
+        "image": {
+          "width": 256,
+          "height": 256,
+          "format": "JPEG",
+          "mime": "image/jpeg",
+          "sha256": "a294299b0518a50ebc275c0ec4519b022cab8b34735039f6c2a089a911f6964e",
+          "bytes": 15646
+        },
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Minimum image size is 320x240."
+        },
+        "expected_rejection": true,
+        "reason": "Original dimensions below configured minimum"
+      },
+      {
+        "id": "empty",
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "A nonempty JPEG, PNG, or WebP image is required."
+        },
+        "expected_rejection": true
+      },
+      {
+        "id": "corrupt-jpeg",
+        "gate": {
+          "accepted": false,
+          "status": 400,
+          "detail": "Image data is invalid or damaged."
+        },
+        "expected_rejection": true
+      },
+      {
+        "id": "blank-white",
+        "gate": {
+          "accepted": false,
+          "status": 422,
+          "detail": "Image lacks enough visual detail for diagnosis."
+        },
+        "expected_rejection": true
+      }
+    ]
+  },
+  "environment": {
+    "python": "3.10.5 (tags/v3.10.5:f377153, Jun  6 2022, 16:14:13) [MSC v.1929 64 bit (AMD64)]",
+    "packages": {
+      "google-genai": "1.72.0",
+      "Pillow": "12.2.0",
+      "SQLAlchemy": "2.0.49",
+      "fastapi": "0.135.3"
+    }
+  },
+  "mode": "live-paired-service-pilot",
+  "protocol": {
+    "models": [
+      "gemini-3.5-flash-lite"
+    ],
+    "config_overrides": {
+      "temperature": 0,
+      "max_output_tokens": 4096,
+      "thinking_config": {
+        "thinking_level": "minimal"
+      }
+    },
+    "repetitions": 1,
+    "order": "case order fixed; single-model run, not interleaved",
+    "rag": "No index present; real service empty-context fallback; not a RAG evaluation",
+    "database": "Isolated SQLite seeded from unchanged data.json; no production DB connection",
+    "scope": "Image gate + real preliminary and diagnosis calls + validation + DB grounding; not HTTP/auth/device/SMTP acceptance",
+    "raw_definition": "Final diagnosis JSON before name/confidence validation; not unconstrained base-model accuracy",
+    "image_handling": "Original decoded by production Pillow loader, no resize/crop; SDK serializes image; filenames and expected labels are not included in prompts",
+    "latency": "Two sequential model calls plus local processing, excluding deliberate rate-limit sleep; not deployment SLA",
+    "labels": "Dataset folder labels only; no expert confirmation; small selected pilot, no population inference",
+    "professional_advice_review": "Not performed; source presence and dosage patterns are mechanical risk indicators only",
+    "request_limit_per_model": 18,
+    "retry_attempts": 1
+  },
+  "input_checks": [
+    {
+      "case_id": "plant-01",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-02",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-03",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-04",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-05",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-06",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-07",
+      "accepted": true
+    },
+    {
+      "case_id": "plant-08",
+      "accepted": true
+    },
+    {
+      "case_id": "nonplant-checkerboard",
+      "accepted": true
+    }
+  ],
+  "rows": [
+    {
+      "case_id": "plant-01",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:22:33.563331+00:00",
+      "status": "ok",
+      "raw": {
+        "crop_name": "番茄",
+        "category": "disease",
+        "status_name": "早疫病 (Early Blight)",
+        "confidence": 0.85,
+        "suggestion": "- 下位葉出現黃化現象\n- 葉片上形成具有同心輪紋的褐色至黑色病斑\n- 病斑周圍常伴隨黃色暈圈",
+        "treatment": "1. 隨時清除並銷毀罹病嚴重的下位葉，減少病原菌擴散來源。\n2. 避免從上方直接噴灌澆水，降低葉面濕潤時間以抑制病菌發芽與侵入。\n3. 適時合理施肥，保持田間通風良好，增強植株抗病力。"
+      },
+      "validated": {
+        "crop_name": "番茄",
+        "category": "disease",
+        "status_name": "早疫病 (Early Blight)",
+        "confidence": 0.85,
+        "suggestion": "- 下位葉出現黃化現象\n- 葉片上形成具有同心輪紋的褐色至黑色病斑\n- 病斑周圍常伴隨黃色暈圈",
+        "treatment": "1. 隨時清除並銷毀罹病嚴重的下位葉，減少病原菌擴散來源。\n2. 避免從上方直接噴灌澆水，降低葉面濕潤時間以抑制病菌發芽與侵入。\n3. 適時合理施肥，保持田間通風良好，增強植株抗病力。",
+        "grounding_source": "model_pending_database_check",
+        "requires_review": false
+      },
+      "final": {
+        "crop_name": "番茄",
+        "category": "disease",
+        "status_name": "早疫病 (Early Blight)",
+        "confidence": 0.85,
+        "suggestion": "主要危害葉片、莖和果實。葉片上出現暗褐色同心輪紋的圓形病斑，周圍有黃色暈環。老葉先發病，嚴重時葉片乾枯脫落。",
+        "treatment": "發病初期可噴灑 75% 百菌清可濕性粉劑 600 倍液，或 50% 撲滅寧可濕性粉劑 1500 倍液。注意田間通風，雨後及時排水，並移除病殘體。",
+        "grounding_source": "disease_database",
+        "reference_source": null,
+        "reference_url": null,
+        "reference_record_id": null,
+        "requires_review": true
+      },
+      "calls": [
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:22:33.567566+00:00",
+          "prompt_sha256": "df5039f2f48745cfc4d37b74588111cde6a167b8e1c7d6ae87abf0cd5ccbe39f",
+          "prompt": "You are an agricultural expert. Briefly describe the main subject and any visible symptoms in this image in a few keywords (e.g., 'tomato, leaf spots, yellowing'). This will be used to search a knowledge base. Respond in Traditional Chinese.",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "番茄, 葉斑病, 黃化",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "KmHCavnhFt-q9tMPxMeewA8",
+          "usage": {
+            "candidates_token_count": 10,
+            "prompt_token_count": 1116,
+            "prompt_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 52
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 1064
+              }
+            ],
+            "total_token_count": 1126
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 2.5950518001336604
+        },
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:22:46.568532+00:00",
+          "prompt_sha256": "e5a3139c9f6944a94f11353fca6b82b4ba7f6116995141ccf475509e3b879dba",
+          "prompt": "\n    You are a top-tier plant pathologist. Analyze the provided image and context from our knowledge base to provide a professional diagnosis. Respond in valid JSON format, using Traditional Chinese for all user-facing text.\n\n    --- Knowledge Base Context ---\n    No specific context found.\n    ---\n\n    Reference Lists (for name standardization):\n    - Known crops: 甜椒, 萵苣, 甜瓜, 西瓜, 薑, 玉米百合, 玉米, 辣椒, 觀賞辣椒, 豌豆芽菜, 豌豆, 玉米筍, 檬果, 甘藍, 樹番茄, 青油菜, 紅龍果, 馬拉巴栗, 菊花, 火鶴, 玫瑰, 劍蘭, 百合, 其他蘭花, 小花蕙蘭, 虎頭蘭, 嘉德麗雅蘭, 仙履蘭, 石斛蘭, 文心蘭, 蝴蝶蘭, 其他景觀作物, 景觀小油菊, 景觀萬壽菊, 景觀波斯菊, 景觀向日葵, 其他綠肥作物, 魯冰, 青皮豆, 鐵虎豆, 苕子, 紫雲英, 田菁, 爬地蘭, 富貴豆, 太陽麻, 大豆類, 大菜, 埃及三葉草, 其他牧草, 其他長期牧草, 其他短期牧草, 青割玉米, 蘇丹草, 苜蓿草, 盤固拉草, 狼尾草, 尼羅草, 酒類製品, 蜂產品, 綜合蔬果製品, 其他特用作物加工製品, 胡麻製品, 薑黃製品, 愛玉製品, 茶製品, 油茶製品, 洛神葵製品, 香茅製品, 甘蔗製品, 咖啡製品, 梔子製品, 諾麗果製品, 風茹製品, 甜菊製品, 杭菊製品, 向日葵製品, 仙草製品, 紫蘇製品, 其他花卉加工製品, 油菊製品, 茉莉花製品, 玫瑰花製品, 其他水果加工製品, 可可製品, 栗子製品, 椰子製品, 橄欖製品, 棗製品, 梅製品, 李製品, 桃製品, 芒果製品, 龍眼製品, 荔枝製品, 枇杷製品, 梨製品, 蘋果製品, 木鱉果製品, 楊梅製品, 榴槤蜜製品, 桑椹製品, 波羅蜜製品, 柿製品, 釋迦製品, 奇異果製品, 紅龍果製品, 百香果製品, 楊桃製品, 葡萄製品, 蓮霧製品, 番石榴製品, 鳳梨製品, 香蕉製品, 木瓜製品, 金柑製品, 檸檬製品, 柑橘製品, 椪柑製品, 柳橙製品, 葡萄柚製品, 柚子製品, 其他蔬菜加工製品, 白木耳製品, 黑木耳製品, 猴頭菇製品, 杏鮑菇製品, 香菇製品, 草莓製品, 黃秋葵製品, 菱角製品, 番茄製品, 辣椒製品, 甜瓜製品, 西瓜製品, 越瓜製品, 苦瓜製品, 胡瓜製品, 絲瓜製品, 南瓜製品, 冬瓜製品, 蠶豆製品, 豌豆製品, 花豆製品, 毛豆製品, 金針花製品, 胡蘿蔔製品, 牛蒡製品, 蘿蔔製品, 馬鈴薯製品, 山藥製品, 山葵製品, 蘆筍製品, 薑製品, 芋頭製品, 蓮藕製品, 竹筍製品, 食用百合製品, 洋蔥製品, 蔥製品, 蒜製品, 羅勒製品, 菠菜製品, 芹菜製品, 芥菜製品, 油菜製品, 結球白菜製品, 甘藍製品, 其他五穀雜糧加工製品, 木薯製品, 甘藷製品, 綠豆製品, 紅豆製品, 落花生製品, 大豆製品, 薏苡製品, 燕麥製品, 蕎麥製品, 大麥製品, 高粱製品, 小米製品, 小麥製品, 玉米製品, 硬質玉米製品, 稻米製品, 其他特用作物, 其他長期特作, 其他短期特作, 其他飲料作物, 愛玉子, 茶, 洛神, 咖啡, 杭菊, 仙草, 其他香料作物, 香水蓮, 香草, 秀英, 茉莉花_薰芬茶用, 桂花, 檸檬香茅, 香茅, 蒔蘿, 芳香萬壽菊, 薄荷, 紫蘇, 其他澱粉作物, 紅蓮蕉, 蒟蒻, 葛鬱金, 葛藤, 其他染料作物, 薑黃, 大菁, 藷茛, 梔子, 大青, 紅花, 其他纖維作物, 瓊麻, 亞麻, 圓藺草, 苧麻, 大甲藺, 三角藺, 棉花, 貴黍, 其他糖料作物, 甘蔗, 甜菊, 其他嗜好作物, 菸草, 荖藤, 荖葉, 荖花, 其他油料作物, 胡麻, 小果種油茶, 大果種油茶, 向日葵_採種供作加工原料, 其他藥用作物, 杜虹花, 白花蛇舌草, 桋梧, 假人參, 蕺菜, 辣木, 山葡萄, 地黃, 七葉膽, 澤瀉, 白果, 香椿, 小葉藜, 何首烏, 南薑, 羊奶頭, 土肉桂, 肉桂, 桔梗, 黨蔘, 青葙, 法國綠莧, 金線蓮, 刺五加, 蓪草, 山芙蓉, 圓葉錦葵, 穿心蓮, 白鶴靈芝, 麥門冬, 蘆薈, 白藷莨, 枸杞, 葉用枸杞, 諾麗果, 桑黃, 茯苓, 樟芝, 槐耳, 通天草, 黃耆, 當歸, 柴胡, 明日葉, 艾草, 小金英, 蒲公英, 風茹草, 傷寒草, 六神花, 除蟲菊, 澤蘭, 款冬, 山防風, 荊芥, 筋骨草, 半支蓮, 丹參, 黃芩, 益母草, 草石蠶, 其他雜糧, 其他藷類, 木薯, 甘藷, 其他穀類, 臺灣藜, 高粱, 薏苡, 蕎麥, 燕麥, 小麥, 小米, 大麥, 其他豆類, 樹豆, 落花生, 米豆, 綠豆, 紅豆, 大豆, 珠廉, 鳳尾草, 高山羊齒, 腎蕨, 石蓮, 山蘇, 虎尾蘭, 常春藤, 蔓綠絨, 電信蘭, 黃金葛, 其他多年生草本, 球薑, 火炬花, 野薑花, 薑荷花, 月桃, 水蠟燭, 天堂鳥, 聖誕果, 牛頭茄, 金魚草, 泡盛草, 陸蓮花, 飛燕草, 夢幻草, 白頭翁, 銀蘆, 星辰花, 豇豆, 蠶豆, 翼豆, 萊豆, 鵲豆, 毛豆, 刀豆, 菜豆, 其他花菜苗, 其他花菜, 金針花, 石蓮花, 朝鮮薊, 青花菜, 花椰菜, 其他根菜, 胡蘿蔔, 甜菜根, 闊葉大豆, 豆薯, 雪蓮薯, 辣根, 瑞典蕪菁, 蘿蔔, 其他莖菜, 仙人掌肉質莖, 碧玉筍, 晚香玉筍, 食用大黃, 水蓮, 薯蕷, 荸薺, 蓴菜, 馬鈴薯, 慈菇, 萵苣莖, 菊芋, 黃藤心, 半天筍, 山葵, 球莖甘藍, 蘆筍, 蘘荷, 芋, 蓮, 茭白筍, 甘蔗筍, 牧草筍, 竹筍, 其他鱗莖, 食用百合, 蝦夷蔥, 蕎頭, 洋蔥, 韭蔥, 分蔥, 蔥, 蒜頭, 大蒜, 其他葉菜苗, 其他葉菜, 麻意, 糯米糰, 龍葵, 食茱萸, 學菜, 水合歡, 過溝菜蕨, 龍鳳草, 人蔘菜, 馬齒莧, 番杏, 冰花, 羅勒, 山菠菜, 葉用甘藷, 蕹菜, 藤三七, 落葵, 韭菜, 菾菜, 菠菜, 莧菜, 香芹菜, 水芹, 茴香, 刺芹, 芫荽, 芹菜, 闊苞菊, 白鳳菜, 紅鳳菜, 茼蒿, 山茼蒿, 吉康菜, 苦苣, 珍珠菜, 葉用蘿蔔, 西洋菜, 芝麻菜, 薺菜, 千寶菜, 油江菜, 廣島菜, 青菘菜, 小菘菜, 菜心, 水菜, 塌棵菜, 油菜, 不結球白菜, 芥菜, 結球白菜, 黑種草, 觀賞玉米, 古代稀, 貝殼花, 洋桔梗, 羽衣甘藍, 芥藍, 其他稻米, 秈糯, 稉糯, 軟秈, 硬秈, 稉稻, 觀賞南瓜, 松蟲草, 風鈴花, 紫羅蘭, 葉牡丹, 百日草, 鱗托菊, 瓜葉菊, 向日葵, 矢車菊, 雲南菊, 金盞花, 千日紅, 藜, 雞冠花, 紅莧菜, 雁來紅, 萬代蘭, 腎藥蘭, 皇后蘭, 樹攔, 蜘蛛蘭, 千代蘭, 其他果樹, 可可, 胡桃, 蘋婆, 長山核桃, 澳洲胡桃, 栗子, 胡榛子, 腰果, 扁桃, 杏仁, 檳榔, 椰子, 其它核果, 棗椰子, 爪哇橄欖, 橄欖, 錫蘭橄欖, 印度棗, 中國棗, 酪梨, 梅, 杏, 櫻桃, 李, 桃, 油柑, 紅毛丹, 龍眼, 荔枝, 其他仁果, 枇杷, 梨, 蘋果, 其他漿果, 木鱉果, 山竹, 榴槤, 西印度櫻桃, 人心果, 神秘果, 黃金果, 蛋黃果, 石榴, 楊梅, 榴槤蜜, 桑椹, 小波羅蜜, 波羅蜜, 無花果, 麵包果, 柿, 羅望子, 釋迦, 藍莓, 奇異果, 百香果, 楊桃, 葡萄, 嘉寶果, 蓮霧, 番石榴, 鳳梨, 芭蕉, 香蕉, 番木瓜, 其他柑橘, 金柑與小果柑橘, 枸櫞, 甜橙, 寬皮柑, 葡萄柚, 柚子, 其他蔬菜, 其他長期蔬菜, 其他短期蔬菜, 採種用蔬菜, 小海帶, 髮菜, 海菜, 海帶, 其他菇類, 松茸, 紫丁香蘑, 金福菇, 白玉菇, 鴻喜菇, 酒杯菇, 白木耳, 金耳, 滑菇, 草菇, 粉紅玫瑰菇, 蠔菇, 秀珍菇, 白靈菇, 杏鮑菇, 鮑魚菇, 珊瑚菇, 竹蓀, 舞菇, 香菇, 金針菇, 猴頭菇, 靈芝, 北蟲草, 牛肝菌, 茶樹菇, 毛木耳, 斤耳, 黑木耳, 雞肉絲菇, 雞腿菇, 巴西蘑菇, 洋菇, 其他芽菜, 綠豆芽, 紅豆芽, 蠶豆芽, 苜蓿芽, 黑豆芽, 黃豆芽, 蕎麥芽菜, 落花生芽菜, 蘿蔔芽菜, 青花菜芽菜, 芥藍芽菜, 甘藍芽菜, 其他果菜苗, 其他果菜, 草莓, 黃秋葵, 菱角, 破布子, 香瓜茄, 茄子, 小果番茄, 番茄, 其他瓜菜, 蛇瓜, 隼人瓜, 越瓜, 苦瓜, 胡瓜, 絲瓜, 扁蒲, 南瓜, 冬瓜, 小菊, 紫菀, 紐西蘭麻, 火炬百合, 萱草, 狐尾百合, 假葉樹, 鳴子百合, 天鵝絨, 伯利恆之星, 風信子, 吊蘭, 葉蘭, 文竹, 蘆筍草, 武竹, 夜來香, 翠珠花, 海芋, 合果芋, 白鶴芋, 黛粉葉, 觀音蓮, 唐棉, 紫嬌花, 火球花, 孤挺花, 文殊蘭, 繡球蔥, 百子蓮, 水仙, 石蒜, 君子蘭, 水仙百合, 菖蒲, 其他木本花卉, 山茶花, 木羊齒, 柳, 七里香, 六月雪, 仙丹花, 梔子花, 寒丁子, 麻葉繡球, 海神花, 針墊花, 雪松, 新西蘭, 林投, 牡丹, 女貞, 茉莉, 素馨, 連翹, 尤加利, 蠟梅, 降天桑, 香樹蘭, 洛神葵, 玉蘭花, 金絲桃, 金雀花, 三角尤加利, 聖誕紅, 羽毛花, 變葉木, 蘇鐵, 側柏, 香冠柏, 柳杉, 扁柏, 征木, 五彩千年木, 星點木, 青竹, 百合竹, 虎斑木, 朱蕉, 觀音棕竹, 黃椰子, 八角金盤, 藍星花, 其他一二年生草本, 紅茄, 蚌蘭, 宮燈百合, 嘉蘭, 滿天星, 深山櫻, 康乃馨, 夕霧花, 三角桔梗, 美人蕉, 擎天鳳梨, 觀果鳳梨, 蜻蜓鳳梨, 麥桿菊, 琉璃菊, 一枝黃花, 澳洲鼓槌菊, 麟麟菊, 非洲菊, 白藍菊, 大理花, 波斯菊, 麵線菊, 大菊, 射干, 鳶尾, 小蒼蘭, 段菊, 繡球花, 赫蕉, 袋鼠花, 龍膽, 羽扇豆, 金翠花, 八卦草, 初雪草, 水莞, 巨果薑, 水晶花, 補雪草, 卡斯比亞, 虎尾花, 睡蓮, 竹芋, 鬱金香, 波羅門蔘, 牛蒡, 其他堅果, 雲芝, 其他豆菜, 龍鬚菜, 食用薊, 皇帝豆, 包心白菜, 青江白菜, 敏豆, 小黃瓜, 旱芹, 粉豆, 桑果, 洋香瓜, 柑桔, 柿子, 文旦, 樹葡萄, 牛奶果, 草花, 球根花卉, 蘭類, 觀葉植物, 香花植物, 觀賞樹木, 菊科, 薑科, 荖籐, 烏心石, 茉草, 水稻, 肖楠, 大葉楠, 冬蟲夏草, 水黃皮, 草皮, 牛樟, 雜草, 菊苣, 蘿勒, 黑松, 檜木, 柳樹, 蘋婆果, 九芎, 二葉松, 五葉松, 亞歷山大椰子, 光臘樹, 光蠟樹, 刺桐, 刺桐樹, 加州杉, 加蜜蛋黃果, 十字花科, 千頭木麻黃, 南洋杉, 南洋櫻, 印度紫壇, 印度紫檀, 古煉, 台東蘇鐵, 台灣山蘇花, 台灣杉, 台灣櫸, 台灣欒樹, 台灣海藻, 台灣赤楠, 咸豐草, 嘉德麗亞蘭, 土人參, 垂榕, 大王椰子, 大葉刺桐, 大葉山攬, 大葉山欖, 大葉桃花心木, 大葉欖仁, 大葉雀榕, 夾竹桃, 孟宗竹, 小槐花, 小葉南洋杉, 小葉南洋衫, 小葉桃花心木, 小葉欖仁, 小葉黃槐, 心葉牽牛花, 捲葉蘇鐵, 掌葉蘋婆, 日日櫻, 春不老, 晚香玉, 月橘, 木棉, 木芙蓉, 木麻黃, 本樟, 朱槿, 朴子, 朴樹, 杜鵑, 松, 松樹, 枯里珍, 柏, 柏樹, 柑橘, 柚, 桂竹, 桃樹, 桃花心木, 桑樹, 梅樹, 森氏紅淡比, 椰子樹, 楊樹, 楓香, 楓香樹, 楠木, 榔榆, 榕, 榕樹, 槭樹, 樟, 樟樹, 樹蘭, 橡膠樹, 檀香, 檸檬, 檸檬桉, 檸檬樹, 櫸木, 櫻花, 欖仁, 欖仁樹, 毛木, 毛柿, 水柳, 法國梧桐, 流蘇, 浦葵, 海桐, 海棗, 火焰木, 火燄木, 火龍果, 烏臼, 珊瑚刺桐, 珊瑚莿桐, 琉球蘇鐵, 瓊涯海棠, 番椒, 番荔枝, 痲瘋樹, 白薇, 相思樹, 矮仙丹, 矮仙丹花, 福木, 福祿桐, 竹柏, 筆筒樹, 紅刺林投, 紅楠, 綬草, 緬梔, 羅漢松, 羊蹄甲, 美人樹, 肉桂樹, 肉豆, 肯氏南洋杉, 腋唇蘭, 芒果, 苦楝, 茄冬, 茄苳, 茶花樹, 草海桐, 荔枝樹, 莿桐, 菠羅密, 菠蘿蜜, 菩提, 菩提樹, 華盛頓椰子, 蔓澤蘭, 蕗藤, 蕙蘭, 西施柚, 豔紫荊, 象牙木, 象牙樹, 豬草, 銀姬小蠟, 銀樺, 銀耳, 銀膠菊, 鐵線蕨, 長梗滿天星, 長豇豆, 阿勃勒, 阿薩姆茶, 雀榕, 雞冠刺桐, 青剛櫟, 青楓, 香杉, 鳳凰木, 麵包樹, 黃槿, 黃脈刺桐, 黃脤刺桐, 黃連木, 黃金風鈴木, 黑板樹, 龍柏, 龍眼樹\n    - Known diseases: 葉斑病, 腐爛, 痂病, 發芽, 畸形果, 乾旱, 早疫病 (Early Blight), 晚疫病 (Late Blight), 灰黴病 (Gray Mold), 病毒病 (Virus Disease), 臍腐病 (Blossom-End Rot), 褐根病, 褐根病, 葉震病, 炭疽病, 側柏枝枯病, 枝枯病, 煤煙病, 褐根病, 細菌性病害, 褐根病, 褐根病, 枝枯病, 潰瘍病, 葉枯病, 褐根病, 褐根病, 褐根病, 樹木褐根病, 褐根病, 褐根病, 原因不明, 褐根病, 褐根腐病, 褐根病, 咖啡銹病, 褐根病, 褐根病, 癌腫病, 樹木褐根病, 褐根病, 褐根病, 褐根病, 枝枯病, 腐朽菌, 褐根病, 葉枯病, 癌腫病, 枝枯病, 木耳, 木層孔菌, 褐根病, 木材腐朽菌, 褐根病, 闊葉樹藻斑病, 褐根病, 褐根病, 疑似疫病黃化萎凋, 松樹潰瘍病, 葉震病, 枝枯病, 腐朽菌, 褐根病, 銹病, 竹簇葉病, Phellinus noxius, 褐根病, 褐根腐病, 褐根病, 木材腐朽菌, 椰子樹芽腐病, 褐根病, 褐根病, 褐根病, 褐根病, 可能已被感染褐根病, 孔洞木材腐朽, 木材腐朽病, 根腐病, 樹木褐根病, 煤煙病, 紫膠介殼蟲與煤煙病, 腐朽菌, 褐根病, 褐根腐病, 靈芝根基腐朽病, 鮑魚菇, 樹木褐根病, 褐根病, 樣本無褐根病病原, 樹木褐根病, 腐朽菌, 褐根病, 褐根病, 熱帶靈芝, 癌腫病, 簇葉病, 細菌性或Cercospora sp.角斑, 褐根病, 白紋羽病, 白蟻及褐根病, 細菌性癌腫病, 褐褐病, 褐根病, 褐根病, 褐根病, 褐根病, 褐根病, 葉枯病, 褐根病, 褐根病, 樹木褐根病, 炭疽病, 褐根病, 炭疽病, 熱帶靈芝, 疫病菌, 褐根病, 褐根腐病, 黑腐病與炭疽病, 真菌腐朽性病害, 玫瑰黑斑病, 褐根病, 褐斑病, 褐根病, 癌腫病, 褐根病, 褐根腐病, 褐根腐病、生理反應, 樹木褐根病, 褐根病, 蘆筍莖枯病, 褐根病, 摺菌, 褐根病, 褐根病, 腐霉病或疫病, 褐根病, 疑似褐根病, 褐根腐病, 褐根病, 褐根病, 褐根病, 疫病根腐, 肖楠病, 樹木褐根病, 褐根病, 褐根病, 癌腫病, 細菌性癌腫病, 褐根病, 褐根病, 枝枯病, 炭疽病, 褐根病, 闊葉樹藻斑病, 腐生性危害, 炭疽病、寒害, 褐根病, 褐根病, Phellinus noxius, 褐根病, 黑脂病, 黑腫病, 樹木褐根病, 黃龍病, 褐根病, 煤煙病, 褐根病, 褐根病, 褐根腐病, 褐根病, 褐根病, 白粉病, 褐根病, 褐根病, 樹木褐根病, 腐朽菌, 褐根病, 樹木褐根病, 熱帶靈芝, 褐根病, 松樹葉震病, 流膠病, 葉震病, 褐根病, 疫病菌&腐黴菌, 褐根病, 枝枯病, 枝枯病炭疽病, 褐根病, 褐根病, 樹木褐根病, 褐根病\n    - Known pests: 蟲害, 薊馬, 銀葉粉蝨 (Whitefly), 棉鈴蟲 (Bollworm), 蚜蟲 (Aphid), 咖啡果小蠹, 太平洋臀紋粉介殼蟲, 黃綠綿介殼蟲, 木瓜秀粉介殼蟲, 金花蟲, 椿象, 橘球粉介殼蟲, 長尾粉介殼蟲, 鱗翅目, 咖啡硬介殼蟲, 木瓜秀粉介殼蟲, 美地綿粉介殼蟲, 咖啡硬介殼蟲, 絲粉介殼蟲, 白蠟介殼蟲, 蟻台硬介殼蟲, 鱗翅目, 石蒜綿粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 木瓜秀粉介殼蟲, 粉蝨, 茄綿粉介殼蟲, 蚜蟲, 葉蟎, 月橘白輪盾介殼蟲, 木瓜秀粉介殼蟲, 椰子櫛圓盾介殼蟲, 木瓜秀粉介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 光肩星天牛, 牡蠣盾介殼蟲, 葉蟎, 淡薄圓介殼蟲, 鱗翅目, 桑擬輪盾介殼蟲, 葉蟬, 椰子擬輪盾介殼蟲, 紅蠟介殼蟲, 葉蟎, 螺旋粉蝨, 木瓜秀粉介殼蟲, 黃吹綿介殼蟲, 樟輪盾介殼蟲, 太平洋臀紋粉介殼蟲, 茄綿粉介殼蟲, 太平洋臀紋粉介殼蟲, 柑橘刺粉蝨, 糠片盾介殼蟲, 咖啡木蠹蛾, 桑擬輪盾介殼蟲, 茄綿粉介殼蟲, 橘臀紋粉介殼蟲, 瓜實蠅, 茄綿粉介殼蟲, 雙翅目, 木瓜秀粉介殼蟲, 牡蠣盾介殼蟲, 太平洋臀紋粉介殼蟲, 絲粉介殼蟲, 長角象鼻蟲, 雙翅目, 蚜蟲, 木瓜秀粉介殼蟲, 根蟎, 二點葉蟎, 木瓜秀粉介殼蟲, 粉介殼蟲, 葉蟎, 扁堅介殼蟲, 咖啡硬介殼蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 柑橘刺粉蝨, 番石榴黑疣粉蝨, 螺旋粉蝨, 鱗翅目, 斑潛蠅, 太平洋臀紋粉介殼蟲, 鳳梨嫡粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 蚜蟲, 葉蟎, 象鼻蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 銀葉粉蝨, 木瓜秀粉介殼蟲, 蚜蟲, 銀葉粉蝨, 粉介殼蟲科, 葉蟎, 南黃薊馬, 粉蝨, 薊馬, 椿象, 雙翅目, 中華褐金龜, 木瓜秀粉介殼蟲, 橘球粉介殼蟲, 葉蟬, 木瓜秀粉介殼蟲, 粉介殼蟲, 蚜蟲, 粉蝨, 葉蟎, 木蝨, 盾介殼蟲, 粉蝨, 葉蟎, 蚜蟲, 鱗翅目, 黃綠綿介殼蟲, 棉蚜, 太平洋臀紋粉介殼蟲, 小黃薊馬, 絲粉介殼蟲, 木瓜秀粉介殼蟲, 白蠟介殼蟲, 變葉木片盾介殼蟲, 太平洋偽葉蟎, 葉蟎, 蘭花薊馬, 長跳蟲, 茄綿粉介殼蟲, 雙翅目, 鼠婦, 木瓜秀粉介殼蟲, 扁堅介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 薊馬, 蕉弄蝶, 石蒜綿粉介殼蟲, 茄綿粉介殼蟲, 木蝨, 螟蛾科, 粉介殼蟲 煤灰病, 松材線虫, 疑似松材線蟲, 幹綿蚜, 刺桐釉小蜂, 刺桐釉小蜂、不當移植, 刺桐釉小蜂, 天牛, 夜蛾, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 小蠹蟲, 螟蛾, 蝗蟲、天牛、潛葉蛾, 刺桐釉小蜂, 白蟻、生理性缺水, 竹涓夜蛾, 樟蝙蝠蛾, 蝙蝠蛾, 粉介殼蟲 煤灰病, 介殼蟲, 蘇鐵白輪盾蚧, 天牛, 月橘盾介殼蟲, 白蟻, 軍配蟲, 松材線蟲, 松線虫, 白蟻, 松材線蟲, 萎凋病, 白蟻, 桃蚜, 白蟻, 椰子大象鼻蟲, 綴葉叢螟, 蚜蟲, 斑蛾, 白蟻, 粉介殼蟲 煤灰病, 紫膠介殼蟲, 高背木蝨, 木蠹蛾, 樟樹白輪盾介殼蟲, 樟白介殼蟲, 樟葉蜂, 白蟻, 蜱&#34728;, 台灣家白蟻, 小囊蟲, 桑擬輪介殼蟲, 白蟻, 細菌性穿孔病、台灣黃毒蛾、金花蟲, 葉&#34766;, 粉蝨, 天牛, 紅胸葉蟲, 棉介殼蟲, 烏心石幹綿蚜, 刺桐釉小蜂, 銀葉粉蝨, 根瘤線蟲, 黃帶枝尺蠖蛾, 象牙木木蝨, 黃帶枝尺蛾, 黃帶枝尺蠖蛾, 芒果葉蟬, 白翅夜蟬, 茄苳白翅葉蟬, 螟蛾, 紫膠介殼蟲, 莿桐釉小蜂, 紅胸葉蟲, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 木蝨, 蟎類, 刺桐釉小蜂, 楓粉蝨, 白蟻, 鳳凰木夜蛾, 螨, 刺桐釉小蜂, 刺桐釉小蜂, 松材線蟲, mite’s gall, 白蟻或天牛蛀蝕\n\n    Anti-hallucination rules:\n    - crop_name must exactly match one item from Known crops. If uncertain, use \"未知作物\".\n    - For category \"disease\", status_name must exactly match one item from Known diseases.\n    - For category \"pest\", status_name must exactly match one item from Known pests.\n    - If the image is unclear, confidence is low, or no exact crop/disease/pest match exists, use category \"unknown\" and status_name \"無法判定\".\n    - Do not invent crop names, disease names, pest names, pesticide names, dosages, or treatment steps.\n\n    JSON Output Structure:\n    {\n      \"crop_name\": \"string (The crop's name in Traditional Chinese)\",\n      \"category\": \"string (One of 'disease', 'pest', 'healthy', or 'unknown')\",\n      \"status_name\": \"string (A name from the matching reference list. If healthy, use '健康'. If unknown, use '無法判定')\",\n      \"confidence\": \"float (A value between 0.0 and 1.0)\",\n      \"suggestion\": \"string (A bulleted list of 2-3 key visual symptoms, using '-' for each point and '\\n' for new lines. Example: '- 葉片有黃斑\\n- 葉緣焦枯')\",\n      \"treatment\": \"string (If not healthy, provide a numbered list of actionable steps using '1.', '2.', etc., and '\\n' for new lines. If healthy, provide a positive confirmation like '繼續保持良好照顧。')\"\n    }\n    ",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "```json\n{\n  \"crop_name\": \"番茄\",\n  \"category\": \"disease\",\n  \"status_name\": \"早疫病 (Early Blight)\",\n  \"confidence\": 0.85,\n  \"suggestion\": \"- 下位葉出現黃化現象\\n- 葉片上形成具有同心輪紋的褐色至黑色病斑\\n- 病斑周圍常伴隨黃色暈圈\",\n  \"treatment\": \"1. 隨時清除並銷毀罹病嚴重的下位葉，減少病原菌擴散來源。\\n2. 避免從上方直接噴灌澆水，降低葉面濕潤時間以抑制病菌發芽與侵入。\\n3. 適時合理施肥，保持田間通風良好，增強植株抗病力。\"\n}\n```",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "N2HCap_QFeO6vr0Pz_mc-AU",
+          "usage": {
+            "candidates_token_count": 185,
+            "prompt_token_count": 8428,
+            "prompt_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 7364
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 1064
+              }
+            ],
+            "total_token_count": 8613
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 2.4988984998781234
+        }
+      ],
+      "raw_score": {
+        "outcome": "label_match",
+        "crop_correct": true
+      },
+      "final_score": {
+        "outcome": "label_match",
+        "crop_correct": true
+      },
+      "advice": {
+        "applicable": true,
+        "unverified_source": true,
+        "requires_review": true,
+        "dosage_pattern": true,
+        "professional_correctness": "not independently evaluated"
+      },
+      "wall_seconds": 15.508929299889132,
+      "intentional_sleep_seconds": 10.404845800017938,
+      "inference_seconds": 5.104083499871194
+    },
+    {
+      "case_id": "plant-02",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:22:49.080114+00:00",
+      "status": "ok",
+      "raw": {
+        "crop_name": "番茄",
+        "category": "disease",
+        "status_name": "早疫病 (Early Blight)",
+        "confidence": 0.85,
+        "suggestion": "- 葉片上出現帶有同心輪紋的褐色病斑\n- 病斑周圍常伴隨黃色暈圈",
+        "treatment": "1. 移除並銷毀嚴重受感染的葉片以減少病源。\n2. 加強株間通風與降低田間濕度。\n3. 適時依推薦規範施用核准之防治藥劑。"
+      },
+      "validated": {
+        "crop_name": "番茄",
+        "category": "disease",
+        "status_name": "早疫病 (Early Blight)",
+        "confidence": 0.85,
+        "suggestion": "- 葉片上出現帶有同心輪紋的褐色病斑\n- 病斑周圍常伴隨黃色暈圈",
+        "treatment": "1. 移除並銷毀嚴重受感染的葉片以減少病源。\n2. 加強株間通風與降低田間濕度。\n3. 適時依推薦規範施用核准之防治藥劑。",
+        "grounding_source": "model_pending_database_check",
+        "requires_review": false
+      },
+      "final": {
+        "crop_name": "番茄",
+        "category": "disease",
+        "status_name": "早疫病 (Early Blight)",
+        "confidence": 0.85,
+        "suggestion": "主要危害葉片、莖和果實。葉片上出現暗褐色同心輪紋的圓形病斑，周圍有黃色暈環。老葉先發病，嚴重時葉片乾枯脫落。",
+        "treatment": "發病初期可噴灑 75% 百菌清可濕性粉劑 600 倍液，或 50% 撲滅寧可濕性粉劑 1500 倍液。注意田間通風，雨後及時排水，並移除病殘體。",
+        "grounding_source": "disease_database",
+        "reference_source": null,
+        "reference_url": null,
+        "reference_record_id": null,
+        "requires_review": true
+      },
+      "calls": [
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:22:59.569026+00:00",
+          "prompt_sha256": "df5039f2f48745cfc4d37b74588111cde6a167b8e1c7d6ae87abf0cd5ccbe39f",
+          "prompt": "You are an agricultural expert. Briefly describe the main subject and any visible symptoms in this image in a few keywords (e.g., 'tomato, leaf spots, yellowing'). This will be used to search a knowledge base. Respond in Traditional Chinese.",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "番茄, 葉斑病, 葉片黃化",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "RGHCaovhBruM1e8P3fyu8AU",
+          "usage": {
+            "candidates_token_count": 13,
+            "prompt_token_count": 1116,
+            "prompt_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 52
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 1064
+              }
+            ],
+            "total_token_count": 1129
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 1.635186499916017
+        },
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:23:12.570353+00:00",
+          "prompt_sha256": "e5a3139c9f6944a94f11353fca6b82b4ba7f6116995141ccf475509e3b879dba",
+          "prompt": "\n    You are a top-tier plant pathologist. Analyze the provided image and context from our knowledge base to provide a professional diagnosis. Respond in valid JSON format, using Traditional Chinese for all user-facing text.\n\n    --- Knowledge Base Context ---\n    No specific context found.\n    ---\n\n    Reference Lists (for name standardization):\n    - Known crops: 甜椒, 萵苣, 甜瓜, 西瓜, 薑, 玉米百合, 玉米, 辣椒, 觀賞辣椒, 豌豆芽菜, 豌豆, 玉米筍, 檬果, 甘藍, 樹番茄, 青油菜, 紅龍果, 馬拉巴栗, 菊花, 火鶴, 玫瑰, 劍蘭, 百合, 其他蘭花, 小花蕙蘭, 虎頭蘭, 嘉德麗雅蘭, 仙履蘭, 石斛蘭, 文心蘭, 蝴蝶蘭, 其他景觀作物, 景觀小油菊, 景觀萬壽菊, 景觀波斯菊, 景觀向日葵, 其他綠肥作物, 魯冰, 青皮豆, 鐵虎豆, 苕子, 紫雲英, 田菁, 爬地蘭, 富貴豆, 太陽麻, 大豆類, 大菜, 埃及三葉草, 其他牧草, 其他長期牧草, 其他短期牧草, 青割玉米, 蘇丹草, 苜蓿草, 盤固拉草, 狼尾草, 尼羅草, 酒類製品, 蜂產品, 綜合蔬果製品, 其他特用作物加工製品, 胡麻製品, 薑黃製品, 愛玉製品, 茶製品, 油茶製品, 洛神葵製品, 香茅製品, 甘蔗製品, 咖啡製品, 梔子製品, 諾麗果製品, 風茹製品, 甜菊製品, 杭菊製品, 向日葵製品, 仙草製品, 紫蘇製品, 其他花卉加工製品, 油菊製品, 茉莉花製品, 玫瑰花製品, 其他水果加工製品, 可可製品, 栗子製品, 椰子製品, 橄欖製品, 棗製品, 梅製品, 李製品, 桃製品, 芒果製品, 龍眼製品, 荔枝製品, 枇杷製品, 梨製品, 蘋果製品, 木鱉果製品, 楊梅製品, 榴槤蜜製品, 桑椹製品, 波羅蜜製品, 柿製品, 釋迦製品, 奇異果製品, 紅龍果製品, 百香果製品, 楊桃製品, 葡萄製品, 蓮霧製品, 番石榴製品, 鳳梨製品, 香蕉製品, 木瓜製品, 金柑製品, 檸檬製品, 柑橘製品, 椪柑製品, 柳橙製品, 葡萄柚製品, 柚子製品, 其他蔬菜加工製品, 白木耳製品, 黑木耳製品, 猴頭菇製品, 杏鮑菇製品, 香菇製品, 草莓製品, 黃秋葵製品, 菱角製品, 番茄製品, 辣椒製品, 甜瓜製品, 西瓜製品, 越瓜製品, 苦瓜製品, 胡瓜製品, 絲瓜製品, 南瓜製品, 冬瓜製品, 蠶豆製品, 豌豆製品, 花豆製品, 毛豆製品, 金針花製品, 胡蘿蔔製品, 牛蒡製品, 蘿蔔製品, 馬鈴薯製品, 山藥製品, 山葵製品, 蘆筍製品, 薑製品, 芋頭製品, 蓮藕製品, 竹筍製品, 食用百合製品, 洋蔥製品, 蔥製品, 蒜製品, 羅勒製品, 菠菜製品, 芹菜製品, 芥菜製品, 油菜製品, 結球白菜製品, 甘藍製品, 其他五穀雜糧加工製品, 木薯製品, 甘藷製品, 綠豆製品, 紅豆製品, 落花生製品, 大豆製品, 薏苡製品, 燕麥製品, 蕎麥製品, 大麥製品, 高粱製品, 小米製品, 小麥製品, 玉米製品, 硬質玉米製品, 稻米製品, 其他特用作物, 其他長期特作, 其他短期特作, 其他飲料作物, 愛玉子, 茶, 洛神, 咖啡, 杭菊, 仙草, 其他香料作物, 香水蓮, 香草, 秀英, 茉莉花_薰芬茶用, 桂花, 檸檬香茅, 香茅, 蒔蘿, 芳香萬壽菊, 薄荷, 紫蘇, 其他澱粉作物, 紅蓮蕉, 蒟蒻, 葛鬱金, 葛藤, 其他染料作物, 薑黃, 大菁, 藷茛, 梔子, 大青, 紅花, 其他纖維作物, 瓊麻, 亞麻, 圓藺草, 苧麻, 大甲藺, 三角藺, 棉花, 貴黍, 其他糖料作物, 甘蔗, 甜菊, 其他嗜好作物, 菸草, 荖藤, 荖葉, 荖花, 其他油料作物, 胡麻, 小果種油茶, 大果種油茶, 向日葵_採種供作加工原料, 其他藥用作物, 杜虹花, 白花蛇舌草, 桋梧, 假人參, 蕺菜, 辣木, 山葡萄, 地黃, 七葉膽, 澤瀉, 白果, 香椿, 小葉藜, 何首烏, 南薑, 羊奶頭, 土肉桂, 肉桂, 桔梗, 黨蔘, 青葙, 法國綠莧, 金線蓮, 刺五加, 蓪草, 山芙蓉, 圓葉錦葵, 穿心蓮, 白鶴靈芝, 麥門冬, 蘆薈, 白藷莨, 枸杞, 葉用枸杞, 諾麗果, 桑黃, 茯苓, 樟芝, 槐耳, 通天草, 黃耆, 當歸, 柴胡, 明日葉, 艾草, 小金英, 蒲公英, 風茹草, 傷寒草, 六神花, 除蟲菊, 澤蘭, 款冬, 山防風, 荊芥, 筋骨草, 半支蓮, 丹參, 黃芩, 益母草, 草石蠶, 其他雜糧, 其他藷類, 木薯, 甘藷, 其他穀類, 臺灣藜, 高粱, 薏苡, 蕎麥, 燕麥, 小麥, 小米, 大麥, 其他豆類, 樹豆, 落花生, 米豆, 綠豆, 紅豆, 大豆, 珠廉, 鳳尾草, 高山羊齒, 腎蕨, 石蓮, 山蘇, 虎尾蘭, 常春藤, 蔓綠絨, 電信蘭, 黃金葛, 其他多年生草本, 球薑, 火炬花, 野薑花, 薑荷花, 月桃, 水蠟燭, 天堂鳥, 聖誕果, 牛頭茄, 金魚草, 泡盛草, 陸蓮花, 飛燕草, 夢幻草, 白頭翁, 銀蘆, 星辰花, 豇豆, 蠶豆, 翼豆, 萊豆, 鵲豆, 毛豆, 刀豆, 菜豆, 其他花菜苗, 其他花菜, 金針花, 石蓮花, 朝鮮薊, 青花菜, 花椰菜, 其他根菜, 胡蘿蔔, 甜菜根, 闊葉大豆, 豆薯, 雪蓮薯, 辣根, 瑞典蕪菁, 蘿蔔, 其他莖菜, 仙人掌肉質莖, 碧玉筍, 晚香玉筍, 食用大黃, 水蓮, 薯蕷, 荸薺, 蓴菜, 馬鈴薯, 慈菇, 萵苣莖, 菊芋, 黃藤心, 半天筍, 山葵, 球莖甘藍, 蘆筍, 蘘荷, 芋, 蓮, 茭白筍, 甘蔗筍, 牧草筍, 竹筍, 其他鱗莖, 食用百合, 蝦夷蔥, 蕎頭, 洋蔥, 韭蔥, 分蔥, 蔥, 蒜頭, 大蒜, 其他葉菜苗, 其他葉菜, 麻意, 糯米糰, 龍葵, 食茱萸, 學菜, 水合歡, 過溝菜蕨, 龍鳳草, 人蔘菜, 馬齒莧, 番杏, 冰花, 羅勒, 山菠菜, 葉用甘藷, 蕹菜, 藤三七, 落葵, 韭菜, 菾菜, 菠菜, 莧菜, 香芹菜, 水芹, 茴香, 刺芹, 芫荽, 芹菜, 闊苞菊, 白鳳菜, 紅鳳菜, 茼蒿, 山茼蒿, 吉康菜, 苦苣, 珍珠菜, 葉用蘿蔔, 西洋菜, 芝麻菜, 薺菜, 千寶菜, 油江菜, 廣島菜, 青菘菜, 小菘菜, 菜心, 水菜, 塌棵菜, 油菜, 不結球白菜, 芥菜, 結球白菜, 黑種草, 觀賞玉米, 古代稀, 貝殼花, 洋桔梗, 羽衣甘藍, 芥藍, 其他稻米, 秈糯, 稉糯, 軟秈, 硬秈, 稉稻, 觀賞南瓜, 松蟲草, 風鈴花, 紫羅蘭, 葉牡丹, 百日草, 鱗托菊, 瓜葉菊, 向日葵, 矢車菊, 雲南菊, 金盞花, 千日紅, 藜, 雞冠花, 紅莧菜, 雁來紅, 萬代蘭, 腎藥蘭, 皇后蘭, 樹攔, 蜘蛛蘭, 千代蘭, 其他果樹, 可可, 胡桃, 蘋婆, 長山核桃, 澳洲胡桃, 栗子, 胡榛子, 腰果, 扁桃, 杏仁, 檳榔, 椰子, 其它核果, 棗椰子, 爪哇橄欖, 橄欖, 錫蘭橄欖, 印度棗, 中國棗, 酪梨, 梅, 杏, 櫻桃, 李, 桃, 油柑, 紅毛丹, 龍眼, 荔枝, 其他仁果, 枇杷, 梨, 蘋果, 其他漿果, 木鱉果, 山竹, 榴槤, 西印度櫻桃, 人心果, 神秘果, 黃金果, 蛋黃果, 石榴, 楊梅, 榴槤蜜, 桑椹, 小波羅蜜, 波羅蜜, 無花果, 麵包果, 柿, 羅望子, 釋迦, 藍莓, 奇異果, 百香果, 楊桃, 葡萄, 嘉寶果, 蓮霧, 番石榴, 鳳梨, 芭蕉, 香蕉, 番木瓜, 其他柑橘, 金柑與小果柑橘, 枸櫞, 甜橙, 寬皮柑, 葡萄柚, 柚子, 其他蔬菜, 其他長期蔬菜, 其他短期蔬菜, 採種用蔬菜, 小海帶, 髮菜, 海菜, 海帶, 其他菇類, 松茸, 紫丁香蘑, 金福菇, 白玉菇, 鴻喜菇, 酒杯菇, 白木耳, 金耳, 滑菇, 草菇, 粉紅玫瑰菇, 蠔菇, 秀珍菇, 白靈菇, 杏鮑菇, 鮑魚菇, 珊瑚菇, 竹蓀, 舞菇, 香菇, 金針菇, 猴頭菇, 靈芝, 北蟲草, 牛肝菌, 茶樹菇, 毛木耳, 斤耳, 黑木耳, 雞肉絲菇, 雞腿菇, 巴西蘑菇, 洋菇, 其他芽菜, 綠豆芽, 紅豆芽, 蠶豆芽, 苜蓿芽, 黑豆芽, 黃豆芽, 蕎麥芽菜, 落花生芽菜, 蘿蔔芽菜, 青花菜芽菜, 芥藍芽菜, 甘藍芽菜, 其他果菜苗, 其他果菜, 草莓, 黃秋葵, 菱角, 破布子, 香瓜茄, 茄子, 小果番茄, 番茄, 其他瓜菜, 蛇瓜, 隼人瓜, 越瓜, 苦瓜, 胡瓜, 絲瓜, 扁蒲, 南瓜, 冬瓜, 小菊, 紫菀, 紐西蘭麻, 火炬百合, 萱草, 狐尾百合, 假葉樹, 鳴子百合, 天鵝絨, 伯利恆之星, 風信子, 吊蘭, 葉蘭, 文竹, 蘆筍草, 武竹, 夜來香, 翠珠花, 海芋, 合果芋, 白鶴芋, 黛粉葉, 觀音蓮, 唐棉, 紫嬌花, 火球花, 孤挺花, 文殊蘭, 繡球蔥, 百子蓮, 水仙, 石蒜, 君子蘭, 水仙百合, 菖蒲, 其他木本花卉, 山茶花, 木羊齒, 柳, 七里香, 六月雪, 仙丹花, 梔子花, 寒丁子, 麻葉繡球, 海神花, 針墊花, 雪松, 新西蘭, 林投, 牡丹, 女貞, 茉莉, 素馨, 連翹, 尤加利, 蠟梅, 降天桑, 香樹蘭, 洛神葵, 玉蘭花, 金絲桃, 金雀花, 三角尤加利, 聖誕紅, 羽毛花, 變葉木, 蘇鐵, 側柏, 香冠柏, 柳杉, 扁柏, 征木, 五彩千年木, 星點木, 青竹, 百合竹, 虎斑木, 朱蕉, 觀音棕竹, 黃椰子, 八角金盤, 藍星花, 其他一二年生草本, 紅茄, 蚌蘭, 宮燈百合, 嘉蘭, 滿天星, 深山櫻, 康乃馨, 夕霧花, 三角桔梗, 美人蕉, 擎天鳳梨, 觀果鳳梨, 蜻蜓鳳梨, 麥桿菊, 琉璃菊, 一枝黃花, 澳洲鼓槌菊, 麟麟菊, 非洲菊, 白藍菊, 大理花, 波斯菊, 麵線菊, 大菊, 射干, 鳶尾, 小蒼蘭, 段菊, 繡球花, 赫蕉, 袋鼠花, 龍膽, 羽扇豆, 金翠花, 八卦草, 初雪草, 水莞, 巨果薑, 水晶花, 補雪草, 卡斯比亞, 虎尾花, 睡蓮, 竹芋, 鬱金香, 波羅門蔘, 牛蒡, 其他堅果, 雲芝, 其他豆菜, 龍鬚菜, 食用薊, 皇帝豆, 包心白菜, 青江白菜, 敏豆, 小黃瓜, 旱芹, 粉豆, 桑果, 洋香瓜, 柑桔, 柿子, 文旦, 樹葡萄, 牛奶果, 草花, 球根花卉, 蘭類, 觀葉植物, 香花植物, 觀賞樹木, 菊科, 薑科, 荖籐, 烏心石, 茉草, 水稻, 肖楠, 大葉楠, 冬蟲夏草, 水黃皮, 草皮, 牛樟, 雜草, 菊苣, 蘿勒, 黑松, 檜木, 柳樹, 蘋婆果, 九芎, 二葉松, 五葉松, 亞歷山大椰子, 光臘樹, 光蠟樹, 刺桐, 刺桐樹, 加州杉, 加蜜蛋黃果, 十字花科, 千頭木麻黃, 南洋杉, 南洋櫻, 印度紫壇, 印度紫檀, 古煉, 台東蘇鐵, 台灣山蘇花, 台灣杉, 台灣櫸, 台灣欒樹, 台灣海藻, 台灣赤楠, 咸豐草, 嘉德麗亞蘭, 土人參, 垂榕, 大王椰子, 大葉刺桐, 大葉山攬, 大葉山欖, 大葉桃花心木, 大葉欖仁, 大葉雀榕, 夾竹桃, 孟宗竹, 小槐花, 小葉南洋杉, 小葉南洋衫, 小葉桃花心木, 小葉欖仁, 小葉黃槐, 心葉牽牛花, 捲葉蘇鐵, 掌葉蘋婆, 日日櫻, 春不老, 晚香玉, 月橘, 木棉, 木芙蓉, 木麻黃, 本樟, 朱槿, 朴子, 朴樹, 杜鵑, 松, 松樹, 枯里珍, 柏, 柏樹, 柑橘, 柚, 桂竹, 桃樹, 桃花心木, 桑樹, 梅樹, 森氏紅淡比, 椰子樹, 楊樹, 楓香, 楓香樹, 楠木, 榔榆, 榕, 榕樹, 槭樹, 樟, 樟樹, 樹蘭, 橡膠樹, 檀香, 檸檬, 檸檬桉, 檸檬樹, 櫸木, 櫻花, 欖仁, 欖仁樹, 毛木, 毛柿, 水柳, 法國梧桐, 流蘇, 浦葵, 海桐, 海棗, 火焰木, 火燄木, 火龍果, 烏臼, 珊瑚刺桐, 珊瑚莿桐, 琉球蘇鐵, 瓊涯海棠, 番椒, 番荔枝, 痲瘋樹, 白薇, 相思樹, 矮仙丹, 矮仙丹花, 福木, 福祿桐, 竹柏, 筆筒樹, 紅刺林投, 紅楠, 綬草, 緬梔, 羅漢松, 羊蹄甲, 美人樹, 肉桂樹, 肉豆, 肯氏南洋杉, 腋唇蘭, 芒果, 苦楝, 茄冬, 茄苳, 茶花樹, 草海桐, 荔枝樹, 莿桐, 菠羅密, 菠蘿蜜, 菩提, 菩提樹, 華盛頓椰子, 蔓澤蘭, 蕗藤, 蕙蘭, 西施柚, 豔紫荊, 象牙木, 象牙樹, 豬草, 銀姬小蠟, 銀樺, 銀耳, 銀膠菊, 鐵線蕨, 長梗滿天星, 長豇豆, 阿勃勒, 阿薩姆茶, 雀榕, 雞冠刺桐, 青剛櫟, 青楓, 香杉, 鳳凰木, 麵包樹, 黃槿, 黃脈刺桐, 黃脤刺桐, 黃連木, 黃金風鈴木, 黑板樹, 龍柏, 龍眼樹\n    - Known diseases: 葉斑病, 腐爛, 痂病, 發芽, 畸形果, 乾旱, 早疫病 (Early Blight), 晚疫病 (Late Blight), 灰黴病 (Gray Mold), 病毒病 (Virus Disease), 臍腐病 (Blossom-End Rot), 褐根病, 褐根病, 葉震病, 炭疽病, 側柏枝枯病, 枝枯病, 煤煙病, 褐根病, 細菌性病害, 褐根病, 褐根病, 枝枯病, 潰瘍病, 葉枯病, 褐根病, 褐根病, 褐根病, 樹木褐根病, 褐根病, 褐根病, 原因不明, 褐根病, 褐根腐病, 褐根病, 咖啡銹病, 褐根病, 褐根病, 癌腫病, 樹木褐根病, 褐根病, 褐根病, 褐根病, 枝枯病, 腐朽菌, 褐根病, 葉枯病, 癌腫病, 枝枯病, 木耳, 木層孔菌, 褐根病, 木材腐朽菌, 褐根病, 闊葉樹藻斑病, 褐根病, 褐根病, 疑似疫病黃化萎凋, 松樹潰瘍病, 葉震病, 枝枯病, 腐朽菌, 褐根病, 銹病, 竹簇葉病, Phellinus noxius, 褐根病, 褐根腐病, 褐根病, 木材腐朽菌, 椰子樹芽腐病, 褐根病, 褐根病, 褐根病, 褐根病, 可能已被感染褐根病, 孔洞木材腐朽, 木材腐朽病, 根腐病, 樹木褐根病, 煤煙病, 紫膠介殼蟲與煤煙病, 腐朽菌, 褐根病, 褐根腐病, 靈芝根基腐朽病, 鮑魚菇, 樹木褐根病, 褐根病, 樣本無褐根病病原, 樹木褐根病, 腐朽菌, 褐根病, 褐根病, 熱帶靈芝, 癌腫病, 簇葉病, 細菌性或Cercospora sp.角斑, 褐根病, 白紋羽病, 白蟻及褐根病, 細菌性癌腫病, 褐褐病, 褐根病, 褐根病, 褐根病, 褐根病, 褐根病, 葉枯病, 褐根病, 褐根病, 樹木褐根病, 炭疽病, 褐根病, 炭疽病, 熱帶靈芝, 疫病菌, 褐根病, 褐根腐病, 黑腐病與炭疽病, 真菌腐朽性病害, 玫瑰黑斑病, 褐根病, 褐斑病, 褐根病, 癌腫病, 褐根病, 褐根腐病, 褐根腐病、生理反應, 樹木褐根病, 褐根病, 蘆筍莖枯病, 褐根病, 摺菌, 褐根病, 褐根病, 腐霉病或疫病, 褐根病, 疑似褐根病, 褐根腐病, 褐根病, 褐根病, 褐根病, 疫病根腐, 肖楠病, 樹木褐根病, 褐根病, 褐根病, 癌腫病, 細菌性癌腫病, 褐根病, 褐根病, 枝枯病, 炭疽病, 褐根病, 闊葉樹藻斑病, 腐生性危害, 炭疽病、寒害, 褐根病, 褐根病, Phellinus noxius, 褐根病, 黑脂病, 黑腫病, 樹木褐根病, 黃龍病, 褐根病, 煤煙病, 褐根病, 褐根病, 褐根腐病, 褐根病, 褐根病, 白粉病, 褐根病, 褐根病, 樹木褐根病, 腐朽菌, 褐根病, 樹木褐根病, 熱帶靈芝, 褐根病, 松樹葉震病, 流膠病, 葉震病, 褐根病, 疫病菌&腐黴菌, 褐根病, 枝枯病, 枝枯病炭疽病, 褐根病, 褐根病, 樹木褐根病, 褐根病\n    - Known pests: 蟲害, 薊馬, 銀葉粉蝨 (Whitefly), 棉鈴蟲 (Bollworm), 蚜蟲 (Aphid), 咖啡果小蠹, 太平洋臀紋粉介殼蟲, 黃綠綿介殼蟲, 木瓜秀粉介殼蟲, 金花蟲, 椿象, 橘球粉介殼蟲, 長尾粉介殼蟲, 鱗翅目, 咖啡硬介殼蟲, 木瓜秀粉介殼蟲, 美地綿粉介殼蟲, 咖啡硬介殼蟲, 絲粉介殼蟲, 白蠟介殼蟲, 蟻台硬介殼蟲, 鱗翅目, 石蒜綿粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 木瓜秀粉介殼蟲, 粉蝨, 茄綿粉介殼蟲, 蚜蟲, 葉蟎, 月橘白輪盾介殼蟲, 木瓜秀粉介殼蟲, 椰子櫛圓盾介殼蟲, 木瓜秀粉介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 光肩星天牛, 牡蠣盾介殼蟲, 葉蟎, 淡薄圓介殼蟲, 鱗翅目, 桑擬輪盾介殼蟲, 葉蟬, 椰子擬輪盾介殼蟲, 紅蠟介殼蟲, 葉蟎, 螺旋粉蝨, 木瓜秀粉介殼蟲, 黃吹綿介殼蟲, 樟輪盾介殼蟲, 太平洋臀紋粉介殼蟲, 茄綿粉介殼蟲, 太平洋臀紋粉介殼蟲, 柑橘刺粉蝨, 糠片盾介殼蟲, 咖啡木蠹蛾, 桑擬輪盾介殼蟲, 茄綿粉介殼蟲, 橘臀紋粉介殼蟲, 瓜實蠅, 茄綿粉介殼蟲, 雙翅目, 木瓜秀粉介殼蟲, 牡蠣盾介殼蟲, 太平洋臀紋粉介殼蟲, 絲粉介殼蟲, 長角象鼻蟲, 雙翅目, 蚜蟲, 木瓜秀粉介殼蟲, 根蟎, 二點葉蟎, 木瓜秀粉介殼蟲, 粉介殼蟲, 葉蟎, 扁堅介殼蟲, 咖啡硬介殼蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 柑橘刺粉蝨, 番石榴黑疣粉蝨, 螺旋粉蝨, 鱗翅目, 斑潛蠅, 太平洋臀紋粉介殼蟲, 鳳梨嫡粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 蚜蟲, 葉蟎, 象鼻蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 銀葉粉蝨, 木瓜秀粉介殼蟲, 蚜蟲, 銀葉粉蝨, 粉介殼蟲科, 葉蟎, 南黃薊馬, 粉蝨, 薊馬, 椿象, 雙翅目, 中華褐金龜, 木瓜秀粉介殼蟲, 橘球粉介殼蟲, 葉蟬, 木瓜秀粉介殼蟲, 粉介殼蟲, 蚜蟲, 粉蝨, 葉蟎, 木蝨, 盾介殼蟲, 粉蝨, 葉蟎, 蚜蟲, 鱗翅目, 黃綠綿介殼蟲, 棉蚜, 太平洋臀紋粉介殼蟲, 小黃薊馬, 絲粉介殼蟲, 木瓜秀粉介殼蟲, 白蠟介殼蟲, 變葉木片盾介殼蟲, 太平洋偽葉蟎, 葉蟎, 蘭花薊馬, 長跳蟲, 茄綿粉介殼蟲, 雙翅目, 鼠婦, 木瓜秀粉介殼蟲, 扁堅介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 薊馬, 蕉弄蝶, 石蒜綿粉介殼蟲, 茄綿粉介殼蟲, 木蝨, 螟蛾科, 粉介殼蟲 煤灰病, 松材線虫, 疑似松材線蟲, 幹綿蚜, 刺桐釉小蜂, 刺桐釉小蜂、不當移植, 刺桐釉小蜂, 天牛, 夜蛾, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 小蠹蟲, 螟蛾, 蝗蟲、天牛、潛葉蛾, 刺桐釉小蜂, 白蟻、生理性缺水, 竹涓夜蛾, 樟蝙蝠蛾, 蝙蝠蛾, 粉介殼蟲 煤灰病, 介殼蟲, 蘇鐵白輪盾蚧, 天牛, 月橘盾介殼蟲, 白蟻, 軍配蟲, 松材線蟲, 松線虫, 白蟻, 松材線蟲, 萎凋病, 白蟻, 桃蚜, 白蟻, 椰子大象鼻蟲, 綴葉叢螟, 蚜蟲, 斑蛾, 白蟻, 粉介殼蟲 煤灰病, 紫膠介殼蟲, 高背木蝨, 木蠹蛾, 樟樹白輪盾介殼蟲, 樟白介殼蟲, 樟葉蜂, 白蟻, 蜱&#34728;, 台灣家白蟻, 小囊蟲, 桑擬輪介殼蟲, 白蟻, 細菌性穿孔病、台灣黃毒蛾、金花蟲, 葉&#34766;, 粉蝨, 天牛, 紅胸葉蟲, 棉介殼蟲, 烏心石幹綿蚜, 刺桐釉小蜂, 銀葉粉蝨, 根瘤線蟲, 黃帶枝尺蠖蛾, 象牙木木蝨, 黃帶枝尺蛾, 黃帶枝尺蠖蛾, 芒果葉蟬, 白翅夜蟬, 茄苳白翅葉蟬, 螟蛾, 紫膠介殼蟲, 莿桐釉小蜂, 紅胸葉蟲, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 木蝨, 蟎類, 刺桐釉小蜂, 楓粉蝨, 白蟻, 鳳凰木夜蛾, 螨, 刺桐釉小蜂, 刺桐釉小蜂, 松材線蟲, mite’s gall, 白蟻或天牛蛀蝕\n\n    Anti-hallucination rules:\n    - crop_name must exactly match one item from Known crops. If uncertain, use \"未知作物\".\n    - For category \"disease\", status_name must exactly match one item from Known diseases.\n    - For category \"pest\", status_name must exactly match one item from Known pests.\n    - If the image is unclear, confidence is low, or no exact crop/disease/pest match exists, use category \"unknown\" and status_name \"無法判定\".\n    - Do not invent crop names, disease names, pest names, pesticide names, dosages, or treatment steps.\n\n    JSON Output Structure:\n    {\n      \"crop_name\": \"string (The crop's name in Traditional Chinese)\",\n      \"category\": \"string (One of 'disease', 'pest', 'healthy', or 'unknown')\",\n      \"status_name\": \"string (A name from the matching reference list. If healthy, use '健康'. If unknown, use '無法判定')\",\n      \"confidence\": \"float (A value between 0.0 and 1.0)\",\n      \"suggestion\": \"string (A bulleted list of 2-3 key visual symptoms, using '-' for each point and '\\n' for new lines. Example: '- 葉片有黃斑\\n- 葉緣焦枯')\",\n      \"treatment\": \"string (If not healthy, provide a numbered list of actionable steps using '1.', '2.', etc., and '\\n' for new lines. If healthy, provide a positive confirmation like '繼續保持良好照顧。')\"\n    }\n    ",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "```json\n{\n  \"crop_name\": \"番茄\",\n  \"category\": \"disease\",\n  \"status_name\": \"早疫病 (Early Blight)\",\n  \"confidence\": 0.85,\n  \"suggestion\": \"- 葉片上出現帶有同心輪紋的褐色病斑\\n- 病斑周圍常伴隨黃色暈圈\",\n  \"treatment\": \"1. 移除並銷毀嚴重受感染的葉片以減少病源。\\n2. 加強株間通風與降低田間濕度。\\n3. 適時依推薦規範施用核准之防治藥劑。\"\n}\n```",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "UWHCat2_EJ_W1e8PrfGKkA8",
+          "usage": {
+            "cache_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 3564
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 515
+              }
+            ],
+            "cached_content_token_count": 4079,
+            "candidates_token_count": 147,
+            "prompt_token_count": 8428,
+            "prompt_tokens_details": [
+              {
+                "modality": "IMAGE",
+                "token_count": 1064
+              },
+              {
+                "modality": "TEXT",
+                "token_count": 7364
+              }
+            ],
+            "total_token_count": 8575
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 1.5159104999620467
+        }
+      ],
+      "raw_score": {
+        "outcome": "label_match",
+        "crop_correct": true
+      },
+      "final_score": {
+        "outcome": "label_match",
+        "crop_correct": true
+      },
+      "advice": {
+        "applicable": true,
+        "unverified_source": true,
+        "requires_review": true,
+        "dosage_pattern": true,
+        "professional_correctness": "not independently evaluated"
+      },
+      "wall_seconds": 25.008129799971357,
+      "intentional_sleep_seconds": 21.851466399850324,
+      "inference_seconds": 3.156663400121033
+    },
+    {
+      "case_id": "plant-03",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:23:14.094034+00:00",
+      "status": "ok",
+      "raw": {
+        "crop_name": "番茄",
+        "category": "disease",
+        "status_name": "早疫病 (Early Blight)",
+        "confidence": 0.85,
+        "suggestion": "- 葉片出現同心輪紋狀的褐色病斑\n- 病斑周圍常伴隨黃色暈斑\n- 下位葉先發病並逐漸向上蔓延",
+        "treatment": "1. 移除並銷毀嚴重受感染的葉片與殘株，減少病原菌擴散。\n2. 保持田間通風良好，避免過度密植與過度潮濕。\n3. 適時配合核可的防治藥劑進行噴施保護。"
+      },
+      "validated": {
+        "crop_name": "番茄",
+        "category": "disease",
+        "status_name": "早疫病 (Early Blight)",
+        "confidence": 0.85,
+        "suggestion": "- 葉片出現同心輪紋狀的褐色病斑\n- 病斑周圍常伴隨黃色暈斑\n- 下位葉先發病並逐漸向上蔓延",
+        "treatment": "1. 移除並銷毀嚴重受感染的葉片與殘株，減少病原菌擴散。\n2. 保持田間通風良好，避免過度密植與過度潮濕。\n3. 適時配合核可的防治藥劑進行噴施保護。",
+        "grounding_source": "model_pending_database_check",
+        "requires_review": false
+      },
+      "final": {
+        "crop_name": "番茄",
+        "category": "disease",
+        "status_name": "早疫病 (Early Blight)",
+        "confidence": 0.85,
+        "suggestion": "主要危害葉片、莖和果實。葉片上出現暗褐色同心輪紋的圓形病斑，周圍有黃色暈環。老葉先發病，嚴重時葉片乾枯脫落。",
+        "treatment": "發病初期可噴灑 75% 百菌清可濕性粉劑 600 倍液，或 50% 撲滅寧可濕性粉劑 1500 倍液。注意田間通風，雨後及時排水，並移除病殘體。",
+        "grounding_source": "disease_database",
+        "reference_source": null,
+        "reference_url": null,
+        "reference_record_id": null,
+        "requires_review": true
+      },
+      "calls": [
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:23:25.571177+00:00",
+          "prompt_sha256": "df5039f2f48745cfc4d37b74588111cde6a167b8e1c7d6ae87abf0cd5ccbe39f",
+          "prompt": "You are an agricultural expert. Briefly describe the main subject and any visible symptoms in this image in a few keywords (e.g., 'tomato, leaf spots, yellowing'). This will be used to search a knowledge base. Respond in Traditional Chinese.",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "番茄, 葉部病斑, 葉片黃化",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "XmHCaureB-2ivr0P9dvS4Q0",
+          "usage": {
+            "candidates_token_count": 14,
+            "prompt_token_count": 1132,
+            "prompt_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 52
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 1080
+              }
+            ],
+            "total_token_count": 1146
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 1.8246756999287754
+        },
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:23:38.572030+00:00",
+          "prompt_sha256": "e5a3139c9f6944a94f11353fca6b82b4ba7f6116995141ccf475509e3b879dba",
+          "prompt": "\n    You are a top-tier plant pathologist. Analyze the provided image and context from our knowledge base to provide a professional diagnosis. Respond in valid JSON format, using Traditional Chinese for all user-facing text.\n\n    --- Knowledge Base Context ---\n    No specific context found.\n    ---\n\n    Reference Lists (for name standardization):\n    - Known crops: 甜椒, 萵苣, 甜瓜, 西瓜, 薑, 玉米百合, 玉米, 辣椒, 觀賞辣椒, 豌豆芽菜, 豌豆, 玉米筍, 檬果, 甘藍, 樹番茄, 青油菜, 紅龍果, 馬拉巴栗, 菊花, 火鶴, 玫瑰, 劍蘭, 百合, 其他蘭花, 小花蕙蘭, 虎頭蘭, 嘉德麗雅蘭, 仙履蘭, 石斛蘭, 文心蘭, 蝴蝶蘭, 其他景觀作物, 景觀小油菊, 景觀萬壽菊, 景觀波斯菊, 景觀向日葵, 其他綠肥作物, 魯冰, 青皮豆, 鐵虎豆, 苕子, 紫雲英, 田菁, 爬地蘭, 富貴豆, 太陽麻, 大豆類, 大菜, 埃及三葉草, 其他牧草, 其他長期牧草, 其他短期牧草, 青割玉米, 蘇丹草, 苜蓿草, 盤固拉草, 狼尾草, 尼羅草, 酒類製品, 蜂產品, 綜合蔬果製品, 其他特用作物加工製品, 胡麻製品, 薑黃製品, 愛玉製品, 茶製品, 油茶製品, 洛神葵製品, 香茅製品, 甘蔗製品, 咖啡製品, 梔子製品, 諾麗果製品, 風茹製品, 甜菊製品, 杭菊製品, 向日葵製品, 仙草製品, 紫蘇製品, 其他花卉加工製品, 油菊製品, 茉莉花製品, 玫瑰花製品, 其他水果加工製品, 可可製品, 栗子製品, 椰子製品, 橄欖製品, 棗製品, 梅製品, 李製品, 桃製品, 芒果製品, 龍眼製品, 荔枝製品, 枇杷製品, 梨製品, 蘋果製品, 木鱉果製品, 楊梅製品, 榴槤蜜製品, 桑椹製品, 波羅蜜製品, 柿製品, 釋迦製品, 奇異果製品, 紅龍果製品, 百香果製品, 楊桃製品, 葡萄製品, 蓮霧製品, 番石榴製品, 鳳梨製品, 香蕉製品, 木瓜製品, 金柑製品, 檸檬製品, 柑橘製品, 椪柑製品, 柳橙製品, 葡萄柚製品, 柚子製品, 其他蔬菜加工製品, 白木耳製品, 黑木耳製品, 猴頭菇製品, 杏鮑菇製品, 香菇製品, 草莓製品, 黃秋葵製品, 菱角製品, 番茄製品, 辣椒製品, 甜瓜製品, 西瓜製品, 越瓜製品, 苦瓜製品, 胡瓜製品, 絲瓜製品, 南瓜製品, 冬瓜製品, 蠶豆製品, 豌豆製品, 花豆製品, 毛豆製品, 金針花製品, 胡蘿蔔製品, 牛蒡製品, 蘿蔔製品, 馬鈴薯製品, 山藥製品, 山葵製品, 蘆筍製品, 薑製品, 芋頭製品, 蓮藕製品, 竹筍製品, 食用百合製品, 洋蔥製品, 蔥製品, 蒜製品, 羅勒製品, 菠菜製品, 芹菜製品, 芥菜製品, 油菜製品, 結球白菜製品, 甘藍製品, 其他五穀雜糧加工製品, 木薯製品, 甘藷製品, 綠豆製品, 紅豆製品, 落花生製品, 大豆製品, 薏苡製品, 燕麥製品, 蕎麥製品, 大麥製品, 高粱製品, 小米製品, 小麥製品, 玉米製品, 硬質玉米製品, 稻米製品, 其他特用作物, 其他長期特作, 其他短期特作, 其他飲料作物, 愛玉子, 茶, 洛神, 咖啡, 杭菊, 仙草, 其他香料作物, 香水蓮, 香草, 秀英, 茉莉花_薰芬茶用, 桂花, 檸檬香茅, 香茅, 蒔蘿, 芳香萬壽菊, 薄荷, 紫蘇, 其他澱粉作物, 紅蓮蕉, 蒟蒻, 葛鬱金, 葛藤, 其他染料作物, 薑黃, 大菁, 藷茛, 梔子, 大青, 紅花, 其他纖維作物, 瓊麻, 亞麻, 圓藺草, 苧麻, 大甲藺, 三角藺, 棉花, 貴黍, 其他糖料作物, 甘蔗, 甜菊, 其他嗜好作物, 菸草, 荖藤, 荖葉, 荖花, 其他油料作物, 胡麻, 小果種油茶, 大果種油茶, 向日葵_採種供作加工原料, 其他藥用作物, 杜虹花, 白花蛇舌草, 桋梧, 假人參, 蕺菜, 辣木, 山葡萄, 地黃, 七葉膽, 澤瀉, 白果, 香椿, 小葉藜, 何首烏, 南薑, 羊奶頭, 土肉桂, 肉桂, 桔梗, 黨蔘, 青葙, 法國綠莧, 金線蓮, 刺五加, 蓪草, 山芙蓉, 圓葉錦葵, 穿心蓮, 白鶴靈芝, 麥門冬, 蘆薈, 白藷莨, 枸杞, 葉用枸杞, 諾麗果, 桑黃, 茯苓, 樟芝, 槐耳, 通天草, 黃耆, 當歸, 柴胡, 明日葉, 艾草, 小金英, 蒲公英, 風茹草, 傷寒草, 六神花, 除蟲菊, 澤蘭, 款冬, 山防風, 荊芥, 筋骨草, 半支蓮, 丹參, 黃芩, 益母草, 草石蠶, 其他雜糧, 其他藷類, 木薯, 甘藷, 其他穀類, 臺灣藜, 高粱, 薏苡, 蕎麥, 燕麥, 小麥, 小米, 大麥, 其他豆類, 樹豆, 落花生, 米豆, 綠豆, 紅豆, 大豆, 珠廉, 鳳尾草, 高山羊齒, 腎蕨, 石蓮, 山蘇, 虎尾蘭, 常春藤, 蔓綠絨, 電信蘭, 黃金葛, 其他多年生草本, 球薑, 火炬花, 野薑花, 薑荷花, 月桃, 水蠟燭, 天堂鳥, 聖誕果, 牛頭茄, 金魚草, 泡盛草, 陸蓮花, 飛燕草, 夢幻草, 白頭翁, 銀蘆, 星辰花, 豇豆, 蠶豆, 翼豆, 萊豆, 鵲豆, 毛豆, 刀豆, 菜豆, 其他花菜苗, 其他花菜, 金針花, 石蓮花, 朝鮮薊, 青花菜, 花椰菜, 其他根菜, 胡蘿蔔, 甜菜根, 闊葉大豆, 豆薯, 雪蓮薯, 辣根, 瑞典蕪菁, 蘿蔔, 其他莖菜, 仙人掌肉質莖, 碧玉筍, 晚香玉筍, 食用大黃, 水蓮, 薯蕷, 荸薺, 蓴菜, 馬鈴薯, 慈菇, 萵苣莖, 菊芋, 黃藤心, 半天筍, 山葵, 球莖甘藍, 蘆筍, 蘘荷, 芋, 蓮, 茭白筍, 甘蔗筍, 牧草筍, 竹筍, 其他鱗莖, 食用百合, 蝦夷蔥, 蕎頭, 洋蔥, 韭蔥, 分蔥, 蔥, 蒜頭, 大蒜, 其他葉菜苗, 其他葉菜, 麻意, 糯米糰, 龍葵, 食茱萸, 學菜, 水合歡, 過溝菜蕨, 龍鳳草, 人蔘菜, 馬齒莧, 番杏, 冰花, 羅勒, 山菠菜, 葉用甘藷, 蕹菜, 藤三七, 落葵, 韭菜, 菾菜, 菠菜, 莧菜, 香芹菜, 水芹, 茴香, 刺芹, 芫荽, 芹菜, 闊苞菊, 白鳳菜, 紅鳳菜, 茼蒿, 山茼蒿, 吉康菜, 苦苣, 珍珠菜, 葉用蘿蔔, 西洋菜, 芝麻菜, 薺菜, 千寶菜, 油江菜, 廣島菜, 青菘菜, 小菘菜, 菜心, 水菜, 塌棵菜, 油菜, 不結球白菜, 芥菜, 結球白菜, 黑種草, 觀賞玉米, 古代稀, 貝殼花, 洋桔梗, 羽衣甘藍, 芥藍, 其他稻米, 秈糯, 稉糯, 軟秈, 硬秈, 稉稻, 觀賞南瓜, 松蟲草, 風鈴花, 紫羅蘭, 葉牡丹, 百日草, 鱗托菊, 瓜葉菊, 向日葵, 矢車菊, 雲南菊, 金盞花, 千日紅, 藜, 雞冠花, 紅莧菜, 雁來紅, 萬代蘭, 腎藥蘭, 皇后蘭, 樹攔, 蜘蛛蘭, 千代蘭, 其他果樹, 可可, 胡桃, 蘋婆, 長山核桃, 澳洲胡桃, 栗子, 胡榛子, 腰果, 扁桃, 杏仁, 檳榔, 椰子, 其它核果, 棗椰子, 爪哇橄欖, 橄欖, 錫蘭橄欖, 印度棗, 中國棗, 酪梨, 梅, 杏, 櫻桃, 李, 桃, 油柑, 紅毛丹, 龍眼, 荔枝, 其他仁果, 枇杷, 梨, 蘋果, 其他漿果, 木鱉果, 山竹, 榴槤, 西印度櫻桃, 人心果, 神秘果, 黃金果, 蛋黃果, 石榴, 楊梅, 榴槤蜜, 桑椹, 小波羅蜜, 波羅蜜, 無花果, 麵包果, 柿, 羅望子, 釋迦, 藍莓, 奇異果, 百香果, 楊桃, 葡萄, 嘉寶果, 蓮霧, 番石榴, 鳳梨, 芭蕉, 香蕉, 番木瓜, 其他柑橘, 金柑與小果柑橘, 枸櫞, 甜橙, 寬皮柑, 葡萄柚, 柚子, 其他蔬菜, 其他長期蔬菜, 其他短期蔬菜, 採種用蔬菜, 小海帶, 髮菜, 海菜, 海帶, 其他菇類, 松茸, 紫丁香蘑, 金福菇, 白玉菇, 鴻喜菇, 酒杯菇, 白木耳, 金耳, 滑菇, 草菇, 粉紅玫瑰菇, 蠔菇, 秀珍菇, 白靈菇, 杏鮑菇, 鮑魚菇, 珊瑚菇, 竹蓀, 舞菇, 香菇, 金針菇, 猴頭菇, 靈芝, 北蟲草, 牛肝菌, 茶樹菇, 毛木耳, 斤耳, 黑木耳, 雞肉絲菇, 雞腿菇, 巴西蘑菇, 洋菇, 其他芽菜, 綠豆芽, 紅豆芽, 蠶豆芽, 苜蓿芽, 黑豆芽, 黃豆芽, 蕎麥芽菜, 落花生芽菜, 蘿蔔芽菜, 青花菜芽菜, 芥藍芽菜, 甘藍芽菜, 其他果菜苗, 其他果菜, 草莓, 黃秋葵, 菱角, 破布子, 香瓜茄, 茄子, 小果番茄, 番茄, 其他瓜菜, 蛇瓜, 隼人瓜, 越瓜, 苦瓜, 胡瓜, 絲瓜, 扁蒲, 南瓜, 冬瓜, 小菊, 紫菀, 紐西蘭麻, 火炬百合, 萱草, 狐尾百合, 假葉樹, 鳴子百合, 天鵝絨, 伯利恆之星, 風信子, 吊蘭, 葉蘭, 文竹, 蘆筍草, 武竹, 夜來香, 翠珠花, 海芋, 合果芋, 白鶴芋, 黛粉葉, 觀音蓮, 唐棉, 紫嬌花, 火球花, 孤挺花, 文殊蘭, 繡球蔥, 百子蓮, 水仙, 石蒜, 君子蘭, 水仙百合, 菖蒲, 其他木本花卉, 山茶花, 木羊齒, 柳, 七里香, 六月雪, 仙丹花, 梔子花, 寒丁子, 麻葉繡球, 海神花, 針墊花, 雪松, 新西蘭, 林投, 牡丹, 女貞, 茉莉, 素馨, 連翹, 尤加利, 蠟梅, 降天桑, 香樹蘭, 洛神葵, 玉蘭花, 金絲桃, 金雀花, 三角尤加利, 聖誕紅, 羽毛花, 變葉木, 蘇鐵, 側柏, 香冠柏, 柳杉, 扁柏, 征木, 五彩千年木, 星點木, 青竹, 百合竹, 虎斑木, 朱蕉, 觀音棕竹, 黃椰子, 八角金盤, 藍星花, 其他一二年生草本, 紅茄, 蚌蘭, 宮燈百合, 嘉蘭, 滿天星, 深山櫻, 康乃馨, 夕霧花, 三角桔梗, 美人蕉, 擎天鳳梨, 觀果鳳梨, 蜻蜓鳳梨, 麥桿菊, 琉璃菊, 一枝黃花, 澳洲鼓槌菊, 麟麟菊, 非洲菊, 白藍菊, 大理花, 波斯菊, 麵線菊, 大菊, 射干, 鳶尾, 小蒼蘭, 段菊, 繡球花, 赫蕉, 袋鼠花, 龍膽, 羽扇豆, 金翠花, 八卦草, 初雪草, 水莞, 巨果薑, 水晶花, 補雪草, 卡斯比亞, 虎尾花, 睡蓮, 竹芋, 鬱金香, 波羅門蔘, 牛蒡, 其他堅果, 雲芝, 其他豆菜, 龍鬚菜, 食用薊, 皇帝豆, 包心白菜, 青江白菜, 敏豆, 小黃瓜, 旱芹, 粉豆, 桑果, 洋香瓜, 柑桔, 柿子, 文旦, 樹葡萄, 牛奶果, 草花, 球根花卉, 蘭類, 觀葉植物, 香花植物, 觀賞樹木, 菊科, 薑科, 荖籐, 烏心石, 茉草, 水稻, 肖楠, 大葉楠, 冬蟲夏草, 水黃皮, 草皮, 牛樟, 雜草, 菊苣, 蘿勒, 黑松, 檜木, 柳樹, 蘋婆果, 九芎, 二葉松, 五葉松, 亞歷山大椰子, 光臘樹, 光蠟樹, 刺桐, 刺桐樹, 加州杉, 加蜜蛋黃果, 十字花科, 千頭木麻黃, 南洋杉, 南洋櫻, 印度紫壇, 印度紫檀, 古煉, 台東蘇鐵, 台灣山蘇花, 台灣杉, 台灣櫸, 台灣欒樹, 台灣海藻, 台灣赤楠, 咸豐草, 嘉德麗亞蘭, 土人參, 垂榕, 大王椰子, 大葉刺桐, 大葉山攬, 大葉山欖, 大葉桃花心木, 大葉欖仁, 大葉雀榕, 夾竹桃, 孟宗竹, 小槐花, 小葉南洋杉, 小葉南洋衫, 小葉桃花心木, 小葉欖仁, 小葉黃槐, 心葉牽牛花, 捲葉蘇鐵, 掌葉蘋婆, 日日櫻, 春不老, 晚香玉, 月橘, 木棉, 木芙蓉, 木麻黃, 本樟, 朱槿, 朴子, 朴樹, 杜鵑, 松, 松樹, 枯里珍, 柏, 柏樹, 柑橘, 柚, 桂竹, 桃樹, 桃花心木, 桑樹, 梅樹, 森氏紅淡比, 椰子樹, 楊樹, 楓香, 楓香樹, 楠木, 榔榆, 榕, 榕樹, 槭樹, 樟, 樟樹, 樹蘭, 橡膠樹, 檀香, 檸檬, 檸檬桉, 檸檬樹, 櫸木, 櫻花, 欖仁, 欖仁樹, 毛木, 毛柿, 水柳, 法國梧桐, 流蘇, 浦葵, 海桐, 海棗, 火焰木, 火燄木, 火龍果, 烏臼, 珊瑚刺桐, 珊瑚莿桐, 琉球蘇鐵, 瓊涯海棠, 番椒, 番荔枝, 痲瘋樹, 白薇, 相思樹, 矮仙丹, 矮仙丹花, 福木, 福祿桐, 竹柏, 筆筒樹, 紅刺林投, 紅楠, 綬草, 緬梔, 羅漢松, 羊蹄甲, 美人樹, 肉桂樹, 肉豆, 肯氏南洋杉, 腋唇蘭, 芒果, 苦楝, 茄冬, 茄苳, 茶花樹, 草海桐, 荔枝樹, 莿桐, 菠羅密, 菠蘿蜜, 菩提, 菩提樹, 華盛頓椰子, 蔓澤蘭, 蕗藤, 蕙蘭, 西施柚, 豔紫荊, 象牙木, 象牙樹, 豬草, 銀姬小蠟, 銀樺, 銀耳, 銀膠菊, 鐵線蕨, 長梗滿天星, 長豇豆, 阿勃勒, 阿薩姆茶, 雀榕, 雞冠刺桐, 青剛櫟, 青楓, 香杉, 鳳凰木, 麵包樹, 黃槿, 黃脈刺桐, 黃脤刺桐, 黃連木, 黃金風鈴木, 黑板樹, 龍柏, 龍眼樹\n    - Known diseases: 葉斑病, 腐爛, 痂病, 發芽, 畸形果, 乾旱, 早疫病 (Early Blight), 晚疫病 (Late Blight), 灰黴病 (Gray Mold), 病毒病 (Virus Disease), 臍腐病 (Blossom-End Rot), 褐根病, 褐根病, 葉震病, 炭疽病, 側柏枝枯病, 枝枯病, 煤煙病, 褐根病, 細菌性病害, 褐根病, 褐根病, 枝枯病, 潰瘍病, 葉枯病, 褐根病, 褐根病, 褐根病, 樹木褐根病, 褐根病, 褐根病, 原因不明, 褐根病, 褐根腐病, 褐根病, 咖啡銹病, 褐根病, 褐根病, 癌腫病, 樹木褐根病, 褐根病, 褐根病, 褐根病, 枝枯病, 腐朽菌, 褐根病, 葉枯病, 癌腫病, 枝枯病, 木耳, 木層孔菌, 褐根病, 木材腐朽菌, 褐根病, 闊葉樹藻斑病, 褐根病, 褐根病, 疑似疫病黃化萎凋, 松樹潰瘍病, 葉震病, 枝枯病, 腐朽菌, 褐根病, 銹病, 竹簇葉病, Phellinus noxius, 褐根病, 褐根腐病, 褐根病, 木材腐朽菌, 椰子樹芽腐病, 褐根病, 褐根病, 褐根病, 褐根病, 可能已被感染褐根病, 孔洞木材腐朽, 木材腐朽病, 根腐病, 樹木褐根病, 煤煙病, 紫膠介殼蟲與煤煙病, 腐朽菌, 褐根病, 褐根腐病, 靈芝根基腐朽病, 鮑魚菇, 樹木褐根病, 褐根病, 樣本無褐根病病原, 樹木褐根病, 腐朽菌, 褐根病, 褐根病, 熱帶靈芝, 癌腫病, 簇葉病, 細菌性或Cercospora sp.角斑, 褐根病, 白紋羽病, 白蟻及褐根病, 細菌性癌腫病, 褐褐病, 褐根病, 褐根病, 褐根病, 褐根病, 褐根病, 葉枯病, 褐根病, 褐根病, 樹木褐根病, 炭疽病, 褐根病, 炭疽病, 熱帶靈芝, 疫病菌, 褐根病, 褐根腐病, 黑腐病與炭疽病, 真菌腐朽性病害, 玫瑰黑斑病, 褐根病, 褐斑病, 褐根病, 癌腫病, 褐根病, 褐根腐病, 褐根腐病、生理反應, 樹木褐根病, 褐根病, 蘆筍莖枯病, 褐根病, 摺菌, 褐根病, 褐根病, 腐霉病或疫病, 褐根病, 疑似褐根病, 褐根腐病, 褐根病, 褐根病, 褐根病, 疫病根腐, 肖楠病, 樹木褐根病, 褐根病, 褐根病, 癌腫病, 細菌性癌腫病, 褐根病, 褐根病, 枝枯病, 炭疽病, 褐根病, 闊葉樹藻斑病, 腐生性危害, 炭疽病、寒害, 褐根病, 褐根病, Phellinus noxius, 褐根病, 黑脂病, 黑腫病, 樹木褐根病, 黃龍病, 褐根病, 煤煙病, 褐根病, 褐根病, 褐根腐病, 褐根病, 褐根病, 白粉病, 褐根病, 褐根病, 樹木褐根病, 腐朽菌, 褐根病, 樹木褐根病, 熱帶靈芝, 褐根病, 松樹葉震病, 流膠病, 葉震病, 褐根病, 疫病菌&腐黴菌, 褐根病, 枝枯病, 枝枯病炭疽病, 褐根病, 褐根病, 樹木褐根病, 褐根病\n    - Known pests: 蟲害, 薊馬, 銀葉粉蝨 (Whitefly), 棉鈴蟲 (Bollworm), 蚜蟲 (Aphid), 咖啡果小蠹, 太平洋臀紋粉介殼蟲, 黃綠綿介殼蟲, 木瓜秀粉介殼蟲, 金花蟲, 椿象, 橘球粉介殼蟲, 長尾粉介殼蟲, 鱗翅目, 咖啡硬介殼蟲, 木瓜秀粉介殼蟲, 美地綿粉介殼蟲, 咖啡硬介殼蟲, 絲粉介殼蟲, 白蠟介殼蟲, 蟻台硬介殼蟲, 鱗翅目, 石蒜綿粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 木瓜秀粉介殼蟲, 粉蝨, 茄綿粉介殼蟲, 蚜蟲, 葉蟎, 月橘白輪盾介殼蟲, 木瓜秀粉介殼蟲, 椰子櫛圓盾介殼蟲, 木瓜秀粉介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 光肩星天牛, 牡蠣盾介殼蟲, 葉蟎, 淡薄圓介殼蟲, 鱗翅目, 桑擬輪盾介殼蟲, 葉蟬, 椰子擬輪盾介殼蟲, 紅蠟介殼蟲, 葉蟎, 螺旋粉蝨, 木瓜秀粉介殼蟲, 黃吹綿介殼蟲, 樟輪盾介殼蟲, 太平洋臀紋粉介殼蟲, 茄綿粉介殼蟲, 太平洋臀紋粉介殼蟲, 柑橘刺粉蝨, 糠片盾介殼蟲, 咖啡木蠹蛾, 桑擬輪盾介殼蟲, 茄綿粉介殼蟲, 橘臀紋粉介殼蟲, 瓜實蠅, 茄綿粉介殼蟲, 雙翅目, 木瓜秀粉介殼蟲, 牡蠣盾介殼蟲, 太平洋臀紋粉介殼蟲, 絲粉介殼蟲, 長角象鼻蟲, 雙翅目, 蚜蟲, 木瓜秀粉介殼蟲, 根蟎, 二點葉蟎, 木瓜秀粉介殼蟲, 粉介殼蟲, 葉蟎, 扁堅介殼蟲, 咖啡硬介殼蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 柑橘刺粉蝨, 番石榴黑疣粉蝨, 螺旋粉蝨, 鱗翅目, 斑潛蠅, 太平洋臀紋粉介殼蟲, 鳳梨嫡粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 蚜蟲, 葉蟎, 象鼻蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 銀葉粉蝨, 木瓜秀粉介殼蟲, 蚜蟲, 銀葉粉蝨, 粉介殼蟲科, 葉蟎, 南黃薊馬, 粉蝨, 薊馬, 椿象, 雙翅目, 中華褐金龜, 木瓜秀粉介殼蟲, 橘球粉介殼蟲, 葉蟬, 木瓜秀粉介殼蟲, 粉介殼蟲, 蚜蟲, 粉蝨, 葉蟎, 木蝨, 盾介殼蟲, 粉蝨, 葉蟎, 蚜蟲, 鱗翅目, 黃綠綿介殼蟲, 棉蚜, 太平洋臀紋粉介殼蟲, 小黃薊馬, 絲粉介殼蟲, 木瓜秀粉介殼蟲, 白蠟介殼蟲, 變葉木片盾介殼蟲, 太平洋偽葉蟎, 葉蟎, 蘭花薊馬, 長跳蟲, 茄綿粉介殼蟲, 雙翅目, 鼠婦, 木瓜秀粉介殼蟲, 扁堅介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 薊馬, 蕉弄蝶, 石蒜綿粉介殼蟲, 茄綿粉介殼蟲, 木蝨, 螟蛾科, 粉介殼蟲 煤灰病, 松材線虫, 疑似松材線蟲, 幹綿蚜, 刺桐釉小蜂, 刺桐釉小蜂、不當移植, 刺桐釉小蜂, 天牛, 夜蛾, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 小蠹蟲, 螟蛾, 蝗蟲、天牛、潛葉蛾, 刺桐釉小蜂, 白蟻、生理性缺水, 竹涓夜蛾, 樟蝙蝠蛾, 蝙蝠蛾, 粉介殼蟲 煤灰病, 介殼蟲, 蘇鐵白輪盾蚧, 天牛, 月橘盾介殼蟲, 白蟻, 軍配蟲, 松材線蟲, 松線虫, 白蟻, 松材線蟲, 萎凋病, 白蟻, 桃蚜, 白蟻, 椰子大象鼻蟲, 綴葉叢螟, 蚜蟲, 斑蛾, 白蟻, 粉介殼蟲 煤灰病, 紫膠介殼蟲, 高背木蝨, 木蠹蛾, 樟樹白輪盾介殼蟲, 樟白介殼蟲, 樟葉蜂, 白蟻, 蜱&#34728;, 台灣家白蟻, 小囊蟲, 桑擬輪介殼蟲, 白蟻, 細菌性穿孔病、台灣黃毒蛾、金花蟲, 葉&#34766;, 粉蝨, 天牛, 紅胸葉蟲, 棉介殼蟲, 烏心石幹綿蚜, 刺桐釉小蜂, 銀葉粉蝨, 根瘤線蟲, 黃帶枝尺蠖蛾, 象牙木木蝨, 黃帶枝尺蛾, 黃帶枝尺蠖蛾, 芒果葉蟬, 白翅夜蟬, 茄苳白翅葉蟬, 螟蛾, 紫膠介殼蟲, 莿桐釉小蜂, 紅胸葉蟲, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 木蝨, 蟎類, 刺桐釉小蜂, 楓粉蝨, 白蟻, 鳳凰木夜蛾, 螨, 刺桐釉小蜂, 刺桐釉小蜂, 松材線蟲, mite’s gall, 白蟻或天牛蛀蝕\n\n    Anti-hallucination rules:\n    - crop_name must exactly match one item from Known crops. If uncertain, use \"未知作物\".\n    - For category \"disease\", status_name must exactly match one item from Known diseases.\n    - For category \"pest\", status_name must exactly match one item from Known pests.\n    - If the image is unclear, confidence is low, or no exact crop/disease/pest match exists, use category \"unknown\" and status_name \"無法判定\".\n    - Do not invent crop names, disease names, pest names, pesticide names, dosages, or treatment steps.\n\n    JSON Output Structure:\n    {\n      \"crop_name\": \"string (The crop's name in Traditional Chinese)\",\n      \"category\": \"string (One of 'disease', 'pest', 'healthy', or 'unknown')\",\n      \"status_name\": \"string (A name from the matching reference list. If healthy, use '健康'. If unknown, use '無法判定')\",\n      \"confidence\": \"float (A value between 0.0 and 1.0)\",\n      \"suggestion\": \"string (A bulleted list of 2-3 key visual symptoms, using '-' for each point and '\\n' for new lines. Example: '- 葉片有黃斑\\n- 葉緣焦枯')\",\n      \"treatment\": \"string (If not healthy, provide a numbered list of actionable steps using '1.', '2.', etc., and '\\n' for new lines. If healthy, provide a positive confirmation like '繼續保持良好照顧。')\"\n    }\n    ",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "```json\n{\n  \"crop_name\": \"番茄\",\n  \"category\": \"disease\",\n  \"status_name\": \"早疫病 (Early Blight)\",\n  \"confidence\": 0.85,\n  \"suggestion\": \"- 葉片出現同心輪紋狀的褐色病斑\\n- 病斑周圍常伴隨黃色暈斑\\n- 下位葉先發病並逐漸向上蔓延\",\n  \"treatment\": \"1. 移除並銷毀嚴重受感染的葉片與殘株，減少病原菌擴散。\\n2. 保持田間通風良好，避免過度密植與過度潮濕。\\n3. 適時配合核可的防治藥劑進行噴施保護。\"\n}\n```",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "a2HCao6ZEIPbvr0P66rE8A0",
+          "usage": {
+            "cache_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 3558
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 521
+              }
+            ],
+            "cached_content_token_count": 4079,
+            "candidates_token_count": 171,
+            "prompt_token_count": 8444,
+            "prompt_tokens_details": [
+              {
+                "modality": "IMAGE",
+                "token_count": 1080
+              },
+              {
+                "modality": "TEXT",
+                "token_count": 7364
+              }
+            ],
+            "total_token_count": 8615
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 1.6240343998651952
+        }
+      ],
+      "raw_score": {
+        "outcome": "incorrect_known_label",
+        "crop_correct": true
+      },
+      "final_score": {
+        "outcome": "incorrect_known_label",
+        "crop_correct": true
+      },
+      "advice": {
+        "applicable": true,
+        "unverified_source": true,
+        "requires_review": true,
+        "dosage_pattern": true,
+        "professional_correctness": "not independently evaluated"
+      },
+      "wall_seconds": 26.1039477000013,
+      "intentional_sleep_seconds": 22.650237600086257,
+      "inference_seconds": 3.4537100999150425
+    },
+    {
+      "case_id": "plant-04",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:23:40.204373+00:00",
+      "status": "ok",
+      "raw": {
+        "crop_name": "番茄",
+        "category": "disease",
+        "status_name": "晚疫病 (Late Blight)",
+        "confidence": 0.95,
+        "suggestion": "- 葉片背面出現水浸狀至不規則灰綠色病斑\n- 濕度高時病斑邊緣或背面產生白色黴狀物\n- 病斑迅速擴大並變成褐色至乾枯",
+        "treatment": "1. 發現病葉時應立即摘除並銷毀，減少園區內病原菌擴散。\n2. 保持田間通風良好，避免過度密植與氮肥過多。\n3. 配合推薦之防範藥劑進行防治，並注意輪替使用不同作用機制的藥劑。"
+      },
+      "validated": {
+        "crop_name": "番茄",
+        "category": "disease",
+        "status_name": "晚疫病 (Late Blight)",
+        "confidence": 0.95,
+        "suggestion": "- 葉片背面出現水浸狀至不規則灰綠色病斑\n- 濕度高時病斑邊緣或背面產生白色黴狀物\n- 病斑迅速擴大並變成褐色至乾枯",
+        "treatment": "1. 發現病葉時應立即摘除並銷毀，減少園區內病原菌擴散。\n2. 保持田間通風良好，避免過度密植與氮肥過多。\n3. 配合推薦之防範藥劑進行防治，並注意輪替使用不同作用機制的藥劑。",
+        "grounding_source": "model_pending_database_check",
+        "requires_review": false
+      },
+      "final": {
+        "crop_name": "番茄",
+        "category": "disease",
+        "status_name": "晚疫病 (Late Blight)",
+        "confidence": 0.95,
+        "suggestion": "危害葉、莖、果。葉片上出現水浸狀暗綠色大斑，濕度高時葉背病斑邊緣長出白色黴層。果實上則形成暗褐色不規則的雲紋狀硬塊。",
+        "treatment": "發病初期噴灑 64% 殺毒礬可濕性粉劑 500 倍液，或 72% 克露可濕性粉劑 800 倍液。避免在低溫高濕環境下澆水，保持葉面乾燥。",
+        "grounding_source": "disease_database",
+        "reference_source": null,
+        "reference_url": null,
+        "reference_record_id": null,
+        "requires_review": true
+      },
+      "calls": [
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:23:51.572932+00:00",
+          "prompt_sha256": "df5039f2f48745cfc4d37b74588111cde6a167b8e1c7d6ae87abf0cd5ccbe39f",
+          "prompt": "You are an agricultural expert. Briefly describe the main subject and any visible symptoms in this image in a few keywords (e.g., 'tomato, leaf spots, yellowing'). This will be used to search a knowledge base. Respond in Traditional Chinese.",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "番茄, 葉部病害, 葉背發黴, 灰黴病",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "eGHCapbBBfDa1e8PvbieiAw",
+          "usage": {
+            "candidates_token_count": 19,
+            "prompt_token_count": 1116,
+            "prompt_tokens_details": [
+              {
+                "modality": "IMAGE",
+                "token_count": 1064
+              },
+              {
+                "modality": "TEXT",
+                "token_count": 52
+              }
+            ],
+            "total_token_count": 1135
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 1.4030323999468237
+        },
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:24:04.572941+00:00",
+          "prompt_sha256": "e5a3139c9f6944a94f11353fca6b82b4ba7f6116995141ccf475509e3b879dba",
+          "prompt": "\n    You are a top-tier plant pathologist. Analyze the provided image and context from our knowledge base to provide a professional diagnosis. Respond in valid JSON format, using Traditional Chinese for all user-facing text.\n\n    --- Knowledge Base Context ---\n    No specific context found.\n    ---\n\n    Reference Lists (for name standardization):\n    - Known crops: 甜椒, 萵苣, 甜瓜, 西瓜, 薑, 玉米百合, 玉米, 辣椒, 觀賞辣椒, 豌豆芽菜, 豌豆, 玉米筍, 檬果, 甘藍, 樹番茄, 青油菜, 紅龍果, 馬拉巴栗, 菊花, 火鶴, 玫瑰, 劍蘭, 百合, 其他蘭花, 小花蕙蘭, 虎頭蘭, 嘉德麗雅蘭, 仙履蘭, 石斛蘭, 文心蘭, 蝴蝶蘭, 其他景觀作物, 景觀小油菊, 景觀萬壽菊, 景觀波斯菊, 景觀向日葵, 其他綠肥作物, 魯冰, 青皮豆, 鐵虎豆, 苕子, 紫雲英, 田菁, 爬地蘭, 富貴豆, 太陽麻, 大豆類, 大菜, 埃及三葉草, 其他牧草, 其他長期牧草, 其他短期牧草, 青割玉米, 蘇丹草, 苜蓿草, 盤固拉草, 狼尾草, 尼羅草, 酒類製品, 蜂產品, 綜合蔬果製品, 其他特用作物加工製品, 胡麻製品, 薑黃製品, 愛玉製品, 茶製品, 油茶製品, 洛神葵製品, 香茅製品, 甘蔗製品, 咖啡製品, 梔子製品, 諾麗果製品, 風茹製品, 甜菊製品, 杭菊製品, 向日葵製品, 仙草製品, 紫蘇製品, 其他花卉加工製品, 油菊製品, 茉莉花製品, 玫瑰花製品, 其他水果加工製品, 可可製品, 栗子製品, 椰子製品, 橄欖製品, 棗製品, 梅製品, 李製品, 桃製品, 芒果製品, 龍眼製品, 荔枝製品, 枇杷製品, 梨製品, 蘋果製品, 木鱉果製品, 楊梅製品, 榴槤蜜製品, 桑椹製品, 波羅蜜製品, 柿製品, 釋迦製品, 奇異果製品, 紅龍果製品, 百香果製品, 楊桃製品, 葡萄製品, 蓮霧製品, 番石榴製品, 鳳梨製品, 香蕉製品, 木瓜製品, 金柑製品, 檸檬製品, 柑橘製品, 椪柑製品, 柳橙製品, 葡萄柚製品, 柚子製品, 其他蔬菜加工製品, 白木耳製品, 黑木耳製品, 猴頭菇製品, 杏鮑菇製品, 香菇製品, 草莓製品, 黃秋葵製品, 菱角製品, 番茄製品, 辣椒製品, 甜瓜製品, 西瓜製品, 越瓜製品, 苦瓜製品, 胡瓜製品, 絲瓜製品, 南瓜製品, 冬瓜製品, 蠶豆製品, 豌豆製品, 花豆製品, 毛豆製品, 金針花製品, 胡蘿蔔製品, 牛蒡製品, 蘿蔔製品, 馬鈴薯製品, 山藥製品, 山葵製品, 蘆筍製品, 薑製品, 芋頭製品, 蓮藕製品, 竹筍製品, 食用百合製品, 洋蔥製品, 蔥製品, 蒜製品, 羅勒製品, 菠菜製品, 芹菜製品, 芥菜製品, 油菜製品, 結球白菜製品, 甘藍製品, 其他五穀雜糧加工製品, 木薯製品, 甘藷製品, 綠豆製品, 紅豆製品, 落花生製品, 大豆製品, 薏苡製品, 燕麥製品, 蕎麥製品, 大麥製品, 高粱製品, 小米製品, 小麥製品, 玉米製品, 硬質玉米製品, 稻米製品, 其他特用作物, 其他長期特作, 其他短期特作, 其他飲料作物, 愛玉子, 茶, 洛神, 咖啡, 杭菊, 仙草, 其他香料作物, 香水蓮, 香草, 秀英, 茉莉花_薰芬茶用, 桂花, 檸檬香茅, 香茅, 蒔蘿, 芳香萬壽菊, 薄荷, 紫蘇, 其他澱粉作物, 紅蓮蕉, 蒟蒻, 葛鬱金, 葛藤, 其他染料作物, 薑黃, 大菁, 藷茛, 梔子, 大青, 紅花, 其他纖維作物, 瓊麻, 亞麻, 圓藺草, 苧麻, 大甲藺, 三角藺, 棉花, 貴黍, 其他糖料作物, 甘蔗, 甜菊, 其他嗜好作物, 菸草, 荖藤, 荖葉, 荖花, 其他油料作物, 胡麻, 小果種油茶, 大果種油茶, 向日葵_採種供作加工原料, 其他藥用作物, 杜虹花, 白花蛇舌草, 桋梧, 假人參, 蕺菜, 辣木, 山葡萄, 地黃, 七葉膽, 澤瀉, 白果, 香椿, 小葉藜, 何首烏, 南薑, 羊奶頭, 土肉桂, 肉桂, 桔梗, 黨蔘, 青葙, 法國綠莧, 金線蓮, 刺五加, 蓪草, 山芙蓉, 圓葉錦葵, 穿心蓮, 白鶴靈芝, 麥門冬, 蘆薈, 白藷莨, 枸杞, 葉用枸杞, 諾麗果, 桑黃, 茯苓, 樟芝, 槐耳, 通天草, 黃耆, 當歸, 柴胡, 明日葉, 艾草, 小金英, 蒲公英, 風茹草, 傷寒草, 六神花, 除蟲菊, 澤蘭, 款冬, 山防風, 荊芥, 筋骨草, 半支蓮, 丹參, 黃芩, 益母草, 草石蠶, 其他雜糧, 其他藷類, 木薯, 甘藷, 其他穀類, 臺灣藜, 高粱, 薏苡, 蕎麥, 燕麥, 小麥, 小米, 大麥, 其他豆類, 樹豆, 落花生, 米豆, 綠豆, 紅豆, 大豆, 珠廉, 鳳尾草, 高山羊齒, 腎蕨, 石蓮, 山蘇, 虎尾蘭, 常春藤, 蔓綠絨, 電信蘭, 黃金葛, 其他多年生草本, 球薑, 火炬花, 野薑花, 薑荷花, 月桃, 水蠟燭, 天堂鳥, 聖誕果, 牛頭茄, 金魚草, 泡盛草, 陸蓮花, 飛燕草, 夢幻草, 白頭翁, 銀蘆, 星辰花, 豇豆, 蠶豆, 翼豆, 萊豆, 鵲豆, 毛豆, 刀豆, 菜豆, 其他花菜苗, 其他花菜, 金針花, 石蓮花, 朝鮮薊, 青花菜, 花椰菜, 其他根菜, 胡蘿蔔, 甜菜根, 闊葉大豆, 豆薯, 雪蓮薯, 辣根, 瑞典蕪菁, 蘿蔔, 其他莖菜, 仙人掌肉質莖, 碧玉筍, 晚香玉筍, 食用大黃, 水蓮, 薯蕷, 荸薺, 蓴菜, 馬鈴薯, 慈菇, 萵苣莖, 菊芋, 黃藤心, 半天筍, 山葵, 球莖甘藍, 蘆筍, 蘘荷, 芋, 蓮, 茭白筍, 甘蔗筍, 牧草筍, 竹筍, 其他鱗莖, 食用百合, 蝦夷蔥, 蕎頭, 洋蔥, 韭蔥, 分蔥, 蔥, 蒜頭, 大蒜, 其他葉菜苗, 其他葉菜, 麻意, 糯米糰, 龍葵, 食茱萸, 學菜, 水合歡, 過溝菜蕨, 龍鳳草, 人蔘菜, 馬齒莧, 番杏, 冰花, 羅勒, 山菠菜, 葉用甘藷, 蕹菜, 藤三七, 落葵, 韭菜, 菾菜, 菠菜, 莧菜, 香芹菜, 水芹, 茴香, 刺芹, 芫荽, 芹菜, 闊苞菊, 白鳳菜, 紅鳳菜, 茼蒿, 山茼蒿, 吉康菜, 苦苣, 珍珠菜, 葉用蘿蔔, 西洋菜, 芝麻菜, 薺菜, 千寶菜, 油江菜, 廣島菜, 青菘菜, 小菘菜, 菜心, 水菜, 塌棵菜, 油菜, 不結球白菜, 芥菜, 結球白菜, 黑種草, 觀賞玉米, 古代稀, 貝殼花, 洋桔梗, 羽衣甘藍, 芥藍, 其他稻米, 秈糯, 稉糯, 軟秈, 硬秈, 稉稻, 觀賞南瓜, 松蟲草, 風鈴花, 紫羅蘭, 葉牡丹, 百日草, 鱗托菊, 瓜葉菊, 向日葵, 矢車菊, 雲南菊, 金盞花, 千日紅, 藜, 雞冠花, 紅莧菜, 雁來紅, 萬代蘭, 腎藥蘭, 皇后蘭, 樹攔, 蜘蛛蘭, 千代蘭, 其他果樹, 可可, 胡桃, 蘋婆, 長山核桃, 澳洲胡桃, 栗子, 胡榛子, 腰果, 扁桃, 杏仁, 檳榔, 椰子, 其它核果, 棗椰子, 爪哇橄欖, 橄欖, 錫蘭橄欖, 印度棗, 中國棗, 酪梨, 梅, 杏, 櫻桃, 李, 桃, 油柑, 紅毛丹, 龍眼, 荔枝, 其他仁果, 枇杷, 梨, 蘋果, 其他漿果, 木鱉果, 山竹, 榴槤, 西印度櫻桃, 人心果, 神秘果, 黃金果, 蛋黃果, 石榴, 楊梅, 榴槤蜜, 桑椹, 小波羅蜜, 波羅蜜, 無花果, 麵包果, 柿, 羅望子, 釋迦, 藍莓, 奇異果, 百香果, 楊桃, 葡萄, 嘉寶果, 蓮霧, 番石榴, 鳳梨, 芭蕉, 香蕉, 番木瓜, 其他柑橘, 金柑與小果柑橘, 枸櫞, 甜橙, 寬皮柑, 葡萄柚, 柚子, 其他蔬菜, 其他長期蔬菜, 其他短期蔬菜, 採種用蔬菜, 小海帶, 髮菜, 海菜, 海帶, 其他菇類, 松茸, 紫丁香蘑, 金福菇, 白玉菇, 鴻喜菇, 酒杯菇, 白木耳, 金耳, 滑菇, 草菇, 粉紅玫瑰菇, 蠔菇, 秀珍菇, 白靈菇, 杏鮑菇, 鮑魚菇, 珊瑚菇, 竹蓀, 舞菇, 香菇, 金針菇, 猴頭菇, 靈芝, 北蟲草, 牛肝菌, 茶樹菇, 毛木耳, 斤耳, 黑木耳, 雞肉絲菇, 雞腿菇, 巴西蘑菇, 洋菇, 其他芽菜, 綠豆芽, 紅豆芽, 蠶豆芽, 苜蓿芽, 黑豆芽, 黃豆芽, 蕎麥芽菜, 落花生芽菜, 蘿蔔芽菜, 青花菜芽菜, 芥藍芽菜, 甘藍芽菜, 其他果菜苗, 其他果菜, 草莓, 黃秋葵, 菱角, 破布子, 香瓜茄, 茄子, 小果番茄, 番茄, 其他瓜菜, 蛇瓜, 隼人瓜, 越瓜, 苦瓜, 胡瓜, 絲瓜, 扁蒲, 南瓜, 冬瓜, 小菊, 紫菀, 紐西蘭麻, 火炬百合, 萱草, 狐尾百合, 假葉樹, 鳴子百合, 天鵝絨, 伯利恆之星, 風信子, 吊蘭, 葉蘭, 文竹, 蘆筍草, 武竹, 夜來香, 翠珠花, 海芋, 合果芋, 白鶴芋, 黛粉葉, 觀音蓮, 唐棉, 紫嬌花, 火球花, 孤挺花, 文殊蘭, 繡球蔥, 百子蓮, 水仙, 石蒜, 君子蘭, 水仙百合, 菖蒲, 其他木本花卉, 山茶花, 木羊齒, 柳, 七里香, 六月雪, 仙丹花, 梔子花, 寒丁子, 麻葉繡球, 海神花, 針墊花, 雪松, 新西蘭, 林投, 牡丹, 女貞, 茉莉, 素馨, 連翹, 尤加利, 蠟梅, 降天桑, 香樹蘭, 洛神葵, 玉蘭花, 金絲桃, 金雀花, 三角尤加利, 聖誕紅, 羽毛花, 變葉木, 蘇鐵, 側柏, 香冠柏, 柳杉, 扁柏, 征木, 五彩千年木, 星點木, 青竹, 百合竹, 虎斑木, 朱蕉, 觀音棕竹, 黃椰子, 八角金盤, 藍星花, 其他一二年生草本, 紅茄, 蚌蘭, 宮燈百合, 嘉蘭, 滿天星, 深山櫻, 康乃馨, 夕霧花, 三角桔梗, 美人蕉, 擎天鳳梨, 觀果鳳梨, 蜻蜓鳳梨, 麥桿菊, 琉璃菊, 一枝黃花, 澳洲鼓槌菊, 麟麟菊, 非洲菊, 白藍菊, 大理花, 波斯菊, 麵線菊, 大菊, 射干, 鳶尾, 小蒼蘭, 段菊, 繡球花, 赫蕉, 袋鼠花, 龍膽, 羽扇豆, 金翠花, 八卦草, 初雪草, 水莞, 巨果薑, 水晶花, 補雪草, 卡斯比亞, 虎尾花, 睡蓮, 竹芋, 鬱金香, 波羅門蔘, 牛蒡, 其他堅果, 雲芝, 其他豆菜, 龍鬚菜, 食用薊, 皇帝豆, 包心白菜, 青江白菜, 敏豆, 小黃瓜, 旱芹, 粉豆, 桑果, 洋香瓜, 柑桔, 柿子, 文旦, 樹葡萄, 牛奶果, 草花, 球根花卉, 蘭類, 觀葉植物, 香花植物, 觀賞樹木, 菊科, 薑科, 荖籐, 烏心石, 茉草, 水稻, 肖楠, 大葉楠, 冬蟲夏草, 水黃皮, 草皮, 牛樟, 雜草, 菊苣, 蘿勒, 黑松, 檜木, 柳樹, 蘋婆果, 九芎, 二葉松, 五葉松, 亞歷山大椰子, 光臘樹, 光蠟樹, 刺桐, 刺桐樹, 加州杉, 加蜜蛋黃果, 十字花科, 千頭木麻黃, 南洋杉, 南洋櫻, 印度紫壇, 印度紫檀, 古煉, 台東蘇鐵, 台灣山蘇花, 台灣杉, 台灣櫸, 台灣欒樹, 台灣海藻, 台灣赤楠, 咸豐草, 嘉德麗亞蘭, 土人參, 垂榕, 大王椰子, 大葉刺桐, 大葉山攬, 大葉山欖, 大葉桃花心木, 大葉欖仁, 大葉雀榕, 夾竹桃, 孟宗竹, 小槐花, 小葉南洋杉, 小葉南洋衫, 小葉桃花心木, 小葉欖仁, 小葉黃槐, 心葉牽牛花, 捲葉蘇鐵, 掌葉蘋婆, 日日櫻, 春不老, 晚香玉, 月橘, 木棉, 木芙蓉, 木麻黃, 本樟, 朱槿, 朴子, 朴樹, 杜鵑, 松, 松樹, 枯里珍, 柏, 柏樹, 柑橘, 柚, 桂竹, 桃樹, 桃花心木, 桑樹, 梅樹, 森氏紅淡比, 椰子樹, 楊樹, 楓香, 楓香樹, 楠木, 榔榆, 榕, 榕樹, 槭樹, 樟, 樟樹, 樹蘭, 橡膠樹, 檀香, 檸檬, 檸檬桉, 檸檬樹, 櫸木, 櫻花, 欖仁, 欖仁樹, 毛木, 毛柿, 水柳, 法國梧桐, 流蘇, 浦葵, 海桐, 海棗, 火焰木, 火燄木, 火龍果, 烏臼, 珊瑚刺桐, 珊瑚莿桐, 琉球蘇鐵, 瓊涯海棠, 番椒, 番荔枝, 痲瘋樹, 白薇, 相思樹, 矮仙丹, 矮仙丹花, 福木, 福祿桐, 竹柏, 筆筒樹, 紅刺林投, 紅楠, 綬草, 緬梔, 羅漢松, 羊蹄甲, 美人樹, 肉桂樹, 肉豆, 肯氏南洋杉, 腋唇蘭, 芒果, 苦楝, 茄冬, 茄苳, 茶花樹, 草海桐, 荔枝樹, 莿桐, 菠羅密, 菠蘿蜜, 菩提, 菩提樹, 華盛頓椰子, 蔓澤蘭, 蕗藤, 蕙蘭, 西施柚, 豔紫荊, 象牙木, 象牙樹, 豬草, 銀姬小蠟, 銀樺, 銀耳, 銀膠菊, 鐵線蕨, 長梗滿天星, 長豇豆, 阿勃勒, 阿薩姆茶, 雀榕, 雞冠刺桐, 青剛櫟, 青楓, 香杉, 鳳凰木, 麵包樹, 黃槿, 黃脈刺桐, 黃脤刺桐, 黃連木, 黃金風鈴木, 黑板樹, 龍柏, 龍眼樹\n    - Known diseases: 葉斑病, 腐爛, 痂病, 發芽, 畸形果, 乾旱, 早疫病 (Early Blight), 晚疫病 (Late Blight), 灰黴病 (Gray Mold), 病毒病 (Virus Disease), 臍腐病 (Blossom-End Rot), 褐根病, 褐根病, 葉震病, 炭疽病, 側柏枝枯病, 枝枯病, 煤煙病, 褐根病, 細菌性病害, 褐根病, 褐根病, 枝枯病, 潰瘍病, 葉枯病, 褐根病, 褐根病, 褐根病, 樹木褐根病, 褐根病, 褐根病, 原因不明, 褐根病, 褐根腐病, 褐根病, 咖啡銹病, 褐根病, 褐根病, 癌腫病, 樹木褐根病, 褐根病, 褐根病, 褐根病, 枝枯病, 腐朽菌, 褐根病, 葉枯病, 癌腫病, 枝枯病, 木耳, 木層孔菌, 褐根病, 木材腐朽菌, 褐根病, 闊葉樹藻斑病, 褐根病, 褐根病, 疑似疫病黃化萎凋, 松樹潰瘍病, 葉震病, 枝枯病, 腐朽菌, 褐根病, 銹病, 竹簇葉病, Phellinus noxius, 褐根病, 褐根腐病, 褐根病, 木材腐朽菌, 椰子樹芽腐病, 褐根病, 褐根病, 褐根病, 褐根病, 可能已被感染褐根病, 孔洞木材腐朽, 木材腐朽病, 根腐病, 樹木褐根病, 煤煙病, 紫膠介殼蟲與煤煙病, 腐朽菌, 褐根病, 褐根腐病, 靈芝根基腐朽病, 鮑魚菇, 樹木褐根病, 褐根病, 樣本無褐根病病原, 樹木褐根病, 腐朽菌, 褐根病, 褐根病, 熱帶靈芝, 癌腫病, 簇葉病, 細菌性或Cercospora sp.角斑, 褐根病, 白紋羽病, 白蟻及褐根病, 細菌性癌腫病, 褐褐病, 褐根病, 褐根病, 褐根病, 褐根病, 褐根病, 葉枯病, 褐根病, 褐根病, 樹木褐根病, 炭疽病, 褐根病, 炭疽病, 熱帶靈芝, 疫病菌, 褐根病, 褐根腐病, 黑腐病與炭疽病, 真菌腐朽性病害, 玫瑰黑斑病, 褐根病, 褐斑病, 褐根病, 癌腫病, 褐根病, 褐根腐病, 褐根腐病、生理反應, 樹木褐根病, 褐根病, 蘆筍莖枯病, 褐根病, 摺菌, 褐根病, 褐根病, 腐霉病或疫病, 褐根病, 疑似褐根病, 褐根腐病, 褐根病, 褐根病, 褐根病, 疫病根腐, 肖楠病, 樹木褐根病, 褐根病, 褐根病, 癌腫病, 細菌性癌腫病, 褐根病, 褐根病, 枝枯病, 炭疽病, 褐根病, 闊葉樹藻斑病, 腐生性危害, 炭疽病、寒害, 褐根病, 褐根病, Phellinus noxius, 褐根病, 黑脂病, 黑腫病, 樹木褐根病, 黃龍病, 褐根病, 煤煙病, 褐根病, 褐根病, 褐根腐病, 褐根病, 褐根病, 白粉病, 褐根病, 褐根病, 樹木褐根病, 腐朽菌, 褐根病, 樹木褐根病, 熱帶靈芝, 褐根病, 松樹葉震病, 流膠病, 葉震病, 褐根病, 疫病菌&腐黴菌, 褐根病, 枝枯病, 枝枯病炭疽病, 褐根病, 褐根病, 樹木褐根病, 褐根病\n    - Known pests: 蟲害, 薊馬, 銀葉粉蝨 (Whitefly), 棉鈴蟲 (Bollworm), 蚜蟲 (Aphid), 咖啡果小蠹, 太平洋臀紋粉介殼蟲, 黃綠綿介殼蟲, 木瓜秀粉介殼蟲, 金花蟲, 椿象, 橘球粉介殼蟲, 長尾粉介殼蟲, 鱗翅目, 咖啡硬介殼蟲, 木瓜秀粉介殼蟲, 美地綿粉介殼蟲, 咖啡硬介殼蟲, 絲粉介殼蟲, 白蠟介殼蟲, 蟻台硬介殼蟲, 鱗翅目, 石蒜綿粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 木瓜秀粉介殼蟲, 粉蝨, 茄綿粉介殼蟲, 蚜蟲, 葉蟎, 月橘白輪盾介殼蟲, 木瓜秀粉介殼蟲, 椰子櫛圓盾介殼蟲, 木瓜秀粉介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 光肩星天牛, 牡蠣盾介殼蟲, 葉蟎, 淡薄圓介殼蟲, 鱗翅目, 桑擬輪盾介殼蟲, 葉蟬, 椰子擬輪盾介殼蟲, 紅蠟介殼蟲, 葉蟎, 螺旋粉蝨, 木瓜秀粉介殼蟲, 黃吹綿介殼蟲, 樟輪盾介殼蟲, 太平洋臀紋粉介殼蟲, 茄綿粉介殼蟲, 太平洋臀紋粉介殼蟲, 柑橘刺粉蝨, 糠片盾介殼蟲, 咖啡木蠹蛾, 桑擬輪盾介殼蟲, 茄綿粉介殼蟲, 橘臀紋粉介殼蟲, 瓜實蠅, 茄綿粉介殼蟲, 雙翅目, 木瓜秀粉介殼蟲, 牡蠣盾介殼蟲, 太平洋臀紋粉介殼蟲, 絲粉介殼蟲, 長角象鼻蟲, 雙翅目, 蚜蟲, 木瓜秀粉介殼蟲, 根蟎, 二點葉蟎, 木瓜秀粉介殼蟲, 粉介殼蟲, 葉蟎, 扁堅介殼蟲, 咖啡硬介殼蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 柑橘刺粉蝨, 番石榴黑疣粉蝨, 螺旋粉蝨, 鱗翅目, 斑潛蠅, 太平洋臀紋粉介殼蟲, 鳳梨嫡粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 蚜蟲, 葉蟎, 象鼻蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 銀葉粉蝨, 木瓜秀粉介殼蟲, 蚜蟲, 銀葉粉蝨, 粉介殼蟲科, 葉蟎, 南黃薊馬, 粉蝨, 薊馬, 椿象, 雙翅目, 中華褐金龜, 木瓜秀粉介殼蟲, 橘球粉介殼蟲, 葉蟬, 木瓜秀粉介殼蟲, 粉介殼蟲, 蚜蟲, 粉蝨, 葉蟎, 木蝨, 盾介殼蟲, 粉蝨, 葉蟎, 蚜蟲, 鱗翅目, 黃綠綿介殼蟲, 棉蚜, 太平洋臀紋粉介殼蟲, 小黃薊馬, 絲粉介殼蟲, 木瓜秀粉介殼蟲, 白蠟介殼蟲, 變葉木片盾介殼蟲, 太平洋偽葉蟎, 葉蟎, 蘭花薊馬, 長跳蟲, 茄綿粉介殼蟲, 雙翅目, 鼠婦, 木瓜秀粉介殼蟲, 扁堅介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 薊馬, 蕉弄蝶, 石蒜綿粉介殼蟲, 茄綿粉介殼蟲, 木蝨, 螟蛾科, 粉介殼蟲 煤灰病, 松材線虫, 疑似松材線蟲, 幹綿蚜, 刺桐釉小蜂, 刺桐釉小蜂、不當移植, 刺桐釉小蜂, 天牛, 夜蛾, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 小蠹蟲, 螟蛾, 蝗蟲、天牛、潛葉蛾, 刺桐釉小蜂, 白蟻、生理性缺水, 竹涓夜蛾, 樟蝙蝠蛾, 蝙蝠蛾, 粉介殼蟲 煤灰病, 介殼蟲, 蘇鐵白輪盾蚧, 天牛, 月橘盾介殼蟲, 白蟻, 軍配蟲, 松材線蟲, 松線虫, 白蟻, 松材線蟲, 萎凋病, 白蟻, 桃蚜, 白蟻, 椰子大象鼻蟲, 綴葉叢螟, 蚜蟲, 斑蛾, 白蟻, 粉介殼蟲 煤灰病, 紫膠介殼蟲, 高背木蝨, 木蠹蛾, 樟樹白輪盾介殼蟲, 樟白介殼蟲, 樟葉蜂, 白蟻, 蜱&#34728;, 台灣家白蟻, 小囊蟲, 桑擬輪介殼蟲, 白蟻, 細菌性穿孔病、台灣黃毒蛾、金花蟲, 葉&#34766;, 粉蝨, 天牛, 紅胸葉蟲, 棉介殼蟲, 烏心石幹綿蚜, 刺桐釉小蜂, 銀葉粉蝨, 根瘤線蟲, 黃帶枝尺蠖蛾, 象牙木木蝨, 黃帶枝尺蛾, 黃帶枝尺蠖蛾, 芒果葉蟬, 白翅夜蟬, 茄苳白翅葉蟬, 螟蛾, 紫膠介殼蟲, 莿桐釉小蜂, 紅胸葉蟲, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 木蝨, 蟎類, 刺桐釉小蜂, 楓粉蝨, 白蟻, 鳳凰木夜蛾, 螨, 刺桐釉小蜂, 刺桐釉小蜂, 松材線蟲, mite’s gall, 白蟻或天牛蛀蝕\n\n    Anti-hallucination rules:\n    - crop_name must exactly match one item from Known crops. If uncertain, use \"未知作物\".\n    - For category \"disease\", status_name must exactly match one item from Known diseases.\n    - For category \"pest\", status_name must exactly match one item from Known pests.\n    - If the image is unclear, confidence is low, or no exact crop/disease/pest match exists, use category \"unknown\" and status_name \"無法判定\".\n    - Do not invent crop names, disease names, pest names, pesticide names, dosages, or treatment steps.\n\n    JSON Output Structure:\n    {\n      \"crop_name\": \"string (The crop's name in Traditional Chinese)\",\n      \"category\": \"string (One of 'disease', 'pest', 'healthy', or 'unknown')\",\n      \"status_name\": \"string (A name from the matching reference list. If healthy, use '健康'. If unknown, use '無法判定')\",\n      \"confidence\": \"float (A value between 0.0 and 1.0)\",\n      \"suggestion\": \"string (A bulleted list of 2-3 key visual symptoms, using '-' for each point and '\\n' for new lines. Example: '- 葉片有黃斑\\n- 葉緣焦枯')\",\n      \"treatment\": \"string (If not healthy, provide a numbered list of actionable steps using '1.', '2.', etc., and '\\n' for new lines. If healthy, provide a positive confirmation like '繼續保持良好照顧。')\"\n    }\n    ",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "```json\n{\n  \"crop_name\": \"番茄\",\n  \"category\": \"disease\",\n  \"status_name\": \"晚疫病 (Late Blight)\",\n  \"confidence\": 0.95,\n  \"suggestion\": \"- 葉片背面出現水浸狀至不規則灰綠色病斑\\n- 濕度高時病斑邊緣或背面產生白色黴狀物\\n- 病斑迅速擴大並變成褐色至乾枯\",\n  \"treatment\": \"1. 發現病葉時應立即摘除並銷毀，減少園區內病原菌擴散。\\n2. 保持田間通風良好，避免過度密植與氮肥過多。\\n3. 配合推薦之防範藥劑進行防治，並注意輪替使用不同作用機制的藥劑。\"\n}\n```",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "hWHCatu4EqPW1e8PicWakAY",
+          "usage": {
+            "cache_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 3564
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 515
+              }
+            ],
+            "cached_content_token_count": 4079,
+            "candidates_token_count": 189,
+            "prompt_token_count": 8428,
+            "prompt_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 7364
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 1064
+              }
+            ],
+            "total_token_count": 8617
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 3.428948499960825
+        }
+      ],
+      "raw_score": {
+        "outcome": "label_match",
+        "crop_correct": true
+      },
+      "final_score": {
+        "outcome": "label_match",
+        "crop_correct": true
+      },
+      "advice": {
+        "applicable": true,
+        "unverified_source": true,
+        "requires_review": true,
+        "dosage_pattern": true,
+        "professional_correctness": "not independently evaluated"
+      },
+      "wall_seconds": 27.800433499971405,
+      "intentional_sleep_seconds": 22.963453500065953,
+      "inference_seconds": 4.836979999905452
+    },
+    {
+      "case_id": "plant-05",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:24:08.011641+00:00",
+      "status": "ok",
+      "raw": {
+        "crop_name": "番茄",
+        "category": "healthy",
+        "status_name": "健康",
+        "confidence": 0.95,
+        "suggestion": "- 葉片綠色且葉脈清晰\n- 無明顯病斑或蟲害痕跡\n- 葉緣完整無枯萎",
+        "treatment": "繼續保持良好照顧。"
+      },
+      "validated": {
+        "crop_name": "番茄",
+        "category": "healthy",
+        "status_name": "健康",
+        "confidence": 0.95,
+        "suggestion": "- 葉片綠色且葉脈清晰\n- 無明顯病斑或蟲害痕跡\n- 葉緣完整無枯萎",
+        "treatment": "繼續保持良好照顧。",
+        "grounding_source": "model_pending_database_check",
+        "requires_review": false
+      },
+      "final": {
+        "crop_name": "番茄",
+        "category": "healthy",
+        "status_name": "健康",
+        "confidence": 0.95,
+        "suggestion": "- 目前影像未見資料庫已知病蟲害的明顯特徵",
+        "treatment": "1. 維持正常照護\n2. 定期從相同角度拍攝並比較變化",
+        "grounding_source": "crop_database",
+        "requires_review": false
+      },
+      "calls": [
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:24:17.573396+00:00",
+          "prompt_sha256": "df5039f2f48745cfc4d37b74588111cde6a167b8e1c7d6ae87abf0cd5ccbe39f",
+          "prompt": "You are an agricultural expert. Briefly describe the main subject and any visible symptoms in this image in a few keywords (e.g., 'tomato, leaf spots, yellowing'). This will be used to search a knowledge base. Respond in Traditional Chinese.",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "番茄, 健康葉片",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "kmHCasHUCKXCvr0PwKKayQ4",
+          "usage": {
+            "candidates_token_count": 6,
+            "prompt_token_count": 1116,
+            "prompt_tokens_details": [
+              {
+                "modality": "IMAGE",
+                "token_count": 1064
+              },
+              {
+                "modality": "TEXT",
+                "token_count": 52
+              }
+            ],
+            "total_token_count": 1122
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 1.6211349999066442
+        },
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:24:30.574538+00:00",
+          "prompt_sha256": "e5a3139c9f6944a94f11353fca6b82b4ba7f6116995141ccf475509e3b879dba",
+          "prompt": "\n    You are a top-tier plant pathologist. Analyze the provided image and context from our knowledge base to provide a professional diagnosis. Respond in valid JSON format, using Traditional Chinese for all user-facing text.\n\n    --- Knowledge Base Context ---\n    No specific context found.\n    ---\n\n    Reference Lists (for name standardization):\n    - Known crops: 甜椒, 萵苣, 甜瓜, 西瓜, 薑, 玉米百合, 玉米, 辣椒, 觀賞辣椒, 豌豆芽菜, 豌豆, 玉米筍, 檬果, 甘藍, 樹番茄, 青油菜, 紅龍果, 馬拉巴栗, 菊花, 火鶴, 玫瑰, 劍蘭, 百合, 其他蘭花, 小花蕙蘭, 虎頭蘭, 嘉德麗雅蘭, 仙履蘭, 石斛蘭, 文心蘭, 蝴蝶蘭, 其他景觀作物, 景觀小油菊, 景觀萬壽菊, 景觀波斯菊, 景觀向日葵, 其他綠肥作物, 魯冰, 青皮豆, 鐵虎豆, 苕子, 紫雲英, 田菁, 爬地蘭, 富貴豆, 太陽麻, 大豆類, 大菜, 埃及三葉草, 其他牧草, 其他長期牧草, 其他短期牧草, 青割玉米, 蘇丹草, 苜蓿草, 盤固拉草, 狼尾草, 尼羅草, 酒類製品, 蜂產品, 綜合蔬果製品, 其他特用作物加工製品, 胡麻製品, 薑黃製品, 愛玉製品, 茶製品, 油茶製品, 洛神葵製品, 香茅製品, 甘蔗製品, 咖啡製品, 梔子製品, 諾麗果製品, 風茹製品, 甜菊製品, 杭菊製品, 向日葵製品, 仙草製品, 紫蘇製品, 其他花卉加工製品, 油菊製品, 茉莉花製品, 玫瑰花製品, 其他水果加工製品, 可可製品, 栗子製品, 椰子製品, 橄欖製品, 棗製品, 梅製品, 李製品, 桃製品, 芒果製品, 龍眼製品, 荔枝製品, 枇杷製品, 梨製品, 蘋果製品, 木鱉果製品, 楊梅製品, 榴槤蜜製品, 桑椹製品, 波羅蜜製品, 柿製品, 釋迦製品, 奇異果製品, 紅龍果製品, 百香果製品, 楊桃製品, 葡萄製品, 蓮霧製品, 番石榴製品, 鳳梨製品, 香蕉製品, 木瓜製品, 金柑製品, 檸檬製品, 柑橘製品, 椪柑製品, 柳橙製品, 葡萄柚製品, 柚子製品, 其他蔬菜加工製品, 白木耳製品, 黑木耳製品, 猴頭菇製品, 杏鮑菇製品, 香菇製品, 草莓製品, 黃秋葵製品, 菱角製品, 番茄製品, 辣椒製品, 甜瓜製品, 西瓜製品, 越瓜製品, 苦瓜製品, 胡瓜製品, 絲瓜製品, 南瓜製品, 冬瓜製品, 蠶豆製品, 豌豆製品, 花豆製品, 毛豆製品, 金針花製品, 胡蘿蔔製品, 牛蒡製品, 蘿蔔製品, 馬鈴薯製品, 山藥製品, 山葵製品, 蘆筍製品, 薑製品, 芋頭製品, 蓮藕製品, 竹筍製品, 食用百合製品, 洋蔥製品, 蔥製品, 蒜製品, 羅勒製品, 菠菜製品, 芹菜製品, 芥菜製品, 油菜製品, 結球白菜製品, 甘藍製品, 其他五穀雜糧加工製品, 木薯製品, 甘藷製品, 綠豆製品, 紅豆製品, 落花生製品, 大豆製品, 薏苡製品, 燕麥製品, 蕎麥製品, 大麥製品, 高粱製品, 小米製品, 小麥製品, 玉米製品, 硬質玉米製品, 稻米製品, 其他特用作物, 其他長期特作, 其他短期特作, 其他飲料作物, 愛玉子, 茶, 洛神, 咖啡, 杭菊, 仙草, 其他香料作物, 香水蓮, 香草, 秀英, 茉莉花_薰芬茶用, 桂花, 檸檬香茅, 香茅, 蒔蘿, 芳香萬壽菊, 薄荷, 紫蘇, 其他澱粉作物, 紅蓮蕉, 蒟蒻, 葛鬱金, 葛藤, 其他染料作物, 薑黃, 大菁, 藷茛, 梔子, 大青, 紅花, 其他纖維作物, 瓊麻, 亞麻, 圓藺草, 苧麻, 大甲藺, 三角藺, 棉花, 貴黍, 其他糖料作物, 甘蔗, 甜菊, 其他嗜好作物, 菸草, 荖藤, 荖葉, 荖花, 其他油料作物, 胡麻, 小果種油茶, 大果種油茶, 向日葵_採種供作加工原料, 其他藥用作物, 杜虹花, 白花蛇舌草, 桋梧, 假人參, 蕺菜, 辣木, 山葡萄, 地黃, 七葉膽, 澤瀉, 白果, 香椿, 小葉藜, 何首烏, 南薑, 羊奶頭, 土肉桂, 肉桂, 桔梗, 黨蔘, 青葙, 法國綠莧, 金線蓮, 刺五加, 蓪草, 山芙蓉, 圓葉錦葵, 穿心蓮, 白鶴靈芝, 麥門冬, 蘆薈, 白藷莨, 枸杞, 葉用枸杞, 諾麗果, 桑黃, 茯苓, 樟芝, 槐耳, 通天草, 黃耆, 當歸, 柴胡, 明日葉, 艾草, 小金英, 蒲公英, 風茹草, 傷寒草, 六神花, 除蟲菊, 澤蘭, 款冬, 山防風, 荊芥, 筋骨草, 半支蓮, 丹參, 黃芩, 益母草, 草石蠶, 其他雜糧, 其他藷類, 木薯, 甘藷, 其他穀類, 臺灣藜, 高粱, 薏苡, 蕎麥, 燕麥, 小麥, 小米, 大麥, 其他豆類, 樹豆, 落花生, 米豆, 綠豆, 紅豆, 大豆, 珠廉, 鳳尾草, 高山羊齒, 腎蕨, 石蓮, 山蘇, 虎尾蘭, 常春藤, 蔓綠絨, 電信蘭, 黃金葛, 其他多年生草本, 球薑, 火炬花, 野薑花, 薑荷花, 月桃, 水蠟燭, 天堂鳥, 聖誕果, 牛頭茄, 金魚草, 泡盛草, 陸蓮花, 飛燕草, 夢幻草, 白頭翁, 銀蘆, 星辰花, 豇豆, 蠶豆, 翼豆, 萊豆, 鵲豆, 毛豆, 刀豆, 菜豆, 其他花菜苗, 其他花菜, 金針花, 石蓮花, 朝鮮薊, 青花菜, 花椰菜, 其他根菜, 胡蘿蔔, 甜菜根, 闊葉大豆, 豆薯, 雪蓮薯, 辣根, 瑞典蕪菁, 蘿蔔, 其他莖菜, 仙人掌肉質莖, 碧玉筍, 晚香玉筍, 食用大黃, 水蓮, 薯蕷, 荸薺, 蓴菜, 馬鈴薯, 慈菇, 萵苣莖, 菊芋, 黃藤心, 半天筍, 山葵, 球莖甘藍, 蘆筍, 蘘荷, 芋, 蓮, 茭白筍, 甘蔗筍, 牧草筍, 竹筍, 其他鱗莖, 食用百合, 蝦夷蔥, 蕎頭, 洋蔥, 韭蔥, 分蔥, 蔥, 蒜頭, 大蒜, 其他葉菜苗, 其他葉菜, 麻意, 糯米糰, 龍葵, 食茱萸, 學菜, 水合歡, 過溝菜蕨, 龍鳳草, 人蔘菜, 馬齒莧, 番杏, 冰花, 羅勒, 山菠菜, 葉用甘藷, 蕹菜, 藤三七, 落葵, 韭菜, 菾菜, 菠菜, 莧菜, 香芹菜, 水芹, 茴香, 刺芹, 芫荽, 芹菜, 闊苞菊, 白鳳菜, 紅鳳菜, 茼蒿, 山茼蒿, 吉康菜, 苦苣, 珍珠菜, 葉用蘿蔔, 西洋菜, 芝麻菜, 薺菜, 千寶菜, 油江菜, 廣島菜, 青菘菜, 小菘菜, 菜心, 水菜, 塌棵菜, 油菜, 不結球白菜, 芥菜, 結球白菜, 黑種草, 觀賞玉米, 古代稀, 貝殼花, 洋桔梗, 羽衣甘藍, 芥藍, 其他稻米, 秈糯, 稉糯, 軟秈, 硬秈, 稉稻, 觀賞南瓜, 松蟲草, 風鈴花, 紫羅蘭, 葉牡丹, 百日草, 鱗托菊, 瓜葉菊, 向日葵, 矢車菊, 雲南菊, 金盞花, 千日紅, 藜, 雞冠花, 紅莧菜, 雁來紅, 萬代蘭, 腎藥蘭, 皇后蘭, 樹攔, 蜘蛛蘭, 千代蘭, 其他果樹, 可可, 胡桃, 蘋婆, 長山核桃, 澳洲胡桃, 栗子, 胡榛子, 腰果, 扁桃, 杏仁, 檳榔, 椰子, 其它核果, 棗椰子, 爪哇橄欖, 橄欖, 錫蘭橄欖, 印度棗, 中國棗, 酪梨, 梅, 杏, 櫻桃, 李, 桃, 油柑, 紅毛丹, 龍眼, 荔枝, 其他仁果, 枇杷, 梨, 蘋果, 其他漿果, 木鱉果, 山竹, 榴槤, 西印度櫻桃, 人心果, 神秘果, 黃金果, 蛋黃果, 石榴, 楊梅, 榴槤蜜, 桑椹, 小波羅蜜, 波羅蜜, 無花果, 麵包果, 柿, 羅望子, 釋迦, 藍莓, 奇異果, 百香果, 楊桃, 葡萄, 嘉寶果, 蓮霧, 番石榴, 鳳梨, 芭蕉, 香蕉, 番木瓜, 其他柑橘, 金柑與小果柑橘, 枸櫞, 甜橙, 寬皮柑, 葡萄柚, 柚子, 其他蔬菜, 其他長期蔬菜, 其他短期蔬菜, 採種用蔬菜, 小海帶, 髮菜, 海菜, 海帶, 其他菇類, 松茸, 紫丁香蘑, 金福菇, 白玉菇, 鴻喜菇, 酒杯菇, 白木耳, 金耳, 滑菇, 草菇, 粉紅玫瑰菇, 蠔菇, 秀珍菇, 白靈菇, 杏鮑菇, 鮑魚菇, 珊瑚菇, 竹蓀, 舞菇, 香菇, 金針菇, 猴頭菇, 靈芝, 北蟲草, 牛肝菌, 茶樹菇, 毛木耳, 斤耳, 黑木耳, 雞肉絲菇, 雞腿菇, 巴西蘑菇, 洋菇, 其他芽菜, 綠豆芽, 紅豆芽, 蠶豆芽, 苜蓿芽, 黑豆芽, 黃豆芽, 蕎麥芽菜, 落花生芽菜, 蘿蔔芽菜, 青花菜芽菜, 芥藍芽菜, 甘藍芽菜, 其他果菜苗, 其他果菜, 草莓, 黃秋葵, 菱角, 破布子, 香瓜茄, 茄子, 小果番茄, 番茄, 其他瓜菜, 蛇瓜, 隼人瓜, 越瓜, 苦瓜, 胡瓜, 絲瓜, 扁蒲, 南瓜, 冬瓜, 小菊, 紫菀, 紐西蘭麻, 火炬百合, 萱草, 狐尾百合, 假葉樹, 鳴子百合, 天鵝絨, 伯利恆之星, 風信子, 吊蘭, 葉蘭, 文竹, 蘆筍草, 武竹, 夜來香, 翠珠花, 海芋, 合果芋, 白鶴芋, 黛粉葉, 觀音蓮, 唐棉, 紫嬌花, 火球花, 孤挺花, 文殊蘭, 繡球蔥, 百子蓮, 水仙, 石蒜, 君子蘭, 水仙百合, 菖蒲, 其他木本花卉, 山茶花, 木羊齒, 柳, 七里香, 六月雪, 仙丹花, 梔子花, 寒丁子, 麻葉繡球, 海神花, 針墊花, 雪松, 新西蘭, 林投, 牡丹, 女貞, 茉莉, 素馨, 連翹, 尤加利, 蠟梅, 降天桑, 香樹蘭, 洛神葵, 玉蘭花, 金絲桃, 金雀花, 三角尤加利, 聖誕紅, 羽毛花, 變葉木, 蘇鐵, 側柏, 香冠柏, 柳杉, 扁柏, 征木, 五彩千年木, 星點木, 青竹, 百合竹, 虎斑木, 朱蕉, 觀音棕竹, 黃椰子, 八角金盤, 藍星花, 其他一二年生草本, 紅茄, 蚌蘭, 宮燈百合, 嘉蘭, 滿天星, 深山櫻, 康乃馨, 夕霧花, 三角桔梗, 美人蕉, 擎天鳳梨, 觀果鳳梨, 蜻蜓鳳梨, 麥桿菊, 琉璃菊, 一枝黃花, 澳洲鼓槌菊, 麟麟菊, 非洲菊, 白藍菊, 大理花, 波斯菊, 麵線菊, 大菊, 射干, 鳶尾, 小蒼蘭, 段菊, 繡球花, 赫蕉, 袋鼠花, 龍膽, 羽扇豆, 金翠花, 八卦草, 初雪草, 水莞, 巨果薑, 水晶花, 補雪草, 卡斯比亞, 虎尾花, 睡蓮, 竹芋, 鬱金香, 波羅門蔘, 牛蒡, 其他堅果, 雲芝, 其他豆菜, 龍鬚菜, 食用薊, 皇帝豆, 包心白菜, 青江白菜, 敏豆, 小黃瓜, 旱芹, 粉豆, 桑果, 洋香瓜, 柑桔, 柿子, 文旦, 樹葡萄, 牛奶果, 草花, 球根花卉, 蘭類, 觀葉植物, 香花植物, 觀賞樹木, 菊科, 薑科, 荖籐, 烏心石, 茉草, 水稻, 肖楠, 大葉楠, 冬蟲夏草, 水黃皮, 草皮, 牛樟, 雜草, 菊苣, 蘿勒, 黑松, 檜木, 柳樹, 蘋婆果, 九芎, 二葉松, 五葉松, 亞歷山大椰子, 光臘樹, 光蠟樹, 刺桐, 刺桐樹, 加州杉, 加蜜蛋黃果, 十字花科, 千頭木麻黃, 南洋杉, 南洋櫻, 印度紫壇, 印度紫檀, 古煉, 台東蘇鐵, 台灣山蘇花, 台灣杉, 台灣櫸, 台灣欒樹, 台灣海藻, 台灣赤楠, 咸豐草, 嘉德麗亞蘭, 土人參, 垂榕, 大王椰子, 大葉刺桐, 大葉山攬, 大葉山欖, 大葉桃花心木, 大葉欖仁, 大葉雀榕, 夾竹桃, 孟宗竹, 小槐花, 小葉南洋杉, 小葉南洋衫, 小葉桃花心木, 小葉欖仁, 小葉黃槐, 心葉牽牛花, 捲葉蘇鐵, 掌葉蘋婆, 日日櫻, 春不老, 晚香玉, 月橘, 木棉, 木芙蓉, 木麻黃, 本樟, 朱槿, 朴子, 朴樹, 杜鵑, 松, 松樹, 枯里珍, 柏, 柏樹, 柑橘, 柚, 桂竹, 桃樹, 桃花心木, 桑樹, 梅樹, 森氏紅淡比, 椰子樹, 楊樹, 楓香, 楓香樹, 楠木, 榔榆, 榕, 榕樹, 槭樹, 樟, 樟樹, 樹蘭, 橡膠樹, 檀香, 檸檬, 檸檬桉, 檸檬樹, 櫸木, 櫻花, 欖仁, 欖仁樹, 毛木, 毛柿, 水柳, 法國梧桐, 流蘇, 浦葵, 海桐, 海棗, 火焰木, 火燄木, 火龍果, 烏臼, 珊瑚刺桐, 珊瑚莿桐, 琉球蘇鐵, 瓊涯海棠, 番椒, 番荔枝, 痲瘋樹, 白薇, 相思樹, 矮仙丹, 矮仙丹花, 福木, 福祿桐, 竹柏, 筆筒樹, 紅刺林投, 紅楠, 綬草, 緬梔, 羅漢松, 羊蹄甲, 美人樹, 肉桂樹, 肉豆, 肯氏南洋杉, 腋唇蘭, 芒果, 苦楝, 茄冬, 茄苳, 茶花樹, 草海桐, 荔枝樹, 莿桐, 菠羅密, 菠蘿蜜, 菩提, 菩提樹, 華盛頓椰子, 蔓澤蘭, 蕗藤, 蕙蘭, 西施柚, 豔紫荊, 象牙木, 象牙樹, 豬草, 銀姬小蠟, 銀樺, 銀耳, 銀膠菊, 鐵線蕨, 長梗滿天星, 長豇豆, 阿勃勒, 阿薩姆茶, 雀榕, 雞冠刺桐, 青剛櫟, 青楓, 香杉, 鳳凰木, 麵包樹, 黃槿, 黃脈刺桐, 黃脤刺桐, 黃連木, 黃金風鈴木, 黑板樹, 龍柏, 龍眼樹\n    - Known diseases: 葉斑病, 腐爛, 痂病, 發芽, 畸形果, 乾旱, 早疫病 (Early Blight), 晚疫病 (Late Blight), 灰黴病 (Gray Mold), 病毒病 (Virus Disease), 臍腐病 (Blossom-End Rot), 褐根病, 褐根病, 葉震病, 炭疽病, 側柏枝枯病, 枝枯病, 煤煙病, 褐根病, 細菌性病害, 褐根病, 褐根病, 枝枯病, 潰瘍病, 葉枯病, 褐根病, 褐根病, 褐根病, 樹木褐根病, 褐根病, 褐根病, 原因不明, 褐根病, 褐根腐病, 褐根病, 咖啡銹病, 褐根病, 褐根病, 癌腫病, 樹木褐根病, 褐根病, 褐根病, 褐根病, 枝枯病, 腐朽菌, 褐根病, 葉枯病, 癌腫病, 枝枯病, 木耳, 木層孔菌, 褐根病, 木材腐朽菌, 褐根病, 闊葉樹藻斑病, 褐根病, 褐根病, 疑似疫病黃化萎凋, 松樹潰瘍病, 葉震病, 枝枯病, 腐朽菌, 褐根病, 銹病, 竹簇葉病, Phellinus noxius, 褐根病, 褐根腐病, 褐根病, 木材腐朽菌, 椰子樹芽腐病, 褐根病, 褐根病, 褐根病, 褐根病, 可能已被感染褐根病, 孔洞木材腐朽, 木材腐朽病, 根腐病, 樹木褐根病, 煤煙病, 紫膠介殼蟲與煤煙病, 腐朽菌, 褐根病, 褐根腐病, 靈芝根基腐朽病, 鮑魚菇, 樹木褐根病, 褐根病, 樣本無褐根病病原, 樹木褐根病, 腐朽菌, 褐根病, 褐根病, 熱帶靈芝, 癌腫病, 簇葉病, 細菌性或Cercospora sp.角斑, 褐根病, 白紋羽病, 白蟻及褐根病, 細菌性癌腫病, 褐褐病, 褐根病, 褐根病, 褐根病, 褐根病, 褐根病, 葉枯病, 褐根病, 褐根病, 樹木褐根病, 炭疽病, 褐根病, 炭疽病, 熱帶靈芝, 疫病菌, 褐根病, 褐根腐病, 黑腐病與炭疽病, 真菌腐朽性病害, 玫瑰黑斑病, 褐根病, 褐斑病, 褐根病, 癌腫病, 褐根病, 褐根腐病, 褐根腐病、生理反應, 樹木褐根病, 褐根病, 蘆筍莖枯病, 褐根病, 摺菌, 褐根病, 褐根病, 腐霉病或疫病, 褐根病, 疑似褐根病, 褐根腐病, 褐根病, 褐根病, 褐根病, 疫病根腐, 肖楠病, 樹木褐根病, 褐根病, 褐根病, 癌腫病, 細菌性癌腫病, 褐根病, 褐根病, 枝枯病, 炭疽病, 褐根病, 闊葉樹藻斑病, 腐生性危害, 炭疽病、寒害, 褐根病, 褐根病, Phellinus noxius, 褐根病, 黑脂病, 黑腫病, 樹木褐根病, 黃龍病, 褐根病, 煤煙病, 褐根病, 褐根病, 褐根腐病, 褐根病, 褐根病, 白粉病, 褐根病, 褐根病, 樹木褐根病, 腐朽菌, 褐根病, 樹木褐根病, 熱帶靈芝, 褐根病, 松樹葉震病, 流膠病, 葉震病, 褐根病, 疫病菌&腐黴菌, 褐根病, 枝枯病, 枝枯病炭疽病, 褐根病, 褐根病, 樹木褐根病, 褐根病\n    - Known pests: 蟲害, 薊馬, 銀葉粉蝨 (Whitefly), 棉鈴蟲 (Bollworm), 蚜蟲 (Aphid), 咖啡果小蠹, 太平洋臀紋粉介殼蟲, 黃綠綿介殼蟲, 木瓜秀粉介殼蟲, 金花蟲, 椿象, 橘球粉介殼蟲, 長尾粉介殼蟲, 鱗翅目, 咖啡硬介殼蟲, 木瓜秀粉介殼蟲, 美地綿粉介殼蟲, 咖啡硬介殼蟲, 絲粉介殼蟲, 白蠟介殼蟲, 蟻台硬介殼蟲, 鱗翅目, 石蒜綿粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 木瓜秀粉介殼蟲, 粉蝨, 茄綿粉介殼蟲, 蚜蟲, 葉蟎, 月橘白輪盾介殼蟲, 木瓜秀粉介殼蟲, 椰子櫛圓盾介殼蟲, 木瓜秀粉介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 光肩星天牛, 牡蠣盾介殼蟲, 葉蟎, 淡薄圓介殼蟲, 鱗翅目, 桑擬輪盾介殼蟲, 葉蟬, 椰子擬輪盾介殼蟲, 紅蠟介殼蟲, 葉蟎, 螺旋粉蝨, 木瓜秀粉介殼蟲, 黃吹綿介殼蟲, 樟輪盾介殼蟲, 太平洋臀紋粉介殼蟲, 茄綿粉介殼蟲, 太平洋臀紋粉介殼蟲, 柑橘刺粉蝨, 糠片盾介殼蟲, 咖啡木蠹蛾, 桑擬輪盾介殼蟲, 茄綿粉介殼蟲, 橘臀紋粉介殼蟲, 瓜實蠅, 茄綿粉介殼蟲, 雙翅目, 木瓜秀粉介殼蟲, 牡蠣盾介殼蟲, 太平洋臀紋粉介殼蟲, 絲粉介殼蟲, 長角象鼻蟲, 雙翅目, 蚜蟲, 木瓜秀粉介殼蟲, 根蟎, 二點葉蟎, 木瓜秀粉介殼蟲, 粉介殼蟲, 葉蟎, 扁堅介殼蟲, 咖啡硬介殼蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 柑橘刺粉蝨, 番石榴黑疣粉蝨, 螺旋粉蝨, 鱗翅目, 斑潛蠅, 太平洋臀紋粉介殼蟲, 鳳梨嫡粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 蚜蟲, 葉蟎, 象鼻蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 銀葉粉蝨, 木瓜秀粉介殼蟲, 蚜蟲, 銀葉粉蝨, 粉介殼蟲科, 葉蟎, 南黃薊馬, 粉蝨, 薊馬, 椿象, 雙翅目, 中華褐金龜, 木瓜秀粉介殼蟲, 橘球粉介殼蟲, 葉蟬, 木瓜秀粉介殼蟲, 粉介殼蟲, 蚜蟲, 粉蝨, 葉蟎, 木蝨, 盾介殼蟲, 粉蝨, 葉蟎, 蚜蟲, 鱗翅目, 黃綠綿介殼蟲, 棉蚜, 太平洋臀紋粉介殼蟲, 小黃薊馬, 絲粉介殼蟲, 木瓜秀粉介殼蟲, 白蠟介殼蟲, 變葉木片盾介殼蟲, 太平洋偽葉蟎, 葉蟎, 蘭花薊馬, 長跳蟲, 茄綿粉介殼蟲, 雙翅目, 鼠婦, 木瓜秀粉介殼蟲, 扁堅介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 薊馬, 蕉弄蝶, 石蒜綿粉介殼蟲, 茄綿粉介殼蟲, 木蝨, 螟蛾科, 粉介殼蟲 煤灰病, 松材線虫, 疑似松材線蟲, 幹綿蚜, 刺桐釉小蜂, 刺桐釉小蜂、不當移植, 刺桐釉小蜂, 天牛, 夜蛾, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 小蠹蟲, 螟蛾, 蝗蟲、天牛、潛葉蛾, 刺桐釉小蜂, 白蟻、生理性缺水, 竹涓夜蛾, 樟蝙蝠蛾, 蝙蝠蛾, 粉介殼蟲 煤灰病, 介殼蟲, 蘇鐵白輪盾蚧, 天牛, 月橘盾介殼蟲, 白蟻, 軍配蟲, 松材線蟲, 松線虫, 白蟻, 松材線蟲, 萎凋病, 白蟻, 桃蚜, 白蟻, 椰子大象鼻蟲, 綴葉叢螟, 蚜蟲, 斑蛾, 白蟻, 粉介殼蟲 煤灰病, 紫膠介殼蟲, 高背木蝨, 木蠹蛾, 樟樹白輪盾介殼蟲, 樟白介殼蟲, 樟葉蜂, 白蟻, 蜱&#34728;, 台灣家白蟻, 小囊蟲, 桑擬輪介殼蟲, 白蟻, 細菌性穿孔病、台灣黃毒蛾、金花蟲, 葉&#34766;, 粉蝨, 天牛, 紅胸葉蟲, 棉介殼蟲, 烏心石幹綿蚜, 刺桐釉小蜂, 銀葉粉蝨, 根瘤線蟲, 黃帶枝尺蠖蛾, 象牙木木蝨, 黃帶枝尺蛾, 黃帶枝尺蠖蛾, 芒果葉蟬, 白翅夜蟬, 茄苳白翅葉蟬, 螟蛾, 紫膠介殼蟲, 莿桐釉小蜂, 紅胸葉蟲, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 木蝨, 蟎類, 刺桐釉小蜂, 楓粉蝨, 白蟻, 鳳凰木夜蛾, 螨, 刺桐釉小蜂, 刺桐釉小蜂, 松材線蟲, mite’s gall, 白蟻或天牛蛀蝕\n\n    Anti-hallucination rules:\n    - crop_name must exactly match one item from Known crops. If uncertain, use \"未知作物\".\n    - For category \"disease\", status_name must exactly match one item from Known diseases.\n    - For category \"pest\", status_name must exactly match one item from Known pests.\n    - If the image is unclear, confidence is low, or no exact crop/disease/pest match exists, use category \"unknown\" and status_name \"無法判定\".\n    - Do not invent crop names, disease names, pest names, pesticide names, dosages, or treatment steps.\n\n    JSON Output Structure:\n    {\n      \"crop_name\": \"string (The crop's name in Traditional Chinese)\",\n      \"category\": \"string (One of 'disease', 'pest', 'healthy', or 'unknown')\",\n      \"status_name\": \"string (A name from the matching reference list. If healthy, use '健康'. If unknown, use '無法判定')\",\n      \"confidence\": \"float (A value between 0.0 and 1.0)\",\n      \"suggestion\": \"string (A bulleted list of 2-3 key visual symptoms, using '-' for each point and '\\n' for new lines. Example: '- 葉片有黃斑\\n- 葉緣焦枯')\",\n      \"treatment\": \"string (If not healthy, provide a numbered list of actionable steps using '1.', '2.', etc., and '\\n' for new lines. If healthy, provide a positive confirmation like '繼續保持良好照顧。')\"\n    }\n    ",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "```json\n{\n  \"crop_name\": \"番茄\",\n  \"category\": \"healthy\",\n  \"status_name\": \"健康\",\n  \"confidence\": 0.95,\n  \"suggestion\": \"- 葉片綠色且葉脈清晰\\n- 無明顯病斑或蟲害痕跡\\n- 葉緣完整無枯萎\",\n  \"treatment\": \"繼續保持良好照顧。\"\n}\n```",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "n2HCapGqE4vi1e8PsOXbmAY",
+          "usage": {
+            "cache_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 3564
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 515
+              }
+            ],
+            "cached_content_token_count": 4079,
+            "candidates_token_count": 97,
+            "prompt_token_count": 8428,
+            "prompt_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 7364
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 1064
+              }
+            ],
+            "total_token_count": 8525
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 1.8381362000945956
+        }
+      ],
+      "raw_score": {
+        "outcome": "label_match",
+        "crop_correct": true
+      },
+      "final_score": {
+        "outcome": "label_match",
+        "crop_correct": true
+      },
+      "advice": {
+        "applicable": false
+      },
+      "wall_seconds": 24.403708499856293,
+      "intentional_sleep_seconds": 20.938588499790058,
+      "inference_seconds": 3.4651200000662357
+    },
+    {
+      "case_id": "plant-06",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:24:32.423297+00:00",
+      "status": "ok",
+      "raw": {
+        "crop_name": "辣椒",
+        "category": "pest",
+        "status_name": "粉蝨",
+        "confidence": 0.85,
+        "suggestion": "- 葉片背面可見小型白色蟲體或若蟲分佈\n- 葉脈附近有白色粉末狀分泌物\n- 植株生長可能受到局部影響",
+        "treatment": "1. 發現初期可使用黃色黏蟲板進行誘殺。\n2. 加強田間通風與管理，避免密度過高。\n3. 必要時依植物保護手冊推薦之防治藥劑進行噴施。"
+      },
+      "validated": {
+        "crop_name": "辣椒",
+        "category": "pest",
+        "status_name": "粉蝨",
+        "confidence": 0.85,
+        "suggestion": "- 葉片背面可見小型白色蟲體或若蟲分佈\n- 葉脈附近有白色粉末狀分泌物\n- 植株生長可能受到局部影響",
+        "treatment": "1. 發現初期可使用黃色黏蟲板進行誘殺。\n2. 加強田間通風與管理，避免密度過高。\n3. 必要時依植物保護手冊推薦之防治藥劑進行噴施。",
+        "grounding_source": "model_pending_database_check",
+        "requires_review": false
+      },
+      "final": {
+        "crop_name": "辣椒",
+        "category": "unknown",
+        "status_name": "無法判定",
+        "confidence": 0.5,
+        "suggestion": "- 影像特徵不足，無法與目前資料庫中的作物或病蟲害安全對應\n- 建議重新拍攝清晰葉面、莖部與受害區域",
+        "treatment": "1. 暫時隔離疑似受害植株並持續觀察。\n2. 補拍清晰照片後重新診斷。\n3. 若症狀持續擴大，請諮詢農業專家或更新知識庫。",
+        "grounding_source": "safety_fallback",
+        "requires_review": true
+      },
+      "calls": [
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:24:43.574722+00:00",
+          "prompt_sha256": "df5039f2f48745cfc4d37b74588111cde6a167b8e1c7d6ae87abf0cd5ccbe39f",
+          "prompt": "You are an agricultural expert. Briefly describe the main subject and any visible symptoms in this image in a few keywords (e.g., 'tomato, leaf spots, yellowing'). This will be used to search a knowledge base. Respond in Traditional Chinese.",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "辣椒, 葉片, 水腫病",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "rGHCav7ECfDa1e8PmreeiAw",
+          "usage": {
+            "candidates_token_count": 9,
+            "prompt_token_count": 1132,
+            "prompt_tokens_details": [
+              {
+                "modality": "IMAGE",
+                "token_count": 1080
+              },
+              {
+                "modality": "TEXT",
+                "token_count": 52
+              }
+            ],
+            "total_token_count": 1141
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 2.7004414999391884
+        },
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:24:56.574684+00:00",
+          "prompt_sha256": "e5a3139c9f6944a94f11353fca6b82b4ba7f6116995141ccf475509e3b879dba",
+          "prompt": "\n    You are a top-tier plant pathologist. Analyze the provided image and context from our knowledge base to provide a professional diagnosis. Respond in valid JSON format, using Traditional Chinese for all user-facing text.\n\n    --- Knowledge Base Context ---\n    No specific context found.\n    ---\n\n    Reference Lists (for name standardization):\n    - Known crops: 甜椒, 萵苣, 甜瓜, 西瓜, 薑, 玉米百合, 玉米, 辣椒, 觀賞辣椒, 豌豆芽菜, 豌豆, 玉米筍, 檬果, 甘藍, 樹番茄, 青油菜, 紅龍果, 馬拉巴栗, 菊花, 火鶴, 玫瑰, 劍蘭, 百合, 其他蘭花, 小花蕙蘭, 虎頭蘭, 嘉德麗雅蘭, 仙履蘭, 石斛蘭, 文心蘭, 蝴蝶蘭, 其他景觀作物, 景觀小油菊, 景觀萬壽菊, 景觀波斯菊, 景觀向日葵, 其他綠肥作物, 魯冰, 青皮豆, 鐵虎豆, 苕子, 紫雲英, 田菁, 爬地蘭, 富貴豆, 太陽麻, 大豆類, 大菜, 埃及三葉草, 其他牧草, 其他長期牧草, 其他短期牧草, 青割玉米, 蘇丹草, 苜蓿草, 盤固拉草, 狼尾草, 尼羅草, 酒類製品, 蜂產品, 綜合蔬果製品, 其他特用作物加工製品, 胡麻製品, 薑黃製品, 愛玉製品, 茶製品, 油茶製品, 洛神葵製品, 香茅製品, 甘蔗製品, 咖啡製品, 梔子製品, 諾麗果製品, 風茹製品, 甜菊製品, 杭菊製品, 向日葵製品, 仙草製品, 紫蘇製品, 其他花卉加工製品, 油菊製品, 茉莉花製品, 玫瑰花製品, 其他水果加工製品, 可可製品, 栗子製品, 椰子製品, 橄欖製品, 棗製品, 梅製品, 李製品, 桃製品, 芒果製品, 龍眼製品, 荔枝製品, 枇杷製品, 梨製品, 蘋果製品, 木鱉果製品, 楊梅製品, 榴槤蜜製品, 桑椹製品, 波羅蜜製品, 柿製品, 釋迦製品, 奇異果製品, 紅龍果製品, 百香果製品, 楊桃製品, 葡萄製品, 蓮霧製品, 番石榴製品, 鳳梨製品, 香蕉製品, 木瓜製品, 金柑製品, 檸檬製品, 柑橘製品, 椪柑製品, 柳橙製品, 葡萄柚製品, 柚子製品, 其他蔬菜加工製品, 白木耳製品, 黑木耳製品, 猴頭菇製品, 杏鮑菇製品, 香菇製品, 草莓製品, 黃秋葵製品, 菱角製品, 番茄製品, 辣椒製品, 甜瓜製品, 西瓜製品, 越瓜製品, 苦瓜製品, 胡瓜製品, 絲瓜製品, 南瓜製品, 冬瓜製品, 蠶豆製品, 豌豆製品, 花豆製品, 毛豆製品, 金針花製品, 胡蘿蔔製品, 牛蒡製品, 蘿蔔製品, 馬鈴薯製品, 山藥製品, 山葵製品, 蘆筍製品, 薑製品, 芋頭製品, 蓮藕製品, 竹筍製品, 食用百合製品, 洋蔥製品, 蔥製品, 蒜製品, 羅勒製品, 菠菜製品, 芹菜製品, 芥菜製品, 油菜製品, 結球白菜製品, 甘藍製品, 其他五穀雜糧加工製品, 木薯製品, 甘藷製品, 綠豆製品, 紅豆製品, 落花生製品, 大豆製品, 薏苡製品, 燕麥製品, 蕎麥製品, 大麥製品, 高粱製品, 小米製品, 小麥製品, 玉米製品, 硬質玉米製品, 稻米製品, 其他特用作物, 其他長期特作, 其他短期特作, 其他飲料作物, 愛玉子, 茶, 洛神, 咖啡, 杭菊, 仙草, 其他香料作物, 香水蓮, 香草, 秀英, 茉莉花_薰芬茶用, 桂花, 檸檬香茅, 香茅, 蒔蘿, 芳香萬壽菊, 薄荷, 紫蘇, 其他澱粉作物, 紅蓮蕉, 蒟蒻, 葛鬱金, 葛藤, 其他染料作物, 薑黃, 大菁, 藷茛, 梔子, 大青, 紅花, 其他纖維作物, 瓊麻, 亞麻, 圓藺草, 苧麻, 大甲藺, 三角藺, 棉花, 貴黍, 其他糖料作物, 甘蔗, 甜菊, 其他嗜好作物, 菸草, 荖藤, 荖葉, 荖花, 其他油料作物, 胡麻, 小果種油茶, 大果種油茶, 向日葵_採種供作加工原料, 其他藥用作物, 杜虹花, 白花蛇舌草, 桋梧, 假人參, 蕺菜, 辣木, 山葡萄, 地黃, 七葉膽, 澤瀉, 白果, 香椿, 小葉藜, 何首烏, 南薑, 羊奶頭, 土肉桂, 肉桂, 桔梗, 黨蔘, 青葙, 法國綠莧, 金線蓮, 刺五加, 蓪草, 山芙蓉, 圓葉錦葵, 穿心蓮, 白鶴靈芝, 麥門冬, 蘆薈, 白藷莨, 枸杞, 葉用枸杞, 諾麗果, 桑黃, 茯苓, 樟芝, 槐耳, 通天草, 黃耆, 當歸, 柴胡, 明日葉, 艾草, 小金英, 蒲公英, 風茹草, 傷寒草, 六神花, 除蟲菊, 澤蘭, 款冬, 山防風, 荊芥, 筋骨草, 半支蓮, 丹參, 黃芩, 益母草, 草石蠶, 其他雜糧, 其他藷類, 木薯, 甘藷, 其他穀類, 臺灣藜, 高粱, 薏苡, 蕎麥, 燕麥, 小麥, 小米, 大麥, 其他豆類, 樹豆, 落花生, 米豆, 綠豆, 紅豆, 大豆, 珠廉, 鳳尾草, 高山羊齒, 腎蕨, 石蓮, 山蘇, 虎尾蘭, 常春藤, 蔓綠絨, 電信蘭, 黃金葛, 其他多年生草本, 球薑, 火炬花, 野薑花, 薑荷花, 月桃, 水蠟燭, 天堂鳥, 聖誕果, 牛頭茄, 金魚草, 泡盛草, 陸蓮花, 飛燕草, 夢幻草, 白頭翁, 銀蘆, 星辰花, 豇豆, 蠶豆, 翼豆, 萊豆, 鵲豆, 毛豆, 刀豆, 菜豆, 其他花菜苗, 其他花菜, 金針花, 石蓮花, 朝鮮薊, 青花菜, 花椰菜, 其他根菜, 胡蘿蔔, 甜菜根, 闊葉大豆, 豆薯, 雪蓮薯, 辣根, 瑞典蕪菁, 蘿蔔, 其他莖菜, 仙人掌肉質莖, 碧玉筍, 晚香玉筍, 食用大黃, 水蓮, 薯蕷, 荸薺, 蓴菜, 馬鈴薯, 慈菇, 萵苣莖, 菊芋, 黃藤心, 半天筍, 山葵, 球莖甘藍, 蘆筍, 蘘荷, 芋, 蓮, 茭白筍, 甘蔗筍, 牧草筍, 竹筍, 其他鱗莖, 食用百合, 蝦夷蔥, 蕎頭, 洋蔥, 韭蔥, 分蔥, 蔥, 蒜頭, 大蒜, 其他葉菜苗, 其他葉菜, 麻意, 糯米糰, 龍葵, 食茱萸, 學菜, 水合歡, 過溝菜蕨, 龍鳳草, 人蔘菜, 馬齒莧, 番杏, 冰花, 羅勒, 山菠菜, 葉用甘藷, 蕹菜, 藤三七, 落葵, 韭菜, 菾菜, 菠菜, 莧菜, 香芹菜, 水芹, 茴香, 刺芹, 芫荽, 芹菜, 闊苞菊, 白鳳菜, 紅鳳菜, 茼蒿, 山茼蒿, 吉康菜, 苦苣, 珍珠菜, 葉用蘿蔔, 西洋菜, 芝麻菜, 薺菜, 千寶菜, 油江菜, 廣島菜, 青菘菜, 小菘菜, 菜心, 水菜, 塌棵菜, 油菜, 不結球白菜, 芥菜, 結球白菜, 黑種草, 觀賞玉米, 古代稀, 貝殼花, 洋桔梗, 羽衣甘藍, 芥藍, 其他稻米, 秈糯, 稉糯, 軟秈, 硬秈, 稉稻, 觀賞南瓜, 松蟲草, 風鈴花, 紫羅蘭, 葉牡丹, 百日草, 鱗托菊, 瓜葉菊, 向日葵, 矢車菊, 雲南菊, 金盞花, 千日紅, 藜, 雞冠花, 紅莧菜, 雁來紅, 萬代蘭, 腎藥蘭, 皇后蘭, 樹攔, 蜘蛛蘭, 千代蘭, 其他果樹, 可可, 胡桃, 蘋婆, 長山核桃, 澳洲胡桃, 栗子, 胡榛子, 腰果, 扁桃, 杏仁, 檳榔, 椰子, 其它核果, 棗椰子, 爪哇橄欖, 橄欖, 錫蘭橄欖, 印度棗, 中國棗, 酪梨, 梅, 杏, 櫻桃, 李, 桃, 油柑, 紅毛丹, 龍眼, 荔枝, 其他仁果, 枇杷, 梨, 蘋果, 其他漿果, 木鱉果, 山竹, 榴槤, 西印度櫻桃, 人心果, 神秘果, 黃金果, 蛋黃果, 石榴, 楊梅, 榴槤蜜, 桑椹, 小波羅蜜, 波羅蜜, 無花果, 麵包果, 柿, 羅望子, 釋迦, 藍莓, 奇異果, 百香果, 楊桃, 葡萄, 嘉寶果, 蓮霧, 番石榴, 鳳梨, 芭蕉, 香蕉, 番木瓜, 其他柑橘, 金柑與小果柑橘, 枸櫞, 甜橙, 寬皮柑, 葡萄柚, 柚子, 其他蔬菜, 其他長期蔬菜, 其他短期蔬菜, 採種用蔬菜, 小海帶, 髮菜, 海菜, 海帶, 其他菇類, 松茸, 紫丁香蘑, 金福菇, 白玉菇, 鴻喜菇, 酒杯菇, 白木耳, 金耳, 滑菇, 草菇, 粉紅玫瑰菇, 蠔菇, 秀珍菇, 白靈菇, 杏鮑菇, 鮑魚菇, 珊瑚菇, 竹蓀, 舞菇, 香菇, 金針菇, 猴頭菇, 靈芝, 北蟲草, 牛肝菌, 茶樹菇, 毛木耳, 斤耳, 黑木耳, 雞肉絲菇, 雞腿菇, 巴西蘑菇, 洋菇, 其他芽菜, 綠豆芽, 紅豆芽, 蠶豆芽, 苜蓿芽, 黑豆芽, 黃豆芽, 蕎麥芽菜, 落花生芽菜, 蘿蔔芽菜, 青花菜芽菜, 芥藍芽菜, 甘藍芽菜, 其他果菜苗, 其他果菜, 草莓, 黃秋葵, 菱角, 破布子, 香瓜茄, 茄子, 小果番茄, 番茄, 其他瓜菜, 蛇瓜, 隼人瓜, 越瓜, 苦瓜, 胡瓜, 絲瓜, 扁蒲, 南瓜, 冬瓜, 小菊, 紫菀, 紐西蘭麻, 火炬百合, 萱草, 狐尾百合, 假葉樹, 鳴子百合, 天鵝絨, 伯利恆之星, 風信子, 吊蘭, 葉蘭, 文竹, 蘆筍草, 武竹, 夜來香, 翠珠花, 海芋, 合果芋, 白鶴芋, 黛粉葉, 觀音蓮, 唐棉, 紫嬌花, 火球花, 孤挺花, 文殊蘭, 繡球蔥, 百子蓮, 水仙, 石蒜, 君子蘭, 水仙百合, 菖蒲, 其他木本花卉, 山茶花, 木羊齒, 柳, 七里香, 六月雪, 仙丹花, 梔子花, 寒丁子, 麻葉繡球, 海神花, 針墊花, 雪松, 新西蘭, 林投, 牡丹, 女貞, 茉莉, 素馨, 連翹, 尤加利, 蠟梅, 降天桑, 香樹蘭, 洛神葵, 玉蘭花, 金絲桃, 金雀花, 三角尤加利, 聖誕紅, 羽毛花, 變葉木, 蘇鐵, 側柏, 香冠柏, 柳杉, 扁柏, 征木, 五彩千年木, 星點木, 青竹, 百合竹, 虎斑木, 朱蕉, 觀音棕竹, 黃椰子, 八角金盤, 藍星花, 其他一二年生草本, 紅茄, 蚌蘭, 宮燈百合, 嘉蘭, 滿天星, 深山櫻, 康乃馨, 夕霧花, 三角桔梗, 美人蕉, 擎天鳳梨, 觀果鳳梨, 蜻蜓鳳梨, 麥桿菊, 琉璃菊, 一枝黃花, 澳洲鼓槌菊, 麟麟菊, 非洲菊, 白藍菊, 大理花, 波斯菊, 麵線菊, 大菊, 射干, 鳶尾, 小蒼蘭, 段菊, 繡球花, 赫蕉, 袋鼠花, 龍膽, 羽扇豆, 金翠花, 八卦草, 初雪草, 水莞, 巨果薑, 水晶花, 補雪草, 卡斯比亞, 虎尾花, 睡蓮, 竹芋, 鬱金香, 波羅門蔘, 牛蒡, 其他堅果, 雲芝, 其他豆菜, 龍鬚菜, 食用薊, 皇帝豆, 包心白菜, 青江白菜, 敏豆, 小黃瓜, 旱芹, 粉豆, 桑果, 洋香瓜, 柑桔, 柿子, 文旦, 樹葡萄, 牛奶果, 草花, 球根花卉, 蘭類, 觀葉植物, 香花植物, 觀賞樹木, 菊科, 薑科, 荖籐, 烏心石, 茉草, 水稻, 肖楠, 大葉楠, 冬蟲夏草, 水黃皮, 草皮, 牛樟, 雜草, 菊苣, 蘿勒, 黑松, 檜木, 柳樹, 蘋婆果, 九芎, 二葉松, 五葉松, 亞歷山大椰子, 光臘樹, 光蠟樹, 刺桐, 刺桐樹, 加州杉, 加蜜蛋黃果, 十字花科, 千頭木麻黃, 南洋杉, 南洋櫻, 印度紫壇, 印度紫檀, 古煉, 台東蘇鐵, 台灣山蘇花, 台灣杉, 台灣櫸, 台灣欒樹, 台灣海藻, 台灣赤楠, 咸豐草, 嘉德麗亞蘭, 土人參, 垂榕, 大王椰子, 大葉刺桐, 大葉山攬, 大葉山欖, 大葉桃花心木, 大葉欖仁, 大葉雀榕, 夾竹桃, 孟宗竹, 小槐花, 小葉南洋杉, 小葉南洋衫, 小葉桃花心木, 小葉欖仁, 小葉黃槐, 心葉牽牛花, 捲葉蘇鐵, 掌葉蘋婆, 日日櫻, 春不老, 晚香玉, 月橘, 木棉, 木芙蓉, 木麻黃, 本樟, 朱槿, 朴子, 朴樹, 杜鵑, 松, 松樹, 枯里珍, 柏, 柏樹, 柑橘, 柚, 桂竹, 桃樹, 桃花心木, 桑樹, 梅樹, 森氏紅淡比, 椰子樹, 楊樹, 楓香, 楓香樹, 楠木, 榔榆, 榕, 榕樹, 槭樹, 樟, 樟樹, 樹蘭, 橡膠樹, 檀香, 檸檬, 檸檬桉, 檸檬樹, 櫸木, 櫻花, 欖仁, 欖仁樹, 毛木, 毛柿, 水柳, 法國梧桐, 流蘇, 浦葵, 海桐, 海棗, 火焰木, 火燄木, 火龍果, 烏臼, 珊瑚刺桐, 珊瑚莿桐, 琉球蘇鐵, 瓊涯海棠, 番椒, 番荔枝, 痲瘋樹, 白薇, 相思樹, 矮仙丹, 矮仙丹花, 福木, 福祿桐, 竹柏, 筆筒樹, 紅刺林投, 紅楠, 綬草, 緬梔, 羅漢松, 羊蹄甲, 美人樹, 肉桂樹, 肉豆, 肯氏南洋杉, 腋唇蘭, 芒果, 苦楝, 茄冬, 茄苳, 茶花樹, 草海桐, 荔枝樹, 莿桐, 菠羅密, 菠蘿蜜, 菩提, 菩提樹, 華盛頓椰子, 蔓澤蘭, 蕗藤, 蕙蘭, 西施柚, 豔紫荊, 象牙木, 象牙樹, 豬草, 銀姬小蠟, 銀樺, 銀耳, 銀膠菊, 鐵線蕨, 長梗滿天星, 長豇豆, 阿勃勒, 阿薩姆茶, 雀榕, 雞冠刺桐, 青剛櫟, 青楓, 香杉, 鳳凰木, 麵包樹, 黃槿, 黃脈刺桐, 黃脤刺桐, 黃連木, 黃金風鈴木, 黑板樹, 龍柏, 龍眼樹\n    - Known diseases: 葉斑病, 腐爛, 痂病, 發芽, 畸形果, 乾旱, 早疫病 (Early Blight), 晚疫病 (Late Blight), 灰黴病 (Gray Mold), 病毒病 (Virus Disease), 臍腐病 (Blossom-End Rot), 褐根病, 褐根病, 葉震病, 炭疽病, 側柏枝枯病, 枝枯病, 煤煙病, 褐根病, 細菌性病害, 褐根病, 褐根病, 枝枯病, 潰瘍病, 葉枯病, 褐根病, 褐根病, 褐根病, 樹木褐根病, 褐根病, 褐根病, 原因不明, 褐根病, 褐根腐病, 褐根病, 咖啡銹病, 褐根病, 褐根病, 癌腫病, 樹木褐根病, 褐根病, 褐根病, 褐根病, 枝枯病, 腐朽菌, 褐根病, 葉枯病, 癌腫病, 枝枯病, 木耳, 木層孔菌, 褐根病, 木材腐朽菌, 褐根病, 闊葉樹藻斑病, 褐根病, 褐根病, 疑似疫病黃化萎凋, 松樹潰瘍病, 葉震病, 枝枯病, 腐朽菌, 褐根病, 銹病, 竹簇葉病, Phellinus noxius, 褐根病, 褐根腐病, 褐根病, 木材腐朽菌, 椰子樹芽腐病, 褐根病, 褐根病, 褐根病, 褐根病, 可能已被感染褐根病, 孔洞木材腐朽, 木材腐朽病, 根腐病, 樹木褐根病, 煤煙病, 紫膠介殼蟲與煤煙病, 腐朽菌, 褐根病, 褐根腐病, 靈芝根基腐朽病, 鮑魚菇, 樹木褐根病, 褐根病, 樣本無褐根病病原, 樹木褐根病, 腐朽菌, 褐根病, 褐根病, 熱帶靈芝, 癌腫病, 簇葉病, 細菌性或Cercospora sp.角斑, 褐根病, 白紋羽病, 白蟻及褐根病, 細菌性癌腫病, 褐褐病, 褐根病, 褐根病, 褐根病, 褐根病, 褐根病, 葉枯病, 褐根病, 褐根病, 樹木褐根病, 炭疽病, 褐根病, 炭疽病, 熱帶靈芝, 疫病菌, 褐根病, 褐根腐病, 黑腐病與炭疽病, 真菌腐朽性病害, 玫瑰黑斑病, 褐根病, 褐斑病, 褐根病, 癌腫病, 褐根病, 褐根腐病, 褐根腐病、生理反應, 樹木褐根病, 褐根病, 蘆筍莖枯病, 褐根病, 摺菌, 褐根病, 褐根病, 腐霉病或疫病, 褐根病, 疑似褐根病, 褐根腐病, 褐根病, 褐根病, 褐根病, 疫病根腐, 肖楠病, 樹木褐根病, 褐根病, 褐根病, 癌腫病, 細菌性癌腫病, 褐根病, 褐根病, 枝枯病, 炭疽病, 褐根病, 闊葉樹藻斑病, 腐生性危害, 炭疽病、寒害, 褐根病, 褐根病, Phellinus noxius, 褐根病, 黑脂病, 黑腫病, 樹木褐根病, 黃龍病, 褐根病, 煤煙病, 褐根病, 褐根病, 褐根腐病, 褐根病, 褐根病, 白粉病, 褐根病, 褐根病, 樹木褐根病, 腐朽菌, 褐根病, 樹木褐根病, 熱帶靈芝, 褐根病, 松樹葉震病, 流膠病, 葉震病, 褐根病, 疫病菌&腐黴菌, 褐根病, 枝枯病, 枝枯病炭疽病, 褐根病, 褐根病, 樹木褐根病, 褐根病\n    - Known pests: 蟲害, 薊馬, 銀葉粉蝨 (Whitefly), 棉鈴蟲 (Bollworm), 蚜蟲 (Aphid), 咖啡果小蠹, 太平洋臀紋粉介殼蟲, 黃綠綿介殼蟲, 木瓜秀粉介殼蟲, 金花蟲, 椿象, 橘球粉介殼蟲, 長尾粉介殼蟲, 鱗翅目, 咖啡硬介殼蟲, 木瓜秀粉介殼蟲, 美地綿粉介殼蟲, 咖啡硬介殼蟲, 絲粉介殼蟲, 白蠟介殼蟲, 蟻台硬介殼蟲, 鱗翅目, 石蒜綿粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 木瓜秀粉介殼蟲, 粉蝨, 茄綿粉介殼蟲, 蚜蟲, 葉蟎, 月橘白輪盾介殼蟲, 木瓜秀粉介殼蟲, 椰子櫛圓盾介殼蟲, 木瓜秀粉介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 光肩星天牛, 牡蠣盾介殼蟲, 葉蟎, 淡薄圓介殼蟲, 鱗翅目, 桑擬輪盾介殼蟲, 葉蟬, 椰子擬輪盾介殼蟲, 紅蠟介殼蟲, 葉蟎, 螺旋粉蝨, 木瓜秀粉介殼蟲, 黃吹綿介殼蟲, 樟輪盾介殼蟲, 太平洋臀紋粉介殼蟲, 茄綿粉介殼蟲, 太平洋臀紋粉介殼蟲, 柑橘刺粉蝨, 糠片盾介殼蟲, 咖啡木蠹蛾, 桑擬輪盾介殼蟲, 茄綿粉介殼蟲, 橘臀紋粉介殼蟲, 瓜實蠅, 茄綿粉介殼蟲, 雙翅目, 木瓜秀粉介殼蟲, 牡蠣盾介殼蟲, 太平洋臀紋粉介殼蟲, 絲粉介殼蟲, 長角象鼻蟲, 雙翅目, 蚜蟲, 木瓜秀粉介殼蟲, 根蟎, 二點葉蟎, 木瓜秀粉介殼蟲, 粉介殼蟲, 葉蟎, 扁堅介殼蟲, 咖啡硬介殼蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 柑橘刺粉蝨, 番石榴黑疣粉蝨, 螺旋粉蝨, 鱗翅目, 斑潛蠅, 太平洋臀紋粉介殼蟲, 鳳梨嫡粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 蚜蟲, 葉蟎, 象鼻蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 銀葉粉蝨, 木瓜秀粉介殼蟲, 蚜蟲, 銀葉粉蝨, 粉介殼蟲科, 葉蟎, 南黃薊馬, 粉蝨, 薊馬, 椿象, 雙翅目, 中華褐金龜, 木瓜秀粉介殼蟲, 橘球粉介殼蟲, 葉蟬, 木瓜秀粉介殼蟲, 粉介殼蟲, 蚜蟲, 粉蝨, 葉蟎, 木蝨, 盾介殼蟲, 粉蝨, 葉蟎, 蚜蟲, 鱗翅目, 黃綠綿介殼蟲, 棉蚜, 太平洋臀紋粉介殼蟲, 小黃薊馬, 絲粉介殼蟲, 木瓜秀粉介殼蟲, 白蠟介殼蟲, 變葉木片盾介殼蟲, 太平洋偽葉蟎, 葉蟎, 蘭花薊馬, 長跳蟲, 茄綿粉介殼蟲, 雙翅目, 鼠婦, 木瓜秀粉介殼蟲, 扁堅介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 薊馬, 蕉弄蝶, 石蒜綿粉介殼蟲, 茄綿粉介殼蟲, 木蝨, 螟蛾科, 粉介殼蟲 煤灰病, 松材線虫, 疑似松材線蟲, 幹綿蚜, 刺桐釉小蜂, 刺桐釉小蜂、不當移植, 刺桐釉小蜂, 天牛, 夜蛾, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 小蠹蟲, 螟蛾, 蝗蟲、天牛、潛葉蛾, 刺桐釉小蜂, 白蟻、生理性缺水, 竹涓夜蛾, 樟蝙蝠蛾, 蝙蝠蛾, 粉介殼蟲 煤灰病, 介殼蟲, 蘇鐵白輪盾蚧, 天牛, 月橘盾介殼蟲, 白蟻, 軍配蟲, 松材線蟲, 松線虫, 白蟻, 松材線蟲, 萎凋病, 白蟻, 桃蚜, 白蟻, 椰子大象鼻蟲, 綴葉叢螟, 蚜蟲, 斑蛾, 白蟻, 粉介殼蟲 煤灰病, 紫膠介殼蟲, 高背木蝨, 木蠹蛾, 樟樹白輪盾介殼蟲, 樟白介殼蟲, 樟葉蜂, 白蟻, 蜱&#34728;, 台灣家白蟻, 小囊蟲, 桑擬輪介殼蟲, 白蟻, 細菌性穿孔病、台灣黃毒蛾、金花蟲, 葉&#34766;, 粉蝨, 天牛, 紅胸葉蟲, 棉介殼蟲, 烏心石幹綿蚜, 刺桐釉小蜂, 銀葉粉蝨, 根瘤線蟲, 黃帶枝尺蠖蛾, 象牙木木蝨, 黃帶枝尺蛾, 黃帶枝尺蠖蛾, 芒果葉蟬, 白翅夜蟬, 茄苳白翅葉蟬, 螟蛾, 紫膠介殼蟲, 莿桐釉小蜂, 紅胸葉蟲, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 木蝨, 蟎類, 刺桐釉小蜂, 楓粉蝨, 白蟻, 鳳凰木夜蛾, 螨, 刺桐釉小蜂, 刺桐釉小蜂, 松材線蟲, mite’s gall, 白蟻或天牛蛀蝕\n\n    Anti-hallucination rules:\n    - crop_name must exactly match one item from Known crops. If uncertain, use \"未知作物\".\n    - For category \"disease\", status_name must exactly match one item from Known diseases.\n    - For category \"pest\", status_name must exactly match one item from Known pests.\n    - If the image is unclear, confidence is low, or no exact crop/disease/pest match exists, use category \"unknown\" and status_name \"無法判定\".\n    - Do not invent crop names, disease names, pest names, pesticide names, dosages, or treatment steps.\n\n    JSON Output Structure:\n    {\n      \"crop_name\": \"string (The crop's name in Traditional Chinese)\",\n      \"category\": \"string (One of 'disease', 'pest', 'healthy', or 'unknown')\",\n      \"status_name\": \"string (A name from the matching reference list. If healthy, use '健康'. If unknown, use '無法判定')\",\n      \"confidence\": \"float (A value between 0.0 and 1.0)\",\n      \"suggestion\": \"string (A bulleted list of 2-3 key visual symptoms, using '-' for each point and '\\n' for new lines. Example: '- 葉片有黃斑\\n- 葉緣焦枯')\",\n      \"treatment\": \"string (If not healthy, provide a numbered list of actionable steps using '1.', '2.', etc., and '\\n' for new lines. If healthy, provide a positive confirmation like '繼續保持良好照顧。')\"\n    }\n    ",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "```json\n{\n  \"crop_name\": \"辣椒\",\n  \"category\": \"pest\",\n  \"status_name\": \"粉蝨\",\n  \"confidence\": 0.85,\n  \"suggestion\": \"- 葉片背面可見小型白色蟲體或若蟲分佈\\n- 葉脈附近有白色粉末狀分泌物\\n- 植株生長可能受到局部影響\",\n  \"treatment\": \"1. 發現初期可使用黃色黏蟲板進行誘殺。\\n2. 加強田間通風與管理，避免密度過高。\\n3. 必要時依植物保護手冊推薦之防治藥劑進行噴施。\"\n}\n```",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "uWHCatXFEpWUvr0Pi8Hs-Qk",
+          "usage": {
+            "cache_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 3558
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 521
+              }
+            ],
+            "cached_content_token_count": 4079,
+            "candidates_token_count": 156,
+            "prompt_token_count": 8444,
+            "prompt_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 7364
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 1080
+              }
+            ],
+            "total_token_count": 8600
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 1.7847135998308659
+        }
+      ],
+      "raw_score": {
+        "outcome": "incorrect_known_label",
+        "crop_correct": false
+      },
+      "final_score": {
+        "outcome": "abstained",
+        "crop_correct": false
+      },
+      "advice": {
+        "applicable": false
+      },
+      "wall_seconds": 25.94050130015239,
+      "intentional_sleep_seconds": 21.44938230025582,
+      "inference_seconds": 4.491118999896571
+    },
+    {
+      "case_id": "plant-07",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:24:58.370046+00:00",
+      "status": "ok",
+      "raw": {
+        "crop_name": "馬鈴薯",
+        "category": "disease",
+        "status_name": "早疫病 (Early Blight)",
+        "confidence": 0.9,
+        "suggestion": "- 葉片上出現具同心輪紋的褐色病斑\n- 病斑周圍常伴隨黃化現象\n- 葉緣與其他葉片也有枯萎或乾焦跡象",
+        "treatment": "1. 發現病葉時應及時摘除並銷毀，以減少病原擴散。\n2. 保持田間通風良好，避免過度潮濕。\n3. 適時依推薦規範施用防治藥劑。"
+      },
+      "validated": {
+        "crop_name": "馬鈴薯",
+        "category": "disease",
+        "status_name": "早疫病 (Early Blight)",
+        "confidence": 0.9,
+        "suggestion": "- 葉片上出現具同心輪紋的褐色病斑\n- 病斑周圍常伴隨黃化現象\n- 葉緣與其他葉片也有枯萎或乾焦跡象",
+        "treatment": "1. 發現病葉時應及時摘除並銷毀，以減少病原擴散。\n2. 保持田間通風良好，避免過度潮濕。\n3. 適時依推薦規範施用防治藥劑。",
+        "grounding_source": "model_pending_database_check",
+        "requires_review": false
+      },
+      "final": {
+        "crop_name": "馬鈴薯",
+        "category": "unknown",
+        "status_name": "無法判定",
+        "confidence": 0.5,
+        "suggestion": "- 影像特徵不足，無法與目前資料庫中的作物或病蟲害安全對應\n- 建議重新拍攝清晰葉面、莖部與受害區域",
+        "treatment": "1. 暫時隔離疑似受害植株並持續觀察。\n2. 補拍清晰照片後重新診斷。\n3. 若症狀持續擴大，請諮詢農業專家或更新知識庫。",
+        "grounding_source": "safety_fallback",
+        "requires_review": true
+      },
+      "calls": [
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:25:09.575198+00:00",
+          "prompt_sha256": "df5039f2f48745cfc4d37b74588111cde6a167b8e1c7d6ae87abf0cd5ccbe39f",
+          "prompt": "You are an agricultural expert. Briefly describe the main subject and any visible symptoms in this image in a few keywords (e.g., 'tomato, leaf spots, yellowing'). This will be used to search a knowledge base. Respond in Traditional Chinese.",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "馬鈴薯, 葉斑病, 壞死斑塊",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "xmHCavbdB9Ws9tMPpoeYyAo",
+          "usage": {
+            "candidates_token_count": 14,
+            "prompt_token_count": 1154,
+            "prompt_tokens_details": [
+              {
+                "modality": "IMAGE",
+                "token_count": 1102
+              },
+              {
+                "modality": "TEXT",
+                "token_count": 52
+              }
+            ],
+            "total_token_count": 1168
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 1.6459810000378639
+        },
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:25:22.576046+00:00",
+          "prompt_sha256": "e5a3139c9f6944a94f11353fca6b82b4ba7f6116995141ccf475509e3b879dba",
+          "prompt": "\n    You are a top-tier plant pathologist. Analyze the provided image and context from our knowledge base to provide a professional diagnosis. Respond in valid JSON format, using Traditional Chinese for all user-facing text.\n\n    --- Knowledge Base Context ---\n    No specific context found.\n    ---\n\n    Reference Lists (for name standardization):\n    - Known crops: 甜椒, 萵苣, 甜瓜, 西瓜, 薑, 玉米百合, 玉米, 辣椒, 觀賞辣椒, 豌豆芽菜, 豌豆, 玉米筍, 檬果, 甘藍, 樹番茄, 青油菜, 紅龍果, 馬拉巴栗, 菊花, 火鶴, 玫瑰, 劍蘭, 百合, 其他蘭花, 小花蕙蘭, 虎頭蘭, 嘉德麗雅蘭, 仙履蘭, 石斛蘭, 文心蘭, 蝴蝶蘭, 其他景觀作物, 景觀小油菊, 景觀萬壽菊, 景觀波斯菊, 景觀向日葵, 其他綠肥作物, 魯冰, 青皮豆, 鐵虎豆, 苕子, 紫雲英, 田菁, 爬地蘭, 富貴豆, 太陽麻, 大豆類, 大菜, 埃及三葉草, 其他牧草, 其他長期牧草, 其他短期牧草, 青割玉米, 蘇丹草, 苜蓿草, 盤固拉草, 狼尾草, 尼羅草, 酒類製品, 蜂產品, 綜合蔬果製品, 其他特用作物加工製品, 胡麻製品, 薑黃製品, 愛玉製品, 茶製品, 油茶製品, 洛神葵製品, 香茅製品, 甘蔗製品, 咖啡製品, 梔子製品, 諾麗果製品, 風茹製品, 甜菊製品, 杭菊製品, 向日葵製品, 仙草製品, 紫蘇製品, 其他花卉加工製品, 油菊製品, 茉莉花製品, 玫瑰花製品, 其他水果加工製品, 可可製品, 栗子製品, 椰子製品, 橄欖製品, 棗製品, 梅製品, 李製品, 桃製品, 芒果製品, 龍眼製品, 荔枝製品, 枇杷製品, 梨製品, 蘋果製品, 木鱉果製品, 楊梅製品, 榴槤蜜製品, 桑椹製品, 波羅蜜製品, 柿製品, 釋迦製品, 奇異果製品, 紅龍果製品, 百香果製品, 楊桃製品, 葡萄製品, 蓮霧製品, 番石榴製品, 鳳梨製品, 香蕉製品, 木瓜製品, 金柑製品, 檸檬製品, 柑橘製品, 椪柑製品, 柳橙製品, 葡萄柚製品, 柚子製品, 其他蔬菜加工製品, 白木耳製品, 黑木耳製品, 猴頭菇製品, 杏鮑菇製品, 香菇製品, 草莓製品, 黃秋葵製品, 菱角製品, 番茄製品, 辣椒製品, 甜瓜製品, 西瓜製品, 越瓜製品, 苦瓜製品, 胡瓜製品, 絲瓜製品, 南瓜製品, 冬瓜製品, 蠶豆製品, 豌豆製品, 花豆製品, 毛豆製品, 金針花製品, 胡蘿蔔製品, 牛蒡製品, 蘿蔔製品, 馬鈴薯製品, 山藥製品, 山葵製品, 蘆筍製品, 薑製品, 芋頭製品, 蓮藕製品, 竹筍製品, 食用百合製品, 洋蔥製品, 蔥製品, 蒜製品, 羅勒製品, 菠菜製品, 芹菜製品, 芥菜製品, 油菜製品, 結球白菜製品, 甘藍製品, 其他五穀雜糧加工製品, 木薯製品, 甘藷製品, 綠豆製品, 紅豆製品, 落花生製品, 大豆製品, 薏苡製品, 燕麥製品, 蕎麥製品, 大麥製品, 高粱製品, 小米製品, 小麥製品, 玉米製品, 硬質玉米製品, 稻米製品, 其他特用作物, 其他長期特作, 其他短期特作, 其他飲料作物, 愛玉子, 茶, 洛神, 咖啡, 杭菊, 仙草, 其他香料作物, 香水蓮, 香草, 秀英, 茉莉花_薰芬茶用, 桂花, 檸檬香茅, 香茅, 蒔蘿, 芳香萬壽菊, 薄荷, 紫蘇, 其他澱粉作物, 紅蓮蕉, 蒟蒻, 葛鬱金, 葛藤, 其他染料作物, 薑黃, 大菁, 藷茛, 梔子, 大青, 紅花, 其他纖維作物, 瓊麻, 亞麻, 圓藺草, 苧麻, 大甲藺, 三角藺, 棉花, 貴黍, 其他糖料作物, 甘蔗, 甜菊, 其他嗜好作物, 菸草, 荖藤, 荖葉, 荖花, 其他油料作物, 胡麻, 小果種油茶, 大果種油茶, 向日葵_採種供作加工原料, 其他藥用作物, 杜虹花, 白花蛇舌草, 桋梧, 假人參, 蕺菜, 辣木, 山葡萄, 地黃, 七葉膽, 澤瀉, 白果, 香椿, 小葉藜, 何首烏, 南薑, 羊奶頭, 土肉桂, 肉桂, 桔梗, 黨蔘, 青葙, 法國綠莧, 金線蓮, 刺五加, 蓪草, 山芙蓉, 圓葉錦葵, 穿心蓮, 白鶴靈芝, 麥門冬, 蘆薈, 白藷莨, 枸杞, 葉用枸杞, 諾麗果, 桑黃, 茯苓, 樟芝, 槐耳, 通天草, 黃耆, 當歸, 柴胡, 明日葉, 艾草, 小金英, 蒲公英, 風茹草, 傷寒草, 六神花, 除蟲菊, 澤蘭, 款冬, 山防風, 荊芥, 筋骨草, 半支蓮, 丹參, 黃芩, 益母草, 草石蠶, 其他雜糧, 其他藷類, 木薯, 甘藷, 其他穀類, 臺灣藜, 高粱, 薏苡, 蕎麥, 燕麥, 小麥, 小米, 大麥, 其他豆類, 樹豆, 落花生, 米豆, 綠豆, 紅豆, 大豆, 珠廉, 鳳尾草, 高山羊齒, 腎蕨, 石蓮, 山蘇, 虎尾蘭, 常春藤, 蔓綠絨, 電信蘭, 黃金葛, 其他多年生草本, 球薑, 火炬花, 野薑花, 薑荷花, 月桃, 水蠟燭, 天堂鳥, 聖誕果, 牛頭茄, 金魚草, 泡盛草, 陸蓮花, 飛燕草, 夢幻草, 白頭翁, 銀蘆, 星辰花, 豇豆, 蠶豆, 翼豆, 萊豆, 鵲豆, 毛豆, 刀豆, 菜豆, 其他花菜苗, 其他花菜, 金針花, 石蓮花, 朝鮮薊, 青花菜, 花椰菜, 其他根菜, 胡蘿蔔, 甜菜根, 闊葉大豆, 豆薯, 雪蓮薯, 辣根, 瑞典蕪菁, 蘿蔔, 其他莖菜, 仙人掌肉質莖, 碧玉筍, 晚香玉筍, 食用大黃, 水蓮, 薯蕷, 荸薺, 蓴菜, 馬鈴薯, 慈菇, 萵苣莖, 菊芋, 黃藤心, 半天筍, 山葵, 球莖甘藍, 蘆筍, 蘘荷, 芋, 蓮, 茭白筍, 甘蔗筍, 牧草筍, 竹筍, 其他鱗莖, 食用百合, 蝦夷蔥, 蕎頭, 洋蔥, 韭蔥, 分蔥, 蔥, 蒜頭, 大蒜, 其他葉菜苗, 其他葉菜, 麻意, 糯米糰, 龍葵, 食茱萸, 學菜, 水合歡, 過溝菜蕨, 龍鳳草, 人蔘菜, 馬齒莧, 番杏, 冰花, 羅勒, 山菠菜, 葉用甘藷, 蕹菜, 藤三七, 落葵, 韭菜, 菾菜, 菠菜, 莧菜, 香芹菜, 水芹, 茴香, 刺芹, 芫荽, 芹菜, 闊苞菊, 白鳳菜, 紅鳳菜, 茼蒿, 山茼蒿, 吉康菜, 苦苣, 珍珠菜, 葉用蘿蔔, 西洋菜, 芝麻菜, 薺菜, 千寶菜, 油江菜, 廣島菜, 青菘菜, 小菘菜, 菜心, 水菜, 塌棵菜, 油菜, 不結球白菜, 芥菜, 結球白菜, 黑種草, 觀賞玉米, 古代稀, 貝殼花, 洋桔梗, 羽衣甘藍, 芥藍, 其他稻米, 秈糯, 稉糯, 軟秈, 硬秈, 稉稻, 觀賞南瓜, 松蟲草, 風鈴花, 紫羅蘭, 葉牡丹, 百日草, 鱗托菊, 瓜葉菊, 向日葵, 矢車菊, 雲南菊, 金盞花, 千日紅, 藜, 雞冠花, 紅莧菜, 雁來紅, 萬代蘭, 腎藥蘭, 皇后蘭, 樹攔, 蜘蛛蘭, 千代蘭, 其他果樹, 可可, 胡桃, 蘋婆, 長山核桃, 澳洲胡桃, 栗子, 胡榛子, 腰果, 扁桃, 杏仁, 檳榔, 椰子, 其它核果, 棗椰子, 爪哇橄欖, 橄欖, 錫蘭橄欖, 印度棗, 中國棗, 酪梨, 梅, 杏, 櫻桃, 李, 桃, 油柑, 紅毛丹, 龍眼, 荔枝, 其他仁果, 枇杷, 梨, 蘋果, 其他漿果, 木鱉果, 山竹, 榴槤, 西印度櫻桃, 人心果, 神秘果, 黃金果, 蛋黃果, 石榴, 楊梅, 榴槤蜜, 桑椹, 小波羅蜜, 波羅蜜, 無花果, 麵包果, 柿, 羅望子, 釋迦, 藍莓, 奇異果, 百香果, 楊桃, 葡萄, 嘉寶果, 蓮霧, 番石榴, 鳳梨, 芭蕉, 香蕉, 番木瓜, 其他柑橘, 金柑與小果柑橘, 枸櫞, 甜橙, 寬皮柑, 葡萄柚, 柚子, 其他蔬菜, 其他長期蔬菜, 其他短期蔬菜, 採種用蔬菜, 小海帶, 髮菜, 海菜, 海帶, 其他菇類, 松茸, 紫丁香蘑, 金福菇, 白玉菇, 鴻喜菇, 酒杯菇, 白木耳, 金耳, 滑菇, 草菇, 粉紅玫瑰菇, 蠔菇, 秀珍菇, 白靈菇, 杏鮑菇, 鮑魚菇, 珊瑚菇, 竹蓀, 舞菇, 香菇, 金針菇, 猴頭菇, 靈芝, 北蟲草, 牛肝菌, 茶樹菇, 毛木耳, 斤耳, 黑木耳, 雞肉絲菇, 雞腿菇, 巴西蘑菇, 洋菇, 其他芽菜, 綠豆芽, 紅豆芽, 蠶豆芽, 苜蓿芽, 黑豆芽, 黃豆芽, 蕎麥芽菜, 落花生芽菜, 蘿蔔芽菜, 青花菜芽菜, 芥藍芽菜, 甘藍芽菜, 其他果菜苗, 其他果菜, 草莓, 黃秋葵, 菱角, 破布子, 香瓜茄, 茄子, 小果番茄, 番茄, 其他瓜菜, 蛇瓜, 隼人瓜, 越瓜, 苦瓜, 胡瓜, 絲瓜, 扁蒲, 南瓜, 冬瓜, 小菊, 紫菀, 紐西蘭麻, 火炬百合, 萱草, 狐尾百合, 假葉樹, 鳴子百合, 天鵝絨, 伯利恆之星, 風信子, 吊蘭, 葉蘭, 文竹, 蘆筍草, 武竹, 夜來香, 翠珠花, 海芋, 合果芋, 白鶴芋, 黛粉葉, 觀音蓮, 唐棉, 紫嬌花, 火球花, 孤挺花, 文殊蘭, 繡球蔥, 百子蓮, 水仙, 石蒜, 君子蘭, 水仙百合, 菖蒲, 其他木本花卉, 山茶花, 木羊齒, 柳, 七里香, 六月雪, 仙丹花, 梔子花, 寒丁子, 麻葉繡球, 海神花, 針墊花, 雪松, 新西蘭, 林投, 牡丹, 女貞, 茉莉, 素馨, 連翹, 尤加利, 蠟梅, 降天桑, 香樹蘭, 洛神葵, 玉蘭花, 金絲桃, 金雀花, 三角尤加利, 聖誕紅, 羽毛花, 變葉木, 蘇鐵, 側柏, 香冠柏, 柳杉, 扁柏, 征木, 五彩千年木, 星點木, 青竹, 百合竹, 虎斑木, 朱蕉, 觀音棕竹, 黃椰子, 八角金盤, 藍星花, 其他一二年生草本, 紅茄, 蚌蘭, 宮燈百合, 嘉蘭, 滿天星, 深山櫻, 康乃馨, 夕霧花, 三角桔梗, 美人蕉, 擎天鳳梨, 觀果鳳梨, 蜻蜓鳳梨, 麥桿菊, 琉璃菊, 一枝黃花, 澳洲鼓槌菊, 麟麟菊, 非洲菊, 白藍菊, 大理花, 波斯菊, 麵線菊, 大菊, 射干, 鳶尾, 小蒼蘭, 段菊, 繡球花, 赫蕉, 袋鼠花, 龍膽, 羽扇豆, 金翠花, 八卦草, 初雪草, 水莞, 巨果薑, 水晶花, 補雪草, 卡斯比亞, 虎尾花, 睡蓮, 竹芋, 鬱金香, 波羅門蔘, 牛蒡, 其他堅果, 雲芝, 其他豆菜, 龍鬚菜, 食用薊, 皇帝豆, 包心白菜, 青江白菜, 敏豆, 小黃瓜, 旱芹, 粉豆, 桑果, 洋香瓜, 柑桔, 柿子, 文旦, 樹葡萄, 牛奶果, 草花, 球根花卉, 蘭類, 觀葉植物, 香花植物, 觀賞樹木, 菊科, 薑科, 荖籐, 烏心石, 茉草, 水稻, 肖楠, 大葉楠, 冬蟲夏草, 水黃皮, 草皮, 牛樟, 雜草, 菊苣, 蘿勒, 黑松, 檜木, 柳樹, 蘋婆果, 九芎, 二葉松, 五葉松, 亞歷山大椰子, 光臘樹, 光蠟樹, 刺桐, 刺桐樹, 加州杉, 加蜜蛋黃果, 十字花科, 千頭木麻黃, 南洋杉, 南洋櫻, 印度紫壇, 印度紫檀, 古煉, 台東蘇鐵, 台灣山蘇花, 台灣杉, 台灣櫸, 台灣欒樹, 台灣海藻, 台灣赤楠, 咸豐草, 嘉德麗亞蘭, 土人參, 垂榕, 大王椰子, 大葉刺桐, 大葉山攬, 大葉山欖, 大葉桃花心木, 大葉欖仁, 大葉雀榕, 夾竹桃, 孟宗竹, 小槐花, 小葉南洋杉, 小葉南洋衫, 小葉桃花心木, 小葉欖仁, 小葉黃槐, 心葉牽牛花, 捲葉蘇鐵, 掌葉蘋婆, 日日櫻, 春不老, 晚香玉, 月橘, 木棉, 木芙蓉, 木麻黃, 本樟, 朱槿, 朴子, 朴樹, 杜鵑, 松, 松樹, 枯里珍, 柏, 柏樹, 柑橘, 柚, 桂竹, 桃樹, 桃花心木, 桑樹, 梅樹, 森氏紅淡比, 椰子樹, 楊樹, 楓香, 楓香樹, 楠木, 榔榆, 榕, 榕樹, 槭樹, 樟, 樟樹, 樹蘭, 橡膠樹, 檀香, 檸檬, 檸檬桉, 檸檬樹, 櫸木, 櫻花, 欖仁, 欖仁樹, 毛木, 毛柿, 水柳, 法國梧桐, 流蘇, 浦葵, 海桐, 海棗, 火焰木, 火燄木, 火龍果, 烏臼, 珊瑚刺桐, 珊瑚莿桐, 琉球蘇鐵, 瓊涯海棠, 番椒, 番荔枝, 痲瘋樹, 白薇, 相思樹, 矮仙丹, 矮仙丹花, 福木, 福祿桐, 竹柏, 筆筒樹, 紅刺林投, 紅楠, 綬草, 緬梔, 羅漢松, 羊蹄甲, 美人樹, 肉桂樹, 肉豆, 肯氏南洋杉, 腋唇蘭, 芒果, 苦楝, 茄冬, 茄苳, 茶花樹, 草海桐, 荔枝樹, 莿桐, 菠羅密, 菠蘿蜜, 菩提, 菩提樹, 華盛頓椰子, 蔓澤蘭, 蕗藤, 蕙蘭, 西施柚, 豔紫荊, 象牙木, 象牙樹, 豬草, 銀姬小蠟, 銀樺, 銀耳, 銀膠菊, 鐵線蕨, 長梗滿天星, 長豇豆, 阿勃勒, 阿薩姆茶, 雀榕, 雞冠刺桐, 青剛櫟, 青楓, 香杉, 鳳凰木, 麵包樹, 黃槿, 黃脈刺桐, 黃脤刺桐, 黃連木, 黃金風鈴木, 黑板樹, 龍柏, 龍眼樹\n    - Known diseases: 葉斑病, 腐爛, 痂病, 發芽, 畸形果, 乾旱, 早疫病 (Early Blight), 晚疫病 (Late Blight), 灰黴病 (Gray Mold), 病毒病 (Virus Disease), 臍腐病 (Blossom-End Rot), 褐根病, 褐根病, 葉震病, 炭疽病, 側柏枝枯病, 枝枯病, 煤煙病, 褐根病, 細菌性病害, 褐根病, 褐根病, 枝枯病, 潰瘍病, 葉枯病, 褐根病, 褐根病, 褐根病, 樹木褐根病, 褐根病, 褐根病, 原因不明, 褐根病, 褐根腐病, 褐根病, 咖啡銹病, 褐根病, 褐根病, 癌腫病, 樹木褐根病, 褐根病, 褐根病, 褐根病, 枝枯病, 腐朽菌, 褐根病, 葉枯病, 癌腫病, 枝枯病, 木耳, 木層孔菌, 褐根病, 木材腐朽菌, 褐根病, 闊葉樹藻斑病, 褐根病, 褐根病, 疑似疫病黃化萎凋, 松樹潰瘍病, 葉震病, 枝枯病, 腐朽菌, 褐根病, 銹病, 竹簇葉病, Phellinus noxius, 褐根病, 褐根腐病, 褐根病, 木材腐朽菌, 椰子樹芽腐病, 褐根病, 褐根病, 褐根病, 褐根病, 可能已被感染褐根病, 孔洞木材腐朽, 木材腐朽病, 根腐病, 樹木褐根病, 煤煙病, 紫膠介殼蟲與煤煙病, 腐朽菌, 褐根病, 褐根腐病, 靈芝根基腐朽病, 鮑魚菇, 樹木褐根病, 褐根病, 樣本無褐根病病原, 樹木褐根病, 腐朽菌, 褐根病, 褐根病, 熱帶靈芝, 癌腫病, 簇葉病, 細菌性或Cercospora sp.角斑, 褐根病, 白紋羽病, 白蟻及褐根病, 細菌性癌腫病, 褐褐病, 褐根病, 褐根病, 褐根病, 褐根病, 褐根病, 葉枯病, 褐根病, 褐根病, 樹木褐根病, 炭疽病, 褐根病, 炭疽病, 熱帶靈芝, 疫病菌, 褐根病, 褐根腐病, 黑腐病與炭疽病, 真菌腐朽性病害, 玫瑰黑斑病, 褐根病, 褐斑病, 褐根病, 癌腫病, 褐根病, 褐根腐病, 褐根腐病、生理反應, 樹木褐根病, 褐根病, 蘆筍莖枯病, 褐根病, 摺菌, 褐根病, 褐根病, 腐霉病或疫病, 褐根病, 疑似褐根病, 褐根腐病, 褐根病, 褐根病, 褐根病, 疫病根腐, 肖楠病, 樹木褐根病, 褐根病, 褐根病, 癌腫病, 細菌性癌腫病, 褐根病, 褐根病, 枝枯病, 炭疽病, 褐根病, 闊葉樹藻斑病, 腐生性危害, 炭疽病、寒害, 褐根病, 褐根病, Phellinus noxius, 褐根病, 黑脂病, 黑腫病, 樹木褐根病, 黃龍病, 褐根病, 煤煙病, 褐根病, 褐根病, 褐根腐病, 褐根病, 褐根病, 白粉病, 褐根病, 褐根病, 樹木褐根病, 腐朽菌, 褐根病, 樹木褐根病, 熱帶靈芝, 褐根病, 松樹葉震病, 流膠病, 葉震病, 褐根病, 疫病菌&腐黴菌, 褐根病, 枝枯病, 枝枯病炭疽病, 褐根病, 褐根病, 樹木褐根病, 褐根病\n    - Known pests: 蟲害, 薊馬, 銀葉粉蝨 (Whitefly), 棉鈴蟲 (Bollworm), 蚜蟲 (Aphid), 咖啡果小蠹, 太平洋臀紋粉介殼蟲, 黃綠綿介殼蟲, 木瓜秀粉介殼蟲, 金花蟲, 椿象, 橘球粉介殼蟲, 長尾粉介殼蟲, 鱗翅目, 咖啡硬介殼蟲, 木瓜秀粉介殼蟲, 美地綿粉介殼蟲, 咖啡硬介殼蟲, 絲粉介殼蟲, 白蠟介殼蟲, 蟻台硬介殼蟲, 鱗翅目, 石蒜綿粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 木瓜秀粉介殼蟲, 粉蝨, 茄綿粉介殼蟲, 蚜蟲, 葉蟎, 月橘白輪盾介殼蟲, 木瓜秀粉介殼蟲, 椰子櫛圓盾介殼蟲, 木瓜秀粉介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 光肩星天牛, 牡蠣盾介殼蟲, 葉蟎, 淡薄圓介殼蟲, 鱗翅目, 桑擬輪盾介殼蟲, 葉蟬, 椰子擬輪盾介殼蟲, 紅蠟介殼蟲, 葉蟎, 螺旋粉蝨, 木瓜秀粉介殼蟲, 黃吹綿介殼蟲, 樟輪盾介殼蟲, 太平洋臀紋粉介殼蟲, 茄綿粉介殼蟲, 太平洋臀紋粉介殼蟲, 柑橘刺粉蝨, 糠片盾介殼蟲, 咖啡木蠹蛾, 桑擬輪盾介殼蟲, 茄綿粉介殼蟲, 橘臀紋粉介殼蟲, 瓜實蠅, 茄綿粉介殼蟲, 雙翅目, 木瓜秀粉介殼蟲, 牡蠣盾介殼蟲, 太平洋臀紋粉介殼蟲, 絲粉介殼蟲, 長角象鼻蟲, 雙翅目, 蚜蟲, 木瓜秀粉介殼蟲, 根蟎, 二點葉蟎, 木瓜秀粉介殼蟲, 粉介殼蟲, 葉蟎, 扁堅介殼蟲, 咖啡硬介殼蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 柑橘刺粉蝨, 番石榴黑疣粉蝨, 螺旋粉蝨, 鱗翅目, 斑潛蠅, 太平洋臀紋粉介殼蟲, 鳳梨嫡粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 蚜蟲, 葉蟎, 象鼻蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 銀葉粉蝨, 木瓜秀粉介殼蟲, 蚜蟲, 銀葉粉蝨, 粉介殼蟲科, 葉蟎, 南黃薊馬, 粉蝨, 薊馬, 椿象, 雙翅目, 中華褐金龜, 木瓜秀粉介殼蟲, 橘球粉介殼蟲, 葉蟬, 木瓜秀粉介殼蟲, 粉介殼蟲, 蚜蟲, 粉蝨, 葉蟎, 木蝨, 盾介殼蟲, 粉蝨, 葉蟎, 蚜蟲, 鱗翅目, 黃綠綿介殼蟲, 棉蚜, 太平洋臀紋粉介殼蟲, 小黃薊馬, 絲粉介殼蟲, 木瓜秀粉介殼蟲, 白蠟介殼蟲, 變葉木片盾介殼蟲, 太平洋偽葉蟎, 葉蟎, 蘭花薊馬, 長跳蟲, 茄綿粉介殼蟲, 雙翅目, 鼠婦, 木瓜秀粉介殼蟲, 扁堅介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 薊馬, 蕉弄蝶, 石蒜綿粉介殼蟲, 茄綿粉介殼蟲, 木蝨, 螟蛾科, 粉介殼蟲 煤灰病, 松材線虫, 疑似松材線蟲, 幹綿蚜, 刺桐釉小蜂, 刺桐釉小蜂、不當移植, 刺桐釉小蜂, 天牛, 夜蛾, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 小蠹蟲, 螟蛾, 蝗蟲、天牛、潛葉蛾, 刺桐釉小蜂, 白蟻、生理性缺水, 竹涓夜蛾, 樟蝙蝠蛾, 蝙蝠蛾, 粉介殼蟲 煤灰病, 介殼蟲, 蘇鐵白輪盾蚧, 天牛, 月橘盾介殼蟲, 白蟻, 軍配蟲, 松材線蟲, 松線虫, 白蟻, 松材線蟲, 萎凋病, 白蟻, 桃蚜, 白蟻, 椰子大象鼻蟲, 綴葉叢螟, 蚜蟲, 斑蛾, 白蟻, 粉介殼蟲 煤灰病, 紫膠介殼蟲, 高背木蝨, 木蠹蛾, 樟樹白輪盾介殼蟲, 樟白介殼蟲, 樟葉蜂, 白蟻, 蜱&#34728;, 台灣家白蟻, 小囊蟲, 桑擬輪介殼蟲, 白蟻, 細菌性穿孔病、台灣黃毒蛾、金花蟲, 葉&#34766;, 粉蝨, 天牛, 紅胸葉蟲, 棉介殼蟲, 烏心石幹綿蚜, 刺桐釉小蜂, 銀葉粉蝨, 根瘤線蟲, 黃帶枝尺蠖蛾, 象牙木木蝨, 黃帶枝尺蛾, 黃帶枝尺蠖蛾, 芒果葉蟬, 白翅夜蟬, 茄苳白翅葉蟬, 螟蛾, 紫膠介殼蟲, 莿桐釉小蜂, 紅胸葉蟲, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 木蝨, 蟎類, 刺桐釉小蜂, 楓粉蝨, 白蟻, 鳳凰木夜蛾, 螨, 刺桐釉小蜂, 刺桐釉小蜂, 松材線蟲, mite’s gall, 白蟻或天牛蛀蝕\n\n    Anti-hallucination rules:\n    - crop_name must exactly match one item from Known crops. If uncertain, use \"未知作物\".\n    - For category \"disease\", status_name must exactly match one item from Known diseases.\n    - For category \"pest\", status_name must exactly match one item from Known pests.\n    - If the image is unclear, confidence is low, or no exact crop/disease/pest match exists, use category \"unknown\" and status_name \"無法判定\".\n    - Do not invent crop names, disease names, pest names, pesticide names, dosages, or treatment steps.\n\n    JSON Output Structure:\n    {\n      \"crop_name\": \"string (The crop's name in Traditional Chinese)\",\n      \"category\": \"string (One of 'disease', 'pest', 'healthy', or 'unknown')\",\n      \"status_name\": \"string (A name from the matching reference list. If healthy, use '健康'. If unknown, use '無法判定')\",\n      \"confidence\": \"float (A value between 0.0 and 1.0)\",\n      \"suggestion\": \"string (A bulleted list of 2-3 key visual symptoms, using '-' for each point and '\\n' for new lines. Example: '- 葉片有黃斑\\n- 葉緣焦枯')\",\n      \"treatment\": \"string (If not healthy, provide a numbered list of actionable steps using '1.', '2.', etc., and '\\n' for new lines. If healthy, provide a positive confirmation like '繼續保持良好照顧。')\"\n    }\n    ",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "```json\n{\n  \"crop_name\": \"馬鈴薯\",\n  \"category\": \"disease\",\n  \"status_name\": \"早疫病 (Early Blight)\",\n  \"confidence\": 0.9,\n  \"suggestion\": \"- 葉片上出現具同心輪紋的褐色病斑\\n- 病斑周圍常伴隨黃化現象\\n- 葉緣與其他葉片也有枯萎或乾焦跡象\",\n  \"treatment\": \"1. 發現病葉時應及時摘除並銷毀，以減少病原擴散。\\n2. 保持田間通風良好，避免過度潮濕。\\n3. 適時依推薦規範施用防治藥劑。\"\n}\n```",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "02HCarjqFfys0-kPov_hqQ4",
+          "usage": {
+            "cache_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 3548
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 531
+              }
+            ],
+            "cached_content_token_count": 4079,
+            "candidates_token_count": 166,
+            "prompt_token_count": 8466,
+            "prompt_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 7364
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 1102
+              }
+            ],
+            "total_token_count": 8632
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 1.6789921000599861
+        }
+      ],
+      "raw_score": {
+        "outcome": "incorrect_known_label",
+        "crop_correct": true
+      },
+      "final_score": {
+        "outcome": "abstained",
+        "crop_correct": true
+      },
+      "advice": {
+        "applicable": false
+      },
+      "wall_seconds": 25.89091519988142,
+      "intentional_sleep_seconds": 22.557023299857974,
+      "inference_seconds": 3.3338919000234455
+    },
+    {
+      "case_id": "plant-08",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:25:24.272890+00:00",
+      "status": "ok",
+      "raw": {
+        "crop_name": "蘋果",
+        "category": "disease",
+        "status_name": "葉斑病",
+        "confidence": 0.85,
+        "suggestion": "- 葉片表面出現大量褐色至紫褐色斑點\n- 病斑逐漸擴大並融合，導致葉片黃化\n- 嚴重受害時葉片可能提早落葉",
+        "treatment": "1. 清除並銷毀落葉與受感染的枝條，以減少病原菌感染源。\n2. 加強果園通風透光，避免過度密植與濕度過高。\n3. 在發病初期適時依推薦規範進行防範與藥劑防治。"
+      },
+      "validated": {
+        "crop_name": "蘋果",
+        "category": "disease",
+        "status_name": "葉斑病",
+        "confidence": 0.85,
+        "suggestion": "- 葉片表面出現大量褐色至紫褐色斑點\n- 病斑逐漸擴大並融合，導致葉片黃化\n- 嚴重受害時葉片可能提早落葉",
+        "treatment": "1. 清除並銷毀落葉與受感染的枝條，以減少病原菌感染源。\n2. 加強果園通風透光，避免過度密植與濕度過高。\n3. 在發病初期適時依推薦規範進行防範與藥劑防治。",
+        "grounding_source": "model_pending_database_check",
+        "requires_review": false
+      },
+      "final": {
+        "crop_name": "蘋果",
+        "category": "unknown",
+        "status_name": "無法判定",
+        "confidence": 0.5,
+        "suggestion": "- 影像特徵不足，無法與目前資料庫中的作物或病蟲害安全對應\n- 建議重新拍攝清晰葉面、莖部與受害區域",
+        "treatment": "1. 暫時隔離疑似受害植株並持續觀察。\n2. 補拍清晰照片後重新診斷。\n3. 若症狀持續擴大，請諮詢農業專家或更新知識庫。",
+        "grounding_source": "safety_fallback",
+        "requires_review": true
+      },
+      "calls": [
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:25:35.577120+00:00",
+          "prompt_sha256": "df5039f2f48745cfc4d37b74588111cde6a167b8e1c7d6ae87abf0cd5ccbe39f",
+          "prompt": "You are an agricultural expert. Briefly describe the main subject and any visible symptoms in this image in a few keywords (e.g., 'tomato, leaf spots, yellowing'). This will be used to search a knowledge base. Respond in Traditional Chinese.",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "蘋果, 葉片斑點, 葉黃化",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "4GHCau3lBZOa1e8PzKaX-AU",
+          "usage": {
+            "candidates_token_count": 12,
+            "prompt_token_count": 1162,
+            "prompt_tokens_details": [
+              {
+                "modality": "IMAGE",
+                "token_count": 1110
+              },
+              {
+                "modality": "TEXT",
+                "token_count": 52
+              }
+            ],
+            "total_token_count": 1174
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 2.66264840005897
+        },
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:25:48.577999+00:00",
+          "prompt_sha256": "e5a3139c9f6944a94f11353fca6b82b4ba7f6116995141ccf475509e3b879dba",
+          "prompt": "\n    You are a top-tier plant pathologist. Analyze the provided image and context from our knowledge base to provide a professional diagnosis. Respond in valid JSON format, using Traditional Chinese for all user-facing text.\n\n    --- Knowledge Base Context ---\n    No specific context found.\n    ---\n\n    Reference Lists (for name standardization):\n    - Known crops: 甜椒, 萵苣, 甜瓜, 西瓜, 薑, 玉米百合, 玉米, 辣椒, 觀賞辣椒, 豌豆芽菜, 豌豆, 玉米筍, 檬果, 甘藍, 樹番茄, 青油菜, 紅龍果, 馬拉巴栗, 菊花, 火鶴, 玫瑰, 劍蘭, 百合, 其他蘭花, 小花蕙蘭, 虎頭蘭, 嘉德麗雅蘭, 仙履蘭, 石斛蘭, 文心蘭, 蝴蝶蘭, 其他景觀作物, 景觀小油菊, 景觀萬壽菊, 景觀波斯菊, 景觀向日葵, 其他綠肥作物, 魯冰, 青皮豆, 鐵虎豆, 苕子, 紫雲英, 田菁, 爬地蘭, 富貴豆, 太陽麻, 大豆類, 大菜, 埃及三葉草, 其他牧草, 其他長期牧草, 其他短期牧草, 青割玉米, 蘇丹草, 苜蓿草, 盤固拉草, 狼尾草, 尼羅草, 酒類製品, 蜂產品, 綜合蔬果製品, 其他特用作物加工製品, 胡麻製品, 薑黃製品, 愛玉製品, 茶製品, 油茶製品, 洛神葵製品, 香茅製品, 甘蔗製品, 咖啡製品, 梔子製品, 諾麗果製品, 風茹製品, 甜菊製品, 杭菊製品, 向日葵製品, 仙草製品, 紫蘇製品, 其他花卉加工製品, 油菊製品, 茉莉花製品, 玫瑰花製品, 其他水果加工製品, 可可製品, 栗子製品, 椰子製品, 橄欖製品, 棗製品, 梅製品, 李製品, 桃製品, 芒果製品, 龍眼製品, 荔枝製品, 枇杷製品, 梨製品, 蘋果製品, 木鱉果製品, 楊梅製品, 榴槤蜜製品, 桑椹製品, 波羅蜜製品, 柿製品, 釋迦製品, 奇異果製品, 紅龍果製品, 百香果製品, 楊桃製品, 葡萄製品, 蓮霧製品, 番石榴製品, 鳳梨製品, 香蕉製品, 木瓜製品, 金柑製品, 檸檬製品, 柑橘製品, 椪柑製品, 柳橙製品, 葡萄柚製品, 柚子製品, 其他蔬菜加工製品, 白木耳製品, 黑木耳製品, 猴頭菇製品, 杏鮑菇製品, 香菇製品, 草莓製品, 黃秋葵製品, 菱角製品, 番茄製品, 辣椒製品, 甜瓜製品, 西瓜製品, 越瓜製品, 苦瓜製品, 胡瓜製品, 絲瓜製品, 南瓜製品, 冬瓜製品, 蠶豆製品, 豌豆製品, 花豆製品, 毛豆製品, 金針花製品, 胡蘿蔔製品, 牛蒡製品, 蘿蔔製品, 馬鈴薯製品, 山藥製品, 山葵製品, 蘆筍製品, 薑製品, 芋頭製品, 蓮藕製品, 竹筍製品, 食用百合製品, 洋蔥製品, 蔥製品, 蒜製品, 羅勒製品, 菠菜製品, 芹菜製品, 芥菜製品, 油菜製品, 結球白菜製品, 甘藍製品, 其他五穀雜糧加工製品, 木薯製品, 甘藷製品, 綠豆製品, 紅豆製品, 落花生製品, 大豆製品, 薏苡製品, 燕麥製品, 蕎麥製品, 大麥製品, 高粱製品, 小米製品, 小麥製品, 玉米製品, 硬質玉米製品, 稻米製品, 其他特用作物, 其他長期特作, 其他短期特作, 其他飲料作物, 愛玉子, 茶, 洛神, 咖啡, 杭菊, 仙草, 其他香料作物, 香水蓮, 香草, 秀英, 茉莉花_薰芬茶用, 桂花, 檸檬香茅, 香茅, 蒔蘿, 芳香萬壽菊, 薄荷, 紫蘇, 其他澱粉作物, 紅蓮蕉, 蒟蒻, 葛鬱金, 葛藤, 其他染料作物, 薑黃, 大菁, 藷茛, 梔子, 大青, 紅花, 其他纖維作物, 瓊麻, 亞麻, 圓藺草, 苧麻, 大甲藺, 三角藺, 棉花, 貴黍, 其他糖料作物, 甘蔗, 甜菊, 其他嗜好作物, 菸草, 荖藤, 荖葉, 荖花, 其他油料作物, 胡麻, 小果種油茶, 大果種油茶, 向日葵_採種供作加工原料, 其他藥用作物, 杜虹花, 白花蛇舌草, 桋梧, 假人參, 蕺菜, 辣木, 山葡萄, 地黃, 七葉膽, 澤瀉, 白果, 香椿, 小葉藜, 何首烏, 南薑, 羊奶頭, 土肉桂, 肉桂, 桔梗, 黨蔘, 青葙, 法國綠莧, 金線蓮, 刺五加, 蓪草, 山芙蓉, 圓葉錦葵, 穿心蓮, 白鶴靈芝, 麥門冬, 蘆薈, 白藷莨, 枸杞, 葉用枸杞, 諾麗果, 桑黃, 茯苓, 樟芝, 槐耳, 通天草, 黃耆, 當歸, 柴胡, 明日葉, 艾草, 小金英, 蒲公英, 風茹草, 傷寒草, 六神花, 除蟲菊, 澤蘭, 款冬, 山防風, 荊芥, 筋骨草, 半支蓮, 丹參, 黃芩, 益母草, 草石蠶, 其他雜糧, 其他藷類, 木薯, 甘藷, 其他穀類, 臺灣藜, 高粱, 薏苡, 蕎麥, 燕麥, 小麥, 小米, 大麥, 其他豆類, 樹豆, 落花生, 米豆, 綠豆, 紅豆, 大豆, 珠廉, 鳳尾草, 高山羊齒, 腎蕨, 石蓮, 山蘇, 虎尾蘭, 常春藤, 蔓綠絨, 電信蘭, 黃金葛, 其他多年生草本, 球薑, 火炬花, 野薑花, 薑荷花, 月桃, 水蠟燭, 天堂鳥, 聖誕果, 牛頭茄, 金魚草, 泡盛草, 陸蓮花, 飛燕草, 夢幻草, 白頭翁, 銀蘆, 星辰花, 豇豆, 蠶豆, 翼豆, 萊豆, 鵲豆, 毛豆, 刀豆, 菜豆, 其他花菜苗, 其他花菜, 金針花, 石蓮花, 朝鮮薊, 青花菜, 花椰菜, 其他根菜, 胡蘿蔔, 甜菜根, 闊葉大豆, 豆薯, 雪蓮薯, 辣根, 瑞典蕪菁, 蘿蔔, 其他莖菜, 仙人掌肉質莖, 碧玉筍, 晚香玉筍, 食用大黃, 水蓮, 薯蕷, 荸薺, 蓴菜, 馬鈴薯, 慈菇, 萵苣莖, 菊芋, 黃藤心, 半天筍, 山葵, 球莖甘藍, 蘆筍, 蘘荷, 芋, 蓮, 茭白筍, 甘蔗筍, 牧草筍, 竹筍, 其他鱗莖, 食用百合, 蝦夷蔥, 蕎頭, 洋蔥, 韭蔥, 分蔥, 蔥, 蒜頭, 大蒜, 其他葉菜苗, 其他葉菜, 麻意, 糯米糰, 龍葵, 食茱萸, 學菜, 水合歡, 過溝菜蕨, 龍鳳草, 人蔘菜, 馬齒莧, 番杏, 冰花, 羅勒, 山菠菜, 葉用甘藷, 蕹菜, 藤三七, 落葵, 韭菜, 菾菜, 菠菜, 莧菜, 香芹菜, 水芹, 茴香, 刺芹, 芫荽, 芹菜, 闊苞菊, 白鳳菜, 紅鳳菜, 茼蒿, 山茼蒿, 吉康菜, 苦苣, 珍珠菜, 葉用蘿蔔, 西洋菜, 芝麻菜, 薺菜, 千寶菜, 油江菜, 廣島菜, 青菘菜, 小菘菜, 菜心, 水菜, 塌棵菜, 油菜, 不結球白菜, 芥菜, 結球白菜, 黑種草, 觀賞玉米, 古代稀, 貝殼花, 洋桔梗, 羽衣甘藍, 芥藍, 其他稻米, 秈糯, 稉糯, 軟秈, 硬秈, 稉稻, 觀賞南瓜, 松蟲草, 風鈴花, 紫羅蘭, 葉牡丹, 百日草, 鱗托菊, 瓜葉菊, 向日葵, 矢車菊, 雲南菊, 金盞花, 千日紅, 藜, 雞冠花, 紅莧菜, 雁來紅, 萬代蘭, 腎藥蘭, 皇后蘭, 樹攔, 蜘蛛蘭, 千代蘭, 其他果樹, 可可, 胡桃, 蘋婆, 長山核桃, 澳洲胡桃, 栗子, 胡榛子, 腰果, 扁桃, 杏仁, 檳榔, 椰子, 其它核果, 棗椰子, 爪哇橄欖, 橄欖, 錫蘭橄欖, 印度棗, 中國棗, 酪梨, 梅, 杏, 櫻桃, 李, 桃, 油柑, 紅毛丹, 龍眼, 荔枝, 其他仁果, 枇杷, 梨, 蘋果, 其他漿果, 木鱉果, 山竹, 榴槤, 西印度櫻桃, 人心果, 神秘果, 黃金果, 蛋黃果, 石榴, 楊梅, 榴槤蜜, 桑椹, 小波羅蜜, 波羅蜜, 無花果, 麵包果, 柿, 羅望子, 釋迦, 藍莓, 奇異果, 百香果, 楊桃, 葡萄, 嘉寶果, 蓮霧, 番石榴, 鳳梨, 芭蕉, 香蕉, 番木瓜, 其他柑橘, 金柑與小果柑橘, 枸櫞, 甜橙, 寬皮柑, 葡萄柚, 柚子, 其他蔬菜, 其他長期蔬菜, 其他短期蔬菜, 採種用蔬菜, 小海帶, 髮菜, 海菜, 海帶, 其他菇類, 松茸, 紫丁香蘑, 金福菇, 白玉菇, 鴻喜菇, 酒杯菇, 白木耳, 金耳, 滑菇, 草菇, 粉紅玫瑰菇, 蠔菇, 秀珍菇, 白靈菇, 杏鮑菇, 鮑魚菇, 珊瑚菇, 竹蓀, 舞菇, 香菇, 金針菇, 猴頭菇, 靈芝, 北蟲草, 牛肝菌, 茶樹菇, 毛木耳, 斤耳, 黑木耳, 雞肉絲菇, 雞腿菇, 巴西蘑菇, 洋菇, 其他芽菜, 綠豆芽, 紅豆芽, 蠶豆芽, 苜蓿芽, 黑豆芽, 黃豆芽, 蕎麥芽菜, 落花生芽菜, 蘿蔔芽菜, 青花菜芽菜, 芥藍芽菜, 甘藍芽菜, 其他果菜苗, 其他果菜, 草莓, 黃秋葵, 菱角, 破布子, 香瓜茄, 茄子, 小果番茄, 番茄, 其他瓜菜, 蛇瓜, 隼人瓜, 越瓜, 苦瓜, 胡瓜, 絲瓜, 扁蒲, 南瓜, 冬瓜, 小菊, 紫菀, 紐西蘭麻, 火炬百合, 萱草, 狐尾百合, 假葉樹, 鳴子百合, 天鵝絨, 伯利恆之星, 風信子, 吊蘭, 葉蘭, 文竹, 蘆筍草, 武竹, 夜來香, 翠珠花, 海芋, 合果芋, 白鶴芋, 黛粉葉, 觀音蓮, 唐棉, 紫嬌花, 火球花, 孤挺花, 文殊蘭, 繡球蔥, 百子蓮, 水仙, 石蒜, 君子蘭, 水仙百合, 菖蒲, 其他木本花卉, 山茶花, 木羊齒, 柳, 七里香, 六月雪, 仙丹花, 梔子花, 寒丁子, 麻葉繡球, 海神花, 針墊花, 雪松, 新西蘭, 林投, 牡丹, 女貞, 茉莉, 素馨, 連翹, 尤加利, 蠟梅, 降天桑, 香樹蘭, 洛神葵, 玉蘭花, 金絲桃, 金雀花, 三角尤加利, 聖誕紅, 羽毛花, 變葉木, 蘇鐵, 側柏, 香冠柏, 柳杉, 扁柏, 征木, 五彩千年木, 星點木, 青竹, 百合竹, 虎斑木, 朱蕉, 觀音棕竹, 黃椰子, 八角金盤, 藍星花, 其他一二年生草本, 紅茄, 蚌蘭, 宮燈百合, 嘉蘭, 滿天星, 深山櫻, 康乃馨, 夕霧花, 三角桔梗, 美人蕉, 擎天鳳梨, 觀果鳳梨, 蜻蜓鳳梨, 麥桿菊, 琉璃菊, 一枝黃花, 澳洲鼓槌菊, 麟麟菊, 非洲菊, 白藍菊, 大理花, 波斯菊, 麵線菊, 大菊, 射干, 鳶尾, 小蒼蘭, 段菊, 繡球花, 赫蕉, 袋鼠花, 龍膽, 羽扇豆, 金翠花, 八卦草, 初雪草, 水莞, 巨果薑, 水晶花, 補雪草, 卡斯比亞, 虎尾花, 睡蓮, 竹芋, 鬱金香, 波羅門蔘, 牛蒡, 其他堅果, 雲芝, 其他豆菜, 龍鬚菜, 食用薊, 皇帝豆, 包心白菜, 青江白菜, 敏豆, 小黃瓜, 旱芹, 粉豆, 桑果, 洋香瓜, 柑桔, 柿子, 文旦, 樹葡萄, 牛奶果, 草花, 球根花卉, 蘭類, 觀葉植物, 香花植物, 觀賞樹木, 菊科, 薑科, 荖籐, 烏心石, 茉草, 水稻, 肖楠, 大葉楠, 冬蟲夏草, 水黃皮, 草皮, 牛樟, 雜草, 菊苣, 蘿勒, 黑松, 檜木, 柳樹, 蘋婆果, 九芎, 二葉松, 五葉松, 亞歷山大椰子, 光臘樹, 光蠟樹, 刺桐, 刺桐樹, 加州杉, 加蜜蛋黃果, 十字花科, 千頭木麻黃, 南洋杉, 南洋櫻, 印度紫壇, 印度紫檀, 古煉, 台東蘇鐵, 台灣山蘇花, 台灣杉, 台灣櫸, 台灣欒樹, 台灣海藻, 台灣赤楠, 咸豐草, 嘉德麗亞蘭, 土人參, 垂榕, 大王椰子, 大葉刺桐, 大葉山攬, 大葉山欖, 大葉桃花心木, 大葉欖仁, 大葉雀榕, 夾竹桃, 孟宗竹, 小槐花, 小葉南洋杉, 小葉南洋衫, 小葉桃花心木, 小葉欖仁, 小葉黃槐, 心葉牽牛花, 捲葉蘇鐵, 掌葉蘋婆, 日日櫻, 春不老, 晚香玉, 月橘, 木棉, 木芙蓉, 木麻黃, 本樟, 朱槿, 朴子, 朴樹, 杜鵑, 松, 松樹, 枯里珍, 柏, 柏樹, 柑橘, 柚, 桂竹, 桃樹, 桃花心木, 桑樹, 梅樹, 森氏紅淡比, 椰子樹, 楊樹, 楓香, 楓香樹, 楠木, 榔榆, 榕, 榕樹, 槭樹, 樟, 樟樹, 樹蘭, 橡膠樹, 檀香, 檸檬, 檸檬桉, 檸檬樹, 櫸木, 櫻花, 欖仁, 欖仁樹, 毛木, 毛柿, 水柳, 法國梧桐, 流蘇, 浦葵, 海桐, 海棗, 火焰木, 火燄木, 火龍果, 烏臼, 珊瑚刺桐, 珊瑚莿桐, 琉球蘇鐵, 瓊涯海棠, 番椒, 番荔枝, 痲瘋樹, 白薇, 相思樹, 矮仙丹, 矮仙丹花, 福木, 福祿桐, 竹柏, 筆筒樹, 紅刺林投, 紅楠, 綬草, 緬梔, 羅漢松, 羊蹄甲, 美人樹, 肉桂樹, 肉豆, 肯氏南洋杉, 腋唇蘭, 芒果, 苦楝, 茄冬, 茄苳, 茶花樹, 草海桐, 荔枝樹, 莿桐, 菠羅密, 菠蘿蜜, 菩提, 菩提樹, 華盛頓椰子, 蔓澤蘭, 蕗藤, 蕙蘭, 西施柚, 豔紫荊, 象牙木, 象牙樹, 豬草, 銀姬小蠟, 銀樺, 銀耳, 銀膠菊, 鐵線蕨, 長梗滿天星, 長豇豆, 阿勃勒, 阿薩姆茶, 雀榕, 雞冠刺桐, 青剛櫟, 青楓, 香杉, 鳳凰木, 麵包樹, 黃槿, 黃脈刺桐, 黃脤刺桐, 黃連木, 黃金風鈴木, 黑板樹, 龍柏, 龍眼樹\n    - Known diseases: 葉斑病, 腐爛, 痂病, 發芽, 畸形果, 乾旱, 早疫病 (Early Blight), 晚疫病 (Late Blight), 灰黴病 (Gray Mold), 病毒病 (Virus Disease), 臍腐病 (Blossom-End Rot), 褐根病, 褐根病, 葉震病, 炭疽病, 側柏枝枯病, 枝枯病, 煤煙病, 褐根病, 細菌性病害, 褐根病, 褐根病, 枝枯病, 潰瘍病, 葉枯病, 褐根病, 褐根病, 褐根病, 樹木褐根病, 褐根病, 褐根病, 原因不明, 褐根病, 褐根腐病, 褐根病, 咖啡銹病, 褐根病, 褐根病, 癌腫病, 樹木褐根病, 褐根病, 褐根病, 褐根病, 枝枯病, 腐朽菌, 褐根病, 葉枯病, 癌腫病, 枝枯病, 木耳, 木層孔菌, 褐根病, 木材腐朽菌, 褐根病, 闊葉樹藻斑病, 褐根病, 褐根病, 疑似疫病黃化萎凋, 松樹潰瘍病, 葉震病, 枝枯病, 腐朽菌, 褐根病, 銹病, 竹簇葉病, Phellinus noxius, 褐根病, 褐根腐病, 褐根病, 木材腐朽菌, 椰子樹芽腐病, 褐根病, 褐根病, 褐根病, 褐根病, 可能已被感染褐根病, 孔洞木材腐朽, 木材腐朽病, 根腐病, 樹木褐根病, 煤煙病, 紫膠介殼蟲與煤煙病, 腐朽菌, 褐根病, 褐根腐病, 靈芝根基腐朽病, 鮑魚菇, 樹木褐根病, 褐根病, 樣本無褐根病病原, 樹木褐根病, 腐朽菌, 褐根病, 褐根病, 熱帶靈芝, 癌腫病, 簇葉病, 細菌性或Cercospora sp.角斑, 褐根病, 白紋羽病, 白蟻及褐根病, 細菌性癌腫病, 褐褐病, 褐根病, 褐根病, 褐根病, 褐根病, 褐根病, 葉枯病, 褐根病, 褐根病, 樹木褐根病, 炭疽病, 褐根病, 炭疽病, 熱帶靈芝, 疫病菌, 褐根病, 褐根腐病, 黑腐病與炭疽病, 真菌腐朽性病害, 玫瑰黑斑病, 褐根病, 褐斑病, 褐根病, 癌腫病, 褐根病, 褐根腐病, 褐根腐病、生理反應, 樹木褐根病, 褐根病, 蘆筍莖枯病, 褐根病, 摺菌, 褐根病, 褐根病, 腐霉病或疫病, 褐根病, 疑似褐根病, 褐根腐病, 褐根病, 褐根病, 褐根病, 疫病根腐, 肖楠病, 樹木褐根病, 褐根病, 褐根病, 癌腫病, 細菌性癌腫病, 褐根病, 褐根病, 枝枯病, 炭疽病, 褐根病, 闊葉樹藻斑病, 腐生性危害, 炭疽病、寒害, 褐根病, 褐根病, Phellinus noxius, 褐根病, 黑脂病, 黑腫病, 樹木褐根病, 黃龍病, 褐根病, 煤煙病, 褐根病, 褐根病, 褐根腐病, 褐根病, 褐根病, 白粉病, 褐根病, 褐根病, 樹木褐根病, 腐朽菌, 褐根病, 樹木褐根病, 熱帶靈芝, 褐根病, 松樹葉震病, 流膠病, 葉震病, 褐根病, 疫病菌&腐黴菌, 褐根病, 枝枯病, 枝枯病炭疽病, 褐根病, 褐根病, 樹木褐根病, 褐根病\n    - Known pests: 蟲害, 薊馬, 銀葉粉蝨 (Whitefly), 棉鈴蟲 (Bollworm), 蚜蟲 (Aphid), 咖啡果小蠹, 太平洋臀紋粉介殼蟲, 黃綠綿介殼蟲, 木瓜秀粉介殼蟲, 金花蟲, 椿象, 橘球粉介殼蟲, 長尾粉介殼蟲, 鱗翅目, 咖啡硬介殼蟲, 木瓜秀粉介殼蟲, 美地綿粉介殼蟲, 咖啡硬介殼蟲, 絲粉介殼蟲, 白蠟介殼蟲, 蟻台硬介殼蟲, 鱗翅目, 石蒜綿粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 木瓜秀粉介殼蟲, 粉蝨, 茄綿粉介殼蟲, 蚜蟲, 葉蟎, 月橘白輪盾介殼蟲, 木瓜秀粉介殼蟲, 椰子櫛圓盾介殼蟲, 木瓜秀粉介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 光肩星天牛, 牡蠣盾介殼蟲, 葉蟎, 淡薄圓介殼蟲, 鱗翅目, 桑擬輪盾介殼蟲, 葉蟬, 椰子擬輪盾介殼蟲, 紅蠟介殼蟲, 葉蟎, 螺旋粉蝨, 木瓜秀粉介殼蟲, 黃吹綿介殼蟲, 樟輪盾介殼蟲, 太平洋臀紋粉介殼蟲, 茄綿粉介殼蟲, 太平洋臀紋粉介殼蟲, 柑橘刺粉蝨, 糠片盾介殼蟲, 咖啡木蠹蛾, 桑擬輪盾介殼蟲, 茄綿粉介殼蟲, 橘臀紋粉介殼蟲, 瓜實蠅, 茄綿粉介殼蟲, 雙翅目, 木瓜秀粉介殼蟲, 牡蠣盾介殼蟲, 太平洋臀紋粉介殼蟲, 絲粉介殼蟲, 長角象鼻蟲, 雙翅目, 蚜蟲, 木瓜秀粉介殼蟲, 根蟎, 二點葉蟎, 木瓜秀粉介殼蟲, 粉介殼蟲, 葉蟎, 扁堅介殼蟲, 咖啡硬介殼蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 柑橘刺粉蝨, 番石榴黑疣粉蝨, 螺旋粉蝨, 鱗翅目, 斑潛蠅, 太平洋臀紋粉介殼蟲, 鳳梨嫡粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 蚜蟲, 葉蟎, 象鼻蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 銀葉粉蝨, 木瓜秀粉介殼蟲, 蚜蟲, 銀葉粉蝨, 粉介殼蟲科, 葉蟎, 南黃薊馬, 粉蝨, 薊馬, 椿象, 雙翅目, 中華褐金龜, 木瓜秀粉介殼蟲, 橘球粉介殼蟲, 葉蟬, 木瓜秀粉介殼蟲, 粉介殼蟲, 蚜蟲, 粉蝨, 葉蟎, 木蝨, 盾介殼蟲, 粉蝨, 葉蟎, 蚜蟲, 鱗翅目, 黃綠綿介殼蟲, 棉蚜, 太平洋臀紋粉介殼蟲, 小黃薊馬, 絲粉介殼蟲, 木瓜秀粉介殼蟲, 白蠟介殼蟲, 變葉木片盾介殼蟲, 太平洋偽葉蟎, 葉蟎, 蘭花薊馬, 長跳蟲, 茄綿粉介殼蟲, 雙翅目, 鼠婦, 木瓜秀粉介殼蟲, 扁堅介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 薊馬, 蕉弄蝶, 石蒜綿粉介殼蟲, 茄綿粉介殼蟲, 木蝨, 螟蛾科, 粉介殼蟲 煤灰病, 松材線虫, 疑似松材線蟲, 幹綿蚜, 刺桐釉小蜂, 刺桐釉小蜂、不當移植, 刺桐釉小蜂, 天牛, 夜蛾, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 小蠹蟲, 螟蛾, 蝗蟲、天牛、潛葉蛾, 刺桐釉小蜂, 白蟻、生理性缺水, 竹涓夜蛾, 樟蝙蝠蛾, 蝙蝠蛾, 粉介殼蟲 煤灰病, 介殼蟲, 蘇鐵白輪盾蚧, 天牛, 月橘盾介殼蟲, 白蟻, 軍配蟲, 松材線蟲, 松線虫, 白蟻, 松材線蟲, 萎凋病, 白蟻, 桃蚜, 白蟻, 椰子大象鼻蟲, 綴葉叢螟, 蚜蟲, 斑蛾, 白蟻, 粉介殼蟲 煤灰病, 紫膠介殼蟲, 高背木蝨, 木蠹蛾, 樟樹白輪盾介殼蟲, 樟白介殼蟲, 樟葉蜂, 白蟻, 蜱&#34728;, 台灣家白蟻, 小囊蟲, 桑擬輪介殼蟲, 白蟻, 細菌性穿孔病、台灣黃毒蛾、金花蟲, 葉&#34766;, 粉蝨, 天牛, 紅胸葉蟲, 棉介殼蟲, 烏心石幹綿蚜, 刺桐釉小蜂, 銀葉粉蝨, 根瘤線蟲, 黃帶枝尺蠖蛾, 象牙木木蝨, 黃帶枝尺蛾, 黃帶枝尺蠖蛾, 芒果葉蟬, 白翅夜蟬, 茄苳白翅葉蟬, 螟蛾, 紫膠介殼蟲, 莿桐釉小蜂, 紅胸葉蟲, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 木蝨, 蟎類, 刺桐釉小蜂, 楓粉蝨, 白蟻, 鳳凰木夜蛾, 螨, 刺桐釉小蜂, 刺桐釉小蜂, 松材線蟲, mite’s gall, 白蟻或天牛蛀蝕\n\n    Anti-hallucination rules:\n    - crop_name must exactly match one item from Known crops. If uncertain, use \"未知作物\".\n    - For category \"disease\", status_name must exactly match one item from Known diseases.\n    - For category \"pest\", status_name must exactly match one item from Known pests.\n    - If the image is unclear, confidence is low, or no exact crop/disease/pest match exists, use category \"unknown\" and status_name \"無法判定\".\n    - Do not invent crop names, disease names, pest names, pesticide names, dosages, or treatment steps.\n\n    JSON Output Structure:\n    {\n      \"crop_name\": \"string (The crop's name in Traditional Chinese)\",\n      \"category\": \"string (One of 'disease', 'pest', 'healthy', or 'unknown')\",\n      \"status_name\": \"string (A name from the matching reference list. If healthy, use '健康'. If unknown, use '無法判定')\",\n      \"confidence\": \"float (A value between 0.0 and 1.0)\",\n      \"suggestion\": \"string (A bulleted list of 2-3 key visual symptoms, using '-' for each point and '\\n' for new lines. Example: '- 葉片有黃斑\\n- 葉緣焦枯')\",\n      \"treatment\": \"string (If not healthy, provide a numbered list of actionable steps using '1.', '2.', etc., and '\\n' for new lines. If healthy, provide a positive confirmation like '繼續保持良好照顧。')\"\n    }\n    ",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "```json\n{\n  \"crop_name\": \"蘋果\",\n  \"category\": \"disease\",\n  \"status_name\": \"葉斑病\",\n  \"confidence\": 0.85,\n  \"suggestion\": \"- 葉片表面出現大量褐色至紫褐色斑點\\n- 病斑逐漸擴大並融合，導致葉片黃化\\n- 嚴重受害時葉片可能提早落葉\",\n  \"treatment\": \"1. 清除並銷毀落葉與受感染的枝條，以減少病原菌感染源。\\n2. 加強果園通風透光，避免過度密植與濕度過高。\\n3. 在發病初期適時依推薦規範進行防範與藥劑防治。\"\n}\n```",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "7WHCatj7FLuM1e8P3fyu8AU",
+          "usage": {
+            "cache_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 3545
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 534
+              }
+            ],
+            "cached_content_token_count": 4079,
+            "candidates_token_count": 172,
+            "prompt_token_count": 8474,
+            "prompt_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 7364
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 1110
+              }
+            ],
+            "total_token_count": 8646
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 1.7500360999256372
+        }
+      ],
+      "raw_score": {
+        "outcome": "incorrect_known_label",
+        "crop_correct": true
+      },
+      "final_score": {
+        "outcome": "abstained",
+        "crop_correct": true
+      },
+      "advice": {
+        "applicable": false
+      },
+      "wall_seconds": 26.05750670004636,
+      "intentional_sleep_seconds": 21.635880900081247,
+      "inference_seconds": 4.421625799965113
+    },
+    {
+      "case_id": "nonplant-checkerboard",
+      "model": "gemini-3.5-flash-lite",
+      "started_at": "2026-10-04T14:25:50.338574+00:00",
+      "status": "ok",
+      "raw": {
+        "crop_name": "未知作物",
+        "category": "unknown",
+        "status_name": "無法判定",
+        "confidence": 0.0,
+        "suggestion": "- 影像內容無法辨識為植物或相關病徵\n- 提供的圖片為幾何圖案（棋盤格）",
+        "treatment": "1. 請提供清晰的植物受害部位照片以進行正確診斷。\n2. 確保拍攝時對焦準確且光線充足。"
+      },
+      "validated": {
+        "crop_name": "未知作物",
+        "category": "unknown",
+        "status_name": "無法判定",
+        "confidence": 0.0,
+        "suggestion": "- 影像特徵不足，無法與目前資料庫中的作物或病蟲害安全對應\n- 建議重新拍攝清晰葉面、莖部與受害區域",
+        "treatment": "1. 暫時隔離疑似受害植株並持續觀察。\n2. 補拍清晰照片後重新診斷。\n3. 若症狀持續擴大，請諮詢農業專家或更新知識庫。",
+        "grounding_source": "safety_fallback",
+        "requires_review": true
+      },
+      "final": {
+        "crop_name": "未知作物",
+        "category": "unknown",
+        "status_name": "無法判定",
+        "confidence": 0.0,
+        "suggestion": "- 影像特徵不足，無法與目前資料庫中的作物或病蟲害安全對應\n- 建議重新拍攝清晰葉面、莖部與受害區域",
+        "treatment": "1. 暫時隔離疑似受害植株並持續觀察。\n2. 補拍清晰照片後重新診斷。\n3. 若症狀持續擴大，請諮詢農業專家或更新知識庫。",
+        "grounding_source": "safety_fallback",
+        "requires_review": true
+      },
+      "calls": [
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:26:01.579436+00:00",
+          "prompt_sha256": "df5039f2f48745cfc4d37b74588111cde6a167b8e1c7d6ae87abf0cd5ccbe39f",
+          "prompt": "You are an agricultural expert. Briefly describe the main subject and any visible symptoms in this image in a few keywords (e.g., 'tomato, leaf spots, yellowing'). This will be used to search a knowledge base. Respond in Traditional Chinese.",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "無法辨識，棋盤格紋",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "-mHCapnpCsO3vr0P6J6LmA0",
+          "usage": {
+            "candidates_token_count": 8,
+            "prompt_token_count": 1116,
+            "prompt_tokens_details": [
+              {
+                "modality": "IMAGE",
+                "token_count": 1064
+              },
+              {
+                "modality": "TEXT",
+                "token_count": 52
+              }
+            ],
+            "total_token_count": 1124
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 4.232533700065687
+        },
+        {
+          "model": "gemini-3.5-flash-lite",
+          "production_model_argument": "gemini-2.5-flash",
+          "started_at": "2026-10-04T14:26:14.580389+00:00",
+          "prompt_sha256": "e5a3139c9f6944a94f11353fca6b82b4ba7f6116995141ccf475509e3b879dba",
+          "prompt": "\n    You are a top-tier plant pathologist. Analyze the provided image and context from our knowledge base to provide a professional diagnosis. Respond in valid JSON format, using Traditional Chinese for all user-facing text.\n\n    --- Knowledge Base Context ---\n    No specific context found.\n    ---\n\n    Reference Lists (for name standardization):\n    - Known crops: 甜椒, 萵苣, 甜瓜, 西瓜, 薑, 玉米百合, 玉米, 辣椒, 觀賞辣椒, 豌豆芽菜, 豌豆, 玉米筍, 檬果, 甘藍, 樹番茄, 青油菜, 紅龍果, 馬拉巴栗, 菊花, 火鶴, 玫瑰, 劍蘭, 百合, 其他蘭花, 小花蕙蘭, 虎頭蘭, 嘉德麗雅蘭, 仙履蘭, 石斛蘭, 文心蘭, 蝴蝶蘭, 其他景觀作物, 景觀小油菊, 景觀萬壽菊, 景觀波斯菊, 景觀向日葵, 其他綠肥作物, 魯冰, 青皮豆, 鐵虎豆, 苕子, 紫雲英, 田菁, 爬地蘭, 富貴豆, 太陽麻, 大豆類, 大菜, 埃及三葉草, 其他牧草, 其他長期牧草, 其他短期牧草, 青割玉米, 蘇丹草, 苜蓿草, 盤固拉草, 狼尾草, 尼羅草, 酒類製品, 蜂產品, 綜合蔬果製品, 其他特用作物加工製品, 胡麻製品, 薑黃製品, 愛玉製品, 茶製品, 油茶製品, 洛神葵製品, 香茅製品, 甘蔗製品, 咖啡製品, 梔子製品, 諾麗果製品, 風茹製品, 甜菊製品, 杭菊製品, 向日葵製品, 仙草製品, 紫蘇製品, 其他花卉加工製品, 油菊製品, 茉莉花製品, 玫瑰花製品, 其他水果加工製品, 可可製品, 栗子製品, 椰子製品, 橄欖製品, 棗製品, 梅製品, 李製品, 桃製品, 芒果製品, 龍眼製品, 荔枝製品, 枇杷製品, 梨製品, 蘋果製品, 木鱉果製品, 楊梅製品, 榴槤蜜製品, 桑椹製品, 波羅蜜製品, 柿製品, 釋迦製品, 奇異果製品, 紅龍果製品, 百香果製品, 楊桃製品, 葡萄製品, 蓮霧製品, 番石榴製品, 鳳梨製品, 香蕉製品, 木瓜製品, 金柑製品, 檸檬製品, 柑橘製品, 椪柑製品, 柳橙製品, 葡萄柚製品, 柚子製品, 其他蔬菜加工製品, 白木耳製品, 黑木耳製品, 猴頭菇製品, 杏鮑菇製品, 香菇製品, 草莓製品, 黃秋葵製品, 菱角製品, 番茄製品, 辣椒製品, 甜瓜製品, 西瓜製品, 越瓜製品, 苦瓜製品, 胡瓜製品, 絲瓜製品, 南瓜製品, 冬瓜製品, 蠶豆製品, 豌豆製品, 花豆製品, 毛豆製品, 金針花製品, 胡蘿蔔製品, 牛蒡製品, 蘿蔔製品, 馬鈴薯製品, 山藥製品, 山葵製品, 蘆筍製品, 薑製品, 芋頭製品, 蓮藕製品, 竹筍製品, 食用百合製品, 洋蔥製品, 蔥製品, 蒜製品, 羅勒製品, 菠菜製品, 芹菜製品, 芥菜製品, 油菜製品, 結球白菜製品, 甘藍製品, 其他五穀雜糧加工製品, 木薯製品, 甘藷製品, 綠豆製品, 紅豆製品, 落花生製品, 大豆製品, 薏苡製品, 燕麥製品, 蕎麥製品, 大麥製品, 高粱製品, 小米製品, 小麥製品, 玉米製品, 硬質玉米製品, 稻米製品, 其他特用作物, 其他長期特作, 其他短期特作, 其他飲料作物, 愛玉子, 茶, 洛神, 咖啡, 杭菊, 仙草, 其他香料作物, 香水蓮, 香草, 秀英, 茉莉花_薰芬茶用, 桂花, 檸檬香茅, 香茅, 蒔蘿, 芳香萬壽菊, 薄荷, 紫蘇, 其他澱粉作物, 紅蓮蕉, 蒟蒻, 葛鬱金, 葛藤, 其他染料作物, 薑黃, 大菁, 藷茛, 梔子, 大青, 紅花, 其他纖維作物, 瓊麻, 亞麻, 圓藺草, 苧麻, 大甲藺, 三角藺, 棉花, 貴黍, 其他糖料作物, 甘蔗, 甜菊, 其他嗜好作物, 菸草, 荖藤, 荖葉, 荖花, 其他油料作物, 胡麻, 小果種油茶, 大果種油茶, 向日葵_採種供作加工原料, 其他藥用作物, 杜虹花, 白花蛇舌草, 桋梧, 假人參, 蕺菜, 辣木, 山葡萄, 地黃, 七葉膽, 澤瀉, 白果, 香椿, 小葉藜, 何首烏, 南薑, 羊奶頭, 土肉桂, 肉桂, 桔梗, 黨蔘, 青葙, 法國綠莧, 金線蓮, 刺五加, 蓪草, 山芙蓉, 圓葉錦葵, 穿心蓮, 白鶴靈芝, 麥門冬, 蘆薈, 白藷莨, 枸杞, 葉用枸杞, 諾麗果, 桑黃, 茯苓, 樟芝, 槐耳, 通天草, 黃耆, 當歸, 柴胡, 明日葉, 艾草, 小金英, 蒲公英, 風茹草, 傷寒草, 六神花, 除蟲菊, 澤蘭, 款冬, 山防風, 荊芥, 筋骨草, 半支蓮, 丹參, 黃芩, 益母草, 草石蠶, 其他雜糧, 其他藷類, 木薯, 甘藷, 其他穀類, 臺灣藜, 高粱, 薏苡, 蕎麥, 燕麥, 小麥, 小米, 大麥, 其他豆類, 樹豆, 落花生, 米豆, 綠豆, 紅豆, 大豆, 珠廉, 鳳尾草, 高山羊齒, 腎蕨, 石蓮, 山蘇, 虎尾蘭, 常春藤, 蔓綠絨, 電信蘭, 黃金葛, 其他多年生草本, 球薑, 火炬花, 野薑花, 薑荷花, 月桃, 水蠟燭, 天堂鳥, 聖誕果, 牛頭茄, 金魚草, 泡盛草, 陸蓮花, 飛燕草, 夢幻草, 白頭翁, 銀蘆, 星辰花, 豇豆, 蠶豆, 翼豆, 萊豆, 鵲豆, 毛豆, 刀豆, 菜豆, 其他花菜苗, 其他花菜, 金針花, 石蓮花, 朝鮮薊, 青花菜, 花椰菜, 其他根菜, 胡蘿蔔, 甜菜根, 闊葉大豆, 豆薯, 雪蓮薯, 辣根, 瑞典蕪菁, 蘿蔔, 其他莖菜, 仙人掌肉質莖, 碧玉筍, 晚香玉筍, 食用大黃, 水蓮, 薯蕷, 荸薺, 蓴菜, 馬鈴薯, 慈菇, 萵苣莖, 菊芋, 黃藤心, 半天筍, 山葵, 球莖甘藍, 蘆筍, 蘘荷, 芋, 蓮, 茭白筍, 甘蔗筍, 牧草筍, 竹筍, 其他鱗莖, 食用百合, 蝦夷蔥, 蕎頭, 洋蔥, 韭蔥, 分蔥, 蔥, 蒜頭, 大蒜, 其他葉菜苗, 其他葉菜, 麻意, 糯米糰, 龍葵, 食茱萸, 學菜, 水合歡, 過溝菜蕨, 龍鳳草, 人蔘菜, 馬齒莧, 番杏, 冰花, 羅勒, 山菠菜, 葉用甘藷, 蕹菜, 藤三七, 落葵, 韭菜, 菾菜, 菠菜, 莧菜, 香芹菜, 水芹, 茴香, 刺芹, 芫荽, 芹菜, 闊苞菊, 白鳳菜, 紅鳳菜, 茼蒿, 山茼蒿, 吉康菜, 苦苣, 珍珠菜, 葉用蘿蔔, 西洋菜, 芝麻菜, 薺菜, 千寶菜, 油江菜, 廣島菜, 青菘菜, 小菘菜, 菜心, 水菜, 塌棵菜, 油菜, 不結球白菜, 芥菜, 結球白菜, 黑種草, 觀賞玉米, 古代稀, 貝殼花, 洋桔梗, 羽衣甘藍, 芥藍, 其他稻米, 秈糯, 稉糯, 軟秈, 硬秈, 稉稻, 觀賞南瓜, 松蟲草, 風鈴花, 紫羅蘭, 葉牡丹, 百日草, 鱗托菊, 瓜葉菊, 向日葵, 矢車菊, 雲南菊, 金盞花, 千日紅, 藜, 雞冠花, 紅莧菜, 雁來紅, 萬代蘭, 腎藥蘭, 皇后蘭, 樹攔, 蜘蛛蘭, 千代蘭, 其他果樹, 可可, 胡桃, 蘋婆, 長山核桃, 澳洲胡桃, 栗子, 胡榛子, 腰果, 扁桃, 杏仁, 檳榔, 椰子, 其它核果, 棗椰子, 爪哇橄欖, 橄欖, 錫蘭橄欖, 印度棗, 中國棗, 酪梨, 梅, 杏, 櫻桃, 李, 桃, 油柑, 紅毛丹, 龍眼, 荔枝, 其他仁果, 枇杷, 梨, 蘋果, 其他漿果, 木鱉果, 山竹, 榴槤, 西印度櫻桃, 人心果, 神秘果, 黃金果, 蛋黃果, 石榴, 楊梅, 榴槤蜜, 桑椹, 小波羅蜜, 波羅蜜, 無花果, 麵包果, 柿, 羅望子, 釋迦, 藍莓, 奇異果, 百香果, 楊桃, 葡萄, 嘉寶果, 蓮霧, 番石榴, 鳳梨, 芭蕉, 香蕉, 番木瓜, 其他柑橘, 金柑與小果柑橘, 枸櫞, 甜橙, 寬皮柑, 葡萄柚, 柚子, 其他蔬菜, 其他長期蔬菜, 其他短期蔬菜, 採種用蔬菜, 小海帶, 髮菜, 海菜, 海帶, 其他菇類, 松茸, 紫丁香蘑, 金福菇, 白玉菇, 鴻喜菇, 酒杯菇, 白木耳, 金耳, 滑菇, 草菇, 粉紅玫瑰菇, 蠔菇, 秀珍菇, 白靈菇, 杏鮑菇, 鮑魚菇, 珊瑚菇, 竹蓀, 舞菇, 香菇, 金針菇, 猴頭菇, 靈芝, 北蟲草, 牛肝菌, 茶樹菇, 毛木耳, 斤耳, 黑木耳, 雞肉絲菇, 雞腿菇, 巴西蘑菇, 洋菇, 其他芽菜, 綠豆芽, 紅豆芽, 蠶豆芽, 苜蓿芽, 黑豆芽, 黃豆芽, 蕎麥芽菜, 落花生芽菜, 蘿蔔芽菜, 青花菜芽菜, 芥藍芽菜, 甘藍芽菜, 其他果菜苗, 其他果菜, 草莓, 黃秋葵, 菱角, 破布子, 香瓜茄, 茄子, 小果番茄, 番茄, 其他瓜菜, 蛇瓜, 隼人瓜, 越瓜, 苦瓜, 胡瓜, 絲瓜, 扁蒲, 南瓜, 冬瓜, 小菊, 紫菀, 紐西蘭麻, 火炬百合, 萱草, 狐尾百合, 假葉樹, 鳴子百合, 天鵝絨, 伯利恆之星, 風信子, 吊蘭, 葉蘭, 文竹, 蘆筍草, 武竹, 夜來香, 翠珠花, 海芋, 合果芋, 白鶴芋, 黛粉葉, 觀音蓮, 唐棉, 紫嬌花, 火球花, 孤挺花, 文殊蘭, 繡球蔥, 百子蓮, 水仙, 石蒜, 君子蘭, 水仙百合, 菖蒲, 其他木本花卉, 山茶花, 木羊齒, 柳, 七里香, 六月雪, 仙丹花, 梔子花, 寒丁子, 麻葉繡球, 海神花, 針墊花, 雪松, 新西蘭, 林投, 牡丹, 女貞, 茉莉, 素馨, 連翹, 尤加利, 蠟梅, 降天桑, 香樹蘭, 洛神葵, 玉蘭花, 金絲桃, 金雀花, 三角尤加利, 聖誕紅, 羽毛花, 變葉木, 蘇鐵, 側柏, 香冠柏, 柳杉, 扁柏, 征木, 五彩千年木, 星點木, 青竹, 百合竹, 虎斑木, 朱蕉, 觀音棕竹, 黃椰子, 八角金盤, 藍星花, 其他一二年生草本, 紅茄, 蚌蘭, 宮燈百合, 嘉蘭, 滿天星, 深山櫻, 康乃馨, 夕霧花, 三角桔梗, 美人蕉, 擎天鳳梨, 觀果鳳梨, 蜻蜓鳳梨, 麥桿菊, 琉璃菊, 一枝黃花, 澳洲鼓槌菊, 麟麟菊, 非洲菊, 白藍菊, 大理花, 波斯菊, 麵線菊, 大菊, 射干, 鳶尾, 小蒼蘭, 段菊, 繡球花, 赫蕉, 袋鼠花, 龍膽, 羽扇豆, 金翠花, 八卦草, 初雪草, 水莞, 巨果薑, 水晶花, 補雪草, 卡斯比亞, 虎尾花, 睡蓮, 竹芋, 鬱金香, 波羅門蔘, 牛蒡, 其他堅果, 雲芝, 其他豆菜, 龍鬚菜, 食用薊, 皇帝豆, 包心白菜, 青江白菜, 敏豆, 小黃瓜, 旱芹, 粉豆, 桑果, 洋香瓜, 柑桔, 柿子, 文旦, 樹葡萄, 牛奶果, 草花, 球根花卉, 蘭類, 觀葉植物, 香花植物, 觀賞樹木, 菊科, 薑科, 荖籐, 烏心石, 茉草, 水稻, 肖楠, 大葉楠, 冬蟲夏草, 水黃皮, 草皮, 牛樟, 雜草, 菊苣, 蘿勒, 黑松, 檜木, 柳樹, 蘋婆果, 九芎, 二葉松, 五葉松, 亞歷山大椰子, 光臘樹, 光蠟樹, 刺桐, 刺桐樹, 加州杉, 加蜜蛋黃果, 十字花科, 千頭木麻黃, 南洋杉, 南洋櫻, 印度紫壇, 印度紫檀, 古煉, 台東蘇鐵, 台灣山蘇花, 台灣杉, 台灣櫸, 台灣欒樹, 台灣海藻, 台灣赤楠, 咸豐草, 嘉德麗亞蘭, 土人參, 垂榕, 大王椰子, 大葉刺桐, 大葉山攬, 大葉山欖, 大葉桃花心木, 大葉欖仁, 大葉雀榕, 夾竹桃, 孟宗竹, 小槐花, 小葉南洋杉, 小葉南洋衫, 小葉桃花心木, 小葉欖仁, 小葉黃槐, 心葉牽牛花, 捲葉蘇鐵, 掌葉蘋婆, 日日櫻, 春不老, 晚香玉, 月橘, 木棉, 木芙蓉, 木麻黃, 本樟, 朱槿, 朴子, 朴樹, 杜鵑, 松, 松樹, 枯里珍, 柏, 柏樹, 柑橘, 柚, 桂竹, 桃樹, 桃花心木, 桑樹, 梅樹, 森氏紅淡比, 椰子樹, 楊樹, 楓香, 楓香樹, 楠木, 榔榆, 榕, 榕樹, 槭樹, 樟, 樟樹, 樹蘭, 橡膠樹, 檀香, 檸檬, 檸檬桉, 檸檬樹, 櫸木, 櫻花, 欖仁, 欖仁樹, 毛木, 毛柿, 水柳, 法國梧桐, 流蘇, 浦葵, 海桐, 海棗, 火焰木, 火燄木, 火龍果, 烏臼, 珊瑚刺桐, 珊瑚莿桐, 琉球蘇鐵, 瓊涯海棠, 番椒, 番荔枝, 痲瘋樹, 白薇, 相思樹, 矮仙丹, 矮仙丹花, 福木, 福祿桐, 竹柏, 筆筒樹, 紅刺林投, 紅楠, 綬草, 緬梔, 羅漢松, 羊蹄甲, 美人樹, 肉桂樹, 肉豆, 肯氏南洋杉, 腋唇蘭, 芒果, 苦楝, 茄冬, 茄苳, 茶花樹, 草海桐, 荔枝樹, 莿桐, 菠羅密, 菠蘿蜜, 菩提, 菩提樹, 華盛頓椰子, 蔓澤蘭, 蕗藤, 蕙蘭, 西施柚, 豔紫荊, 象牙木, 象牙樹, 豬草, 銀姬小蠟, 銀樺, 銀耳, 銀膠菊, 鐵線蕨, 長梗滿天星, 長豇豆, 阿勃勒, 阿薩姆茶, 雀榕, 雞冠刺桐, 青剛櫟, 青楓, 香杉, 鳳凰木, 麵包樹, 黃槿, 黃脈刺桐, 黃脤刺桐, 黃連木, 黃金風鈴木, 黑板樹, 龍柏, 龍眼樹\n    - Known diseases: 葉斑病, 腐爛, 痂病, 發芽, 畸形果, 乾旱, 早疫病 (Early Blight), 晚疫病 (Late Blight), 灰黴病 (Gray Mold), 病毒病 (Virus Disease), 臍腐病 (Blossom-End Rot), 褐根病, 褐根病, 葉震病, 炭疽病, 側柏枝枯病, 枝枯病, 煤煙病, 褐根病, 細菌性病害, 褐根病, 褐根病, 枝枯病, 潰瘍病, 葉枯病, 褐根病, 褐根病, 褐根病, 樹木褐根病, 褐根病, 褐根病, 原因不明, 褐根病, 褐根腐病, 褐根病, 咖啡銹病, 褐根病, 褐根病, 癌腫病, 樹木褐根病, 褐根病, 褐根病, 褐根病, 枝枯病, 腐朽菌, 褐根病, 葉枯病, 癌腫病, 枝枯病, 木耳, 木層孔菌, 褐根病, 木材腐朽菌, 褐根病, 闊葉樹藻斑病, 褐根病, 褐根病, 疑似疫病黃化萎凋, 松樹潰瘍病, 葉震病, 枝枯病, 腐朽菌, 褐根病, 銹病, 竹簇葉病, Phellinus noxius, 褐根病, 褐根腐病, 褐根病, 木材腐朽菌, 椰子樹芽腐病, 褐根病, 褐根病, 褐根病, 褐根病, 可能已被感染褐根病, 孔洞木材腐朽, 木材腐朽病, 根腐病, 樹木褐根病, 煤煙病, 紫膠介殼蟲與煤煙病, 腐朽菌, 褐根病, 褐根腐病, 靈芝根基腐朽病, 鮑魚菇, 樹木褐根病, 褐根病, 樣本無褐根病病原, 樹木褐根病, 腐朽菌, 褐根病, 褐根病, 熱帶靈芝, 癌腫病, 簇葉病, 細菌性或Cercospora sp.角斑, 褐根病, 白紋羽病, 白蟻及褐根病, 細菌性癌腫病, 褐褐病, 褐根病, 褐根病, 褐根病, 褐根病, 褐根病, 葉枯病, 褐根病, 褐根病, 樹木褐根病, 炭疽病, 褐根病, 炭疽病, 熱帶靈芝, 疫病菌, 褐根病, 褐根腐病, 黑腐病與炭疽病, 真菌腐朽性病害, 玫瑰黑斑病, 褐根病, 褐斑病, 褐根病, 癌腫病, 褐根病, 褐根腐病, 褐根腐病、生理反應, 樹木褐根病, 褐根病, 蘆筍莖枯病, 褐根病, 摺菌, 褐根病, 褐根病, 腐霉病或疫病, 褐根病, 疑似褐根病, 褐根腐病, 褐根病, 褐根病, 褐根病, 疫病根腐, 肖楠病, 樹木褐根病, 褐根病, 褐根病, 癌腫病, 細菌性癌腫病, 褐根病, 褐根病, 枝枯病, 炭疽病, 褐根病, 闊葉樹藻斑病, 腐生性危害, 炭疽病、寒害, 褐根病, 褐根病, Phellinus noxius, 褐根病, 黑脂病, 黑腫病, 樹木褐根病, 黃龍病, 褐根病, 煤煙病, 褐根病, 褐根病, 褐根腐病, 褐根病, 褐根病, 白粉病, 褐根病, 褐根病, 樹木褐根病, 腐朽菌, 褐根病, 樹木褐根病, 熱帶靈芝, 褐根病, 松樹葉震病, 流膠病, 葉震病, 褐根病, 疫病菌&腐黴菌, 褐根病, 枝枯病, 枝枯病炭疽病, 褐根病, 褐根病, 樹木褐根病, 褐根病\n    - Known pests: 蟲害, 薊馬, 銀葉粉蝨 (Whitefly), 棉鈴蟲 (Bollworm), 蚜蟲 (Aphid), 咖啡果小蠹, 太平洋臀紋粉介殼蟲, 黃綠綿介殼蟲, 木瓜秀粉介殼蟲, 金花蟲, 椿象, 橘球粉介殼蟲, 長尾粉介殼蟲, 鱗翅目, 咖啡硬介殼蟲, 木瓜秀粉介殼蟲, 美地綿粉介殼蟲, 咖啡硬介殼蟲, 絲粉介殼蟲, 白蠟介殼蟲, 蟻台硬介殼蟲, 鱗翅目, 石蒜綿粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 木瓜秀粉介殼蟲, 粉蝨, 茄綿粉介殼蟲, 蚜蟲, 葉蟎, 月橘白輪盾介殼蟲, 木瓜秀粉介殼蟲, 椰子櫛圓盾介殼蟲, 木瓜秀粉介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 光肩星天牛, 牡蠣盾介殼蟲, 葉蟎, 淡薄圓介殼蟲, 鱗翅目, 桑擬輪盾介殼蟲, 葉蟬, 椰子擬輪盾介殼蟲, 紅蠟介殼蟲, 葉蟎, 螺旋粉蝨, 木瓜秀粉介殼蟲, 黃吹綿介殼蟲, 樟輪盾介殼蟲, 太平洋臀紋粉介殼蟲, 茄綿粉介殼蟲, 太平洋臀紋粉介殼蟲, 柑橘刺粉蝨, 糠片盾介殼蟲, 咖啡木蠹蛾, 桑擬輪盾介殼蟲, 茄綿粉介殼蟲, 橘臀紋粉介殼蟲, 瓜實蠅, 茄綿粉介殼蟲, 雙翅目, 木瓜秀粉介殼蟲, 牡蠣盾介殼蟲, 太平洋臀紋粉介殼蟲, 絲粉介殼蟲, 長角象鼻蟲, 雙翅目, 蚜蟲, 木瓜秀粉介殼蟲, 根蟎, 二點葉蟎, 木瓜秀粉介殼蟲, 粉介殼蟲, 葉蟎, 扁堅介殼蟲, 咖啡硬介殼蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 柑橘刺粉蝨, 番石榴黑疣粉蝨, 螺旋粉蝨, 鱗翅目, 斑潛蠅, 太平洋臀紋粉介殼蟲, 鳳梨嫡粉介殼蟲, 木瓜秀粉介殼蟲, 鱗翅目, 蚜蟲, 葉蟎, 象鼻蟲, 太平洋臀紋粉介殼蟲, 木瓜秀粉介殼蟲, 銀葉粉蝨, 木瓜秀粉介殼蟲, 蚜蟲, 銀葉粉蝨, 粉介殼蟲科, 葉蟎, 南黃薊馬, 粉蝨, 薊馬, 椿象, 雙翅目, 中華褐金龜, 木瓜秀粉介殼蟲, 橘球粉介殼蟲, 葉蟬, 木瓜秀粉介殼蟲, 粉介殼蟲, 蚜蟲, 粉蝨, 葉蟎, 木蝨, 盾介殼蟲, 粉蝨, 葉蟎, 蚜蟲, 鱗翅目, 黃綠綿介殼蟲, 棉蚜, 太平洋臀紋粉介殼蟲, 小黃薊馬, 絲粉介殼蟲, 木瓜秀粉介殼蟲, 白蠟介殼蟲, 變葉木片盾介殼蟲, 太平洋偽葉蟎, 葉蟎, 蘭花薊馬, 長跳蟲, 茄綿粉介殼蟲, 雙翅目, 鼠婦, 木瓜秀粉介殼蟲, 扁堅介殼蟲, 茄綿粉介殼蟲, 木瓜秀粉介殼蟲, 薊馬, 蕉弄蝶, 石蒜綿粉介殼蟲, 茄綿粉介殼蟲, 木蝨, 螟蛾科, 粉介殼蟲 煤灰病, 松材線虫, 疑似松材線蟲, 幹綿蚜, 刺桐釉小蜂, 刺桐釉小蜂、不當移植, 刺桐釉小蜂, 天牛, 夜蛾, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 小蠹蟲, 螟蛾, 蝗蟲、天牛、潛葉蛾, 刺桐釉小蜂, 白蟻、生理性缺水, 竹涓夜蛾, 樟蝙蝠蛾, 蝙蝠蛾, 粉介殼蟲 煤灰病, 介殼蟲, 蘇鐵白輪盾蚧, 天牛, 月橘盾介殼蟲, 白蟻, 軍配蟲, 松材線蟲, 松線虫, 白蟻, 松材線蟲, 萎凋病, 白蟻, 桃蚜, 白蟻, 椰子大象鼻蟲, 綴葉叢螟, 蚜蟲, 斑蛾, 白蟻, 粉介殼蟲 煤灰病, 紫膠介殼蟲, 高背木蝨, 木蠹蛾, 樟樹白輪盾介殼蟲, 樟白介殼蟲, 樟葉蜂, 白蟻, 蜱&#34728;, 台灣家白蟻, 小囊蟲, 桑擬輪介殼蟲, 白蟻, 細菌性穿孔病、台灣黃毒蛾、金花蟲, 葉&#34766;, 粉蝨, 天牛, 紅胸葉蟲, 棉介殼蟲, 烏心石幹綿蚜, 刺桐釉小蜂, 銀葉粉蝨, 根瘤線蟲, 黃帶枝尺蠖蛾, 象牙木木蝨, 黃帶枝尺蛾, 黃帶枝尺蠖蛾, 芒果葉蟬, 白翅夜蟬, 茄苳白翅葉蟬, 螟蛾, 紫膠介殼蟲, 莿桐釉小蜂, 紅胸葉蟲, 蘇鐵白輪盾介殼蟲, 蘇鐵白輪盾蚧, 木蝨, 蟎類, 刺桐釉小蜂, 楓粉蝨, 白蟻, 鳳凰木夜蛾, 螨, 刺桐釉小蜂, 刺桐釉小蜂, 松材線蟲, mite’s gall, 白蟻或天牛蛀蝕\n\n    Anti-hallucination rules:\n    - crop_name must exactly match one item from Known crops. If uncertain, use \"未知作物\".\n    - For category \"disease\", status_name must exactly match one item from Known diseases.\n    - For category \"pest\", status_name must exactly match one item from Known pests.\n    - If the image is unclear, confidence is low, or no exact crop/disease/pest match exists, use category \"unknown\" and status_name \"無法判定\".\n    - Do not invent crop names, disease names, pest names, pesticide names, dosages, or treatment steps.\n\n    JSON Output Structure:\n    {\n      \"crop_name\": \"string (The crop's name in Traditional Chinese)\",\n      \"category\": \"string (One of 'disease', 'pest', 'healthy', or 'unknown')\",\n      \"status_name\": \"string (A name from the matching reference list. If healthy, use '健康'. If unknown, use '無法判定')\",\n      \"confidence\": \"float (A value between 0.0 and 1.0)\",\n      \"suggestion\": \"string (A bulleted list of 2-3 key visual symptoms, using '-' for each point and '\\n' for new lines. Example: '- 葉片有黃斑\\n- 葉緣焦枯')\",\n      \"treatment\": \"string (If not healthy, provide a numbered list of actionable steps using '1.', '2.', etc., and '\\n' for new lines. If healthy, provide a positive confirmation like '繼續保持良好照顧。')\"\n    }\n    ",
+          "config": {
+            "temperature": 0,
+            "max_output_tokens": 4096,
+            "thinking_config": {
+              "thinking_level": "minimal"
+            }
+          },
+          "text": "```json\n{\n  \"crop_name\": \"未知作物\",\n  \"category\": \"unknown\",\n  \"status_name\": \"無法判定\",\n  \"confidence\": 0.0,\n  \"suggestion\": \"- 影像內容無法辨識為植物或相關病徵\\n- 提供的圖片為幾何圖案（棋盤格）\",\n  \"treatment\": \"1. 請提供清晰的植物受害部位照片以進行正確診斷。\\n2. 確保拍攝時對焦準確且光線充足。\"\n}\n```",
+          "model_version": "gemini-3.5-flash-lite",
+          "response_id": "B2LCatbYEOCj9tMPvObqkAw",
+          "usage": {
+            "cache_tokens_details": [
+              {
+                "modality": "TEXT",
+                "token_count": 3564
+              },
+              {
+                "modality": "IMAGE",
+                "token_count": 515
+              }
+            ],
+            "cached_content_token_count": 4079,
+            "candidates_token_count": 122,
+            "prompt_token_count": 8428,
+            "prompt_tokens_details": [
+              {
+                "modality": "IMAGE",
+                "token_count": 1064
+              },
+              {
+                "modality": "TEXT",
+                "token_count": 7364
+              }
+            ],
+            "total_token_count": 8550
+          },
+          "finish_reasons": [
+            "FinishReason.STOP"
+          ],
+          "seconds": 1.8439331001136452
+        }
+      ],
+      "raw_score": {
+        "outcome": "abstained",
+        "crop_correct": null
+      },
+      "final_score": {
+        "outcome": "abstained",
+        "crop_correct": null
+      },
+      "advice": {
+        "applicable": false
+      },
+      "wall_seconds": 26.08757059997879,
+      "intentional_sleep_seconds": 20.0052634999156,
+      "inference_seconds": 6.08230710006319
+    }
+  ],
+  "summary": {
+    "gemini-3.5-flash-lite": {
+      "planned": 9,
+      "attempted": 9,
+      "structured_results": 9,
+      "not_run": 0,
+      "input_rejected": 0,
+      "service_or_parse_errors": 0,
+      "crop_agreement_received": {
+        "numerator": 7,
+        "denominator": 8,
+        "value": 0.875
+      },
+      "supported_status_agreement_received": {
+        "numerator": 4,
+        "denominator": 6,
+        "value": 0.6666666666666666
+      },
+      "supported_status_yield_attempted_including_errors": {
+        "numerator": 4,
+        "denominator": 6,
+        "value": 0.6666666666666666
+      },
+      "supported_abstentions": 1,
+      "supported_incorrect_known": 1,
+      "guard_abstention_received": {
+        "numerator": 3,
+        "denominator": 3,
+        "value": 1.0
+      },
+      "raw_to_final": [
+        {
+          "case_id": "plant-01",
+          "raw": "label_match",
+          "final": "label_match"
+        },
+        {
+          "case_id": "plant-02",
+          "raw": "label_match",
+          "final": "label_match"
+        },
+        {
+          "case_id": "plant-03",
+          "raw": "incorrect_known_label",
+          "final": "incorrect_known_label"
+        },
+        {
+          "case_id": "plant-04",
+          "raw": "label_match",
+          "final": "label_match"
+        },
+        {
+          "case_id": "plant-05",
+          "raw": "label_match",
+          "final": "label_match"
+        },
+        {
+          "case_id": "plant-06",
+          "raw": "incorrect_known_label",
+          "final": "abstained"
+        },
+        {
+          "case_id": "plant-07",
+          "raw": "incorrect_known_label",
+          "final": "abstained"
+        },
+        {
+          "case_id": "plant-08",
+          "raw": "incorrect_known_label",
+          "final": "abstained"
+        },
+        {
+          "case_id": "nonplant-checkerboard",
+          "raw": "abstained",
+          "final": "abstained"
+        }
+      ],
+      "unverified_advice": 4,
+      "advice_with_dosage_pattern": 4,
+      "inference_seconds": {
+        "n": 9,
+        "median": 4.421625799965113,
+        "p95_nearest_rank": 6.08230710006319
+      },
+      "api_requests": 18,
+      "api_request_errors": 0,
+      "usage": {
+        "prompt_token_count": 86128,
+        "candidates_token_count": 1510,
+        "thoughts_token_count": 0,
+        "total_token_count": 87638
+      }
+    }
+  },
+  "completed_at": "2026-10-04T14:26:16.436037+00:00"
+}

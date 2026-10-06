@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-04T14:16:32Z",
+  "reason": "The first generation request to gemini-2.5-flash-lite returned HTTP 404: no longer available to new users. The API response recommended gemini-3.5-flash-lite. The unavailable model remains in the original report; no retries or key rotation.",
+  "original_code_commit": "3ab1dea",
+  "replacement_model": "gemini-3.5-flash-lite",
+  "selection_basis": "Provider's explicit replacement in the service error, chosen before observing any replacement-model output, not selected by benchmark performance.",
+  "account_quota_observed": {
+    "billing_tier": "Free tier",
+    "requests_per_minute": 15,
+    "input_tokens_per_minute": 250000,
+    "requests_per_day": 500,
+    "displayed_usage": 0,
+    "caution": "AI Studio says usage display may lag by up to 15 minutes. No billing activation."
+  },
+  "protocol": {
+    "manifest": "test/fixtures/ai_evaluation_manifest.json",
+    "images": "Same original bytes and hashes for all nine cases; no new selection or exclusions",
+    "generation_config": {
+      "temperature": 0,
+      "max_output_tokens": 4096,
+      "thinking_config": {"thinking_budget": 0}
+    },
+    "max_generation_requests": 18,
+    "request_start_interval_seconds": 13,
+    "repetitions": 1,
+    "retry_attempts": 1,
+    "order_deviation": "Replacement is a separate single-model run after selection amendment, not interleaved with the original Flash run. No rerun of Flash results.",
+    "unchanged": "Application prompts, validation thresholds, isolated SQLite reference data, missing-RAG fallback, image gate, and scoring",
+    "comparison_limit": "Identical submitted configuration does not imply identical internal reasoning behavior. Gemini 3 documentation supports legacy thinking_budget but recommends thinking_level and temperature 1.0; this fixed-temperature pilot is not a recommended-default or tuned-model comparison."
+  },
+  "compatibility_amendment": {
+    "recorded_at": "2026-10-04T14:21:27Z",
+    "observed_failure": "First gemini-3.5-flash-lite request with legacy thinking_budget=0 returned HTTP 400 INVALID_ARGUMENT. Provider did not identify the invalid field; no diagnosis output was produced. Original report retained and no automatic retry occurred.",
+    "hypothesis": "Legacy thinking-budget configuration may not be accepted for this model despite general backwards-compatibility documentation.",
+    "explicit_followup": "One new nine-case run using the documented thinking_level=minimal, at most 18 generation requests; no further automatic parameter search or retries.",
+    "generation_config": {
+      "temperature": 0,
+      "max_output_tokens": 4096,
+      "thinking_config": {"thinking_level": "minimal"}
+    },
+    "unchanged": "Same nine images, prompts, scoring, reference database and empty RAG; original Flash results are not rerun or replaced.",
+    "limitation": "Minimal thinking is not equivalent to disabled thinking. Compare these two tested service configurations, not an isolated causal model effect or recommended-default performance.",
+    "offline_tests": "111 passed in 20.02s; test content committed as ed54d02"
+  },
+  "official_sources_checked": [
+    "https://ai.google.dev/gemini-api/docs/pricing",
+    "https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite",
+    "https://ai.google.dev/gemini-api/docs/gemini-3",
+    "https://ai.google.dev/gemini-api/docs/thinking"
+  ]
+}
