@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
@@ -169,10 +169,130 @@ async def request_email_verification(
 
 @router.get("/user/verify-email")
 async def confirm_email_verification(
-    token: str = Query(..., min_length=20), db: Session = Depends(get_db)
+    request: Request,
+    token: str = Query(..., min_length=20),
+    db: Session = Depends(get_db),
 ):
     """使用驗證連結中的一次性 token 完成信箱驗證。"""
-    verify_email_token(token, db)
+    is_success = True
+    error_message = ""
+    already_used = False
+
+    try:
+        verify_email_token(token, db)
+    except HTTPException as exc:
+        if exc.detail == "Token has already been used.":
+            is_success = True
+            already_used = True
+        else:
+            is_success = False
+            error_message = exc.detail
+    except Exception as exc:
+        is_success = False
+        error_message = str(exc)
+
+    accept_header = request.headers.get("accept", "")
+    if "text/html" in accept_header or "text/*" in accept_header or "*/*" in accept_header:
+        if is_success:
+            title_text = "信箱已驗證完成" if already_used else "信箱驗證成功！"
+            desc_text = "您的帳號已成功啟用，現在可以返回 Plant Doctor App 登入使用完整功能。"
+            html_content = f"""<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信箱驗證成功 - 植物醫生 Plant Doctor</title>
+    <style>
+        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center; padding: 16px; color: #2e382d;
+        }}
+        .card {{
+            background: #ffffff; width: 100%; max-width: 440px;
+            border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            padding: 36px 28px; text-align: center;
+        }}
+        .badge {{
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 72px; height: 72px; background: #e8f5e9; color: #2e7d32;
+            font-size: 36px; border-radius: 50%; margin-bottom: 20px;
+        }}
+        h2 {{ font-size: 1.5rem; color: #1b5e20; margin-bottom: 12px; font-weight: 700; }}
+        p {{ font-size: 0.95rem; color: #555; line-height: 1.6; margin-bottom: 28px; }}
+        .btn {{
+            display: inline-block; width: 100%; padding: 14px 20px;
+            font-size: 1rem; font-weight: 600; border-radius: 10px;
+            border: none; cursor: pointer; text-decoration: none;
+            background: #2e7d32; color: #ffffff;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+            transition: background 0.2s;
+        }}
+        .btn:hover {{ background: #1b5e20; }}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge">🌱</div>
+        <h2>{title_text}</h2>
+        <p>{desc_text}</p>
+        <a href="intent://#Intent;package=com.example.plantdoctor;end" class="btn" id="openAppBtn">📱 返回 Plant Doctor App 登入</a>
+    </div>
+    <script>
+        const intentUrl = "intent://#Intent;package=com.example.plantdoctor;end";
+        document.getElementById("openAppBtn").addEventListener("click", function(e) {{
+            window.location.href = intentUrl;
+        }});
+        setTimeout(() => {{
+            window.location.href = intentUrl;
+        }}, 600);
+    </script>
+</body>
+</html>"""
+            return HTMLResponse(content=html_content)
+        else:
+            html_content = """<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信箱驗證失敗 - 植物醫生 Plant Doctor</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center; padding: 16px; color: #2e382d;
+        }
+        .card {
+            background: #ffffff; width: 100%; max-width: 440px;
+            border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            padding: 36px 28px; text-align: center;
+        }
+        .badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 72px; height: 72px; background: #ffebee; color: #c62828;
+            font-size: 36px; border-radius: 50%; margin-bottom: 20px;
+        }
+        h2 { font-size: 1.5rem; color: #c62828; margin-bottom: 12px; font-weight: 700; }
+        p { font-size: 0.95rem; color: #555; line-height: 1.6; margin-bottom: 28px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge">❌</div>
+        <h2>驗證連結無效或已過期</h2>
+        <p>此驗證連結可能已失效或超過有效時限（24小時）。<br>請開啟 App 登入時點選重新發送驗證信。</p>
+    </div>
+</body>
+</html>"""
+            return HTMLResponse(content=html_content, status_code=400)
+
+    if not is_success:
+        raise HTTPException(status_code=400, detail=error_message or "Email verification failed.")
     return {"status": "success", "message": "Email verified successfully."}
 
 
