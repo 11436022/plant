@@ -9,6 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="植物名稱："
+        android:textColor="@android:color/white"
         android:textSize="14sp"
         android:textStyle="bold" />
 
@@ -25,6 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="例如：陽台玫瑰、番茄"
+            android:textColorHint="#B0BEC5"
             android:importantForAutofill="no"
             android:inputType="text" />
 
@@ -43,6 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="採樣間隔時間 (秒)："
+        android:textColor="@android:color/white"
         android:textSize="14sp"
         android:textStyle="bold" />
 

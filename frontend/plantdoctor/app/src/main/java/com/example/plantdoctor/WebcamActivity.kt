@@ -1026,8 +1026,18 @@ class WebcamActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val zone = list[position]
-            holder.tvName.text = zone.name
-            holder.tvSub.text = "採樣間隔：${zone.intervalMinutes} 秒"
+            holder.tvName.text = "🌱 ${zone.name}"
+            holder.tvName.setTextColor(Color.WHITE)
+            holder.tvName.setTypeface(null, android.graphics.Typeface.BOLD)
+
+            holder.tvSub.text = "採樣間隔：${zone.intervalMinutes} 秒 (點擊修改植物/採樣時間)"
+            holder.tvSub.setTextColor(Color.parseColor("#B0BEC5"))
+
+            val lp = holder.itemView.layoutParams as? ViewGroup.MarginLayoutParams
+            lp?.setMargins(0, 4, 0, 8)
+            holder.itemView.layoutParams = lp
+
+            holder.itemView.setBackgroundResource(R.drawable.bg_webcam_crop_dropdown)
             holder.itemView.setOnClickListener { onItemClick(zone) }
         }
 
