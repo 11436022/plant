@@ -1014,30 +1014,20 @@ class WebcamActivity : AppCompatActivity() {
     ) : RecyclerView.Adapter<MultiRegionAdapter.ViewHolder>() {
 
         inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-            val tvName: TextView = v.findViewById(android.R.id.text1)
-            val tvSub: TextView = v.findViewById(android.R.id.text2)
+            val tvName: TextView = v.findViewById(R.id.tvZoneCardName)
+            val tvSub: TextView = v.findViewById(R.id.tvZoneCardInterval)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
-                .inflate(android.R.layout.simple_list_item_2, parent, false)
+                .inflate(R.layout.item_crop_zone_card, parent, false)
             return ViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val zone = list[position]
-            holder.tvName.text = "🌱 ${zone.name}"
-            holder.tvName.setTextColor(Color.WHITE)
-            holder.tvName.setTypeface(null, android.graphics.Typeface.BOLD)
-
-            holder.tvSub.text = "採樣間隔：${zone.intervalMinutes} 秒 (點擊修改植物/採樣時間)"
-            holder.tvSub.setTextColor(Color.parseColor("#B0BEC5"))
-
-            val lp = holder.itemView.layoutParams as? ViewGroup.MarginLayoutParams
-            lp?.setMargins(0, 4, 0, 8)
-            holder.itemView.layoutParams = lp
-
-            holder.itemView.setBackgroundResource(R.drawable.bg_webcam_crop_dropdown)
+            holder.tvName.text = zone.name
+            holder.tvSub.text = "採樣間隔：${zone.intervalMinutes} 秒 (點擊修改植物/時間)"
             holder.itemView.setOnClickListener { onItemClick(zone) }
         }
 
