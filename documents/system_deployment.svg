@@ -130,7 +130,7 @@
     <text x="15" y="15" class="node-sub">&lt;&lt;cloud service&gt;&gt;</text>
     <text x="15" y="26" class="node-header">Google Cloud AI</text>
     
-    <text x="15" y="52" class="artifact-title">Gemini 2.5 Flash</text>
+    <text x="15" y="52" class="artifact-title">Gemini 3.8 Flash</text>
     <text x="15" y="70" class="artifact-desc">• 雲端多模態大語言模型</text>
     <text x="15" y="85" class="artifact-desc">• 廣域影像特徵初判與臨床語意解說</text>
     <text x="15" y="100" class="artifact-desc">• google-genai 官方 SDK</text>
@@ -200,7 +200,7 @@
   <g transform="translate(40, 625)">
     <rect width="1120" height="95" fill="#F8FAF7" stroke="#B5C6B3" stroke-width="1.2" rx="6" />
     <text x="20" y="25" class="artifact-title" font-size="12">架構亮點與技術特色說明 (Deployment Highlights):</text>
-    <text x="20" y="47" class="artifact-desc">• 雙模型協同推論 (Dual-Model Parallel)：FastAPI 非同步協同調度 Google Gemini 2.5 Flash (廣域多模態) 與本地自訓 ConvNet (微觀病斑分類)，兼具雲端強大推理與本地即時高隱私。</text>
+    <text x="20" y="47" class="artifact-desc">• 雙模型協同推論 (Dual-Model Parallel)：FastAPI 非同步協同調度 Google Gemini 3.8 Flash (廣域多模態) 與本地自訓 ConvNet (微觀病斑分類)，兼具雲端強大推理與本地即時高隱私。</text>
     <text x="20" y="65" class="artifact-desc">• 零雲端託管成本 (Zero Cloud Hosting Cost)：完全免除 Vertex AI / AutoML 端點高昂固定租金；本地自訓特定作物卷積神經網路直接部署於主機內部，經濟且可隨時複訓迭代。</text>
     <text x="20" y="83" class="artifact-desc">• 知識庫檢索增強與客觀校驗 (RAG Verification)：整合 FAISS 向量索引與農業部官方病蟲害知識庫，結合 70% 信心度閾值過濾，杜絕 AI 幻覺，確保診斷指引具備農政權威性。</text>
   </g>

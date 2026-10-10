@@ -1,0 +1,76 @@
+{
+  "dataset": "PlantDoc (In-the-wild)",
+  "total_images": 472,
+  "crop_accuracy": 48.31,
+  "top1_accuracy": 24.58,
+  "top3_accuracy": 41.53,
+  "high_confidence_direct_hits": 280,
+  "fallback_to_gemini_triggered": 192,
+  "crop_breakdown": {
+    "蘋果": {
+      "total": 58,
+      "top1": 4,
+      "crop_match": 6
+    },
+    "甜椒": {
+      "total": 34,
+      "top1": 12,
+      "crop_match": 18
+    },
+    "藍莓": {
+      "total": 22,
+      "top1": 4,
+      "crop_match": 4
+    },
+    "櫻桃": {
+      "total": 20,
+      "top1": 0,
+      "crop_match": 0
+    },
+    "玉米": {
+      "total": 52,
+      "top1": 14,
+      "crop_match": 36
+    },
+    "葡萄": {
+      "total": 40,
+      "top1": 16,
+      "crop_match": 32
+    },
+    "桃": {
+      "total": 18,
+      "top1": 6,
+      "crop_match": 6
+    },
+    "馬鈴薯": {
+      "total": 32,
+      "top1": 0,
+      "crop_match": 4
+    },
+    "覆盆子": {
+      "total": 14,
+      "top1": 8,
+      "crop_match": 8
+    },
+    "大豆": {
+      "total": 16,
+      "top1": 8,
+      "crop_match": 8
+    },
+    "南瓜": {
+      "total": 12,
+      "top1": 4,
+      "crop_match": 4
+    },
+    "草莓": {
+      "total": 16,
+      "top1": 0,
+      "crop_match": 0
+    },
+    "番茄": {
+      "total": 138,
+      "top1": 40,
+      "crop_match": 102
+    }
+  }
+}

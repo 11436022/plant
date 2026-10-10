@@ -1,0 +1,273 @@
+{
+  "dataset_path": "D:\\archive\\New Plant Diseases Dataset(Augmented)\\New Plant Diseases Dataset(Augmented)\\valid",
+  "total_samples": 17572,
+  "total_time_seconds": 131.55,
+  "avg_latency_ms": 7.49,
+  "top1_accuracy": 91.78,
+  "top3_accuracy": 98.49,
+  "device": "cuda:0",
+  "crop_summary": {
+    "蘋果": {
+      "accuracy": 89.4,
+      "correct": 1737,
+      "total": 1943
+    },
+    "藍莓": {
+      "accuracy": 75.11,
+      "correct": 341,
+      "total": 454
+    },
+    "櫻桃": {
+      "accuracy": 97.26,
+      "correct": 853,
+      "total": 877
+    },
+    "玉米": {
+      "accuracy": 93.71,
+      "correct": 1714,
+      "total": 1829
+    },
+    "葡萄": {
+      "accuracy": 85.65,
+      "correct": 1546,
+      "total": 1805
+    },
+    "柑橘": {
+      "accuracy": 99.8,
+      "correct": 502,
+      "total": 503
+    },
+    "桃": {
+      "accuracy": 94.05,
+      "correct": 838,
+      "total": 891
+    },
+    "甜椒": {
+      "accuracy": 96.1,
+      "correct": 937,
+      "total": 975
+    },
+    "馬鈴薯": {
+      "accuracy": 83.31,
+      "correct": 1188,
+      "total": 1426
+    },
+    "覆盆子": {
+      "accuracy": 96.85,
+      "correct": 431,
+      "total": 445
+    },
+    "大豆": {
+      "accuracy": 100.0,
+      "correct": 505,
+      "total": 505
+    },
+    "南瓜": {
+      "accuracy": 100.0,
+      "correct": 434,
+      "total": 434
+    },
+    "草莓": {
+      "accuracy": 89.89,
+      "correct": 809,
+      "total": 900
+    },
+    "番茄": {
+      "accuracy": 93.63,
+      "correct": 4293,
+      "total": 4585
+    }
+  },
+  "per_class_summary": {
+    "Apple___Apple_scab": {
+      "accuracy": 97.22,
+      "correct": 490,
+      "total": 504
+    },
+    "Apple___Black_rot": {
+      "accuracy": 79.88,
+      "correct": 397,
+      "total": 497
+    },
+    "Apple___Cedar_apple_rust": {
+      "accuracy": 80.0,
+      "correct": 352,
+      "total": 440
+    },
+    "Apple___healthy": {
+      "accuracy": 99.2,
+      "correct": 498,
+      "total": 502
+    },
+    "Blueberry___healthy": {
+      "accuracy": 75.11,
+      "correct": 341,
+      "total": 454
+    },
+    "Cherry_(including_sour)___Powdery_mildew": {
+      "accuracy": 95.96,
+      "correct": 404,
+      "total": 421
+    },
+    "Cherry_(including_sour)___healthy": {
+      "accuracy": 98.46,
+      "correct": 449,
+      "total": 456
+    },
+    "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": {
+      "accuracy": 74.88,
+      "correct": 307,
+      "total": 410
+    },
+    "Corn_(maize)___Common_rust_": {
+      "accuracy": 99.16,
+      "correct": 473,
+      "total": 477
+    },
+    "Corn_(maize)___Northern_Leaf_Blight": {
+      "accuracy": 98.74,
+      "correct": 471,
+      "total": 477
+    },
+    "Corn_(maize)___healthy": {
+      "accuracy": 99.57,
+      "correct": 463,
+      "total": 465
+    },
+    "Grape___Black_rot": {
+      "accuracy": 47.88,
+      "correct": 226,
+      "total": 472
+    },
+    "Grape___Esca_(Black_Measles)": {
+      "accuracy": 99.38,
+      "correct": 477,
+      "total": 480
+    },
+    "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": {
+      "accuracy": 100.0,
+      "correct": 430,
+      "total": 430
+    },
+    "Grape___healthy": {
+      "accuracy": 97.64,
+      "correct": 413,
+      "total": 423
+    },
+    "Orange___Haunglongbing_(Citrus_greening)": {
+      "accuracy": 99.8,
+      "correct": 502,
+      "total": 503
+    },
+    "Peach___Bacterial_spot": {
+      "accuracy": 100.0,
+      "correct": 459,
+      "total": 459
+    },
+    "Peach___healthy": {
+      "accuracy": 87.73,
+      "correct": 379,
+      "total": 432
+    },
+    "Pepper,_bell___Bacterial_spot": {
+      "accuracy": 97.07,
+      "correct": 464,
+      "total": 478
+    },
+    "Pepper,_bell___healthy": {
+      "accuracy": 95.17,
+      "correct": 473,
+      "total": 497
+    },
+    "Potato___Early_blight": {
+      "accuracy": 99.79,
+      "correct": 484,
+      "total": 485
+    },
+    "Potato___Late_blight": {
+      "accuracy": 99.79,
+      "correct": 484,
+      "total": 485
+    },
+    "Potato___healthy": {
+      "accuracy": 48.25,
+      "correct": 220,
+      "total": 456
+    },
+    "Raspberry___healthy": {
+      "accuracy": 96.85,
+      "correct": 431,
+      "total": 445
+    },
+    "Soybean___healthy": {
+      "accuracy": 100.0,
+      "correct": 505,
+      "total": 505
+    },
+    "Squash___Powdery_mildew": {
+      "accuracy": 100.0,
+      "correct": 434,
+      "total": 434
+    },
+    "Strawberry___Leaf_scorch": {
+      "accuracy": 99.77,
+      "correct": 443,
+      "total": 444
+    },
+    "Strawberry___healthy": {
+      "accuracy": 80.26,
+      "correct": 366,
+      "total": 456
+    },
+    "Tomato___Bacterial_spot": {
+      "accuracy": 99.29,
+      "correct": 422,
+      "total": 425
+    },
+    "Tomato___Early_blight": {
+      "accuracy": 98.54,
+      "correct": 473,
+      "total": 480
+    },
+    "Tomato___Late_blight": {
+      "accuracy": 97.62,
+      "correct": 452,
+      "total": 463
+    },
+    "Tomato___Leaf_Mold": {
+      "accuracy": 98.51,
+      "correct": 463,
+      "total": 470
+    },
+    "Tomato___Septoria_leaf_spot": {
+      "accuracy": 91.06,
+      "correct": 397,
+      "total": 436
+    },
+    "Tomato___Spider_mites Two-spotted_spider_mite": {
+      "accuracy": 93.56,
+      "correct": 407,
+      "total": 435
+    },
+    "Tomato___Target_Spot": {
+      "accuracy": 71.99,
+      "correct": 329,
+      "total": 457
+    },
+    "Tomato___Tomato_Yellow_Leaf_Curl_Virus": {
+      "accuracy": 99.8,
+      "correct": 489,
+      "total": 490
+    },
+    "Tomato___Tomato_mosaic_virus": {
+      "accuracy": 86.16,
+      "correct": 386,
+      "total": 448
+    },
+    "Tomato___healthy": {
+      "accuracy": 98.75,
+      "correct": 475,
+      "total": 481
+    }
+  }
+}

@@ -188,11 +188,11 @@
     <line x1="343" y1="225" x2="368" y2="225" class="line" />
     <text x="335" y="211" class="guard-text" text-anchor="middle">[信心度 &lt; 75%]</text>
 
-    <!-- State S2b: Gemini 2.5 Flash 雲端兜底 (Gemini_Inferencing) -->
+    <!-- State S2b: Gemini 3.8 Flash 雲端兜底 (Gemini_Inferencing) -->
     <g transform="translate(370, 172)">
       <rect width="280" height="106" class="ai-indigo-box" />
       <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 23 L 0 23 Z" class="ai-indigo-header" />
-      <text x="140" y="16" class="state-name" fill="#1A281E">Gemini 2.5 Flash 雲端兜底 (Gemini_Inferencing)</text>
+      <text x="140" y="16" class="state-name" fill="#1A281E">Gemini 3.8 Flash 雲端兜底 (Gemini_Inferencing)</text>
       <text x="10" y="42" class="action-text">entry / 呼叫 Google GenAI 官方 SDK</text>
       <text x="10" y="61" class="action-text">do / 全域多模態病徵視覺理解與長尾鑑別</text>
       <text x="10" y="80" class="action-text">do / 強制約束 JSON Schema 結構化輸出規格</text>

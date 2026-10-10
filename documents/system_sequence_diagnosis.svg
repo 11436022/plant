@@ -56,9 +56,9 @@
   <text x="820" y="82" class="lifeline-title">本地自訓 ConvNeXt</text>
   <line x1="820" y1="99" x2="820" y2="1150" class="lifeline-line" />
 
-  <!-- Lifeline 5: Gemini 2.5 Flash -->
+  <!-- Lifeline 5: Gemini 3.8 Flash -->
   <rect x="930" y="55" width="180" height="44" class="lifeline-cloud" />
-  <text x="1020" y="82" class="lifeline-title">Gemini 2.5 Flash</text>
+  <text x="1020" y="82" class="lifeline-title">Gemini 3.8 Flash</text>
   <line x1="1020" y1="99" x2="1020" y2="1150" class="lifeline-line" />
 
   <!-- Lifeline 6: FAISS & MySQL -->
@@ -109,7 +109,7 @@
 
   <!-- Msg 6a: Gemini Call -->
   <line x1="605" y1="375" x2="1015" y2="375" class="msg-line" />
-  <text x="615" y="366" class="msg-text">6a: 請求雲端多模態分析 (Gemini 2.5 Flash)</text>
+  <text x="615" y="366" class="msg-text">6a: 請求雲端多模態分析 (Gemini 3.8 Flash)</text>
 
   <!-- Msg 6b: Gemini Return -->
   <line x1="1015" y1="418" x2="605" y2="418" class="return-line" />

@@ -221,7 +221,7 @@
       <rect width="231" height="84" class="cloud-comp-box" />
       <use href="#comp-icon" x="205" y="10" />
       <text x="12" y="25" class="comp-title">Google Gemini API 元件</text>
-      <text x="12" y="50" class="comp-desc">• Gemini 2.5 Flash 雲端多模態視覺初判</text>
+      <text x="12" y="50" class="comp-desc">• Gemini 3.8 Flash 雲端多模態視覺初判</text>
       <text x="12" y="70" class="comp-desc">• 廣域病理特徵分析與結構化輸出</text>
     </g>
 

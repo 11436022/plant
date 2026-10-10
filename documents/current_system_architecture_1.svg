@@ -119,7 +119,7 @@
 
   <!-- 3. Gemini Multimodal Fallback (Step 2) -->
   <rect x="1196" y="435" width="318" height="105" rx="8" class="ai-box"/>
-  <text x="1355" y="478" text-anchor="middle" class="head">Gemini 2.5 Flash 雲端模型</text>
+  <text x="1355" y="478" text-anchor="middle" class="head">Gemini 3.8 Flash 雲端模型</text>
   <text x="1355" y="512" text-anchor="middle" class="text">步驟 2: 多模態影像初判與兜底</text>
 
   <!-- 4. Agricultural Knowledge Base & FAISS (Step 3) -->

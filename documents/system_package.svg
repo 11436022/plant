@@ -182,7 +182,7 @@
       <text x="12" y="42" class="module-text">• prediction_service.py</text>
       <text x="175" y="42" class="module-desc">(決策仲裁、特徵權重校準與 70% 閾值檢驗)</text>
       <text x="12" y="63" class="module-text">• gemini_service.py</text>
-      <text x="175" y="63" class="module-desc">(Gemini 2.5 Flash 多模態推論與病徵解析)</text>
+      <text x="175" y="63" class="module-desc">(Gemini 3.8 Flash 多模態推論與病徵解析)</text>
       <text x="12" y="84" class="module-text">• local_convnet.py</text>
       <text x="175" y="84" class="module-desc">(自訓微觀病斑卷積網路分類，零運算成本)</text>
       <text x="12" y="105" class="module-text">• rag_service.py</text>
