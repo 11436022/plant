@@ -618,11 +618,25 @@ class WebcamActivity : AppCompatActivity() {
             ) {
                 if (pendingUploads[regionId] === call) pendingUploads.remove(regionId)
                 file.delete()
-                if (!isMonitoring || monitoringSessionId != requestSessionId || isDestroyed) return
+
+                // 💡 1. 在過濾前，先印出目前的關鍵變數狀態
+                Log.d("WEBCAM_DEBUG", "收到 200 回傳！目前狀態：isMonitoring=$isMonitoring, 全域Session=$monitoringSessionId, 請求時Session=$requestSessionId, isDestroyed=$isDestroyed")
+
+                // 原本的攔截線
+                if (!isMonitoring || monitoringSessionId != requestSessionId || isDestroyed) {
+                    // 💡 2. 這裡加一行 Log，看它到底是不是在這裡被丟棄的
+                    Log.w("WEBCAM_DEBUG", "回傳資料被攔截丟棄！因為狀態不對。")
+                    return
+                }
+
                 val result = response.body()
+                Log.d("WEBCAM_DEBUG", "成功突破攔截，response.isSuccessful=${response.isSuccessful}, result status=${result?.status}")
+
                 when {
-                    response.isSuccessful && result != null && result.status == "success" ->
+                    response.isSuccessful && result != null && result.status == "success" -> {
+                        Log.d("WEBCAM_DEBUG", "即將進入 handleWebcamResult")
                         handleWebcamResult(result, requestSessionId, regionId, regionName)
+                    }
                     response.code() == 401 -> {
                         stopMonitoring()
                         Toast.makeText(this@WebcamActivity, "登入已過期，請重新登入", Toast.LENGTH_SHORT).show()
@@ -633,6 +647,7 @@ class WebcamActivity : AppCompatActivity() {
                     }
                 }
             }
+
 
             override fun onFailure(call: Call<WebcamAnalyzeResponse>, t: Throwable) {
                 if (pendingUploads[regionId] === call) pendingUploads.remove(regionId)
@@ -650,28 +665,63 @@ class WebcamActivity : AppCompatActivity() {
         regionId: String,
         regionName: String
     ) {
+        // 關卡 1：基礎生命週期與監控狀態檢查
         if (!isMonitoring || monitoringSessionId != sessionId || isFinishing || isDestroyed) return
-        val monitoring = result.monitoring
-        if (!monitoring.matchesScope(sessionId, regionId)) return
-        val alert = result.alert
-        if (alert?.session_id != null && alert.session_id != sessionId) return
-        if (alert?.region_id != null && alert.region_id != regionId) return
-        val statusText = result.diagnosis.status_name?.takeIf { it.isNotBlank() } ?: "無法判定"
+
+        // 💡 側路穿透解析：直接將結果還原成最原始的 JSON 字串，100% 避開 Data Class 的欄位限制
+        val statusText = try {
+            val rawJsonString = com.google.gson.Gson().toJson(result)
+            val jsonObject = org.json.JSONObject(rawJsonString)
+
+            // 1. 優先嘗試從 alert 區塊撈取（如果觸發了警報，這裡最精準）
+            val alertJson = jsonObject.optJSONObject("alert")
+            val alertCrop = alertJson?.optString("crop_name")?.takeIf { it.isNotBlank() }
+            val alertStatus = alertJson?.optString("status_name")?.takeIf { it.isNotBlank() }
+
+            if (alertCrop != null && alertStatus != null) {
+                if (alertStatus.contains(alertCrop)) alertStatus else "$alertCrop $alertStatus"
+            } else {
+                // 2. 核心救援點：如果 alert 是 null，直接暴力穿透到原本壞掉的 diagnosis 原始 JSON 欄位中去挖！
+                val diagnosisJson = jsonObject.optJSONObject("diagnosis")
+                val dCrop = diagnosisJson?.optString("crop_name")?.takeIf { it.isNotBlank() } ?: ""
+                val dStatus = diagnosisJson?.optString("status_name")?.takeIf { it.isNotBlank() }
+                    ?: diagnosisJson?.optString("disease_name")?.takeIf { it.isNotBlank() }
+
+                if (dStatus != null) {
+                    // 如果抓到了疾病名稱，且它沒包含作物名稱，就幫它組合起來（例如：蘋果 裂果）
+                    if (dStatus.contains(dCrop) || dCrop.isBlank()) dStatus else "$dCrop $dStatus"
+                } else {
+                    // 3. 萬一真的都沒有，就用原本對象的值兜底
+                    result.diagnosis.status_name?.takeIf { it.isNotBlank() } ?: "無法判定"
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("WebcamTest", "側路 JSON 解析異常", e)
+            result.diagnosis.status_name?.takeIf { it.isNotBlank() } ?: "無法判定"
+        }
+
+        // 解析複核狀態
         val reviewText = when (result.diagnosis.requires_review) {
             true -> "（需要人工複核）"
             false -> ""
-            null -> "（複核狀態未提供）"
+            null -> ""
         }
-        backendStatusText = "$regionName：連續判定 ${monitoring.streak} 次；${monitoring.statusLabel()}"
+
+        // 更新 App 主畫面的狀態文字（不論有沒有觸發警報，畫面都會即時更新為真實診斷結果，如：蘋果 裂果）
+        backendStatusText = "$regionName：連續判定 ${result.monitoring.streak} 次；${result.monitoring.statusLabel()}"
         updateDiagnosisUI("$regionName：$statusText$reviewText", totalCaptureCount)
 
-        // Only a newly created backend alert can produce a phone notification.
-        if (monitoring.triggered && alert != null &&
-            alert.id !in notifiedAlertIds && alert.id !in pendingAlertNotifications) {
-            sendAlertNotification("$regionName：$statusText", alert.id)
-            Toast.makeText(this, "後端已建立監控警報", Toast.LENGTH_LONG).show()
+        // 4. 根據後端正式版的機制，只有在確實建立 alert 物件時（triggered=true），才對手機發送推播通知
+        if (result.alert != null) {
+            Log.d("WebcamTest", "🎉 正式版警報觸發！滿足連續共識，發送手機推播：$statusText")
+            sendAlertNotification("$regionName：$statusText", result.alert.id)
+            Toast.makeText(this, "監控警報觸發：$statusText", Toast.LENGTH_LONG).show()
+        } else {
+            // 這是正式版後端預期的正常行為：可能還在累積次數中（streak 增加），或者植物很健康
+            Log.d("WebcamTest", "通過檢查：未達警報觸發門檻或狀態健康，畫面已更新，不發送推播")
         }
     }
+
 
     fun uploadSinglePlantFrame(jpegBytes: ByteArray) {
         runOnUiThread {
@@ -1014,20 +1064,20 @@ class WebcamActivity : AppCompatActivity() {
     ) : RecyclerView.Adapter<MultiRegionAdapter.ViewHolder>() {
 
         inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-            val tvName: TextView = v.findViewById(R.id.tvZoneCardName)
-            val tvSub: TextView = v.findViewById(R.id.tvZoneCardInterval)
+            val tvName: TextView = v.findViewById(android.R.id.text1)
+            val tvSub: TextView = v.findViewById(android.R.id.text2)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_crop_zone_card, parent, false)
+                .inflate(android.R.layout.simple_list_item_2, parent, false)
             return ViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val zone = list[position]
             holder.tvName.text = zone.name
-            holder.tvSub.text = "採樣間隔：${zone.intervalMinutes} 秒 (點擊修改植物/時間)"
+            holder.tvSub.text = "採樣間隔：${zone.intervalMinutes} 秒"
             holder.itemView.setOnClickListener { onItemClick(zone) }
         }
 
@@ -1094,7 +1144,7 @@ class WebcamActivity : AppCompatActivity() {
             1 -> "#1A237E" // 深藍底
             2 -> "#3E2723" // 深可可底
             3 -> "#4A0033" // 深莓紅底
-            else -> "#FFFFFF" // 白底
+            else -> "#00AA00" // 深綠色
         }
 
         dialog.window?.let { window ->
