@@ -228,7 +228,7 @@
 
                     <View
                         android:layout_width="match_parent"
-                        android:layout_height="80dp" />
+                        android:layout_height="160dp" />
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>
         </androidx.constraintlayout.widget.ConstraintLayout>
