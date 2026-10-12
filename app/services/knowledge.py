@@ -35,7 +35,7 @@ async def get_or_complete_knowledge(table_name, name_val, db):
             # 如果不是植物，直接報錯，中斷流程
             raise HTTPException(
                 status_code=400, 
-                detail=f"'{name_val}' 不像是一個有效的植物名稱，請重新輸入。"
+                detail=f"\'{name_val}\' 不像是一個有效的植物名稱，請重新輸入。"
             )
         new_crop = models.Crop(crop_name=name_val)
         db.add(new_crop)
@@ -45,13 +45,13 @@ async def get_or_complete_knowledge(table_name, name_val, db):
 
     prompt = (
         f"Provide a short description and treatment for {name_val}. "
-        "Format the response as:\n"
-        "Description: ...\n"
+        "Format the response as:\\n"
+        "Description: ...\\n"
         "Treatment: ..."
     )
 
     try:
-        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        response = client.models.generate_content(model="models/gemini-3.8-flash", contents=prompt)
         ai_text = response.text or ""
     except Exception:
         ai_text = ""
@@ -79,7 +79,6 @@ async def get_or_complete_knowledge(table_name, name_val, db):
         "suggestion": description,
         "treatment": treatment,
     }
-
 
 def get_crop_id_by_name(crop_name):
     """依作物名稱查詢主鍵。"""

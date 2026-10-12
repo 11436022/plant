@@ -23,14 +23,12 @@ HEALTHY_STATUS_NAME = "健康"
 MIN_DIAGNOSIS_CONFIDENCE = 0.65
 MIN_HEALTHY_CONFIDENCE = 0.85
 
-
 def parse_custom_label(label: str) -> tuple[str, str]:
     """解析客製化標籤 (格式: '植物名稱-病害名稱' 或 '植物名稱-健康')。"""
     if not label or "-" not in label:
         return label or UNKNOWN_CROP_NAME, UNKNOWN_STATUS_NAME
     parts = label.split("-", 1)
     return parts[0].strip(), parts[1].strip()
-
 
 def _coerce_confidence(value) -> float:
     """Keep confidence in a predictable 0.0-1.0 range."""
@@ -40,7 +38,6 @@ def _coerce_confidence(value) -> float:
     except (TypeError, ValueError):
         return 0.0
     return max(0.0, min(1.0, confidence)) if math.isfinite(confidence) else 0.0
-
 
 def _uncertain_diagnosis(crop_name: str | None = None, confidence: float = 0.0) -> dict:
     """Return a conservative result instead of inventing a diagnosis."""
@@ -56,12 +53,10 @@ def _uncertain_diagnosis(crop_name: str | None = None, confidence: float = 0.0) 
         "requires_review": True,
     }
 
-
 def _normalize_name(value: str | None) -> str:
     """Normalize names for exact matching without trusting model wording."""
 
     return "".join(str(value or "").strip().lower().split())
-
 
 def _match_known_name(value: str | None, known_names: list[str]) -> str | None:
     """Return the canonical database name only when the AI output matches it."""
@@ -75,13 +70,11 @@ def _match_known_name(value: str | None, known_names: list[str]) -> str | None:
             return known_name
     return None
 
-
 def _safe_text(value: str | None, fallback: str) -> str:
     """Use fallback text when model output is missing."""
 
     text = str(value or "").strip()
     return text if text else fallback
-
 
 def validate_diagnosis_result(data, crops: list[str], diseases: list[str], pests: list[str]) -> dict:
     """Constrain AI diagnosis to database-backed crop and disease/pest names."""
@@ -138,7 +131,6 @@ def validate_diagnosis_result(data, crops: list[str], diseases: list[str], pests
         "grounding_source": "model_pending_database_check",
         "requires_review": False,
     }
-
 
 def arbitrate_diagnosis(
     gemini_result: dict | None,
@@ -299,7 +291,6 @@ def arbitrate_diagnosis(
 
     return _uncertain_diagnosis()
 
-
 def generate_precise_prescription(
     crop_name: str,
     status_name: str,
@@ -449,7 +440,6 @@ def generate_precise_prescription(
     )
     return safe_sugg, safe_treat, "general_safe_prescription"
 
-
 def _call_gemini_fallback(
     image_path: str,
     crop_hint: str | None = None,
@@ -489,13 +479,12 @@ def _call_gemini_fallback(
     }}
     """
     try:
-        response = client.models.generate_content(model="gemini-2.5-flash", contents=[prompt, img])
+        response = client.models.generate_content(model="models/gemini-3.8-flash", contents=[prompt, img])
         clean_text = (response.text or "").replace("```json", "").replace("```", "").strip()
         return json.loads(clean_text)
     except Exception as e:
         print(f"❌ Gemini 多模態兜底失敗: {e}")
         return _uncertain_diagnosis(crop_name=crop_hint)
-
 
 def diagnostic_plant(
     image_path: str,
@@ -596,8 +585,6 @@ def diagnostic_plant(
     }
     return final_result
 
-
-
 def _get_standardized_name(new_name: str, existing_names: list[str]) -> str:
     """使用 AI 的語意理解能力來解析同義詞，並回傳一個標準化的名稱。"""
     if not existing_names or new_name in existing_names:
@@ -618,7 +605,7 @@ def _get_standardized_name(new_name: str, existing_names: list[str]) -> str:
     Your response must be ONLY ONE of the terms.
     """
     try:
-        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        response = client.models.generate_content(model="models/gemini-3.8-flash", contents=prompt)
         standardized_name = (response.text or "").strip()
         
         # 安全性檢查：確保 AI 的回應是有效的選項之一
@@ -635,7 +622,6 @@ def _get_standardized_name(new_name: str, existing_names: list[str]) -> str:
     except Exception as e:
         print(f"❌ 標準化失敗: {e}，將使用原名稱 '{new_name}'")
         return new_name
-
 
 def ground_diagnosis_in_database(data: dict, db: Session) -> dict:
     """Cross-check crop ownership and replace generated advice with database facts."""
@@ -809,7 +795,6 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
             "requires_review": raw_ai_data.get("requires_review", False),
         }
 
-
 def get_reference_lists(db: Session) -> tuple[list[str], list[str], list[str]]:
     """從既有 Session 讀取模型參考清單。"""
 
@@ -817,8 +802,6 @@ def get_reference_lists(db: Session) -> tuple[list[str], list[str], list[str]]:
     diseases = [d.disease_name for d in db.query(models.Disease).all()]
     pests = [p.pest_name for p in db.query(models.Pest).all()]
     return crops, diseases, pests
-
-
 
 async def classify_agriculture_term(name: str) -> str:
     """判斷農業狀態名稱屬於病害或蟲害。"""
@@ -828,7 +811,7 @@ async def classify_agriculture_term(name: str) -> str:
         f"disease, pest, invalid. Input: {name}"
     )
     try:
-        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        response = client.models.generate_content(model="models/gemini-3.8-flash", contents=prompt)
         result = (response.text or "").strip().lower()
         if result in {"disease", "pest"}:
             return result
@@ -848,7 +831,7 @@ async def check_if_real_crop(name_val: str) -> bool:
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash", 
+            model="models/gemini-3.8-flash", 
             contents=prompt
         )
         # 取得回傳內容並清理空白與大小寫
@@ -858,7 +841,6 @@ async def check_if_real_crop(name_val: str) -> bool:
         # 如果 AI 服務出錯，保險起見我們預設為 True (或者 False，看你的嚴謹度)
         print(f"AI Check Error: {e}")
         return False
-
 
 async def save_to_db(data, image_path, user_id, user_note, db: Session):
     """將診斷結果寫入 plant_diary。"""
@@ -880,80 +862,73 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
 
     try:
         if target_crop_id is None and crop_name and crop_name != UNKNOWN_CROP_NAME:
-            crop = models.Crop(crop_name=crop_name)
-            db.add(crop)
-            db.flush()
-            target_crop_id = crop.crop_id
+            # 如果作物不存在，則創建它
+            is_real = await check_if_real_crop(crop_name)
+            if is_real:
+                new_crop = models.Crop(crop_name=crop_name)
+                db.add(new_crop)
+                db.commit()
+                db.refresh(new_crop)
+                target_crop_id = new_crop.crop_id
+                print(f"🌱 作物 '{crop_name}' 不在資料庫中，已自動新增。")
 
-        if category == "disease":
-            disease = db.query(models.Disease).filter(
-                models.Disease.disease_name == status_name,
-                models.Disease.crop_id == target_crop_id,
-            ).first() if target_crop_id is not None else None
-            if disease:
-                disease_id = disease.disease_id
-            elif target_crop_id is not None and status_name not in [UNKNOWN_STATUS_NAME, "未知", "無法判定"]:
-                new_disease = models.Disease(
-                    crop_id=target_crop_id,
-                    disease_name=status_name,
-                    description=final_suggestion,
-                    treatment=final_treatment,
-                )
-                db.add(new_disease)
-                db.flush()
-                disease_id = new_disease.disease_id
-        elif category == "pest":
-            pest = db.query(models.Pest).filter(
-                models.Pest.pest_name == status_name,
-                models.Pest.crop_id == target_crop_id,
-            ).first() if target_crop_id is not None else None
-            if pest:
-                pest_id = pest.pest_id
-            elif target_crop_id is not None and status_name not in [UNKNOWN_STATUS_NAME, "未知", "無法判定"]:
-                new_pest = models.Pest(
-                    crop_id=target_crop_id,
-                    pest_name=status_name,
-                    description=final_suggestion,
-                    treatment=final_treatment,
-                )
-                db.add(new_pest)
-                db.flush()
-                pest_id = new_pest.pest_id
+        if target_crop_id:
+            if category == "disease" and status_name != UNKNOWN_STATUS_NAME:
+                disease = db.query(models.Disease).filter_by(crop_id=target_crop_id, disease_name=status_name).first()
+                if not disease:
+                    new_disease = models.Disease(
+                        crop_id=target_crop_id,
+                        disease_name=status_name,
+                        description=final_suggestion,
+                        treatment=final_treatment,
+                    )
+                    db.add(new_disease)
+                    db.commit()
+                    db.refresh(new_disease)
+                    disease_id = new_disease.disease_id
+                    print(f"✨ 新病害 '{status_name}' 已為作物 '{crop_name}' 新增至資料庫。")
+                else:
+                    disease_id = disease.disease_id
 
-        if category == "unknown" or status_name in [UNKNOWN_STATUS_NAME, "無法判定", "未知"]:
-            data = _uncertain_diagnosis(crop_name, _coerce_confidence(data.get("confidence")))
-            final_suggestion = data["suggestion"]
-            final_treatment = data["treatment"]
+            elif category == "pest" and status_name != UNKNOWN_STATUS_NAME:
+                pest = db.query(models.Pest).filter_by(crop_id=target_crop_id, pest_name=status_name).first()
+                if not pest:
+                    new_pest = models.Pest(
+                        crop_id=target_crop_id,
+                        pest_name=status_name,
+                        description=final_suggestion,
+                        treatment=final_treatment,
+                    )
+                    db.add(new_pest)
+                    db.commit()
+                    db.refresh(new_pest)
+                    pest_id = new_pest.pest_id
+                    print(f"✨ 新害蟲 '{status_name}' 已為作物 '{crop_name}' 新增至資料庫。")
+                else:
+                    pest_id = pest.pest_id
 
-        new_diary = models.PlantDiary()
-        new_diary.user_id = user_id
-        new_diary.crop_id = target_crop_id
-        new_diary.status_name = status_name
-        new_diary.image_url = str(Path(image_path).as_posix())
-        new_diary.disease_id = disease_id
-        new_diary.pest_id = pest_id
-        new_diary.confidence = data.get("confidence")
-        new_diary.category = category
-        new_diary.requires_review = data.get("requires_review", True)
-        new_diary.grounding_source = data.get("grounding_source") or "legacy_unverified"
-        new_diary.reference_source = data.get("reference_source")
-        new_diary.reference_url = data.get("reference_url")
-        new_diary.reference_record_id = data.get("reference_record_id")
+        # 讀取圖片並轉為 Base64
+        with open(image_path, "rb") as image_file:
+            image_base64 = base64.b64encode(image_file.read()).decode("utf-8")
 
-        # 🌟 這裡使用手動賦值，避免建構子屬性名稱混淆
-        # 如果您的資料庫欄位是 suggestion，這會正確運作
-        new_diary.gemini_suggestion = final_suggestion
-        new_diary.gemini_treatment = final_treatment
-
-        new_diary.user_note = user_note
-        new_diary.created_at = datetime.now()
-
-        db.add(new_diary)
-        db.flush()
-        diary_id = new_diary.id
+        new_diary_entry = models.PlantDiary(
+            user_id=user_id,
+            crop_id=target_crop_id,
+            disease_id=disease_id,
+            pest_id=pest_id,
+            image_base64=image_base64,
+            user_note=user_note,
+            ai_suggestion=final_suggestion,
+            ai_treatment=final_treatment,
+            ai_confidence=data.get("confidence", 0.0),
+            grounding_source=data.get("grounding_source"),
+            requires_review=data.get("requires_review", False),
+            created_at=datetime.utcnow(),
+        )
+        db.add(new_diary_entry)
         db.commit()
-        return diary_id
-    except Exception as exc:
+        print(f"✅ 診斷日誌已成功儲存 (使用者 ID: {user_id})")
+
+    except Exception as e:
         db.rollback()
-        print(f"CRITICAL DATABASE ERROR: {str(exc)}") # 🌟 這行會把真正的錯誤原因印在後端視窗
-        raise RuntimeError(f"Database Save Failed: {exc}") from exc
+        print(f"❌ 儲存診斷日誌失敗: {e}")
