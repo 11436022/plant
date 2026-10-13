@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1500 720"
+   width="1500"
+   height="720"
+   version="1.1"
+   id="svg51"
+   sodipodi:docname="R02_防幻覺與分流架構圖.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview51"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.1208333"
+     inkscape:cx="664.23792"
+     inkscape:cy="377.84387"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg51" />
+  <defs
+     id="defs4">
+    <style
+       id="style1">
+      .bg { fill: #FFFFFF; }
+      .slide-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 30px; font-weight: 800; fill: #111827; text-anchor: middle; }
+      .stage-badge { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #3F6212; text-anchor: middle; }
+      
+      .box-green { fill: #9BBA68; stroke: #6E8B3D; stroke-width: 2; rx: 14; ry: 14; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.08)); }
+      .box-green-dark { fill: #7E9F48; stroke: #557028; stroke-width: 2; rx: 14; ry: 14; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.08)); }
+      .box-blue { fill: #DCECCB; stroke: #6E8B3D; stroke-width: 2; rx: 12; ry: 12; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06)); }
+      .box-reject { fill: #FEF2F2; stroke: #DC2626; stroke-width: 2; stroke-dasharray: 6,4; rx: 12; ry: 12; }
+      .box-warn { fill: #FFFBEB; stroke: #D97706; stroke-width: 2; rx: 12; ry: 12; }
+
+      .node-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 18px; font-weight: bold; fill: #111827; text-anchor: middle; }
+      .node-title-white { font-family: 'Microsoft JhengHei', sans-serif; font-size: 18px; font-weight: bold; fill: #FFFFFF; text-anchor: middle; }
+      .node-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13.5px; fill: #1F2937; text-anchor: middle; }
+      .node-sub-white { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; fill: #F9FAFB; text-anchor: middle; }
+      .reject-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 15px; font-weight: bold; fill: #B91C1C; text-anchor: middle; }
+      .reject-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12.5px; fill: #7F1D1D; text-anchor: middle; }
+      .warn-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 15px; font-weight: bold; fill: #92400E; text-anchor: middle; }
+      .warn-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12.5px; fill: #78350F; text-anchor: middle; }
+
+      .arrow-main { stroke: #374151; stroke-width: 2.4; fill: none; marker-end: url(#arrow-dark); }
+      .arrow-pass { stroke: #3F6212; stroke-width: 2.4; fill: none; marker-end: url(#arrow-green); }
+      .arrow-fallback { stroke: #B45309; stroke-width: 2.2; stroke-dasharray: 7,4; fill: none; marker-end: url(#arrow-amber); }
+      .arrow-reject { stroke: #DC2626; stroke-width: 2.2; stroke-dasharray: 6,4; fill: none; marker-end: url(#arrow-red); }
+
+      .edge-label-pass { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #365314; }
+      .edge-label-warn { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #B45309; }
+      .edge-label-reject { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #DC2626; }
+    </style>
+    <marker
+       id="arrow-dark"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6.5"
+       markerHeight="6.5"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1.5 L 10 5 L 0 8.5 z"
+         fill="#374151"
+         id="path1" />
+    </marker>
+    <marker
+       id="arrow-green"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6.5"
+       markerHeight="6.5"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1.5 L 10 5 L 0 8.5 z"
+         fill="#3F6212"
+         id="path2" />
+    </marker>
+    <marker
+       id="arrow-amber"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6.5"
+       markerHeight="6.5"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1.5 L 10 5 L 0 8.5 z"
+         fill="#B45309"
+         id="path3" />
+    </marker>
+    <marker
+       id="arrow-red"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6.5"
+       markerHeight="6.5"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1.5 L 10 5 L 0 8.5 z"
+         fill="#DC2626"
+         id="path4" />
+    </marker>
+    <marker
+       id="arrow-green-0"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6.5"
+       markerHeight="6.5"
+       orient="auto-start-reverse">
+      <path
+         d="M 0,1.5 10,5 0,8.5 Z"
+         fill="#3f6212"
+         id="path2-9" />
+    </marker>
+  </defs>
+  <rect
+     width="100%"
+     height="100%"
+     class="bg"
+     id="rect4"
+     x="3.5687733"
+     y="2.67658" />
+  <line
+     x1="572.64313"
+     y1="270.45999"
+     x2="826.40802"
+     y2="270.45999"
+     class="arrow-pass"
+     id="line12-8"
+     style="fill:none;stroke:#3f6212;stroke-width:4.27446;marker-end:url(#arrow-green-0)" />
+  <!-- Title -->
+  <text
+     x="750"
+     y="52"
+     class="slide-title"
+     id="text4">R02：如何防範 AI 幻覺與錯誤？（五重防禦與分流架構）</text>
+  <!-- ========================================================= -->
+  <!-- STAGE 1: 影像品質快篩 (x=35..245, y=215..330)              -->
+  <!-- ========================================================= -->
+  <text
+     x="140"
+     y="200"
+     class="stage-badge"
+     id="text5">【第 1 關：輸入品質過濾】</text>
+  <rect
+     x="35"
+     y="215"
+     width="210"
+     height="115"
+     class="box-green"
+     id="rect5" />
+  <text
+     x="140"
+     y="262"
+     class="node-title"
+     id="text6">1. 影像品質快篩</text>
+  <text
+     x="140"
+     y="294"
+     class="node-sub"
+     id="text7">使用後端解析影像</text>
+  <text
+     x="140"
+     y="302"
+     class="node-sub"
+     id="text8" />
+  <!-- Branch 1-Reject (Down): 標準差 < 5.0 -->
+  <line
+     x1="140"
+     y1="330"
+     x2="140"
+     y2="495"
+     class="arrow-reject"
+     id="line8" />
+  <text
+     x="152"
+     y="418"
+     class="edge-label-reject"
+     id="text9">標準差 &lt; 5.0</text>
+  <rect
+     x="35"
+     y="500"
+     width="210"
+     height="90"
+     class="box-reject"
+     id="rect9" />
+  <text
+     x="140"
+     y="534"
+     class="reject-title"
+     id="text10">【攔截】前置壞幀過濾</text>
+  <text
+     x="140"
+     y="558"
+     class="reject-sub"
+     id="text11">拒絕推論，引導重新拍攝</text>
+  <text
+     x="140"
+     y="576"
+     class="reject-sub"
+     id="text12" />
+  <!-- Branch 1-Pass (Right): 標準差 >= 5.0 -->
+  <line
+     x1="245"
+     y1="272"
+     x2="325"
+     y2="272"
+     class="arrow-pass"
+     id="line12" />
+  <text
+     x="285"
+     y="258"
+     class="edge-label-pass"
+     text-anchor="middle"
+     id="text13">&gt;5.0 合格</text>
+  <!-- ========================================================= -->
+  <!-- STAGE 2: 本地 ConvNeXt 特徵快篩 (x=330..570, y=215..330)   -->
+  <!-- ========================================================= -->
+  <text
+     x="450"
+     y="200"
+     class="stage-badge"
+     id="text14">【第 2 關：邊緣特徵與部位雙重守門】</text>
+  <rect
+     x="330"
+     y="215"
+     width="240"
+     height="115"
+     class="box-green"
+     id="rect14" />
+  <text
+     x="450"
+     y="248"
+     class="node-title"
+     id="text15">2. ConvNeXt 特徵快篩</text>
+  <text
+     x="450"
+     y="275"
+     class="node-sub"
+     id="text16">• 信心度 ≥ 75% 且餘弦 ≥ 0.68</text>
+  <text
+     x="450"
+     y="297"
+     class="node-sub"
+     id="text17">• 部位感知守門 (防果實套葉病)</text>
+  <text
+     x="450"
+     y="317"
+     class="node-sub"
+     id="text18">• 壓倒性信心 (≥85%) 自動校正</text>
+  <!-- Branch 2A (Top Fast-Track): exits right-top of Stage 2 (x=570, y=235) -> up to y=130 -> right to x=790 -> down to y=245 -> into left of Stage 4 (x=835) -->
+  <text
+     x="709.27509"
+     y="198.97398"
+     class="edge-label-pass"
+     text-anchor="middle"
+     id="text19" />
+  <!-- Branch 2B (Down/Right Fallback): < 75% 或特徵偏離/部位不符 -> 轉交 Gemini -->
+  <path
+     d="M 450 330 L 450 405 L 580 405"
+     class="arrow-fallback"
+     id="path19" />
+  <text
+     x="440"
+     y="372"
+     class="edge-label-warn"
+     text-anchor="end"
+     id="text20">&lt; 75% 或特徵偏離 / 部位不符</text>
+  <text
+     x="440"
+     y="390"
+     class="edge-label-warn"
+     text-anchor="end"
+     id="text21">(拒絕本地盲目命中，轉交雲端)</text>
+  <!-- ========================================================= -->
+  <!-- STAGE 3: Gemini 雲端兜底與安全煞車 (x=585..815, y=350..465) -->
+  <!-- ========================================================= -->
+  <text
+     x="700"
+     y="338"
+     class="stage-badge"
+     id="text22">【第 3 關：雲端多模態與低信心煞車】</text>
+  <rect
+     x="585"
+     y="350"
+     width="230"
+     height="115"
+     class="box-green"
+     id="rect22" />
+  <text
+     x="700"
+     y="384"
+     class="node-title"
+     id="text23">3. Gemini 雲端複檢</text>
+  <text
+     x="700"
+     y="410"
+     class="node-sub"
+     id="text24">• 廣域多模態病徵視覺初判</text>
+  <text
+     x="700"
+     y="432"
+     class="node-sub"
+     id="text25">• 確診門檻 ≥ 65% / 健康 ≥ 85%</text>
+  <text
+     x="700"
+     y="452"
+     class="node-sub"
+     id="text26">• 強制白名單與 JSON 格式約束</text>
+  <!-- Branch 3-Reject (Down): 信心度 < 65% (或健康 < 85%) -> 安全防禦煞車 -->
+  <line
+     x1="700"
+     y1="465"
+     x2="700"
+     y2="500"
+     class="arrow-reject"
+     id="line26" />
+  <text
+     x="712"
+     y="488"
+     class="edge-label-reject"
+     id="text27">信心度 &lt; 65%</text>
+  <rect
+     x="575"
+     y="505"
+     width="250"
+     height="90"
+     class="box-reject"
+     id="rect27" />
+  <text
+     x="700"
+     y="538"
+     class="reject-title"
+     id="text28">【攔截】OOD 安全防禦煞車</text>
+  <text
+     x="700"
+     y="562"
+     class="reject-sub"
+     id="text29">回傳「無法判定」</text>
+  <text
+     x="700"
+     y="580"
+     class="reject-sub"
+     id="text30" />
+  <!-- Branch 3-Pass (Up/Right): 雲端確診通過 (>= 65%) -> 進入第 4 關左下側 (x=835, y=295) -->
+  <path
+     d="M 815 405 L 865 405 L 865 325"
+     class="arrow-pass"
+     id="path30" />
+  <text
+     x="874"
+     y="375"
+     class="edge-label-pass"
+     id="text31">&gt;65% 確診</text>
+  <!-- ========================================================= -->
+  <!-- STAGE 4: 雙重知識庫處方拘束 (x=835..1135, y=215..325)       -->
+  <!-- ========================================================= -->
+  <text
+     x="985.89221"
+     y="230.33458"
+     class="stage-badge"
+     id="text32">【第 4 關：雙重官方知識庫處方拘束】</text>
+  <rect
+     x="831.29395"
+     y="244.30508"
+     width="303.84338"
+     height="80.832222"
+     class="box-green-dark"
+     id="rect32" />
+  <text
+     x="983.21558"
+     y="292.60968"
+     class="node-title-white"
+     id="text33"><tspan
+       style="fill:#000000"
+       id="tspan56">4. 雙重知識庫處方拘束</tspan></text>
+  <text
+     x="985"
+     y="276"
+     class="node-sub-white"
+     id="text34" />
+  <text
+     x="985"
+     y="298"
+     class="node-sub-white"
+     id="text35" />
+  <!-- Sub-branch 4A (Top-Right): 優先查 MySQL 官方防治庫 -->
+  <path
+     d="m 1135,273.55018 h 50 v -77 h 50"
+     class="arrow-pass"
+     id="path35" />
+  <text
+     x="1185"
+     y="185.22676"
+     class="edge-label-pass"
+     text-anchor="middle"
+     id="text36">① 優先查庫命中</text>
+  <rect
+     x="1242.1636"
+     y="171.68558"
+     width="206.6572"
+     height="49.576538"
+     class="box-blue"
+     id="rect36" />
+  <text
+     x="1342.4906"
+     y="201.21602"
+     class="node-title"
+     style="font-size:16px"
+     id="text37">4A. MySQL 官方防治庫</text>
+  <text
+     x="1355"
+     y="176"
+     class="node-sub"
+     id="text38" />
+  <text
+     x="1355"
+     y="196"
+     class="node-sub"
+     id="text39" />
+  <!-- Sub-branch 4B (Middle-Right): MySQL 未收錄 -> 檢索 FAISS 專書 + Gemini -->
+  <path
+     d="M 1135 295 L 1185 295 L 1185 308 L 1235 308"
+     class="arrow-fallback"
+     id="path39" />
+  <text
+     x="1182"
+     y="332"
+     class="edge-label-warn"
+     text-anchor="middle"
+     id="text40">② 資料庫未收錄</text>
+  <rect
+     x="1245.3376"
+     y="289.35785"
+     width="214.90875"
+     height="48.901814"
+     class="box-warn"
+     id="rect40" />
+  <text
+     x="1355"
+     y="317.17468"
+     class="warn-title"
+     id="text41">4B. FAISS 專書＋Gemini</text>
+  <text
+     x="1355"
+     y="308"
+     class="warn-sub"
+     id="text42" />
+  <text
+     x="1355"
+     y="328"
+     class="warn-sub"
+     id="text43" />
+  <text
+     x="1355"
+     y="346"
+     class="warn-sub"
+     id="text44" />
+  <!-- ========================================================= -->
+  <!-- STAGE 5: Webcam 連續 3 幀穩定共識 (x=1040..1470, y=475..595) -->
+  <!-- ========================================================= -->
+  <!-- Branch from Stage 4 down to Stage 5 for Webcam mode -->
+  <path
+     d="M 985 325 L 985 535 L 1035 535"
+     class="arrow-main"
+     id="path44" />
+  <text
+     x="995"
+     y="425"
+     class="edge-label-pass"
+     text-anchor="start"
+     id="text45">[Webcam 串流監控模式]</text>
+  <text
+     x="1255"
+     y="460"
+     class="stage-badge"
+     id="text46">【第 5 關：時序防抖與主動學習閉環】</text>
+  <rect
+     x="1040"
+     y="475"
+     width="430"
+     height="120"
+     class="box-green"
+     id="rect46" />
+  <text
+     x="1255"
+     y="508"
+     class="node-title"
+     id="text47">5. Webcam 連續 3 幀穩定共識 (&gt;=80%)</text>
+  <text
+     x="1255"
+     y="536"
+     class="node-sub"
+     id="text48">• 連續 3 幀診斷同一病害 ＋ 官方資料庫依據 ＋ 信心度 ≥ 80%</text>
+  <text
+     x="1255"
+     y="558"
+     class="node-sub"
+     id="text49">• 徹底消除風吹晃動與光影誤報，達標才觸發警報與寄信</text>
+  <text
+     x="1255"
+     y="580"
+     class="node-sub"
+     id="text50" />
+  <!-- Footer Summary Bar -->
+  <text
+     x="752"
+     y="667"
+     class="node-sub"
+     style="font-weight:bold;font-size:15px"
+     id="text51" />
+</svg>
