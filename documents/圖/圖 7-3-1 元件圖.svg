@@ -45,7 +45,7 @@
   <g transform="translate(30, 52)">
     <rect width="246" height="600" class="subsystem-bg" />
     <path d="M 0 6 Q 0 0 6 0 L 240 0 Q 246 0 246 6 L 246 30 L 0 30 Z" class="subsystem-header" />
-    <text x="14" y="21" class="pkg-title">客戶端元件群 (Client Subsystem)</text>
+    <text x="12" y="20" class="pkg-title" style="font-size: 14.5px;">客戶端元件群 (Client Subsystem)</text>
 
     <!-- C1: Android UI -->
     <g transform="translate(12, 42)">
@@ -80,7 +80,7 @@
       <use href="#comp-icon" x="196" y="10" />
       <text x="12" y="25" class="comp-title">管理者儀表板元件</text>
       <text x="12" y="50" class="comp-desc">• Web 統計圖表與全站病歷維護</text>
-      <text x="12" y="70" class="comp-desc">• 糾錯回饋審核與標註資料集匯出</text>
+      <text x="12" y="70" class="comp-desc">• 糾錯回饋審核與專家真值標註</text>
     </g>
 
     <!-- C5: Webcam Monitor -->
@@ -109,93 +109,93 @@
     <path d="M 0 6 Q 0 0 6 0 L 574 0 Q 580 0 580 6 L 580 30 L 0 30 Z" class="subsystem-header" />
     <text x="14" y="21" class="pkg-title">FastAPI 後端核心服務群 (Backend Subsystem)</text>
 
-    <!-- Row 1: B1 Gateway (w=230) & B2 Auth (w=230), gap=90 -->
+    <!-- Left-side Internal Route Bus from B1 Gateway to B6 & B7 (at x=15) -->
+    <path d="M 32 105 L 15 105 L 15 524 L 32 524" class="line-intra" />
+    <line x1="15" y1="414" x2="32" y2="414" class="line-intra" />
+
+    <!-- Row 1: B1 Gateway (x=32, w=222) & B2 Auth (x=343, w=222), gap=89 -->
     <!-- B1: API Gateway -->
-    <g transform="translate(15, 42)">
-      <rect width="230" height="84" class="comp-box" />
-      <use href="#comp-icon" x="204" y="10" />
+    <g transform="translate(32, 42)">
+      <rect width="222" height="84" class="comp-box" />
+      <use href="#comp-icon" x="196" y="10" />
       <text x="12" y="25" class="comp-title">API 路由閘道元件</text>
       <text x="12" y="50" class="comp-desc">• REST API 集中路由分派與過濾</text>
       <text x="12" y="70" class="comp-desc">• Pydantic 請求資料型別自動校驗</text>
     </g>
 
     <!-- B2: Auth & Security -->
-    <g transform="translate(335, 42)">
-      <rect width="230" height="84" class="comp-box" />
-      <use href="#comp-icon" x="204" y="10" />
+    <g transform="translate(343, 42)">
+      <rect width="222" height="84" class="comp-box" />
+      <use href="#comp-icon" x="196" y="10" />
       <text x="12" y="25" class="comp-title">身分認證與授權元件</text>
       <text x="12" y="50" class="comp-desc">• Bcrypt 密碼安全雜湊與驗證</text>
       <text x="12" y="70" class="comp-desc">• JWT 權杖簽署與 RBAC 角色控管</text>
     </g>
 
-    <!-- B1 -> B2 Auth (gap is 90px from x=245 to x=335, perfectly spaced!) -->
-    <line x1="245" y1="84" x2="335" y2="84" class="line-intra" />
-    <text x="290" y="76" class="dep-label" text-anchor="middle">&lt;&lt;auth&gt;&gt;</text>
+    <!-- B1 -> B2 Auth -->
+    <line x1="254" y1="84" x2="343" y2="84" class="line-intra" />
+    <text x="298" y="76" class="dep-label" text-anchor="middle">&lt;&lt;auth&gt;&gt;</text>
 
     <!-- B1 -> B3 Dispatch -->
-    <line x1="130" y1="126" x2="130" y2="152" class="line-intra" />
-    <text x="138" y="142" class="dep-label" text-anchor="start">&lt;&lt;dispatch&gt;&gt;</text>
+    <line x1="143" y1="126" x2="143" y2="152" class="line-intra" />
+    <text x="151" y="142" class="dep-label" text-anchor="start">&lt;&lt;dispatch&gt;&gt;</text>
 
-    <!-- Row 2: B3 Dual-Model Orchestrator -->
-    <g transform="translate(15, 152)">
-      <rect width="550" height="84" class="ai-comp-box" />
-      <use href="#comp-icon" x="524" y="10" />
-      <text x="12" y="25" class="comp-title">多模型決策仲裁核心</text>
-      <text x="12" y="50" class="comp-desc">• 本地 ConvNeXt 快篩與雲端 Gemini 兜底調度</text>
-      <text x="12" y="70" class="comp-desc">• 信心度閾值仲裁 (≥ 70%) 與未達標安全防禦煞車</text>
+    <!-- Row 2: B3 Cascade Diagnosis & Prescription Core -->
+    <g transform="translate(32, 152)">
+      <rect width="533" height="84" class="ai-comp-box" />
+      <use href="#comp-icon" x="507" y="10" />
+      <text x="12" y="25" class="comp-title">階層式診斷與動態處方決策核心 (services/ai.py)</text>
+      <text x="12" y="50" class="comp-desc">• 階段一 (病害辨識)：本地 ConvNeXt 快篩 (≥75%) 與 Gemini 兜底 (65%/85%)</text>
+      <text x="12" y="70" class="comp-desc">• 階段二 (處方決策)：優先查 MySQL 防治庫，缺漏時檢索 FAISS + Gemini 生成</text>
     </g>
 
     <!-- B3 -> B4 ConvNeXt -->
-    <line x1="130" y1="236" x2="130" y2="262" class="line-intra" />
-    <text x="138" y="252" class="dep-label" text-anchor="start">&lt;&lt;invoke&gt;&gt;</text>
+    <line x1="143" y1="236" x2="143" y2="262" class="line-intra" />
+    <text x="151" y="252" class="dep-label" text-anchor="start">&lt;&lt;invoke&gt;&gt;</text>
 
     <!-- B3 -> B5 FAISS -->
-    <line x1="450" y1="236" x2="450" y2="262" class="line-intra" />
-    <text x="458" y="252" class="dep-label" text-anchor="start">&lt;&lt;query&gt;&gt;</text>
+    <line x1="454" y1="236" x2="454" y2="262" class="line-intra" />
+    <text x="462" y="252" class="dep-label" text-anchor="start">&lt;&lt;retrieve&gt;&gt;</text>
+
+    <!-- B3 -> B6 Cache Diagnosis Result (down center channel x=298) -->
+    <line x1="298" y1="236" x2="298" y2="372" class="line-intra" />
+    <text x="298" y="308" class="dep-label" text-anchor="middle">&lt;&lt;cache&gt;&gt;</text>
 
     <!-- Row 3: B4 Local ConvNeXt & B5 FAISS -->
     <!-- B4: ConvNeXt -->
-    <g transform="translate(15, 262)">
-      <rect width="230" height="84" class="ai-comp-box" />
-      <use href="#comp-icon" x="204" y="10" />
+    <g transform="translate(32, 262)">
+      <rect width="222" height="84" class="ai-comp-box" />
+      <use href="#comp-icon" x="196" y="10" />
       <text x="12" y="25" class="comp-title">本地 ConvNeXt 推論核心</text>
-      <text x="12" y="50" class="comp-desc">• 特定作物卷積病斑分類 (零成本)</text>
-      <text x="12" y="70" class="comp-desc">• 微觀病理局部特徵快速萃取</text>
+      <text x="12" y="50" class="comp-desc">• PyTorch 38 類病斑分類 (零成本)</text>
+      <text x="12" y="70" class="comp-desc">• Softmax 與特徵餘弦雙重檢驗</text>
     </g>
 
     <!-- B5: FAISS Vector RAG -->
-    <g transform="translate(335, 262)">
-      <rect width="230" height="84" class="ai-comp-box" />
-      <use href="#comp-icon" x="204" y="10" />
+    <g transform="translate(343, 262)">
+      <rect width="222" height="84" class="ai-comp-box" />
+      <use href="#comp-icon" x="196" y="10" />
       <text x="12" y="25" class="comp-title">FAISS 向量檢索核心</text>
-      <text x="12" y="50" class="comp-desc">• 農業部官方病害特徵向量索引</text>
-      <text x="12" y="70" class="comp-desc">• 檢索增強 (RAG) 與處方客觀校驗</text>
+      <text x="12" y="50" class="comp-desc">• 農業部官方防治專書向量索引</text>
+      <text x="12" y="70" class="comp-desc">• 資料庫缺漏處方時提供 RAG 依據</text>
     </g>
 
-    <!-- B4 -> B6 Diary Manager -->
-    <line x1="130" y1="346" x2="130" y2="372" class="line-intra" />
-    <text x="138" y="362" class="dep-label" text-anchor="start">&lt;&lt;save&gt;&gt;</text>
-
     <!-- Row 4: B6 Diary & Feedback Manager -->
-    <g transform="translate(15, 372)">
-      <rect width="550" height="84" class="comp-box" />
-      <use href="#comp-icon" x="524" y="10" />
+    <g transform="translate(32, 372)">
+      <rect width="533" height="84" class="comp-box" />
+      <use href="#comp-icon" x="507" y="10" />
       <text x="12" y="25" class="comp-title">植物日誌與反饋管理元件</text>
       <text x="12" y="50" class="comp-desc">• 二階段病歷持久化 (序號快取 ➜ 使用者確認儲存)</text>
       <text x="12" y="70" class="comp-desc">• 個人備忘筆記維護與糾錯反饋存檔</text>
     </g>
 
-    <!-- B6 -> B7 Webcam Engine -->
-    <line x1="130" y1="456" x2="130" y2="482" class="line-intra" />
-    <text x="138" y="472" class="dep-label" text-anchor="start">&lt;&lt;monitor&gt;&gt;</text>
-
     <!-- Row 5: B7 Webcam Alert Engine -->
-    <g transform="translate(15, 482)">
-      <rect width="550" height="84" class="comp-box" />
-      <use href="#comp-icon" x="524" y="10" />
+    <g transform="translate(32, 482)">
+      <rect width="533" height="84" class="comp-box" />
+      <use href="#comp-icon" x="507" y="10" />
       <text x="12" y="25" class="comp-title">Webcam 時序警報引擎</text>
-      <text x="12" y="50" class="comp-desc">• 連續 3 影格共識判定 (過濾光影晃動誤報)</text>
-      <text x="12" y="70" class="comp-desc">• 觸發高危病害警報並非同步寫入時序記錄</text>
+      <text x="12" y="50" class="comp-desc">• 調用階層式診斷並執行連續 3 影格共識判定 (≥80%)</text>
+      <text x="12" y="70" class="comp-desc">• 觸發高危病害警報並非同步寫入時序記錄與郵件推播</text>
     </g>
   </g>
 
@@ -221,19 +221,20 @@
       <rect width="231" height="84" class="cloud-comp-box" />
       <use href="#comp-icon" x="205" y="10" />
       <text x="12" y="25" class="comp-title">Google Gemini API 元件</text>
-      <text x="12" y="50" class="comp-desc">• Gemini 3.8 Flash 雲端多模態視覺初判</text>
-      <text x="12" y="70" class="comp-desc">• 廣域病理特徵分析與結構化輸出</text>
+      <text x="12" y="50" class="comp-desc">• Gemini 3.8 雲端多模態視覺初判</text>
+      <text x="12" y="70" class="comp-desc">• 結合 FAISS 專書動態生成處方</text>
     </g>
 
     <!-- E3: MySQL Relational DB -->
-    <g transform="translate(12, 372)">
-      <rect width="231" height="194" class="db-comp-box" />
+    <g transform="translate(12, 262)">
+      <rect width="231" height="304" class="db-comp-box" />
       <use href="#comp-icon" x="205" y="10" />
       <text x="12" y="25" class="comp-title">MySQL 關聯式資料庫</text>
-      <text x="12" y="56" class="comp-desc">• 會員帳號、權限與認證權杖持久化</text>
-      <text x="12" y="90" class="comp-desc">• 診斷日誌、病害知識庫與備忘筆記</text>
-      <text x="12" y="124" class="comp-desc">• 時序警報記錄與糾錯反饋庫維護</text>
-      <text x="12" y="158" class="comp-desc">• SQLAlchemy 2.0 ORM 連線映射</text>
+      <text x="12" y="64" class="comp-desc">• 官方作物與病蟲害權威處方庫查詢</text>
+      <text x="12" y="104" class="comp-desc">• 會員帳號、權限與認證權杖持久化</text>
+      <text x="12" y="144" class="comp-desc">• 診斷日誌與個人備忘筆記存檔</text>
+      <text x="12" y="184" class="comp-desc">• 時序警報記錄與專家標註真值維護</text>
+      <text x="12" y="224" class="comp-desc">• SQLAlchemy 2.0 ORM 連線映射</text>
     </g>
   </g>
 
@@ -242,34 +243,28 @@
   <!-- ========================================================================= -->
 
   <!-- [A] CLIENT TO BACKEND GATEWAY (Bus at abs x = 385) -->
-  <!-- Client right edge is at abs x = 30 + 12 + 222 = 264 -->
-  <!-- Subsystem border is at x = 276. Bus is at x = 385. Labels centered at x = 330! -->
-  
-  <!-- C2: REST API (abs y = 52 + 152 + 42 = 246) -> Trunk -->
+  <!-- C2: REST API (abs y = 246) -> Trunk -->
   <line x1="264" y1="246" x2="385" y2="246" class="line-inter" />
   <text x="330" y="238" class="interface-text" text-anchor="middle">HTTPS / REST</text>
 
-  <!-- C4: Admin Dashboard (abs y = 52 + 372 + 42 = 466) -> Trunk -->
+  <!-- C4: Admin Dashboard (abs y = 466) -> Trunk -->
   <line x1="264" y1="466" x2="385" y2="466" class="line-inter" />
   <text x="330" y="458" class="interface-text" text-anchor="middle">HTTP / Web</text>
 
-  <!-- C5: Webcam Monitor (abs y = 52 + 482 + 42 = 576) -> Trunk -->
+  <!-- C5: Webcam Monitor (abs y = 576) -> Trunk -->
   <line x1="264" y1="576" x2="385" y2="576" class="line-inter" />
   <text x="330" y="568" class="interface-text" text-anchor="middle">HTTP Stream</text>
 
   <!-- Vertical Trunk Line from y=576 up to y=136 -->
   <line x1="385" y1="576" x2="385" y2="136" class="line-trunk" />
 
-  <!-- Trunk into B1 Gateway (abs x = 425 + 15 = 440, abs y = 52 + 42 + 42 = 136) -->
-  <line x1="385" y1="136" x2="440" y2="136" class="line-inter" />
+  <!-- Trunk into B1 Gateway (abs x = 425 + 32 = 457, abs y = 136) -->
+  <line x1="385" y1="136" x2="457" y2="136" class="line-inter" />
 
 
-  <!-- [B] BACKEND TO EXTERNAL (PURE STRAIGHT HORIZONTAL LINES) -->
+  <!-- [B] BACKEND TO EXTERNAL -->
   <!-- Backend components right edge: abs x = 425 + 565 = 990 -->
-  <!-- Backend border: abs x = 1005 -->
-  <!-- External border: abs x = 1115 -->
   <!-- External components left edge: abs x = 1115 + 12 = 1127 -->
-  <!-- Distance between borders is 110px. Labels centered at x = 1060! -->
   
   <!-- 1. Auth -> SMTP (abs y = 136) -->
   <line x1="990" y1="136" x2="1127" y2="136" class="line-inter" />
@@ -279,11 +274,15 @@
   <line x1="990" y1="246" x2="1127" y2="246" class="line-inter" />
   <text x="1060" y="236" class="interface-text" text-anchor="middle">HTTPS API</text>
 
-  <!-- 3. Diary Manager -> MySQL (abs y = 466) -->
+  <!-- 3. Orchestrator -> MySQL Official Prescription Lookup (from B3 right edge y=268 -> y=356 -> E3) -->
+  <path d="M 990 268 L 1016 268 L 1016 356 L 1127 356" class="line-inter" />
+  <text x="1070" y="346" class="interface-text" text-anchor="middle">查詢官方處方庫</text>
+
+  <!-- 4. Diary Manager -> MySQL (abs y = 466) -->
   <line x1="990" y1="466" x2="1127" y2="466" class="line-inter" />
   <text x="1060" y="456" class="interface-text" text-anchor="middle">SQLAlchemy ORM</text>
 
-  <!-- 4. Webcam Alert -> MySQL (abs y = 576) -->
+  <!-- 5. Webcam Alert -> MySQL (abs y = 576) -->
   <line x1="990" y1="576" x2="1127" y2="576" class="line-inter" />
   <text x="1060" y="566" class="interface-text" text-anchor="middle">時序寫入 / ORM</text>
 

@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 760 760"
+   width="760"
+   height="760"
+   version="1.1"
+   id="svg31"
+   sodipodi:docname="圖 6-1-1 使用者註冊循序圖.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview31"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.0618421"
+     inkscape:cx="379.52912"
+     inkscape:cy="380"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg31" />
+  <defs
+     id="defs2">
+    <style
+       id="style1">
+      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 17px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .life-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .life-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #64748b; text-anchor: middle; }
+      .life-line { stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 4,4; }
+      .life-box { fill: #f1f5f9; stroke: #334155; stroke-width: 1.5; rx: 5; ry: 5; }
+      .life-ai { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 5; ry: 5; }
+      .life-db { fill: #fefce8; stroke: #ca8a04; stroke-width: 1.5; rx: 5; ry: 5; }
+      .activation { fill: #cbd5e1; stroke: #475569; stroke-width: 1.2; rx: 2; ry: 2; }
+      .msg-line { stroke: #1e293b; stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+      .ret-line { stroke: #2563eb; stroke-width: 1.4; stroke-dasharray: 4,4; fill: none; marker-end: url(#blue-arrow); }
+      .msg-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #1e293b; }
+      .ret-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #1d4ed8; }
+      .msg-shield { fill: #ffffff; fill-opacity: 0.92; }
+      .alt-box { fill: #f8fafc; fill-opacity: 0.4; stroke: #64748b; stroke-width: 1.2; stroke-dasharray: 5,3; }
+      .alt-header { fill: #e2e8f0; stroke: #64748b; stroke-width: 1.2; }
+      .alt-tag { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; font-weight: bold; fill: #334155; }
+      .alt-cond { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; font-weight: bold; fill: #1e40af; }
+      .alt-div { stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4,4; }
+    </style>
+    <marker
+       id="arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1 L 10 5 L 0 9 z"
+         fill="#1e293b"
+         id="path1" />
+    </marker>
+    <marker
+       id="blue-arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1 L 10 5 L 0 9 z"
+         fill="#2563eb"
+         id="path2" />
+    </marker>
+  </defs>
+  <rect
+     width="100%"
+     height="100%"
+     fill="#ffffff"
+     id="rect2" />
+  <text
+     x="380.0"
+     y="32"
+     class="title"
+     id="text2">▲圖 6-1-1 使用者註冊循序圖</text>
+  <line
+     x1="65.0"
+     y1="97"
+     x2="65.0"
+     y2="720"
+     class="life-line"
+     id="line2" />
+  <rect
+     x="10.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-box"
+     id="rect3" />
+  <text
+     x="65.0"
+     y="73"
+     class="life-title"
+     id="text3">使用者</text>
+  <text
+     x="65.0"
+     y="88"
+     class="life-sub"
+     id="text4">User</text>
+  <line
+     x1="222.5"
+     y1="97"
+     x2="222.5"
+     y2="720"
+     class="life-line"
+     id="line4" />
+  <rect
+     x="167.5"
+     y="55"
+     width="110"
+     height="42"
+     class="life-box"
+     id="rect4" />
+  <text
+     x="222.5"
+     y="73"
+     class="life-title"
+     id="text5">Android App</text>
+  <text
+     x="222.5"
+     y="88"
+     class="life-sub"
+     id="text6">Client</text>
+  <line
+     x1="380.0"
+     y1="97"
+     x2="380.0"
+     y2="720"
+     class="life-line"
+     id="line6" />
+  <rect
+     x="325.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-box"
+     id="rect6" />
+  <text
+     x="380.0"
+     y="73"
+     class="life-title"
+     id="text7">FastAPI</text>
+  <text
+     x="380.0"
+     y="88"
+     class="life-sub"
+     id="text8">後端伺服器</text>
+  <line
+     x1="537.5"
+     y1="97"
+     x2="537.5"
+     y2="720"
+     class="life-line"
+     id="line8" />
+  <rect
+     x="482.5"
+     y="55"
+     width="110"
+     height="42"
+     class="life-db"
+     id="rect8" />
+  <text
+     x="537.5"
+     y="73"
+     class="life-title"
+     id="text9">MySQL</text>
+  <text
+     x="537.5"
+     y="88"
+     class="life-sub"
+     id="text10">資料庫</text>
+  <line
+     x1="695.0"
+     y1="97"
+     x2="695.0"
+     y2="720"
+     class="life-line"
+     id="line10" />
+  <rect
+     x="640.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-ai"
+     id="rect10" />
+  <text
+     x="695.0"
+     y="73"
+     class="life-title"
+     id="text11">SMTP 服務</text>
+  <text
+     x="695.0"
+     y="88"
+     class="life-sub"
+     id="text12">Gmail Server</text>
+  <rect
+     x="60.0"
+     y="110"
+     width="10"
+     height="570"
+     class="activation"
+     id="rect12" />
+  <rect
+     x="217.5"
+     y="110"
+     width="10"
+     height="570"
+     class="activation"
+     id="rect13" />
+  <rect
+     x="375.0"
+     y="130"
+     width="10"
+     height="520"
+     class="activation"
+     id="rect14" />
+  <rect
+     x="532.5"
+     y="150"
+     width="10"
+     height="330"
+     class="activation"
+     id="rect15" />
+  <rect
+     x="72.0"
+     y="103"
+     width="294"
+     height="15"
+     class="msg-shield"
+     id="rect16" />
+  <line
+     x1="70.0"
+     y1="120"
+     x2="217.5"
+     y2="120"
+     class="msg-line"
+     id="line16" />
+  <text
+     x="75.0"
+     y="115"
+     class="msg-text"
+     text-anchor="start"
+     id="text16">1: 輸入姓名、Gmail 與密碼，點選「完成註冊」</text>
+  <line
+     x1="227.5"
+     y1="150"
+     x2="375.0"
+     y2="150"
+     class="msg-line"
+     id="line17" />
+  <text
+     x="232.5"
+     y="145"
+     class="msg-text"
+     text-anchor="start"
+     id="text17">2: POST /api/v1/auth/register (username, email, password)</text>
+  <line
+     x1="385.0"
+     y1="180"
+     x2="532.5"
+     y2="180"
+     class="msg-line"
+     id="line18" />
+  <text
+     x="390.0"
+     y="175"
+     class="msg-text"
+     text-anchor="start"
+     id="text18">3: SELECT id FROM users WHERE email = :email OR username = :name</text>
+  <line
+     x1="532.5"
+     y1="210"
+     x2="385.0"
+     y2="210"
+     class="ret-line"
+     id="line19" />
+  <text
+     x="390.0"
+     y="205"
+     class="ret-text"
+     text-anchor="start"
+     id="text19">4: 回傳已存在紀錄或空值</text>
+  <rect
+     x="197.5"
+     y="235"
+     width="522.5"
+     height="415"
+     class="alt-box"
+     id="rect20" />
+  <polygon
+     points="197.5,235 239.5,235 229.5,253 197.5,253"
+     class="alt-header"
+     id="polygon20" />
+  <text
+     x="204.5"
+     y="248"
+     class="alt-tag"
+     id="text20">alt</text>
+  <text
+     x="247.5"
+     y="249"
+     class="alt-cond"
+     id="text21">[帳號重複或格式無效]</text>
+  <line
+     x1="197.5"
+     y1="370"
+     x2="720.0"
+     y2="370"
+     class="alt-div"
+     id="line21" />
+  <text
+     x="212.5"
+     y="385"
+     class="alt-cond"
+     id="text22">[驗證成功並建立帳號]</text>
+  <line
+     x1="375.0"
+     y1="275"
+     x2="227.5"
+     y2="275"
+     class="ret-line"
+     id="line22" />
+  <text
+     x="232.5"
+     y="270"
+     class="ret-text"
+     text-anchor="start"
+     id="text23">5a: HTTP 400 Bad Request (信箱已被註冊或密碼長度不足)</text>
+  <line
+     x1="217.5"
+     y1="310"
+     x2="70.0"
+     y2="310"
+     class="ret-line"
+     id="line23" />
+  <text
+     x="75.0"
+     y="305"
+     class="ret-text"
+     text-anchor="start"
+     id="text24">6a: 彈出 Toast 錯誤提示並聚焦錯誤欄位</text>
+  <path
+     d="M 385.0 395 L 413.0 395 L 413.0 417 L 385.0 417"
+     class="msg-line"
+     id="path24" />
+  <text
+     x="418.0"
+     y="410"
+     class="msg-text"
+     text-anchor="start"
+     id="text25">5b: BCrypt 密碼單向雜湊運算</text>
+  <line
+     x1="385.0"
+     y1="435"
+     x2="532.5"
+     y2="435"
+     class="msg-line"
+     id="line25" />
+  <text
+     x="390.0"
+     y="430"
+     class="msg-text"
+     text-anchor="start"
+     id="text26">6b: INSERT INTO users (is_verified=0, password_hash...)</text>
+  <line
+     x1="532.5"
+     y1="465"
+     x2="385.0"
+     y2="465"
+     class="ret-line"
+     id="line26" />
+  <text
+     x="390.0"
+     y="460"
+     class="ret-text"
+     text-anchor="start"
+     id="text27">7b: 寫入成功，回傳 user_id</text>
+  <line
+     x1="385.0"
+     y1="495"
+     x2="690.0"
+     y2="495"
+     class="msg-line"
+     id="line27" />
+  <text
+     x="390.0"
+     y="490"
+     class="msg-text"
+     text-anchor="start"
+     id="text28">8b: 發送含有驗證 Token 之開通郵件</text>
+  <line
+     x1="690.0"
+     y1="530"
+     x2="385.0"
+     y2="530"
+     class="ret-line"
+     id="line28" />
+  <text
+     x="390.0"
+     y="525"
+     class="ret-text"
+     text-anchor="start"
+     id="text29">9b: SMTP 發信成功確認</text>
+  <line
+     x1="375.0"
+     y1="565"
+     x2="227.5"
+     y2="565"
+     class="ret-line"
+     id="line29" />
+  <text
+     x="232.5"
+     y="560"
+     class="ret-text"
+     text-anchor="start"
+     id="text30">10b: HTTP 201 Created (註冊成功，請前往信箱驗證)</text>
+  <line
+     x1="217.5"
+     y1="600"
+     x2="70.0"
+     y2="600"
+     class="ret-line"
+     id="line30" />
+  <text
+     x="75.0"
+     y="595"
+     class="ret-text"
+     text-anchor="start"
+     id="text31">11b: 顯示註冊成功對話框並導向驗證指引頁</text>
+</svg>

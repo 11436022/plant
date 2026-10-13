@@ -113,7 +113,7 @@
     <text x="12" y="102" class="member-text">+ is_plant_error: Boolean (作物誤判標記)</text>
     <line x1="0" y1="112" x2="290" y2="112" class="divider" />
     <text x="12" y="130" class="member-text">+ submit_feedback() (提報糾錯)</text>
-    <text x="12" y="148" class="member-text">+ export_active_learning() (匯出訓練)</text>
+    <text x="12" y="148" class="member-text">+ annotate_ground_truth() (專家標註)</text>
   </g>
 
   <!-- ================= ASSOCIATIONS (ZERO CROSSINGS) ================= -->

@@ -226,7 +226,7 @@
        x="35"
        y="125"
        class="artifact-desc"
-       id="text17">• 紀錄審查、糾錯回饋審核與匯出</text>
+       id="text17">• 紀錄審查、糾錯回饋審核與標註</text>
     <rect
        x="25"
        y="150"
@@ -348,7 +348,7 @@
        x="35"
        y="210"
        class="artifact-desc"
-       id="text30">• 70% 信心度閾值檢核與零雲端成本機制</text>
+       id="text30">• 75% / 65% 信心度閾值檢核與零雲端成本機制</text>
     <rect
        x="25"
        y="240"
@@ -404,7 +404,7 @@
        x="35"
        y="393"
        class="artifact-title"
-       id="text36">本地自訓特定作物 ConvNet 權重庫</text>
+       id="text36">本地自訓特定作物 ConvNeXt 權重庫</text>
     <text
        x="35"
        y="410"
@@ -734,7 +734,7 @@
        x="20"
        y="47"
        class="artifact-desc"
-       id="text78">• 階層式快篩與兜底 :優先調度本地 ConvNet 進行極速快篩 (命中即 0 元成本)；未命中或低置信時無縫啟動 Gemini 雲端兜底，兼具極速低成本與超廣域泛化力。</text>
+       id="text78">• 階層式快篩與兜底 :優先調度本地 ConvNeXt 進行極速快篩 (命中即 0 元成本)；未命中或低置信時無縫啟動 Gemini 雲端兜底，兼具極速低成本與超廣域泛化力。</text>
     <text
        x="20"
        y="65"
@@ -744,6 +744,6 @@
        x="20"
        y="83"
        class="artifact-desc"
-       id="text80">• 知識庫檢索增強與客觀校驗 (RAG Verification)：整合 FAISS 向量索引與農業部官方病蟲害知識庫，結合 70% 信心度閾值過濾，杜絕 AI 幻覺，確保診斷指引具備農政權威性。</text>
+       id="text80">• 知識庫檢索增強與客觀校驗 (RAG Verification)：整合 MySQL 官方防治庫與 FAISS 農業部專書索引，結合 75% / 65% 信心度閾值過濾，杜絕 AI 幻覺，確保診斷指引具備農政權威性。</text>
   </g>
 </svg>

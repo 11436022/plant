@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 760 660"
+   width="760"
+   height="660"
+   version="1.1"
+   id="svg20"
+   sodipodi:docname="圖 6-1-7 編輯診斷備忘筆記循序圖.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview20"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.2227273"
+     inkscape:cx="380.2974"
+     inkscape:cy="330"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg20" />
+  <defs
+     id="defs2">
+    <style
+       id="style1">
+      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 17px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .life-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .life-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #64748b; text-anchor: middle; }
+      .life-line { stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 4,4; }
+      .life-box { fill: #f1f5f9; stroke: #334155; stroke-width: 1.5; rx: 5; ry: 5; }
+      .life-ai { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 5; ry: 5; }
+      .life-db { fill: #fefce8; stroke: #ca8a04; stroke-width: 1.5; rx: 5; ry: 5; }
+      .activation { fill: #cbd5e1; stroke: #475569; stroke-width: 1.2; rx: 2; ry: 2; }
+      .msg-line { stroke: #1e293b; stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+      .ret-line { stroke: #2563eb; stroke-width: 1.4; stroke-dasharray: 4,4; fill: none; marker-end: url(#blue-arrow); }
+      .msg-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #1e293b; }
+      .ret-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #1d4ed8; }
+      .msg-shield { fill: #ffffff; fill-opacity: 0.92; }
+      .alt-box { fill: #f8fafc; fill-opacity: 0.4; stroke: #64748b; stroke-width: 1.2; stroke-dasharray: 5,3; }
+      .alt-header { fill: #e2e8f0; stroke: #64748b; stroke-width: 1.2; }
+      .alt-tag { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; font-weight: bold; fill: #334155; }
+      .alt-cond { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; font-weight: bold; fill: #1e40af; }
+      .alt-div { stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4,4; }
+    </style>
+    <marker
+       id="arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1 L 10 5 L 0 9 z"
+         fill="#1e293b"
+         id="path1" />
+    </marker>
+    <marker
+       id="blue-arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1 L 10 5 L 0 9 z"
+         fill="#2563eb"
+         id="path2" />
+    </marker>
+  </defs>
+  <rect
+     width="100%"
+     height="100%"
+     fill="#ffffff"
+     id="rect2" />
+  <text
+     x="380.0"
+     y="32"
+     class="title"
+     id="text2">▲圖 6-1-7 編輯診斷備忘筆記循序圖</text>
+  <line
+     x1="65.0"
+     y1="97"
+     x2="65.0"
+     y2="620"
+     class="life-line"
+     id="line2" />
+  <rect
+     x="10.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-box"
+     id="rect3" />
+  <text
+     x="65.0"
+     y="73"
+     class="life-title"
+     id="text3">使用者</text>
+  <text
+     x="65.0"
+     y="88"
+     class="life-sub"
+     id="text4">User</text>
+  <line
+     x1="275.0"
+     y1="97"
+     x2="275.0"
+     y2="620"
+     class="life-line"
+     id="line4" />
+  <rect
+     x="220.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-box"
+     id="rect4" />
+  <text
+     x="275.0"
+     y="73"
+     class="life-title"
+     id="text5">Android App</text>
+  <text
+     x="275.0"
+     y="88"
+     class="life-sub"
+     id="text6">Client</text>
+  <line
+     x1="485.0"
+     y1="97"
+     x2="485.0"
+     y2="620"
+     class="life-line"
+     id="line6" />
+  <rect
+     x="430.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-box"
+     id="rect6" />
+  <text
+     x="485.0"
+     y="73"
+     class="life-title"
+     id="text7">FastAPI</text>
+  <text
+     x="485.0"
+     y="88"
+     class="life-sub"
+     id="text8">後端伺服器</text>
+  <line
+     x1="695.0"
+     y1="97"
+     x2="695.0"
+     y2="620"
+     class="life-line"
+     id="line8" />
+  <rect
+     x="640.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-db"
+     id="rect8" />
+  <text
+     x="695.0"
+     y="73"
+     class="life-title"
+     id="text9">MySQL</text>
+  <text
+     x="695.0"
+     y="88"
+     class="life-sub"
+     id="text10">資料庫</text>
+  <rect
+     x="60.0"
+     y="110"
+     width="10"
+     height="470"
+     class="activation"
+     id="rect10" />
+  <rect
+     x="270.0"
+     y="110"
+     width="10"
+     height="470"
+     class="activation"
+     id="rect11" />
+  <rect
+     x="480.0"
+     y="140"
+     width="10"
+     height="410"
+     class="activation"
+     id="rect12" />
+  <rect
+     x="690.0"
+     y="170"
+     width="10"
+     height="300"
+     class="activation"
+     id="rect13" />
+  <line
+     x1="70.0"
+     y1="120"
+     x2="270.0"
+     y2="120"
+     class="msg-line"
+     id="line14" />
+  <text
+     x="75.0"
+     y="115"
+     class="msg-text"
+     text-anchor="start"
+     id="text14">1: 點選編輯圖示，輸入最新照護備忘心得，按下「儲存」</text>
+  <line
+     x1="280.0"
+     y1="150"
+     x2="480.0"
+     y2="150"
+     class="msg-line"
+     id="line15" />
+  <text
+     x="285.0"
+     y="145"
+     class="msg-text"
+     text-anchor="start"
+     id="text15">2: PATCH /api/v1/diaries/{id} (user_note='施用有機銅劑第三天...', JWT)</text>
+  <line
+     x1="490.0"
+     y1="180"
+     x2="690.0"
+     y2="180"
+     class="msg-line"
+     id="line16" />
+  <text
+     x="495.0"
+     y="175"
+     class="msg-text"
+     text-anchor="start"
+     id="text16">3: 驗證 JWT 認證身分並比對 diary_id</text>
+  <line
+     x1="490.81784"
+     y1="245.53903"
+     x2="690.81787"
+     y2="245.53903"
+     class="msg-line"
+     id="line17" />
+  <text
+     x="490.91077"
+     y="211.91449"
+     class="msg-text"
+     text-anchor="start"
+     id="text17"><tspan
+       sodipodi:role="line"
+       id="tspan20"
+       x="490.91077"
+       y="211.91449">4: UPDATE plant_diary</tspan><tspan
+       sodipodi:role="line"
+       id="tspan21"
+       x="490.91077"
+       y="225.66449">SET user_note = :note, updated_at = NOW()</tspan><tspan
+       sodipodi:role="line"
+       x="490.91077"
+       y="239.41449"
+       id="tspan22">WHERE id = :id</tspan></text>
+  <rect
+     x="492.0"
+     y="263"
+     width="140"
+     height="15"
+     class="msg-shield"
+     id="rect18" />
+  <line
+     x1="690.0"
+     y1="280"
+     x2="490.0"
+     y2="280"
+     class="ret-line"
+     id="line18" />
+  <text
+     x="495.0"
+     y="275"
+     class="ret-text"
+     text-anchor="start"
+     id="text18">5: 資料庫更新成功確認</text>
+  <line
+     x1="480.0"
+     y1="330"
+     x2="280.0"
+     y2="330"
+     class="ret-line"
+     id="line19" />
+  <text
+     x="285.0"
+     y="325"
+     class="ret-text"
+     text-anchor="start"
+     id="text19">6: HTTP 200 OK (status='success', updated_at)</text>
+  <line
+     x1="270.0"
+     y1="380"
+     x2="70.0"
+     y2="380"
+     class="ret-line"
+     id="line20" />
+  <text
+     x="75.0"
+     y="375"
+     class="ret-text"
+     text-anchor="start"
+     id="text20">7: 刷新詳細頁文字視圖，顯示「備忘更新成功！」</text>
+</svg>

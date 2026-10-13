@@ -171,7 +171,7 @@
       <text x="12" y="105" class="module-text">• webcam.py</text>
       <text x="130" y="105" class="module-desc">(Webcam 即時影格串流、時序判定與警報通知)</text>
       <text x="12" y="126" class="module-text">• feedback.py / admin.py</text>
-      <text x="175" y="126" class="module-desc">(糾錯回饋審定與後台日誌統計匯出)</text>
+      <text x="175" y="126" class="module-desc">(糾錯回饋專家標註與後台日誌統計維護)</text>
     </g>
 
     <!-- Subpkg 2: Services (y=286) -->
@@ -180,10 +180,10 @@
       <text x="10" y="15" class="subpkg-title">.services</text>
       <rect y="22" width="562" height="126" class="subpkg-body" />
       <text x="12" y="42" class="module-text">• prediction_service.py</text>
-      <text x="175" y="42" class="module-desc">(決策仲裁、特徵權重校準與 70% 閾值檢驗)</text>
+      <text x="175" y="42" class="module-desc">(決策仲裁、特徵權重校準與 75%/65% 閾值檢驗)</text>
       <text x="12" y="63" class="module-text">• gemini_service.py</text>
       <text x="175" y="63" class="module-desc">(Gemini 3.8 Flash 多模態推論與病徵解析)</text>
-      <text x="12" y="84" class="module-text">• local_convnet.py</text>
+      <text x="12" y="84" class="module-text">• convnext.py</text>
       <text x="175" y="84" class="module-desc">(自訓微觀病斑卷積網路分類，零運算成本)</text>
       <text x="12" y="105" class="module-text">• rag_service.py</text>
       <text x="175" y="105" class="module-desc">(FAISS 向量檢索增強與客觀防治對策校驗)</text>

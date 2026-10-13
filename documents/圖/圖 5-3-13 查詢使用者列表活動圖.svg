@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 820" width="740" height="820">
+  <defs>
+    <style>
+      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 17px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .lane-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 14px; font-weight: bold; fill: #1e293b; text-anchor: middle; }
+      .text-bold { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .text-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #64748b; text-anchor: middle; }
+      .text-decision { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; font-weight: bold; fill: #1e40af; text-anchor: middle; }
+      .text-edge { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #1e293b; text-anchor: middle; font-weight: bold; }
+      .label-bg { fill: #ffffff; fill-opacity: 0.95; rx: 3; ry: 3; }
+      .lane-bg { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.5; }
+      .lane-header { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.5; }
+      .action-usr { fill: #ffffff; stroke: #2563eb; stroke-width: 1.5; rx: 6; ry: 6; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.04)); }
+      .action-sys { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 6; ry: 6; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.04)); }
+      .decision-box { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.5; }
+      .flow-line { stroke: #334155; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
+      .flow-line-noarrow { stroke: #334155; stroke-width: 1.5; fill: none; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" fill="#ffffff" />
+  <text x="370.0" y="32" class="title">▲圖 5-3-13 查詢使用者列表活動圖</text>
+  <rect x="45" y="55" width="325.0" height="735" class="lane-bg" />
+  <rect x="45" y="55" width="325.0" height="35" class="lane-header" />
+  <text x="207.5" y="77" class="lane-title">系統管理員</text>
+  <rect x="370.0" y="55" width="325.0" height="735" class="lane-bg" />
+  <rect x="370.0" y="55" width="325.0" height="35" class="lane-header" />
+  <text x="532.5" y="77" class="lane-title">使用者管理後台</text>
+<circle cx="207.5" cy="105" r="12" fill="#0f172a" />
+<rect x="112.5" y="140" width="190" height="44" class="action-usr" />
+<text x="207.5" y="166" class="text-bold">點選側邊欄「使用者管理」</text>
+<rect x="437.5" y="140" width="190" height="44" class="action-sys" />
+<text x="532.5" y="166" class="text-bold">分頁查詢會員資料庫</text>
+<rect x="112.5" y="225" width="190" height="44" class="action-usr" />
+<text x="207.5" y="251" class="text-bold">檢視全體會員名單表格</text>
+<rect x="112.5" y="310" width="190" height="44" class="action-usr" />
+<text x="207.5" y="336" class="text-bold">輸入名稱或 Email 關鍵字</text>
+<rect x="437.5" y="310" width="190" height="44" class="action-sys" />
+<text x="532.5" y="336" class="text-bold">資料庫條件比對過濾</text>
+<polygon points="532.5,395 607.5,417.0 532.5,439 457.5,417.0" class="decision-box" />
+<text x="532.5" y="421.0" class="text-decision">是否存在符合之會員</text>
+<rect x="112.5" y="395" width="190" height="44" class="action-usr" />
+<text x="207.5" y="421" class="text-bold">顯示「查無使用者」提示</text>
+<circle cx="207.5" cy="475" r="8" fill="#0f172a" />
+<circle cx="207.5" cy="475" r="14" fill="none" stroke="#0f172a" stroke-width="2" />
+<rect x="437.5" y="480" width="190" height="44" class="action-sys" />
+<text x="532.5" y="506" class="text-bold">封裝符合之會員資料集</text>
+<rect x="112.5" y="560" width="190" height="44" class="action-usr" />
+<text x="207.5" y="586" class="text-bold">呈現特定會員資料表格</text>
+<circle cx="207.5" cy="635" r="8" fill="#0f172a" />
+<circle cx="207.5" cy="635" r="14" fill="none" stroke="#0f172a" stroke-width="2" />
+<line x1="207.5" y1="117" x2="207.5" y2="140" class="flow-line" />
+<line x1="302.5" y1="162.0" x2="437.5" y2="162.0" class="flow-line" />
+<line x1="532.5" y1="184" x2="532.5" y2="200" class="flow-line-noarrow" />
+<line x1="532.5" y1="200" x2="207.5" y2="200" class="flow-line-noarrow" />
+<line x1="207.5" y1="200" x2="207.5" y2="225" class="flow-line" />
+<line x1="207.5" y1="269" x2="207.5" y2="310" class="flow-line" />
+<line x1="302.5" y1="332.0" x2="437.5" y2="332.0" class="flow-line" />
+<line x1="532.5" y1="354" x2="532.5" y2="395" class="flow-line" />
+<line x1="457.5" y1="417.0" x2="302.5" y2="417.0" class="flow-line" />
+<rect x="342.0" y="399.0" width="76" height="16" class="label-bg" />
+<text x="380.0" y="411.0" class="text-edge">[查無資料]</text>
+<line x1="207.5" y1="439" x2="207.5" y2="461" class="flow-line" />
+<line x1="532.5" y1="439" x2="532.5" y2="480" class="flow-line" />
+<rect x="489.0" y="457.5" width="87" height="16" class="label-bg" />
+<text x="532.5" y="469.5" class="text-edge">[有符合帳號]</text>
+<line x1="532.5" y1="524" x2="532.5" y2="535" class="flow-line-noarrow" />
+<line x1="532.5" y1="535" x2="207.5" y2="535" class="flow-line-noarrow" />
+<line x1="207.5" y1="535" x2="207.5" y2="560" class="flow-line" />
+<line x1="207.5" y1="604" x2="207.5" y2="621" class="flow-line" />
+</svg>

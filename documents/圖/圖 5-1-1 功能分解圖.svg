@@ -145,7 +145,7 @@
     <rect x="1322" y="503" width="224" height="44" rx="6" class="item-box"/>
     <text x="1434" y="530" text-anchor="middle" class="item">回饋審核與專家人工標註</text>
     <rect x="1322" y="559" width="224" height="44" rx="6" class="item-box"/>
-    <text x="1434" y="586" text-anchor="middle" class="item">模型訓練資料匯出 (JSONL)</text>
+    <text x="1434" y="586" text-anchor="middle" class="item">專家標註真值儲存與維護</text>
   </g>
 
   <!-- Bottom Academic Principles & Guidance -->
@@ -154,10 +154,10 @@
   <text x="235" y="662" class="note">F1–F6 為唯一之一級業務功能分類；Android 端、Web 端與 FastAPI 技術元件屬於系統架構，不重複列入功能層級。</text>
   
   <text x="82" y="700" class="note" font-weight="700">階層式推論與防幻覺：</text>
-  <text x="235" y="700" class="note">採用本地自訓 ConvNeXt 優先快篩，未命中則由 Gemini 多模態兜底，並結合 FAISS 向量知識庫防範模型幻覺。</text>
+  <text x="235" y="700" class="note">採用本地自訓 ConvNeXt 優先快篩，未命中則由 Gemini 多模態兜底；處方優先查詢 MySQL 防治庫，缺漏時檢索 FAISS 結合 Gemini 生成。</text>
   
   <text x="82" y="738" class="note" font-weight="700">主動學習閉環：</text>
-  <text x="235" y="738" class="note">提供診斷結果反饋機制，管理者透過後台進行專家人工標註並匯出標準訓練集，為專屬模型提供持續迭代優化之依據。</text>
+  <text x="235" y="738" class="note">提供診斷結果反饋機制，管理者透過後台進行專家人工標註並留存真值於資料庫，為專屬模型提供持續迭代優化之依據。</text>
 
   <text x="1546" y="805" text-anchor="end" class="subtitle" font-size="14px">版本：現行已實作完整功能（畢業專題正式版本）</text>
 </svg>

@@ -95,8 +95,8 @@
   <!-- 3. Decision Integration & RAG Core -->
   <rect x="510" y="480" width="570" height="130" rx="8" class="safety"/>
   <text x="795" y="522" text-anchor="middle" class="head">決策整合與 RAG 校驗核心</text>
-  <text x="795" y="558" text-anchor="middle" class="text">步驟 3: FAISS 向量檢索比對農業部官方資料庫</text>
-  <text x="795" y="588" text-anchor="middle" class="text">動態精準處方生成；信心度門檻評估 (≥ 70%)</text>
+  <text x="795" y="558" text-anchor="middle" class="text">步驟 3: 查詢 MySQL 防治庫 / 缺漏時檢索 FAISS + Gemini</text>
+  <text x="795" y="588" text-anchor="middle" class="text">動態精準處方生成；信心度門檻評估 (75% / 65%)</text>
 
   <!-- 4. Diary, Feedback & Training Data Operations -->
   <rect x="510" y="645" width="570" height="105" rx="8" class="service"/>

@@ -131,21 +131,21 @@
     <rect width="240" height="155" class="service-box" />
     <path d="M 0 4 Q 0 0 4 0 L 236 0 Q 240 0 240 4 L 240 28 L 0 28 Z" class="class-header-green" />
     <text x="120" y="19" class="class-title">PredictionService (階層調度)</text>
-    <text x="12" y="45" class="member-text">- convnet_svc: LocalConvNet</text>
+    <text x="12" y="45" class="member-text">- convnext_svc: LocalConvNeXt</text>
     <text x="12" y="61" class="member-text">- gemini_svc: GeminiService</text>
-    <text x="12" y="77" class="member-text">- threshold: Float = 0.70</text>
+    <text x="12" y="77" class="member-text">- threshold: Float = 0.65</text>
     <line x1="0" y1="85" x2="240" y2="85" class="divider" />
     <text x="12" y="102" class="member-method">+ cascadePredict(img): Dict</text>
     <text x="12" y="120" class="member-method">+ arbitrateAndFuse(): Dict</text>
     <text x="12" y="138" class="member-method">+ confirmAndSave(): Diary</text>
   </g>
 
-  <!-- 8. LocalConvNetService (快篩) (x: 545..760, w: 215, h: 155) -->
+  <!-- 8. LocalConvNeXtService (快篩) (x: 545..760, w: 215, h: 155) -->
   <g transform="translate(545, 310)">
     <rect width="215" height="155" class="service-box" />
     <path d="M 0 4 Q 0 0 4 0 L 211 0 Q 215 0 215 4 L 215 28 L 0 28 Z" class="class-header-green" />
-    <text x="107" y="19" class="class-title">LocalConvNetService (快篩)</text>
-    <text x="12" y="45" class="member-text">- weights: 'convnet.pth'</text>
+    <text x="107" y="19" class="class-title">LocalConvNeXtService (快篩)</text>
+    <text x="12" y="45" class="member-text">- weights: 'convnext_best.pth'</text>
     <text x="12" y="61" class="member-text">- threshold: Float = 0.75</text>
     <line x1="0" y1="69" x2="215" y2="69" class="divider" />
     <text x="12" y="88" class="member-method">+ classify(image): Dict</text>

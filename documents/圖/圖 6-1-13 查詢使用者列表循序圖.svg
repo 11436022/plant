@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 760 740"
+   width="760"
+   height="740"
+   version="1.1"
+   id="svg30"
+   sodipodi:docname="圖 6-1-13 查詢使用者列表循序圖.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview30"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.0905405"
+     inkscape:cx="379.62825"
+     inkscape:cy="370"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg30" />
+  <defs
+     id="defs2">
+    <style
+       id="style1">
+      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 17px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .life-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .life-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #64748b; text-anchor: middle; }
+      .life-line { stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 4,4; }
+      .life-box { fill: #f1f5f9; stroke: #334155; stroke-width: 1.5; rx: 5; ry: 5; }
+      .life-ai { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 5; ry: 5; }
+      .life-db { fill: #fefce8; stroke: #ca8a04; stroke-width: 1.5; rx: 5; ry: 5; }
+      .activation { fill: #cbd5e1; stroke: #475569; stroke-width: 1.2; rx: 2; ry: 2; }
+      .msg-line { stroke: #1e293b; stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+      .ret-line { stroke: #2563eb; stroke-width: 1.4; stroke-dasharray: 4,4; fill: none; marker-end: url(#blue-arrow); }
+      .msg-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #1e293b; }
+      .ret-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #1d4ed8; }
+      .msg-shield { fill: #ffffff; fill-opacity: 0.92; }
+      .alt-box { fill: #f8fafc; fill-opacity: 0.4; stroke: #64748b; stroke-width: 1.2; stroke-dasharray: 5,3; }
+      .alt-header { fill: #e2e8f0; stroke: #64748b; stroke-width: 1.2; }
+      .alt-tag { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; font-weight: bold; fill: #334155; }
+      .alt-cond { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; font-weight: bold; fill: #1e40af; }
+      .alt-div { stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4,4; }
+    </style>
+    <marker
+       id="arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1 L 10 5 L 0 9 z"
+         fill="#1e293b"
+         id="path1" />
+    </marker>
+    <marker
+       id="blue-arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1 L 10 5 L 0 9 z"
+         fill="#2563eb"
+         id="path2" />
+    </marker>
+  </defs>
+  <rect
+     width="100%"
+     height="100%"
+     fill="#ffffff"
+     id="rect2"
+     x="-5.7196826e-07"
+     y="4.5848823" />
+  <text
+     x="380.0"
+     y="32"
+     class="title"
+     id="text2">▲圖 6-1-13 查詢使用者列表循序圖</text>
+  <line
+     x1="65.0"
+     y1="97"
+     x2="65.0"
+     y2="700"
+     class="life-line"
+     id="line2" />
+  <rect
+     x="10.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-box"
+     id="rect3" />
+  <text
+     x="65.0"
+     y="73"
+     class="life-title"
+     id="text3">管理員</text>
+  <text
+     x="65.0"
+     y="88"
+     class="life-sub"
+     id="text4">Admin</text>
+  <line
+     x1="275.0"
+     y1="97"
+     x2="275.0"
+     y2="700"
+     class="life-line"
+     id="line4" />
+  <rect
+     x="220.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-box"
+     id="rect4" />
+  <text
+     x="275.0"
+     y="73"
+     class="life-title"
+     id="text5">管理後台</text>
+  <text
+     x="275.0"
+     y="88"
+     class="life-sub"
+     id="text6">Admin UI</text>
+  <line
+     x1="485.0"
+     y1="97"
+     x2="485.0"
+     y2="700"
+     class="life-line"
+     id="line6" />
+  <rect
+     x="430.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-box"
+     id="rect6" />
+  <text
+     x="485.0"
+     y="73"
+     class="life-title"
+     id="text7">FastAPI</text>
+  <text
+     x="485.0"
+     y="88"
+     class="life-sub"
+     id="text8">後端伺服器</text>
+  <line
+     x1="695.0"
+     y1="97"
+     x2="695.0"
+     y2="700"
+     class="life-line"
+     id="line8" />
+  <rect
+     x="640.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-db"
+     id="rect8" />
+  <text
+     x="695.0"
+     y="73"
+     class="life-title"
+     id="text9">MySQL</text>
+  <text
+     x="695.0"
+     y="88"
+     class="life-sub"
+     id="text10">資料庫</text>
+  <rect
+     x="60.0"
+     y="110"
+     width="10"
+     height="550"
+     class="activation"
+     id="rect10" />
+  <rect
+     x="270.0"
+     y="110"
+     width="10"
+     height="550"
+     class="activation"
+     id="rect11" />
+  <rect
+     x="480.0"
+     y="135"
+     width="10"
+     height="495"
+     class="activation"
+     id="rect12" />
+  <rect
+     x="690.0"
+     y="165"
+     width="10"
+     height="415"
+     class="activation"
+     id="rect13" />
+  <line
+     x1="70.0"
+     y1="120"
+     x2="270.0"
+     y2="120"
+     class="msg-line"
+     id="line14" />
+  <text
+     x="75.0"
+     y="115"
+     class="msg-text"
+     text-anchor="start"
+     id="text14">1: 點選側邊導覽欄位「使用者管理」</text>
+  <line
+     x1="280.0"
+     y1="145"
+     x2="480.0"
+     y2="145"
+     class="msg-line"
+     id="line15" />
+  <text
+     x="285.0"
+     y="140"
+     class="msg-text"
+     text-anchor="start"
+     id="text15">2: GET /admin/users/?page=1 (帶管理者權限認證)</text>
+  <line
+     x1="490.0"
+     y1="175"
+     x2="690.0"
+     y2="175"
+     class="msg-line"
+     id="line16" />
+  <text
+     x="495"
+     y="156.24535"
+     class="msg-text"
+     text-anchor="start"
+     id="text16"><tspan
+       sodipodi:role="line"
+       id="tspan30"
+       x="495"
+       y="156.24535">3: SELECT id, username, email, is_verified,</tspan><tspan
+       sodipodi:role="line"
+       id="tspan31"
+       x="495"
+       y="169.99535">created_at FROM users LIMIT 20</tspan></text>
+  <text
+     x="495.0"
+     y="205"
+     class="ret-text"
+     text-anchor="start"
+     id="text17">4: 回傳使用者列表集合與分頁總頁數</text>
+  <line
+     x1="480.0"
+     y1="245"
+     x2="280.0"
+     y2="245"
+     class="ret-line"
+     id="line18" />
+  <text
+     x="285.0"
+     y="240"
+     class="ret-text"
+     text-anchor="start"
+     id="text18">5: HTTP 200 OK (渲染 users.html 頁面)</text>
+  <line
+     x1="270.0"
+     y1="280"
+     x2="70.0"
+     y2="280"
+     class="ret-line"
+     id="line19" />
+  <text
+     x="75.0"
+     y="275"
+     class="ret-text"
+     text-anchor="start"
+     id="text19">6: 展示使用者清單表格與分頁控制器</text>
+  <line
+     x1="70.0"
+     y1="320"
+     x2="270.0"
+     y2="320"
+     class="msg-line"
+     id="line20" />
+  <text
+     x="75.0"
+     y="315"
+     class="msg-text"
+     text-anchor="start"
+     id="text20">7: 於搜尋框輸入「ntub」關鍵字進行過濾</text>
+  <line
+     x1="280.0"
+     y1="350"
+     x2="480.0"
+     y2="350"
+     class="msg-line"
+     id="line21" />
+  <text
+     x="285.0"
+     y="345"
+     class="msg-text"
+     text-anchor="start"
+     id="text21">8: GET /admin/users/?search=ntub</text>
+  <line
+     x1="490"
+     y1="396.92068"
+     x2="690"
+     y2="396.92068"
+     class="msg-line"
+     id="line22" />
+  <text
+     x="462.90582"
+     y="379.08301"
+     class="msg-text"
+     text-anchor="start"
+     id="text22"><tspan
+       sodipodi:role="line"
+       id="tspan32"
+       x="462.90582"
+       y="379.08301">9: SELECT * FROM users WHERE username LIKE '%ntub%'</tspan><tspan
+       sodipodi:role="line"
+       id="tspan33"
+       x="462.90582"
+       y="392.83301">OR email LIKE '%ntub%'</tspan></text>
+  <rect
+     x="492.0"
+     y="403"
+     width="173"
+     height="15"
+     class="msg-shield"
+     id="rect23" />
+  <line
+     x1="690.0"
+     y1="420"
+     x2="490.0"
+     y2="420"
+     class="ret-line"
+     id="line23" />
+  <text
+     x="495.0"
+     y="415"
+     class="ret-text"
+     text-anchor="start"
+     id="text23">10: 回傳過濾後之會員紀錄集</text>
+  <rect
+     x="40.0"
+     y="450"
+     width="680.0"
+     height="170"
+     class="alt-box"
+     id="rect24" />
+  <polygon
+     points="40.0,450 82.0,450 72.0,468 40.0,468"
+     class="alt-header"
+     id="polygon24" />
+  <text
+     x="47.0"
+     y="463"
+     class="alt-tag"
+     id="text24">alt</text>
+  <text
+     x="90.0"
+     y="464"
+     class="alt-cond"
+     id="text25">[查無符合之使用者]</text>
+  <line
+     x1="40.0"
+     y1="530"
+     x2="720.0"
+     y2="530"
+     class="alt-div"
+     id="line25" />
+  <text
+     x="55.0"
+     y="545"
+     class="alt-cond"
+     id="text26">[查詢成功，包含目標資料]</text>
+  <rect
+     x="282.0"
+     y="463"
+     width="316"
+     height="15"
+     class="msg-shield"
+     id="rect26" />
+  <line
+     x1="480.0"
+     y1="480"
+     x2="280.0"
+     y2="480"
+     class="ret-line"
+     id="line26" />
+  <text
+     x="285.0"
+     y="475"
+     class="ret-text"
+     text-anchor="start"
+     id="text27">11a: 局部渲染：表格顯示「未找到任何符合條件的會員」</text>
+  <rect
+     x="72.0"
+     y="488"
+     width="151"
+     height="15"
+     class="msg-shield"
+     id="rect27" />
+  <line
+     x1="270.0"
+     y1="505"
+     x2="70.0"
+     y2="505"
+     class="ret-line"
+     id="line27" />
+  <text
+     x="75.0"
+     y="500"
+     class="ret-text"
+     text-anchor="start"
+     id="text28">12a: 提示查無相關帳號</text>
+  <rect
+     x="282.0"
+     y="543"
+     width="283"
+     height="15"
+     class="msg-shield"
+     id="rect28" />
+  <line
+     x1="480.0"
+     y1="560"
+     x2="280.0"
+     y2="560"
+     class="ret-line"
+     id="line28" />
+  <text
+     x="285.0"
+     y="555"
+     class="ret-text"
+     text-anchor="start"
+     id="text29">11b: 局部渲染：呈現符合關鍵字之使用者詳細資料</text>
+  <line
+     x1="270.0"
+     y1="590"
+     x2="70.0"
+     y2="590"
+     class="ret-line"
+     id="line29" />
+  <text
+     x="75.0"
+     y="585"
+     class="ret-text"
+     text-anchor="start"
+     id="text30">12b: 管理員查閱該帳號之驗證開通歷程</text>
+</svg>

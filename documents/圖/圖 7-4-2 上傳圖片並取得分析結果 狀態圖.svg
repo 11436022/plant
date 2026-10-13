@@ -117,7 +117,7 @@
       <path d="M 0 6 Q 0 0 6 0 L 249 0 Q 255 0 255 6 L 255 23 L 0 23 Z" class="state-header" />
       <text x="127" y="16" class="state-name">結果展示中 (Result_Displayed)</text>
       <text x="10" y="40" class="action-text">entry / 渲染作物病害診斷卡片</text>
-      <text x="10" y="58" class="action-text">do / 呈現病名、置信度與階梯處置建議</text>
+      <text x="10" y="58" class="action-text">do / 呈現病名、置信度與防治處置建議</text>
       <text x="10" y="76" class="action-text">do / 暫存 prediction_id 於本機記憶體</text>
       <text x="10" y="93" class="action-text">exit / 導向儲存病歷紀錄或手動糾錯</text>
     </g>
@@ -170,10 +170,10 @@
     <text x="215" y="141" class="transition-text" text-anchor="middle">優先啟動本地快篩</text>
 
     <!-- State S2a: 本地 ConvNeXt 快篩中 (ConvNeXt_Screening) -->
-    <g transform="translate(20, 172)">
-      <rect width="280" height="106" class="ai-green-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 23 L 0 23 Z" class="ai-green-header" />
-      <text x="140" y="16" class="state-name" fill="#1A281E">本地 ConvNeXt 快篩中 (ConvNeXt_Screening)</text>
+    <g transform="translate(10, 172)">
+      <rect width="284" height="106" class="ai-green-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 278 0 Q 284 0 284 6 L 284 23 L 0 23 Z" class="ai-green-header" />
+      <text x="142" y="16" class="state-name" style="font-size: 11.5px;" fill="#1A281E">本地 ConvNeXt 快篩中 (ConvNeXt_Screening)</text>
       <text x="10" y="42" class="action-text">entry / 載入 PyTorch 38 類病害特徵卷積權重</text>
       <text x="10" y="61" class="action-text">do / 毫秒級微觀病斑特徵萃取與分類辨識</text>
       <text x="10" y="80" class="action-text">do / 計算置信度並比對閥值 (門檻 75% / 85%)</text>
@@ -181,18 +181,18 @@
     </g>
 
     <!-- Choice Pseudo-state (Diamond) & Pure Guard Condition: Line UNBROKEN -->
-    <line x1="300" y1="225" x2="327" y2="225" class="line" />
+    <line x1="294" y1="225" x2="327" y2="225" class="line" />
     <polygon points="335,217 343,225 335,233 327,225" class="choice-diamond" />
 
     <!-- Choice Branch 1: [信心度 < 75%] -> S2b (Gemini) (Pure Guard text ABOVE line at y=212) -->
-    <line x1="343" y1="225" x2="368" y2="225" class="line" />
-    <text x="335" y="211" class="guard-text" text-anchor="middle">[信心度 &lt; 75%]</text>
+    <line x1="343" y1="225" x2="374" y2="225" class="line" />
+    <text x="335" y="210" class="guard-text" style="font-size: 10px;" text-anchor="middle">[信心度 &lt; 75%]</text>
 
     <!-- State S2b: Gemini 3.8 Flash 雲端兜底 (Gemini_Inferencing) -->
-    <g transform="translate(370, 172)">
-      <rect width="280" height="106" class="ai-indigo-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 23 L 0 23 Z" class="ai-indigo-header" />
-      <text x="140" y="16" class="state-name" fill="#1A281E">Gemini 3.8 Flash 雲端兜底 (Gemini_Inferencing)</text>
+    <g transform="translate(376, 172)">
+      <rect width="284" height="106" class="ai-indigo-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 278 0 Q 284 0 284 6 L 284 23 L 0 23 Z" class="ai-indigo-header" />
+      <text x="142" y="16" class="state-name" style="font-size: 11.5px;" fill="#1A281E">Gemini 3.8 Flash 雲端兜底 (Gemini_Inferencing)</text>
       <text x="10" y="42" class="action-text">entry / 呼叫 Google GenAI 官方 SDK</text>
       <text x="10" y="61" class="action-text">do / 全域多模態病徵視覺理解與長尾鑑別</text>
       <text x="10" y="80" class="action-text">do / 強制約束 JSON Schema 結構化輸出規格</text>
@@ -208,15 +208,15 @@
     <text x="430" y="298" class="transition-text" text-anchor="middle">雲端兜底分析完成</text>
 
     <!-- State S3: 動態處方決策中 (Decision_Integrating) -->
-    <g transform="translate(105, 328)">
-      <rect width="460" height="122" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 454 0 Q 460 0 460 6 L 460 23 L 0 23 Z" class="state-header" />
-      <text x="230" y="16" class="state-name">動態處方決策中 (Decision_Integrating)</text>
-      <text x="10" y="42" class="action-text">entry / 接收作物與病害名稱，依判定來源分流決策</text>
-      <text x="10" y="60" class="action-text">do / 【ConvNeXt 命中】本地專家庫直出階梯處方 (純本地 0 API費用)</text>
-      <text x="10" y="78" class="action-text">do / 【Gemini 兜底】FAISS RAG 向量檢索農業部手冊 (杜絕模型幻覺)</text>
-      <text x="10" y="96" class="action-text">do / 辨別健康植株 (≥85%) 或依相片病徵嚴重度動態開立</text>
-      <text x="10" y="114" class="action-text">do / 信心度未達安全門檻 (65%) 啟動防禦煞車引導補拍</text>
+    <g transform="translate(90, 328)">
+      <rect width="490" height="122" class="state-box" />
+      <path d="M 0 6 Q 0 0 6 0 L 484 0 Q 490 0 490 6 L 490 23 L 0 23 Z" class="state-header" />
+      <text x="245" y="16" class="state-name">動態處方決策中 (Decision_Integrating)</text>
+      <text x="12" y="42" class="action-text">entry / 接收確診之作物與病害名稱，啟動處方查找與校驗</text>
+      <text x="12" y="60" class="action-text">do / 【優先查庫】查詢 MySQL 官方防治庫，命中則直出權威處方</text>
+      <text x="12" y="78" class="action-text">do / 【缺漏補齊】若資料庫無現成處方，檢索 FAISS 專書並結合 Gemini 生成</text>
+      <text x="12" y="96" class="action-text">do / 辨別健康植株 (≥85%) 或綁定官方文獻出處 (無文獻新案例標記待覆核)</text>
+      <text x="12" y="114" class="action-text">do / 信心度未達安全門檻 (65%) 啟動防禦煞車引導補拍</text>
     </g>
 
     <!-- Transition Step 3 -> S4: Line is UNBROKEN at x=290; Pure Text placed cleanly to the RIGHT -->

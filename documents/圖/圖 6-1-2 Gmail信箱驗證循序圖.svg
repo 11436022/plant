@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 760 740"
+   width="760"
+   height="740"
+   version="1.1"
+   id="svg30"
+   sodipodi:docname="圖 6-1-2 Gmail信箱驗證循序圖.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview30"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.0905405"
+     inkscape:cx="379.62827"
+     inkscape:cy="369.08304"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg30" />
+  <defs
+     id="defs2">
+    <style
+       id="style1">
+      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 17px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .life-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .life-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #64748b; text-anchor: middle; }
+      .life-line { stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 4,4; }
+      .life-box { fill: #f1f5f9; stroke: #334155; stroke-width: 1.5; rx: 5; ry: 5; }
+      .life-ai { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 5; ry: 5; }
+      .life-db { fill: #fefce8; stroke: #ca8a04; stroke-width: 1.5; rx: 5; ry: 5; }
+      .activation { fill: #cbd5e1; stroke: #475569; stroke-width: 1.2; rx: 2; ry: 2; }
+      .msg-line { stroke: #1e293b; stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+      .ret-line { stroke: #2563eb; stroke-width: 1.4; stroke-dasharray: 4,4; fill: none; marker-end: url(#blue-arrow); }
+      .msg-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #1e293b; }
+      .ret-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #1d4ed8; }
+      .msg-shield { fill: #ffffff; fill-opacity: 0.92; }
+      .alt-box { fill: #f8fafc; fill-opacity: 0.4; stroke: #64748b; stroke-width: 1.2; stroke-dasharray: 5,3; }
+      .alt-header { fill: #e2e8f0; stroke: #64748b; stroke-width: 1.2; }
+      .alt-tag { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; font-weight: bold; fill: #334155; }
+      .alt-cond { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; font-weight: bold; fill: #1e40af; }
+      .alt-div { stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4,4; }
+    </style>
+    <marker
+       id="arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1 L 10 5 L 0 9 z"
+         fill="#1e293b"
+         id="path1" />
+    </marker>
+    <marker
+       id="blue-arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1 L 10 5 L 0 9 z"
+         fill="#2563eb"
+         id="path2" />
+    </marker>
+  </defs>
+  <rect
+     width="100%"
+     height="100%"
+     fill="#ffffff"
+     id="rect2" />
+  <text
+     x="380.0"
+     y="32"
+     class="title"
+     id="text2">▲圖 6-1-2 Gmail信箱驗證循序圖</text>
+  <line
+     x1="65.0"
+     y1="97"
+     x2="65.0"
+     y2="700"
+     class="life-line"
+     id="line2" />
+  <rect
+     x="10.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-box"
+     id="rect3" />
+  <text
+     x="65.0"
+     y="73"
+     class="life-title"
+     id="text3">使用者</text>
+  <text
+     x="65.0"
+     y="88"
+     class="life-sub"
+     id="text4">User</text>
+  <line
+     x1="222.5"
+     y1="97"
+     x2="222.5"
+     y2="700"
+     class="life-line"
+     id="line4" />
+  <rect
+     x="167.5"
+     y="55"
+     width="110"
+     height="42"
+     class="life-box"
+     id="rect4" />
+  <text
+     x="222.5"
+     y="73"
+     class="life-title"
+     id="text5">郵件客戶端</text>
+  <text
+     x="222.5"
+     y="88"
+     class="life-sub"
+     id="text6">Gmail App/Web</text>
+  <line
+     x1="380.0"
+     y1="97"
+     x2="380.0"
+     y2="700"
+     class="life-line"
+     id="line6" />
+  <rect
+     x="325.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-box"
+     id="rect6" />
+  <text
+     x="380.0"
+     y="73"
+     class="life-title"
+     id="text7">瀏覽器</text>
+  <text
+     x="380.0"
+     y="88"
+     class="life-sub"
+     id="text8">Web Browser</text>
+  <line
+     x1="537.5"
+     y1="97"
+     x2="537.5"
+     y2="700"
+     class="life-line"
+     id="line8" />
+  <rect
+     x="482.5"
+     y="55"
+     width="110"
+     height="42"
+     class="life-box"
+     id="rect8" />
+  <text
+     x="537.5"
+     y="73"
+     class="life-title"
+     id="text9">FastAPI</text>
+  <text
+     x="537.5"
+     y="88"
+     class="life-sub"
+     id="text10">後端伺服器</text>
+  <line
+     x1="695.0"
+     y1="97"
+     x2="695.0"
+     y2="700"
+     class="life-line"
+     id="line10" />
+  <rect
+     x="640.0"
+     y="55"
+     width="110"
+     height="42"
+     class="life-db"
+     id="rect10" />
+  <text
+     x="695.0"
+     y="73"
+     class="life-title"
+     id="text11">MySQL</text>
+  <text
+     x="695.0"
+     y="88"
+     class="life-sub"
+     id="text12">資料庫</text>
+  <rect
+     x="60.0"
+     y="110"
+     width="10"
+     height="550"
+     class="activation"
+     id="rect12" />
+  <rect
+     x="217.5"
+     y="110"
+     width="10"
+     height="90"
+     class="activation"
+     id="rect13" />
+  <rect
+     x="375.0"
+     y="160"
+     width="10"
+     height="490"
+     class="activation"
+     id="rect14" />
+  <rect
+     x="532.5"
+     y="190"
+     width="10"
+     height="430"
+     class="activation"
+     id="rect15" />
+  <rect
+     x="690.0"
+     y="220"
+     width="10"
+     height="300"
+     class="activation"
+     id="rect16" />
+  <line
+     x1="70.0"
+     y1="120"
+     x2="217.5"
+     y2="120"
+     class="msg-line"
+     id="line17" />
+  <text
+     x="75.0"
+     y="115"
+     class="msg-text"
+     text-anchor="start"
+     id="text17">1: 開啟認證郵件，點擊「驗證我的帳號」連結</text>
+  <line
+     x1="227.5"
+     y1="155"
+     x2="375.0"
+     y2="155"
+     class="msg-line"
+     id="line18" />
+  <text
+     x="232.5"
+     y="150"
+     class="msg-text"
+     text-anchor="start"
+     id="text18">2: 叫用預設瀏覽器開啟驗證網址</text>
+  <line
+     x1="387.75092"
+     y1="183.16605"
+     x2="535.25092"
+     y2="183.16605"
+     class="msg-line"
+     id="line19" />
+  <rect
+     x="388.0"
+     y="160"
+     width="300"
+     height="15"
+     class="msg-shield"
+     id="sh_3" />
+  <text
+     x="390.0"
+     y="172.0"
+     class="msg-text"
+     text-anchor="start"
+     id="text19">3: GET /api/v1/auth/verify-email?token={verify_token}</text>
+  <line
+     x1="543.41699"
+     y1="215.91698"
+     x2="690.91699"
+     y2="215.91698"
+     class="msg-line"
+     id="line20" />
+  <rect
+     x="544.0"
+     y="178"
+     width="205"
+     height="36"
+     class="msg-shield"
+     id="sh_4" />
+  <text
+     x="546.0"
+     y="187.5"
+     class="msg-text"
+     text-anchor="start"
+     id="text20"><tspan
+       sodipodi:role="line"
+       id="tspan33"
+       x="546.0"
+       y="187.5">4: SELECT id, is_verified, token_expiry</tspan><tspan
+       sodipodi:role="line"
+       id="tspan34"
+       x="546.0"
+       y="199.5">FROM users</tspan><tspan
+       sodipodi:role="line"
+       id="tspan35"
+       x="546.0"
+       y="211.5">WHERE verification_token = :token</tspan></text>
+  <line
+     x1="690"
+     y1="259.67163"
+     x2="542.5"
+     y2="259.67163"
+     class="ret-line"
+     id="line21" />
+  <text
+     x="542.9151"
+     y="252.83768"
+     class="ret-text"
+     text-anchor="start"
+     id="text21">5: 回傳會員資料與過期時戳</text>
+  <rect
+     x="355.0"
+     y="270"
+     width="365.0"
+     height="330"
+     class="alt-box"
+     id="rect22" />
+  <polygon
+     points="355.0,270 397.0,270 387.0,288 355.0,288"
+     class="alt-header"
+     id="polygon22" />
+  <text
+     x="362.0"
+     y="283"
+     class="alt-tag"
+     id="text22">alt</text>
+  <text
+     x="405.0"
+     y="284"
+     class="alt-cond"
+     id="text23">[Token 無效或逾期]</text>
+  <line
+     x1="355.0"
+     y1="390"
+     x2="720.0"
+     y2="390"
+     class="alt-div"
+     id="line23" />
+  <text
+     x="370.0"
+     y="405"
+     class="alt-cond"
+     id="text24">[Token 合法且未過期]</text>
+  <line
+     x1="532.5"
+     y1="310"
+     x2="385.0"
+     y2="310"
+     class="ret-line"
+     id="line24" />
+  <text
+     x="390.0"
+     y="305"
+     class="ret-text"
+     text-anchor="start"
+     id="text25">6a: HTTP 400 Bad Request (Token Expired or Invalid)</text>
+  <rect
+     x="72.0"
+     y="328"
+     width="261"
+     height="15"
+     class="msg-shield"
+     id="rect25" />
+  <line
+     x1="375.0"
+     y1="345"
+     x2="70.0"
+     y2="345"
+     class="ret-line"
+     id="line25" />
+  <text
+     x="75.0"
+     y="340"
+     class="ret-text"
+     text-anchor="start"
+     id="text26">7a: 瀏覽器渲染「驗證失敗：連結已逾期」頁面</text>
+  <line
+     x1="542.5"
+     y1="440.08673"
+     x2="690"
+     y2="440.08673"
+     class="msg-line"
+     id="line26" />
+  <text
+     x="546.0"
+     y="408.49445"
+     class="msg-text"
+     text-anchor="start"
+     id="text27"><tspan
+       sodipodi:role="line"
+       id="tspan30"
+       x="546.0"
+       y="408.49445">6b: UPDATE users</tspan><tspan
+       sodipodi:role="line"
+       id="tspan31"
+       x="546.0"
+       y="422.24445">SET is_verified = 1,</tspan><tspan
+       sodipodi:role="line"
+       x="546.0"
+       y="435.99445"
+       id="tspan32">verification_token = NULL WHERE id = :id</tspan></text>
+  <line
+     x1="690.0"
+     y1="465"
+     x2="542.5"
+     y2="465"
+     class="ret-line"
+     id="line27" />
+  <text
+     x="547.5"
+     y="460"
+     class="ret-text"
+     text-anchor="start"
+     id="text28">7b: 資料庫更新成功確認</text>
+  <line
+     x1="532.5"
+     y1="505"
+     x2="385.0"
+     y2="505"
+     class="ret-line"
+     id="line28" />
+  <rect
+     x="388.0"
+     y="488"
+     width="275"
+     height="15"
+     class="msg-shield"
+     id="sh_8b" />
+  <text
+     x="390.0"
+     y="500"
+     class="ret-text"
+     text-anchor="start"
+     id="text29">8b: HTTP 200 OK (回傳 Jinja2 驗證成功 HTML 頁面)</text>
+  <line
+     x1="375.0"
+     y1="545"
+     x2="70.0"
+     y2="545"
+     class="ret-line"
+     id="line29" />
+  <rect
+     x="72.0"
+     y="528"
+     width="295"
+     height="15"
+     class="msg-shield"
+     id="sh_9b" />
+  <text
+     x="75.0"
+     y="540"
+     class="ret-text"
+     text-anchor="start"
+     id="text30">9b: 瀏覽器渲染「帳號開通成功！歡迎登入 Plant Doctor」</text>
+</svg>

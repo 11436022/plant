@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 740 820"
+   width="740"
+   height="820"
+   version="1.1"
+   id="svg42"
+   sodipodi:docname="圖 5-3-11 管理Webcam警報活動圖.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview42"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.98414634"
+     inkscape:cx="369.86369"
+     inkscape:cy="410"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg42" />
+  <defs
+     id="defs1">
+    <style
+       id="style1">
+      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 17px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .lane-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 14px; font-weight: bold; fill: #1e293b; text-anchor: middle; }
+      .text-bold { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .text-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #64748b; text-anchor: middle; }
+      .text-decision { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; font-weight: bold; fill: #1e40af; text-anchor: middle; }
+      .text-edge { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #1e293b; text-anchor: middle; font-weight: bold; }
+      .label-bg { fill: #ffffff; fill-opacity: 0.95; rx: 3; ry: 3; }
+      .lane-bg { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.5; }
+      .lane-header { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.5; }
+      .action-usr { fill: #ffffff; stroke: #2563eb; stroke-width: 1.5; rx: 6; ry: 6; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.04)); }
+      .action-sys { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 6; ry: 6; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.04)); }
+      .decision-box { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.5; }
+      .flow-line { stroke: #334155; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
+      .flow-line-noarrow { stroke: #334155; stroke-width: 1.5; fill: none; }
+    </style>
+    <marker
+       id="arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1 L 10 5 L 0 9 z"
+         fill="#334155"
+         id="path1" />
+    </marker>
+  </defs>
+  <rect
+     width="100%"
+     height="100%"
+     fill="#ffffff"
+     id="rect1" />
+  <text
+     x="370.0"
+     y="32"
+     class="title"
+     id="text1">▲圖 5-3-11 管理Webcam警報活動圖</text>
+  <rect
+     x="45"
+     y="55"
+     width="325.0"
+     height="735"
+     class="lane-bg"
+     id="rect2" />
+  <rect
+     x="45"
+     y="55"
+     width="325.0"
+     height="35"
+     class="lane-header"
+     id="rect3" />
+  <text
+     x="207.5"
+     y="77"
+     class="lane-title"
+     id="text3">使用者 (Web)</text>
+  <rect
+     x="370.0"
+     y="55"
+     width="325.0"
+     height="735"
+     class="lane-bg"
+     id="rect4" />
+  <rect
+     x="370.0"
+     y="55"
+     width="325.0"
+     height="35"
+     class="lane-header"
+     id="rect5" />
+  <text
+     x="532.5"
+     y="77"
+     class="lane-title"
+     id="text5">後端與資料庫</text>
+  <circle
+     cx="207.5"
+     cy="95"
+     r="12"
+     fill="#0f172a"
+     id="circle5" />
+  <rect
+     x="112.5"
+     y="130"
+     width="190"
+     height="44"
+     class="action-usr"
+     id="rect6" />
+  <text
+     x="207.5"
+     y="156"
+     class="text-bold"
+     id="text6">開啟「警報管理中心」</text>
+  <rect
+     x="437.5"
+     y="130"
+     width="190"
+     height="44"
+     class="action-sys"
+     id="rect7" />
+  <text
+     x="532.5"
+     y="156"
+     class="text-bold"
+     id="text8">查詢警報歷史紀錄</text>
+  <rect
+     x="112.5"
+     y="215"
+     width="190"
+     height="44"
+     class="action-usr"
+     id="rect9" />
+  <text
+     x="207.5"
+     y="241"
+     class="text-bold"
+     id="text10">瀏覽警報列表與截圖</text>
+  <polygon
+     points="207.5,305 292.5,327.0 207.5,349 122.5,327.0"
+     class="decision-box"
+     id="polygon11" />
+  <text
+     x="207.5"
+     y="331.0"
+     class="text-decision"
+     id="text12">選擇管理操作項目</text>
+  <rect
+     x="132.5"
+     y="395"
+     width="150"
+     height="44"
+     class="action-usr"
+     id="rect12" />
+  <text
+     x="207.5"
+     y="421"
+     class="text-bold"
+     id="text13">點選「確認知悉」</text>
+  <rect
+     x="457.5"
+     y="395"
+     width="150"
+     height="44"
+     class="action-sys"
+     id="rect14" />
+  <text
+     x="532.5"
+     y="421"
+     class="text-bold"
+     id="text15">更新 acknowledged_at</text>
+  <rect
+     x="132.5"
+     y="490"
+     width="150"
+     height="44"
+     class="action-usr"
+     id="rect16" />
+  <text
+     x="207.5"
+     y="516"
+     class="text-bold"
+     id="text17">點選「刪除警報」</text>
+  <rect
+     x="457.5"
+     y="490"
+     width="150"
+     height="44"
+     class="action-sys"
+     id="rect18" />
+  <text
+     x="532.5"
+     y="516"
+     class="text-bold"
+     id="text19">刪除警報紀錄與截圖</text>
+  <rect
+     x="112.5"
+     y="585"
+     width="190"
+     height="44"
+     class="action-usr"
+     id="rect20" />
+  <text
+     x="207.5"
+     y="611"
+     class="text-bold"
+     id="text21">即時刷新警報列表視圖</text>
+  <circle
+     cx="207.5"
+     cy="665"
+     r="8"
+     fill="#0f172a"
+     id="circle22" />
+  <circle
+     cx="207.5"
+     cy="665"
+     r="14"
+     fill="none"
+     stroke="#0f172a"
+     stroke-width="2"
+     id="circle23" />
+  <line
+     x1="207.5"
+     y1="107"
+     x2="207.5"
+     y2="130"
+     class="flow-line"
+     id="line23" />
+  <line
+     x1="302.5"
+     y1="152.0"
+     x2="437.5"
+     y2="152.0"
+     class="flow-line"
+     id="line24" />
+  <line
+     x1="532.5"
+     y1="174"
+     x2="532.5"
+     y2="190"
+     class="flow-line-noarrow"
+     id="line25" />
+  <line
+     x1="532.5"
+     y1="190"
+     x2="207.5"
+     y2="190"
+     class="flow-line-noarrow"
+     id="line26" />
+  <line
+     x1="207.5"
+     y1="190"
+     x2="207.5"
+     y2="215"
+     class="flow-line"
+     id="line27" />
+  <line
+     x1="207.5"
+     y1="259"
+     x2="207.5"
+     y2="305"
+     class="flow-line"
+     id="line28" />
+  <line
+     x1="207.5"
+     y1="349"
+     x2="207.5"
+     y2="395"
+     class="flow-line"
+     id="line29" />
+  <text
+     x="236.56444"
+     y="373.04834"
+     class="text-edge"
+     id="text29">[確認知悉]</text>
+  <line
+     x1="122.5"
+     y1="327.0"
+     x2="65"
+     y2="327.0"
+     class="flow-line-noarrow"
+     id="line30" />
+  <line
+     x1="65"
+     y1="327.0"
+     x2="65"
+     y2="512.0"
+     class="flow-line-noarrow"
+     id="line31" />
+  <line
+     x1="65"
+     y1="512.0"
+     x2="132.5"
+     y2="512.0"
+     class="flow-line"
+     id="line32" />
+  <rect
+     x="40.75"
+     y="305.0"
+     width="76"
+     height="16"
+     class="label-bg"
+     id="rect32" />
+  <text
+     x="78.75"
+     y="317.0"
+     class="text-edge"
+     id="text32">[刪除警報]</text>
+  <line
+     x1="282.5"
+     y1="417.0"
+     x2="457.5"
+     y2="417.0"
+     class="flow-line"
+     id="line33" />
+  <rect
+     x="310.0"
+     y="395.0"
+     width="120"
+     height="16"
+     class="label-bg"
+     id="rect33" />
+  <text
+     x="370.0"
+     y="407.0"
+     class="text-edge"
+     id="text33">PATCH 標記知悉</text>
+  <line
+     x1="282.5"
+     y1="512.0"
+     x2="457.5"
+     y2="512.0"
+     class="flow-line"
+     id="line34" />
+  <rect
+     x="304.5"
+     y="490.0"
+     width="131"
+     height="16"
+     class="label-bg"
+     id="rect34" />
+  <text
+     x="370.0"
+     y="502.0"
+     class="text-edge"
+     id="text34">DELETE 刪除警報</text>
+  <line
+     x1="607.5"
+     y1="417.0"
+     x2="637.5"
+     y2="417.0"
+     class="flow-line-noarrow"
+     id="line35" />
+  <line
+     x1="637.5"
+     y1="417.0"
+     x2="637.5"
+     y2="550"
+     class="flow-line-noarrow"
+     id="line36" />
+  <line
+     x1="637.5"
+     y1="550"
+     x2="232.5"
+     y2="550"
+     class="flow-line-noarrow"
+     id="line37" />
+  <line
+     x1="232.5"
+     y1="550"
+     x2="232.5"
+     y2="585"
+     class="flow-line"
+     id="line38" />
+  <line
+     x1="532.5"
+     y1="534"
+     x2="532.5"
+     y2="550"
+     class="flow-line-noarrow"
+     id="line39" />
+  <line
+     x1="532.5"
+     y1="550"
+     x2="182.5"
+     y2="550"
+     class="flow-line-noarrow"
+     id="line40" />
+  <line
+     x1="182.5"
+     y1="550"
+     x2="182.5"
+     y2="585"
+     class="flow-line"
+     id="line41" />
+  <line
+     x1="207.5"
+     y1="629"
+     x2="207.5"
+     y2="651"
+     class="flow-line"
+     id="line42" />
+</svg>

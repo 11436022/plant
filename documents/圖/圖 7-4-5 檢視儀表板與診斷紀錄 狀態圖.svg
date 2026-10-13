@@ -150,50 +150,54 @@
   </g>
 
   <!-- ========================================================================= -->
-  <!-- 3. SUB-PROCESS 2: FEEDBACK & ACTIVE LEARNING (x=680, y=390, w=680, h=330) -->
+  <!-- 3. SUB-PROCESS 2: FEEDBACK & ANNOTATION (x=680, y=390, w=680, h=330)      -->
   <!-- ========================================================================= -->
   <g transform="translate(680, 390)">
     <rect width="680" height="330" class="composite-bg" />
     <path d="M 0 8 Q 0 0 8 0 L 672 0 Q 680 0 680 8 L 680 32 L 0 32 Z" class="composite-header" fill="#E5EDE3" />
-    <text x="16" y="21" class="group-title" fill="#1A281E">管理功能 2：糾錯審核與本地 ConvNet 模型持續訓練標註 (UC-14)</text>
+    <text x="16" y="21" class="group-title" fill="#1A281E">管理功能 2：使用者糾錯反饋審核與專家真值標註 (UC-14)</text>
 
     <!-- State 7: 反饋審查 (w=280, h=92) -->
     <g transform="translate(25, 50)">
       <rect width="280" height="92" class="ai-box" />
       <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 26 L 0 26 Z" class="ai-header" />
       <text x="140" y="18" class="state-name" text-anchor="middle">反饋審查 (Reviewing_Feedback)</text>
-      <text x="12" y="46" class="action-text">entry / GET /api/v1/feedback (待審清單)</text>
-      <text x="12" y="65" class="action-text">do / 比對 AI 原判與用戶糾錯標籤</text>
-      <text x="12" y="84" class="action-text">do / 專家審核並標註真值 (Ground Truth)</text>
+      <text x="12" y="46" class="action-text">entry / GET /admin/feedback/ (待審清單)</text>
+      <text x="12" y="65" class="action-text">do / 比對原始 AI 診斷與用戶回報內容</text>
+      <text x="12" y="84" class="action-text">do / 輸入專家校正之作物與病害名稱</text>
     </g>
 
     <!-- Transition S7 -> S8 (gap = 65px) -->
     <line x1="305" y1="96" x2="368" y2="96" class="line" />
-    <text x="337" y="86" class="transition-text" text-anchor="middle">通過標註</text>
+    <text x="337" y="86" class="transition-text" text-anchor="middle">儲存標註</text>
 
-    <!-- State 8: 專家標註確認 (w=280, h=92) -->
+    <!-- State 8: 專家標註寫入 (w=280, h=92) -->
     <g transform="translate(370, 50)">
       <rect width="280" height="92" class="ai-box" />
       <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 26 L 0 26 Z" class="ai-header" />
-      <text x="140" y="18" class="state-name" text-anchor="middle">專家標註確認 (Label_Confirmed)</text>
-      <text x="12" y="46" class="action-text">do / 更新 feedback 為已審查並鎖定真值</text>
-      <text x="12" y="65" class="action-text">do / 納入主動學習候選池 (Candidate Pool)</text>
-      <text x="12" y="84" class="action-text">exit / 觸發批次匯出訓練集流程</text>
+      <text x="140" y="18" class="state-name" text-anchor="middle">專家標註寫入 (Annotation_Saving)</text>
+      <text x="12" y="46" class="action-text">entry / POST /admin/feedback/annotate/{id}</text>
+      <text x="12" y="65" class="action-text">do / UPDATE diagnosis_feedback 寫入真值</text>
+      <text x="12" y="84" class="action-text">exit / 發送 HTTP 303 See Other 重導向</text>
     </g>
 
     <!-- Transition S8 -> S9 -->
     <line x1="510" y1="142" x2="510" y2="188" class="line" />
-    <text x="520" y="168" class="transition-text">匯出訓練集</text>
+    <text x="520" y="168" class="transition-text">重導向刷新</text>
 
-    <!-- State 9: 匯出訓練集供 ConvNet 訓練 (w=440, h=96) -->
+    <!-- State 9: 標註真值留存與列表更新 (w=440, h=96) -->
     <g transform="translate(130, 190)">
       <rect width="440" height="96" class="ai-box" />
       <path d="M 0 6 Q 0 0 6 0 L 434 0 Q 440 0 440 6 L 440 26 L 0 26 Z" class="ai-header" />
-      <text x="220" y="18" class="state-name" text-anchor="middle">匯出訓練集供 ConvNet 訓練 (Export_JSONL)</text>
-      <text x="12" y="46" class="action-text">do / 匯出標註資料集並執行資料增強</text>
-      <text x="12" y="66" class="action-text">do / 本地 PyTorch 驅動主動學習 (Active Learning)</text>
-      <text x="12" y="86" class="action-text">do / 迭代更新 convnet.pth 權重檔</text>
+      <text x="220" y="18" class="state-name" text-anchor="middle">標註真值留存與列表更新 (Feedback_Updated)</text>
+      <text x="12" y="46" class="action-text">entry / 重新載入 feedback.html 呈現校正狀態</text>
+      <text x="12" y="66" class="action-text">do / 永久留存專家標註真值與圖片於資料庫</text>
+      <text x="12" y="86" class="action-text">do / 累積標註樣本作為後續模型離線重訓依據</text>
     </g>
+
+    <!-- Loop back Return Path S9 -> S7 -->
+    <path d="M 130 238 L 70 238 L 70 144" class="line-back" />
+    <text x="100" y="228" class="transition-text" text-anchor="middle">繼續審核</text>
   </g>
 
   <!-- ========================================================================= -->
