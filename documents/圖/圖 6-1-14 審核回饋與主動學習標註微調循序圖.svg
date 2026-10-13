@@ -1,0 +1,210 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1040" width="800" height="1040">
+  <defs>
+    <style>
+      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 20px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .life-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 15.5px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .life-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .life-line { stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 4,4; }
+      .life-box { fill: #f1f5f9; stroke: #334155; stroke-width: 1.5; rx: 5; ry: 5; }
+      .life-ai { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 5; ry: 5; }
+      .life-db { fill: #fefce8; stroke: #ca8a04; stroke-width: 1.5; rx: 5; ry: 5; }
+      .activation { fill: #cbd5e1; stroke: #475569; stroke-width: 1.2; rx: 2; ry: 2; }
+      .msg-line { stroke: #1e293b; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
+      .ret-line { stroke: #2563eb; stroke-width: 1.5; stroke-dasharray: 4,4; fill: none; marker-end: url(#blue-arrow); }
+      .msg-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13.5px; font-weight: 500; fill: #1e293b; }
+      .ret-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13.5px; font-weight: 500; fill: #1d4ed8; }
+      .msg-shield { fill: #ffffff; fill-opacity: 0.94; rx: 3; ry: 3; }
+      .phase-box { fill: #f8fafc; fill-opacity: 0.55; stroke: #64748b; stroke-width: 1.3; stroke-dasharray: 5,3; }
+      .phase-header { fill: #e2e8f0; stroke: #64748b; stroke-width: 1.3; }
+      .phase-tag { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13.5px; font-weight: bold; fill: #334155; }
+      .phase-cond { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13.5px; font-weight: bold; fill: #047857; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#1e293b" />
+    </marker>
+    <marker id="blue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" fill="#ffffff" />
+  <text x="400.0" y="34" class="title">▲圖 6-1-14 審核回饋與主動學習標註微調循序圖</text>
+
+  <!-- Lifelines -->
+  <!-- 1. 管理員 (Admin) -->
+  <line x1="60.0" y1="103" x2="60.0" y2="1005" class="life-line" />
+  <rect x="10.0" y="58" width="100" height="45" class="life-box" />
+  <text x="60.0" y="78" class="life-title">管理員</text>
+  <text x="60.0" y="93" class="life-sub">Admin</text>
+
+  <!-- 2. 審核工作台 (Admin UI) -->
+  <line x1="220.0" y1="103" x2="220.0" y2="1005" class="life-line" />
+  <rect x="165.0" y="58" width="110" height="45" class="life-box" />
+  <text x="220.0" y="78" class="life-title">審核工作台</text>
+  <text x="220.0" y="93" class="life-sub">Admin UI (Web)</text>
+
+  <!-- 3. FastAPI (後端伺服器) -->
+  <line x1="385.0" y1="103" x2="385.0" y2="1005" class="life-line" />
+  <rect x="330.0" y="58" width="110" height="45" class="life-box" />
+  <text x="385.0" y="78" class="life-title">FastAPI</text>
+  <text x="385.0" y="93" class="life-sub">後端伺服器</text>
+
+  <!-- 4. MySQL (資料庫) -->
+  <line x1="545.0" y1="103" x2="545.0" y2="1005" class="life-line" />
+  <rect x="490.0" y="58" width="110" height="45" class="life-box" />
+  <text x="545.0" y="78" class="life-title">MySQL</text>
+  <text x="545.0" y="93" class="life-sub">官方資料庫</text>
+
+  <!-- 5. 記憶庫與微調器 (Visual RAG & Trainer) -->
+  <line x1="710.0" y1="103" x2="710.0" y2="1005" class="life-line" />
+  <rect x="645.0" y="58" width="130" height="45" class="life-ai" />
+  <text x="710.0" y="78" class="life-title">記憶庫與微調器</text>
+  <text x="710.0" y="93" class="life-sub">Visual RAG &amp; Trainer</text>
+
+  <!-- Activations -->
+  <rect x="55.0" y="125" width="10" height="850" class="activation" />
+  <rect x="215.0" y="125" width="10" height="850" class="activation" />
+  <rect x="380.0" y="155" width="10" height="810" class="activation" />
+  <rect x="540.0" y="185" width="10" height="190" class="activation" />
+  <rect x="705.0" y="360" width="10" height="70" class="activation" />
+  <rect x="705.0" y="580" width="10" height="65" class="activation" />
+  <rect x="705.0" y="850" width="10" height="75" class="activation" />
+
+  <!-- PHASE 1: Feedback Review & Ground Truth Annotation -->
+  <rect x="28.0" y="115" width="744.0" height="365" class="phase-box" />
+  <polygon points="28.0,115 88.0,115 78.0,135 28.0,135" class="phase-header" />
+  <text x="35.0" y="130" class="phase-tag">階段 1</text>
+  <rect x="95.0" y="117" width="375" height="18" class="msg-shield" />
+  <text x="98.0" y="131" class="phase-cond">回饋審核與專家真值標註 (即時刻錄視覺特徵記憶)</text>
+
+  <!-- Step 1 -->
+  <rect x="67.0" y="132" width="225" height="18" class="msg-shield" />
+  <line x1="65.0" y1="150" x2="215.0" y2="150" class="msg-line" />
+  <text x="70.0" y="145" class="msg-text">1: 進入「使用者回饋」審核工作台</text>
+
+  <!-- Step 2 -->
+  <rect x="227.0" y="162" width="235" height="18" class="msg-shield" />
+  <line x1="225.0" y1="180" x2="380.0" y2="180" class="msg-line" />
+  <text x="230.0" y="175" class="msg-text">2: GET /admin/feedback/ (查詢待審回饋)</text>
+
+  <!-- Step 3 -->
+  <rect x="387.0" y="192" width="265" height="18" class="msg-shield" />
+  <line x1="390.0" y1="210" x2="540.0" y2="210" class="msg-line" />
+  <text x="392.0" y="205" class="msg-text">3: SELECT * FROM feedback (待審清單)</text>
+
+  <!-- Step 4 -->
+  <rect x="387.0" y="222" width="245" height="18" class="msg-shield" />
+  <line x1="540.0" y1="240" x2="390.0" y2="240" class="ret-line" />
+  <text x="392.0" y="235" class="ret-text">4: 回傳待審回饋紀錄、糾錯說明與病葉影像</text>
+
+  <!-- Step 5 -->
+  <rect x="227.0" y="252" width="245" height="18" class="msg-shield" />
+  <line x1="380.0" y1="270" x2="225.0" y2="270" class="ret-line" />
+  <text x="230.0" y="265" class="ret-text">5: HTTP 200 OK (渲染反饋審核清單與原圖)</text>
+
+  <!-- Step 6 -->
+  <rect x="67.0" y="282" width="240" height="18" class="msg-shield" />
+  <line x1="65.0" y1="300" x2="215.0" y2="300" class="msg-line" />
+  <text x="70.0" y="295" class="msg-text">6: 專家檢視病徵、輸入真值病害並確認</text>
+
+  <!-- Step 7 -->
+  <rect x="227.0" y="312" width="240" height="18" class="msg-shield" />
+  <line x1="225.0" y1="330" x2="380.0" y2="330" class="msg-line" />
+  <text x="230.0" y="325" class="msg-text">7: POST /feedback/annotate/{id} (送出真值)</text>
+
+  <!-- Step 8 -->
+  <rect x="387.0" y="342" width="250" height="18" class="msg-shield" />
+  <line x1="390.0" y1="360" x2="540.0" y2="360" class="msg-line" />
+  <text x="392.0" y="355" class="msg-text">8: UPDATE 反饋真值標籤並標記已覆核</text>
+
+  <!-- Step 9: Visual Memory addOrUpdate -->
+  <rect x="387.0" y="372" width="315" height="18" class="msg-shield" />
+  <line x1="390.0" y1="390" x2="705.0" y2="390" class="msg-line" />
+  <text x="392.0" y="385" class="msg-text">9: 【即時刻錄】提取 768 維特徵 (add_or_update)</text>
+
+  <!-- Step 10 -->
+  <rect x="387.0" y="402" width="280" height="18" class="msg-shield" />
+  <line x1="705.0" y1="420" x2="390.0" y2="420" class="ret-line" />
+  <text x="392.0" y="415" class="ret-text">10: 刻錄成功確認 (零延遲寫入視覺特徵庫)</text>
+
+  <!-- Step 11 -->
+  <rect x="227.0" y="432" width="230" height="18" class="msg-shield" />
+  <line x1="380.0" y1="450" x2="225.0" y2="450" class="ret-line" />
+  <text x="230.0" y="445" class="ret-text">11: HTTP 303 Redirect (重定向回審核首頁)</text>
+
+  <!-- Step 12 -->
+  <rect x="67.0" y="457" width="230" height="18" class="msg-shield" />
+  <line x1="215.0" y1="472" x2="65.0" y2="472" class="ret-line" />
+  <text x="70.0" y="468" class="ret-text">12: 頁面重載顯示「已覆核」真值狀態徽章</text>
+
+  <!-- PHASE 2: Active Learning Flywheel & Retraining -->
+  <rect x="28.0" y="495" width="744.0" height="495" class="phase-box" />
+  <polygon points="28.0,495 88.0,495 78.0,515 28.0,515" class="phase-header" />
+  <text x="35.0" y="510" class="phase-tag">階段 2</text>
+  <rect x="95.0" y="497" width="415" height="18" class="msg-shield" />
+  <text x="98.0" y="511" class="phase-cond">主動學習閉環 (特徵索引批次重構、資料集匯出與微調重訓)</text>
+
+  <!-- Step 13: Rebuild Visual Memory Index -->
+  <rect x="67.0" y="522" width="220" height="18" class="msg-shield" />
+  <line x1="65.0" y1="540" x2="215.0" y2="540" class="msg-line" />
+  <text x="70.0" y="535" class="msg-text">13: 點選「重建特徵索引快取」按鈕</text>
+
+  <!-- Step 14 -->
+  <rect x="227.0" y="552" width="245" height="18" class="msg-shield" />
+  <line x1="225.0" y1="570" x2="380.0" y2="570" class="msg-line" />
+  <text x="230.0" y="565" class="msg-text">14: POST /rebuild-memory (批次特徵重構)</text>
+
+  <!-- Step 15 -->
+  <rect x="387.0" y="582" width="310" height="18" class="msg-shield" />
+  <line x1="390.0" y1="600" x2="705.0" y2="600" class="msg-line" />
+  <text x="392.0" y="595" class="msg-text">15: 批次重構全量特徵向量快取 (rebuild_index)</text>
+
+  <!-- Step 16 -->
+  <rect x="387.0" y="617" width="280" height="18" class="msg-shield" />
+  <line x1="705.0" y1="635" x2="390.0" y2="635" class="ret-line" />
+  <text x="392.0" y="630" class="ret-text">16: 向量索引重構完成確認 (共 N 筆樣本索引)</text>
+
+  <!-- Step 17: Export Dataset -->
+  <rect x="67.0" y="652" width="210" height="18" class="msg-shield" />
+  <line x1="65.0" y1="670" x2="215.0" y2="670" class="msg-line" />
+  <text x="70.0" y="665" class="msg-text">17: 點選「匯出微調訓練集」按鈕</text>
+
+  <!-- Step 18 -->
+  <rect x="227.0" y="682" width="245" height="18" class="msg-shield" />
+  <line x1="225.0" y1="700" x2="380.0" y2="700" class="msg-line" />
+  <text x="230.0" y="695" class="msg-text">18: POST /export-dataset (組織訓練數據)</text>
+
+  <!-- Step 19: Self loop -->
+  <path d="M 390.0 720 L 420.0 720 L 420.0 742 L 390.0 742" class="msg-line" />
+  <rect x="424.0" y="722" width="330" height="18" class="msg-shield" />
+  <text x="426.0" y="736" class="msg-text">19: 組織標準訓練集目錄與 manifest.json (export)</text>
+
+  <!-- Step 20 -->
+  <rect x="227.0" y="757" width="255" height="18" class="msg-shield" />
+  <line x1="380.0" y1="775" x2="225.0" y2="775" class="ret-line" />
+  <text x="230.0" y="770" class="ret-text">20: 匯出完成 (回傳影像檔案清單與真值標籤)</text>
+
+  <!-- Step 21: Retrain -->
+  <rect x="67.0" y="792" width="220" height="18" class="msg-shield" />
+  <line x1="65.0" y1="810" x2="215.0" y2="810" class="msg-line" />
+  <text x="70.0" y="805" class="msg-text">21: 點選「啟動本地模型微調」按鈕</text>
+
+  <!-- Step 22 -->
+  <rect x="227.0" y="822" width="250" height="18" class="msg-shield" />
+  <line x1="225.0" y1="840" x2="380.0" y2="840" class="msg-line" />
+  <text x="230.0" y="835" class="msg-text">22: POST /feedback/retrain (觸發模型微調)</text>
+
+  <!-- Step 23 -->
+  <rect x="387.0" y="852" width="315" height="18" class="msg-shield" />
+  <line x1="390.0" y1="870" x2="705.0" y2="870" class="msg-line" />
+  <text x="392.0" y="865" class="msg-text">23: 啟動 PyTorch 背景微調訓練 (run_retraining)</text>
+
+  <!-- Step 24 -->
+  <rect x="387.0" y="887" width="310" height="18" class="msg-shield" />
+  <line x1="705.0" y1="905" x2="390.0" y2="905" class="ret-line" />
+  <text x="392.0" y="900" class="ret-text">24: 微調訓練收斂，熱更新 ConvNeXt 權重演進閉環</text>
+
+  <!-- Step 25 -->
+  <rect x="67.0" y="927" width="255" height="18" class="msg-shield" />
+  <line x1="215.0" y1="945" x2="65.0" y2="945" class="ret-line" />
+  <text x="70.0" y="940" class="ret-text">25: 顯示模型權重持續演進成功提示 (新版本就緒)</text>
+</svg>

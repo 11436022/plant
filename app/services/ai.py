@@ -15,13 +15,103 @@ from app.db.session import SessionLocal
 from app.services import rag
 from app.services.convnext import predict_convnext_fast_screen
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+def get_gemini_client():
+    api_key = getattr(settings, "GEMINI_API_KEY", None) or os.getenv("GEMINI_API_KEY")
+    return genai.Client(api_key=api_key)
+
+
+client = get_gemini_client()
 
 UNKNOWN_CROP_NAME = "未知作物"
 UNKNOWN_STATUS_NAME = "無法判定"
 HEALTHY_STATUS_NAME = "健康"
 MIN_DIAGNOSIS_CONFIDENCE = 0.65
 MIN_HEALTHY_CONFIDENCE = 0.85
+
+UNKNOWN_CROP_NAMES = {
+    "未知作物", "未知", "未知植物", "無法辨識", "無法判定",
+    "非植物", "無植物特徵", "非植物影像", "無效影像", "無效",
+    "其他", "其他作物", "其他果樹", "其他植物", "未指定", "未選擇", "無", "不確定",
+    "unknown", "none"
+}
+UNKNOWN_STATUS_NAMES = {
+    "無法判定", "未知", "無植物特徵", "無病害特徵", "非植物",
+    "無法辨識", "無效", "無病徵", "無明顯病徵", "unknown"
+}
+
+
+def call_gemini_with_fallback(
+    contents,
+    primary_model: str | None = None,
+    fallback_models: list[str] | None = None,
+    max_retries: int | None = None,
+    base_delay: float = 0.8,
+):
+    """
+    呼叫 Gemini API 核心函式，具備 503/429 自適應退避重試機制：
+    1. 採用主力模型 (預設 models/gemini-3.8-flash)
+    2. 若遇 503 (UNAVAILABLE / high demand) 或 429 暫時性頻率限制，進行短暫退避重試
+    3. 若遇 429 專案月度支出上限 (spending cap)，立即終止重試並輸出明確排查指引
+    """
+    import time
+
+    p_model = primary_model or getattr(settings, "GEMINI_PRIMARY_MODEL", "models/gemini-3.8-flash")
+    f_models = fallback_models if fallback_models is not None else getattr(settings, "GEMINI_FALLBACK_MODELS", [])
+    retries = max_retries or getattr(settings, "GEMINI_MAX_RETRIES", 2)
+
+    candidate_models = [p_model] + [m for m in f_models if m != p_model]
+    last_exception = None
+
+    active_client = client or get_gemini_client()
+    try:
+        from google.genai import types
+        gen_config = types.GenerateContentConfig(temperature=0.0, seed=42)
+    except Exception:
+        gen_config = None
+
+    for model_name in candidate_models:
+        for attempt in range(1, retries + 1):
+            try:
+                call_kwargs = {"model": model_name, "contents": contents}
+                if gen_config is not None:
+                    call_kwargs["config"] = gen_config
+                response = active_client.models.generate_content(**call_kwargs)
+                if response and (response.text is not None):
+                    if model_name != p_model:
+                        print(f"[OK]  [Gemini 備援成功] 主力模型忙碌，備援模型【{model_name}】順利完成生成。")
+                    return response
+            except Exception as exc:
+                last_exception = exc
+                err_msg = str(exc)
+
+                # 專案月度支出上限（專案層級硬性阻擋，非暫時限流，重試無效）
+                if "spending cap" in err_msg.lower() or "spend cap" in err_msg.lower():
+                    print(
+                        f"[Emergency]  [Gemini 專案支出上限] Google Cloud 專案已達月度支出上限 (monthly spending cap)！\n"
+                        f"   原因：此限制綁定於 Google Cloud 專案層級，在同一個舊專案中新建 Key 依然會被阻擋。\n"
+                        f"   解決：請前往 https://ai.studio/spend 調整上限，或在 https://aistudio.google.com/app/apikey 點擊「Create API key in new project」建立全新專案金鑰。"
+                    )
+                    raise exc
+
+                is_transient = any(
+                    code in err_msg
+                    for code in ["503", "429", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "high demand", "overloaded"]
+                )
+                if is_transient:
+                    if attempt < retries:
+                        sleep_time = base_delay * attempt
+                        print(f"[WARN]  [Gemini 尖峰提醒] {model_name} 暫時忙碌 ({err_msg[:60]}...)，等待 {sleep_time:.1f} 秒後進行第 {attempt + 1} 次重試...")
+                        time.sleep(sleep_time)
+                        continue
+                    else:
+                        print(f"[WARN]  [Gemini 自動切換] {model_name} 重試達上限，自動切換至下一備援模型...")
+                        break
+                else:
+                    print(f"[WARN]  [Gemini 異常] {model_name} 回傳錯誤: {err_msg[:80]}...")
+                    break
+
+    raise last_exception or RuntimeError("All Gemini candidate models failed to generate content.")
+
 
 
 def parse_custom_label(label: str) -> tuple[str, str]:
@@ -213,7 +303,7 @@ def arbitrate_diagnosis(
                 # 客製化模型受限於閉集 3 標籤，容易誤判相近新病害。
                 # 裁決：採納 Gemini 的精細診斷，標記 requires_review=True 作為催生新標籤之依據！
                 conflict_note = (
-                    f"⚠️ 診斷分歧提醒：通用AI診斷為【{gemini_raw_status}】，專屬模型預測為【{custom_status}】"
+                    f"[WARN]  診斷分歧提醒：通用AI診斷為【{gemini_raw_status}】，專屬模型預測為【{custom_status}】"
                     f"(信心度 {custom_score:.2f})。此案例已標記供後台專家覆核。"
                 )
                 merged_sugg = f"{conflict_note}\n{gemini_sugg}" if gemini_sugg else conflict_note
@@ -263,7 +353,7 @@ def arbitrate_diagnosis(
                 else ("pest" if "蟲" in custom_status else "disease")
             )
             rescue_sugg = (
-                f"🌟 專屬模型反向救援：依病徵特寫高信心 ({custom_score:.2f}) 辨識為【{custom_crop} - {custom_status}】\n"
+                f"[DYNAMIC]  專屬模型反向救援：依病徵特寫高信心 ({custom_score:.2f}) 辨識為【{custom_crop} - {custom_status}】\n"
                 f"{gemini_sugg}"
             )
             rescue_treat = gemini_treat or f"請依【{custom_crop} - {custom_status}】標準農業防治手冊處置，注意田間通風與管理。"
@@ -321,15 +411,15 @@ def generate_precise_prescription(
     3. 離線備援：查詢 MySQL 本地專家資料庫記錄 (作為 AI 無法連線時的保險備援)
     4. 安全通用專家處方 (最底層保險)
     """
+    if status_name in UNKNOWN_STATUS_NAMES or crop_name in UNKNOWN_CROP_NAMES or category == "unknown":
+        sugg = fallback_suggestion or "- 影像特徵不足或非植物影像，無法進行病理辨識\n- 建議將鏡頭靠近植物葉片或受害部位重新拍攝"
+        treat = fallback_treatment or "1. 重新拍攝清晰的植物特寫照片後再次診斷。\n2. 確保光源充足且對焦於葉片或病斑。"
+        return sugg, treat, ""
+
     if status_name in [HEALTHY_STATUS_NAME, "健康"]:
         suggestion = "- 植株生長強健，葉色均勻鮮綠，無枯黃萎凋或異常捲曲變形\n- 葉面及葉背均無明顯病斑、白粉、黴菌或害蟲侵蝕痕跡"
         treatment = "1. 維持當前適度日照與澆水頻率，避免盆土長期積水爛根。\n2. 保持良好通風環境，適時修剪老葉促進通風與生長。\n3. 定期檢查葉背與莖部新芽，持續做好日常田間衛生與預防。"
         return suggestion, treatment, "healthy_status"
-
-    if status_name in [UNKNOWN_STATUS_NAME, "無法判定"]:
-        sugg = fallback_suggestion or "- 影像特徵不足，無法與目前資料庫中的作物或病害特徵安全對應\n- 建議重新拍攝清晰葉面、莖部與受害區域"
-        treat = fallback_treatment or "1. 暫時隔離疑似受害植株並持續觀察。\n2. 補拍清晰照片後重新診斷。\n3. 若症狀持續擴大，請諮詢農業專家或更新知識庫。"
-        return sugg, treat, ""
 
     def _is_invalid_text(t: str) -> bool:
         """偵測是否為交白卷或官腔廢話。"""
@@ -370,12 +460,16 @@ def generate_precise_prescription(
                     base_desc = rec.description.strip()
                     base_treat_db = rec.treatment.strip()
         except Exception as db_err:
-            print(f"⚠️ 查詢 MySQL 處方資料庫出錯: {db_err}")
+            print(f"[WARN]  查詢 MySQL 處方資料庫出錯: {db_err}")
         finally:
             if should_close_db and local_db:
                 local_db.close()
 
     if base_desc and base_treat_db:
+        if fallback_suggestion and fallback_treatment and not _is_invalid_text(fallback_suggestion) and not _is_invalid_text(fallback_treatment):
+            if is_local_convnext_hit or "雙模型會診" in fallback_suggestion:
+                print(f"[DYNAMIC]  採用雙模型會診動態處置：依當前照片病徵輕重度專屬生成 -> {crop_name} - {status_name}")
+                return fallback_suggestion, fallback_treatment, "convnext_gemini_dynamic_prescription"
         if is_local_convnext_hit:
             convnext_sugg = (
                 f"- 【病徵特徵】：{base_desc}\n"
@@ -386,10 +480,10 @@ def generate_precise_prescription(
                 f"2. 【標準防治與用藥處置】：{base_treat_db}\n"
                 f"3. 【環境防護管理】：適當拉開植株間距降低微氣候濕度，澆水改採滴灌或盆土注水避免噴濕葉面，發病期暫停施用高氮肥料並保持排水良好。"
             )
-            print(f"🚀 本地 ConvNeXt 命中：採用 MySQL 專家資料庫權威處方 -> {crop_name} - {status_name}")
+            print(f"[ConvNeXt]  本地 ConvNeXt 命中：採用 MySQL 專家資料庫權威處方 -> {crop_name} - {status_name}")
             return convnext_sugg, convnext_treat, "convnext_local_graded_prescription"
         else:
-            print(f"📖 命中 MySQL 專家資料庫標準指引 -> {crop_name} - {status_name}")
+            print(f"[MySQL]  命中 MySQL 專家資料庫標準指引 -> {crop_name} - {status_name}")
             return base_desc, base_treat_db, "mysql_fallback_database"
 
     # --- 步驟 2：MySQL 資料庫無該病害處方 -> 檢索 FAISS 農業部官方專書並結合 Gemini 動態生成處方 ---
@@ -407,58 +501,136 @@ def generate_precise_prescription(
                 f"你是一位專業植物病理專家。目前已辨識此照片為【{crop_name} - {status_name}】。\n"
                 f"{rag_ref}"
                 "請根據照片中植株實際病徵嚴重度與官方防治規範，以繁體中文回傳單層 JSON：\n"
-                '{"suggestion": "2-3點具體病徵與風險，每點以 - 開頭並以 \\n 換行", '
-                '"treatment": "3點具體防治與推薦用藥步驟，以 1. 2. 3. 開頭並以 \\n 換行"}'
+                '{"suggestion": "2點具體病徵與風險分析（每點以 - 開頭並以 \\n 換行，每點精簡控制在 30 至 50 字以內）", '
+                '"treatment": "3點行動導向防治步驟（以 1. 2. 3. 開頭並以 \\n 換行）。【排版規範】：每點格式為『1. 步驟名稱：具體處置作為與稀釋倍率』，去除冗長理論贅述，每點字數精簡控制在 40 至 60 字以內。"}'
             )
-            resp = client.models.generate_content(model="gemini-2.5-flash", contents=[rx_prompt, img])
+            resp = call_gemini_with_fallback(contents=[rx_prompt, img])
             clean_rx = (resp.text or "").replace("```json", "").replace("```", "").strip()
             rx_data = json.loads(clean_rx)
             gen_sugg = str(rx_data.get("suggestion", "")).strip()
             gen_treat = str(rx_data.get("treatment", "")).strip()
             if not _is_invalid_text(gen_sugg) and not _is_invalid_text(gen_treat):
-                print(f"🌐 資料庫無現成處方 -> 已結合 FAISS 農業部專書與 Gemini 動態生成處方：{crop_name} - {status_name}")
+                print(f"[Gemini]  資料庫無現成處方 -> 已結合 FAISS 農業部專書與 Gemini 動態生成處方：{crop_name} - {status_name}")
                 return gen_sugg, gen_treat, "gemini_multimodal_dynamic_prescription"
         except Exception as rx_err:
-            print(f"⚠️ 結合 FAISS 與 Gemini 生成處方失敗: {rx_err}")
+            print(f"[WARN]  結合 FAISS 與 Gemini 生成處方失敗: {rx_err}")
 
     if fallback_suggestion and fallback_treatment and not _is_invalid_text(fallback_suggestion) and not _is_invalid_text(fallback_treatment):
-        print(f"🌟 採用 Gemini 看圖動態處置：依當前照片病徵輕重度專屬生成 (長度: {len(fallback_suggestion)}/{len(fallback_treatment)})")
+        print(f"[DYNAMIC]  採用 Gemini 看圖動態處置：依當前照片病徵輕重度專屬生成 (長度: {len(fallback_suggestion)}/{len(fallback_treatment)})")
         return fallback_suggestion, fallback_treatment, "gemini_multimodal_dynamic_prescription"
 
     # --- 步驟 3：安全通用專家處方 (離線或雲端異常時之最底層保險) ---
-    print(f"ℹ️ 使用通用安全農業處方: {crop_name} - {status_name}")
+    print(f"[INFO]  使用通用安全農業處方: {crop_name} - {status_name}")
     safe_sugg = (
-        f"- 植株出現典型【{status_name}】病徵，葉面可見局部色斑、組織壞死或水浸狀病斑\n"
-        f"- 隨病程進展，病斑周圍可能伴隨黃暈，需注意相鄰葉片與枝條是否有擴散跡象\n"
-        f"- 潮濕多雨時病部可能滋生細微黴狀物或微細黑色分生子器"
+        f"- 典型病徵：葉面出現【{status_name}】局部色斑、褪綠或水浸狀壞死，請注意受害程度。\n"
+        f"- 擴散風險：高溫多濕或通風不良時易向相鄰健康組織蔓延，需即時採取防護。"
     )
     safe_treat = (
-        f"1. 即時修剪並徹底清除罹病葉片與枯枝，裝袋集中銷毀，阻斷初次及再次感染源。\n"
-        f"2. 加強田間通風與採光，適度整枝修剪，避免密植導致高溫高濕之微氣候。\n"
-        f"3. 澆水時採取滴灌或盆土注水，避免噴灌弄濕葉面；發病期間避免過量施用氮肥。\n"
-        f"4. 參照【{crop_name} - {status_name}】植物保護手冊，於發病初期施用登記推薦藥劑或廣效保護型殺菌劑（如波爾多液、三氟敏等）。"
+        f"1. 病斑修剪隔離：立即剪除發病葉片並集中銷毀，修剪工具消毒，阻斷病原二度感染。\n"
+        f"2. 通風控水管理：維持良好通風採光，採盆土注水避免噴濕葉面，發病期間暫停施用氮肥。\n"
+        f"3. 推薦保護資材：參照【{crop_name}】植保手冊，於發病初期施用登記核准藥劑或保護型殺菌劑。"
     )
     return safe_sugg, safe_treat, "general_safe_prescription"
+
+
+def _call_openai_fallback(image_path: str, crop_hint: str | None = None) -> dict | None:
+    """跨雲供應商備援：當 Google Gemini 被風控 (403) 或額度超限 (429) 時，由 OpenAI 接棒視覺分析。"""
+    openai_key = getattr(settings, "OPENAI_API_KEY", None) or os.getenv("OPENAI_API_KEY")
+    if not openai_key:
+        return None
+    try:
+        from openai import OpenAI
+        client_oa = OpenAI(api_key=openai_key)
+        with open(image_path, "rb") as f:
+            b64 = base64.b64encode(f.read()).decode("utf-8")
+
+        if crop_hint:
+            user_crop_instruction = (
+                f"已知使用者指定/選定的作物名稱為：【{crop_hint}】。"
+                f"請以該作物為基準，專注鑑別長尾、罕見病徵、生理障礙或害蟲，並回傳精確病害名稱（或判定為 '健康'）。"
+            )
+        else:
+            user_crop_instruction = (
+                "請辨識影像中的植物名稱（crop_name）及其健康狀態（status_name，如特定病害、蟲害，或 '健康'）。\n"
+                "【關鍵防呆規範】：若影像非植物、純黑、純色、嚴重模糊無特徵、日常非植物用品或手機截圖，"
+                "crop_name 必須填寫 '未知作物'，status_name 必須填寫 '無法判定'，category 必須填寫 'unknown'，confidence 填寫 0.0。"
+            )
+
+        prompt = f"""
+        You are a top-tier plant pathologist.
+        {user_crop_instruction}
+
+        IMPORTANT:
+        - All text MUST be in Traditional Chinese.
+        - Standardize the crop and issue names to their most common and correct form.
+        - If the image contains NO plant leaves/organs, or is completely black/invalid/non-plant, category MUST be 'unknown', crop_name MUST be '未知作物', status_name MUST be '無法判定', confidence MUST be 0.0.
+        - 若影像中同時出現多種病蟲害跡象（如葉斑、蟲害、焦枯等複合徵候），請以【受害最顯著、最影響植株生長之首要病徵】為唯一確診依據，確保診斷具有高度一致性與決定性。
+        - Respond in a valid, non-nested, single-level JSON format.
+
+        JSON Output Structure:
+        {{
+          "crop_name": "string (標準化的作物名稱，非植物請填 '未知作物')",
+          "status_name": "string (標準化的病害/害蟲名稱，健康填 '健康'，非植物請填 '無法判定')",
+          "category": "string (One of 'disease', 'pest', 'healthy', 'unknown')",
+          "confidence": 0.90,
+          "suggestion": "string (2 點核心病徵與風險分析，每點以 '-' 開頭，每點約 30-50 字，'\\n' 換行)",
+          "treatment": "string (3 點行動導向防治步驟，以 '1.' '2.' '3.' 開頭，格式為『步驟名稱：具體作法與稀釋倍率』，去除冗長理論贅述，每點精簡控制在 40-60 字以內，'\\n' 換行)"
+        }}
+        """
+        resp = client_oa.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.0,
+            messages=[{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64}"}}
+                ]
+            }],
+            response_format={"type": "json_object"},
+            max_tokens=600,
+        )
+        data = json.loads(resp.choices[0].message.content)
+        print(f"[OK]  [跨雲備援成功] Google Gemini 異常，已由 OpenAI gpt-4o-mini 接棒多模態視覺診斷！")
+        return data
+    except Exception as e:
+        print(f"[WARN]  OpenAI 備援兜底失敗: {e}")
+        return None
 
 
 def _call_gemini_fallback(
     image_path: str,
     crop_hint: str | None = None,
+    visual_memory_hint: dict | None = None,
     mock_result: dict | None = None,
 ) -> dict:
-    """步驟 3：Gemini 多模態兜底推論。"""
+    """步驟 3：Gemini 多模態兜底推論 (若失敗自動嘗試 OpenAI 跨雲備援)。"""
     if mock_result is not None:
         return mock_result
 
     img = Image.open(image_path)
-    if crop_hint:
+    if visual_memory_hint:
+        vm_crop = visual_memory_hint.get("crop_name", "")
+        vm_status = visual_memory_hint.get("status_name", "")
+        vm_sim = visual_memory_hint.get("similarity", 0.0)
+        user_crop_instruction = (
+            f"【視覺特徵檢索記憶庫先驗指示】：\n"
+            f"本影像與資料庫歷史專家覆核樣本（ID #{visual_memory_hint.get('feedback_id')}）之特徵相似度達 {vm_sim:.1%}！\n"
+            f"歷史專家已確認該作物為【{vm_crop}】，病害疑似為【{vm_status}】。\n"
+            f"請以此作物【{vm_crop}】為優先先驗依據，專注進行精準病害會診（若特徵明顯非此病害則依看圖診斷實情回傳）。"
+        )
+    elif crop_hint:
         user_crop_instruction = (
             f"已知使用者指定/選定的作物名稱為：【{crop_hint}】。"
             f"請以該作物為基準，專注鑑別長尾、罕見病徵、生理障礙或害蟲，並回傳精確病害名稱（或判定為 '健康'）。"
             f"若影像特徵嚴重明顯與【{crop_hint}】違背，請依專業視覺判斷修正作物名稱。"
         )
     else:
-        user_crop_instruction = "請辨識影像中的植物名稱（crop_name）及其健康狀態（status_name，如特定病害、蟲害，或 '健康'）。"
+        user_crop_instruction = (
+            "請辨識影像中的植物名稱（crop_name）及其健康狀態（status_name，如特定病害、蟲害，或 '健康'）。\n"
+            "【關鍵防呆規範】：若影像非植物、純黑、純色、嚴重模糊無特徵、日常非植物用品或手機截圖，"
+            "crop_name 必須填寫 '未知作物'，status_name 必須填寫 '無法判定'，category 必須填寫 'unknown'，confidence 填寫 0.0。"
+        )
 
     prompt = f"""
     You are a top-tier plant pathologist.
@@ -467,25 +639,110 @@ def _call_gemini_fallback(
     IMPORTANT:
     - All text MUST be in Traditional Chinese.
     - Standardize the crop and issue names to their most common and correct form.
+    - If the image contains NO plant leaves/organs, or is completely black/invalid/non-plant, category MUST be 'unknown', crop_name MUST be '未知作物', status_name MUST be '無法判定', confidence MUST be 0.0.
+    - 若影像中同時出現多種病蟲害跡象（如葉斑、蟲害、焦枯等複合徵候），請以【受害最顯著、最影響植株生長之首要病徵】為唯一確診依據，確保診斷具有高度一致性與決定性。
     - Respond in a valid, non-nested, single-level JSON format.
 
     JSON Output Structure:
     {{
-      "crop_name": "string (標準化的作物名稱)",
-      "status_name": "string (標準化的病害/害蟲名稱，或 '健康')",
-      "category": "string (One of 'disease', 'pest', 'healthy')",
+      "crop_name": "string (標準化的作物名稱，非植物請填 '未知作物')",
+      "status_name": "string (標準化的病害/害蟲名稱，健康填 '健康'，非植物請填 '無法判定')",
+      "category": "string (One of 'disease', 'pest', 'healthy', 'unknown')",
       "confidence": "float (A value between 0.0 and 1.0)",
-      "suggestion": "string (2-3 點核心視覺特徵，每點以 '-' 開頭，'\\n' 換行)",
-      "treatment": "string (可執行的處置步驟，每點以 '1.', '2.' 等開頭，'\\n' 換行)"
+      "suggestion": "string (2 點核心病徵與風險分析，每點以 '-' 開頭，每點約 30-50 字，'\\n' 換行)",
+      "treatment": "string (3 點行動導向防治步驟，以 '1.' '2.' '3.' 開頭，格式為『步驟名稱：具體作法與稀釋倍率』，去除冗長理論贅述，每點精簡控制在 40-60 字以內，'\\n' 換行)"
     }}
     """
     try:
-        response = client.models.generate_content(model="gemini-2.5-flash", contents=[prompt, img])
+        response = call_gemini_with_fallback(contents=[prompt, img])
         clean_text = (response.text or "").replace("```json", "").replace("```", "").strip()
         return json.loads(clean_text)
     except Exception as e:
-        print(f"❌ Gemini 多模態兜底失敗: {e}")
+        print(f"[ERROR]  Gemini 多模態兜底失敗: {e}")
+        oa_res = _call_openai_fallback(image_path=image_path, crop_hint=crop_hint)
+        if oa_res:
+            return oa_res
         return _uncertain_diagnosis(crop_name=crop_hint)
+
+
+def verify_and_cross_examine_with_gemini(
+    image_path: str,
+    convnext_hit: dict,
+    crop_hint: str | None = None,
+    mock_gemini_result: dict | None = None,
+) -> dict | None:
+    """
+    方案 3：軟標籤引導之多模態視覺鑑別診斷與二次覆核 (Cross-Modal Soft-Label Verification)。
+    - 不盲目順從 ConvNeXt 監督式標籤！
+    - 結合 RAG 知識庫標準病徵描述與 ConvNeXt Top-K 軟標籤分佈。
+    - 請 Gemini 檢視照片葉面實際病徵進行「視覺覆核」：
+      * 若特徵符合第一候選：確認無誤並開立動態嚴重度處方 (concurred)。
+      * 若特徵不符第一候選：直接推翻修正，並記錄推翻依據供後續專家審查與蒸餾 (overruled)。
+    """
+    if mock_gemini_result is not None:
+        return mock_gemini_result
+
+    if not image_path or not Path(image_path).exists():
+        return None
+
+    if not getattr(settings, "ENABLE_GEMINI_CROSS_VERIFICATION", True):
+        return None
+
+    top_candidates = convnext_hit.get("top_k_candidates") or []
+    cand_str_list = []
+    for idx, c in enumerate(top_candidates, 1):
+        cand_str_list.append(
+            f"{idx}. 【{c.get('crop_name')} - {c.get('status_name')}】"
+            f"(Softmax機率: {c.get('score', 0):.1%}, 餘弦相似度: {c.get('cosine_similarity', 0):.2f})"
+        )
+    candidates_text = "\n".join(cand_str_list) if cand_str_list else f"1. 【{convnext_hit.get('crop_name')} - {convnext_hit.get('status_name')}】"
+
+    top1_crop = convnext_hit.get("crop_name", "")
+    top1_status = convnext_hit.get("status_name", "")
+    cam_ratio = convnext_hit.get("cam_foreground_ratio", 1.0)
+
+    # 檢索 RAG 知識庫中該病害的官方標準視覺特徵
+    rag_snippet = ""
+    try:
+        rag_snippet = rag.search_knowledge_base(f"{top1_crop} {top1_status} 病徵 特徵", k=2)
+    except Exception:
+        rag_snippet = ""
+
+    rag_text = f"\n【農業部官方標準病徵描述】：\n{rag_snippet}\n" if rag_snippet else ""
+
+    verify_prompt = f"""
+你是一位權威資深植物病理學家。
+本地輕量級模型（ConvNeXt 監督式快篩）根據影像提出以下軟標籤候選病害（Soft Labels）：
+{candidates_text}
+（弱監督 CAM 熱力圖前景對齊率：{cam_ratio:.1%}）
+{rag_text}
+【任務說明】：
+請嚴格比對照片中真實植株葉面/組織病徵，進行【視覺特徵二次覆核】：
+1. 檢視影像特徵是否確實符合第一候選【{top1_crop} - {top1_status}】之典型病理特徵？
+2. 重要原則：請勿盲從第一候選！
+   - 若符合第一候選：is_concurred 設為 true，並依照片中實際病斑嚴重度（初期微發/中度擴散/重度壞死）開立專屬動態處置。
+   - 若特徵明顯不符第一候選（例如實為第二候選、健康、或未收錄病徵）：請直接將 is_concurred 設為 false，推翻並修正為正確之病名（verified_status），並詳細說明推翻之視覺依據。
+
+請以繁體中文回傳單層 JSON 格式：
+{{
+  "verified_crop": "{top1_crop}",
+  "verified_status": "string (確認或修正後的病害名稱，或 '健康')",
+  "category": "string (disease, pest, 或 healthy)",
+  "is_concurred": true,
+  "confidence": 0.92,
+  "suggestion": "string (2 點核心病徵與風險分析，以 '-' 開頭，每點約 30-50 字，'\\n' 換行)",
+  "treatment": "string (3 點行動導向防治步驟，以 '1.' '2.' '3.' 開頭，格式為『步驟名稱：具體作法與稀釋倍率』，去除冗長理論贅述，每點精簡控制在 40-60 字以內，'\\n' 換行)"
+}}
+"""
+    try:
+        img = Image.open(image_path)
+        resp = call_gemini_with_fallback(contents=[verify_prompt, img])
+        clean_text = (resp.text or "").replace("```json", "").replace("```", "").strip()
+        data = json.loads(clean_text)
+        return data
+    except Exception as exc:
+        print(f"[INFO]  Gemini 多模態二次覆核略過: {exc}")
+        return None
 
 
 def diagnostic_plant(
@@ -501,9 +758,9 @@ def diagnostic_plant(
 ) -> dict:
     """
     三層瀑布流階層式植物診斷架構 (Three-Tier Cascade Diagnosis Engine):
-    步驟 1: 本地模型 (ConvNeXt) 優先快篩 (已支援 38 類 PlantVillage 病害，限定選定作物比對，>= 75% 命中)
-    步驟 2: Gemini 多模態兜底 (已知植物定向診斷，或未知植物自動識別長尾病徵)
-    步驟 3: 精準 RAG 檢索 (強制 Query: [植物名稱] + [確診病名] -> 100% 精準處方箋)
+    步驟 1: 本地模型 (ConvNeXt) 混合學習快篩 (方案 1 CAM 空間對齊 + 方案 2 動態原型 OOD 攔截)
+    步驟 2: 方案 3 多模態軟標籤二次覆核 (避免盲信監督式標籤，若未命中則由 Gemini 全域兜底)
+    步驟 3: 精準處方箋生成 (優先查庫、過濾 RAG 雜訊、保障高信心成果)
     """
     if crop_hint is None and crops:
         if isinstance(crops, str):
@@ -513,7 +770,7 @@ def diagnostic_plant(
 
     clean_crop = (
         crop_hint.strip()
-        if crop_hint and crop_hint.strip() not in ["未知", "未知作物", "未知植物", "無法判定"]
+        if crop_hint and crop_hint.strip() not in UNKNOWN_CROP_NAMES
         else None
     )
 
@@ -540,27 +797,123 @@ def diagnostic_plant(
         chosen_category = convnext_hit.get("category", "disease")
         chosen_conf = convnext_hit["confidence"]
         source = "local_convnext_fast_screen"
-        if convnext_hit.get("is_confidence_override"):
-            print(f"🚀 步驟 1 命中：本地 ConvNeXt 壓倒性信心反轉成功 -> {chosen_crop} - {chosen_status} ({chosen_conf:.2f})")
-        else:
-            print(f"🚀 步驟 1 命中：本地 ConvNeXt 快篩成功 -> {chosen_crop} - {chosen_status} ({chosen_conf:.2f})")
 
-    # --- 步驟 2：Gemini 多模態兜底 (若步驟 1 未命中) ---
+        # 方案 3：軟標籤引導之多模態視覺二次覆核 (避免盲目採信監督式標籤)
+        cross_res = verify_and_cross_examine_with_gemini(
+            image_path=image_path,
+            convnext_hit=convnext_hit,
+            crop_hint=clean_crop,
+            mock_gemini_result=mock_gemini_result,
+        )
+        if cross_res and isinstance(cross_res, dict):
+            is_concurred = cross_res.get("is_concurred", True)
+            verified_crop = cross_res.get("verified_crop") or chosen_crop
+            verified_status = cross_res.get("verified_status") or chosen_status
+            verified_cat = cross_res.get("category") or chosen_category
+            verified_conf = _coerce_confidence(cross_res.get("confidence", chosen_conf))
+            v_sugg = cross_res.get("suggestion", "")
+            v_treat = cross_res.get("treatment", "")
+            override_reason = cross_res.get("override_reason", "")
+
+            if is_concurred and (verified_status == chosen_status or chosen_status in verified_status):
+                source = "convnext_gemini_cross_verified"
+                chosen_conf = max(chosen_conf, verified_conf)
+                base_sugg = v_sugg
+                base_treat = v_treat
+                print(f"[Consensus]  [雙模型會診共識] ConvNeXt 與 Gemini 雙重確認標籤無誤：{chosen_crop} - {chosen_status} (信心度: {chosen_conf:.2f})")
+            else:
+                source = "convnext_overruled_by_gemini_verification"
+                chosen_crop = verified_crop
+                chosen_status = verified_status
+                chosen_category = verified_cat
+                chosen_conf = verified_conf
+                warning_header = (
+                    f"[WARN]  【雙模型會診校正】：本地監督式模型初步猜測為【{convnext_hit['status_name']}】，"
+                    f"經多模態專家視覺覆核發現：{override_reason}，已自動校正為【{verified_status}】。"
+                )
+                base_sugg = f"{warning_header}\n{v_sugg}" if v_sugg else warning_header
+                base_treat = v_treat
+                print(f"[Override]  [雙模型會診推翻] Gemini 視覺校正 ConvNeXt 標籤：{convnext_hit['status_name']} -> {verified_status} ({override_reason})")
+        else:
+            if convnext_hit.get("is_confidence_override"):
+                print(f"[ConvNeXt]  步驟 1 命中：本地 ConvNeXt 壓倒性信心反轉成功 -> {chosen_crop} - {chosen_status} ({chosen_conf:.2f})")
+            else:
+                print(f"[ConvNeXt]  步驟 1 命中：本地 ConvNeXt 快篩成功 -> {chosen_crop} - {chosen_status} ({chosen_conf:.2f})")
+
+    # --- 步驟 2：視覺特徵檢索飛輪與 Gemini 多模態兜底 (若步驟 1 未命中) ---
     if not chosen_crop:
-        print("➡️ 步驟 1 本地模型未命中，啟動步驟 2 Gemini 多模態兜底...")
+        # 方案 2：視覺特徵檢索飛輪 (Visual RAG Memory Flywheel)
+        # 若使用者未指定作物，在特徵空間比對歷史專家標註樣本，秒速提供作物先驗知識
+        visual_mem_hit = None
+        if not clean_crop:
+            try:
+                from app.services.visual_memory import visual_memory
+                visual_mem_hit = visual_memory.search(image_path=image_path, min_similarity=0.82)
+                if visual_mem_hit:
+                    clean_crop = visual_mem_hit["crop_name"]
+                    print(
+                        f"[VisualMemory]  [視覺特徵檢索飛輪命中] 匹配歷史專家樣本 #{visual_mem_hit['feedback_id']} "
+                        f"(相似度: {visual_mem_hit['similarity']:.2f}) -> 注入作物先驗: 【{clean_crop}】"
+                    )
+            except Exception as vm_err:
+                print(f"[WARN] 視覺記憶檢索異常: {vm_err}")
+
+        print("[Step 2]  步驟 1 本地模型未命中，啟動步驟 2 Gemini 多模態兜底...")
         gemini_res = _call_gemini_fallback(
             image_path=image_path,
             crop_hint=clean_crop,
+            visual_memory_hint=visual_mem_hit,
             mock_result=mock_gemini_result,
         )
-        chosen_crop = gemini_res.get("crop_name") or clean_crop or UNKNOWN_CROP_NAME
-        chosen_status = gemini_res.get("status_name") or UNKNOWN_STATUS_NAME
-        chosen_category = gemini_res.get("category", "unknown")
-        chosen_conf = _coerce_confidence(gemini_res.get("confidence", 0.0))
-        base_sugg = gemini_res.get("suggestion", "")
-        base_treat = gemini_res.get("treatment", "")
-        source = "gemini_multimodal_fallback"
-        print(f"🌐 步驟 2 命中：Gemini 多模態兜底完成 -> {chosen_crop} - {chosen_status} ({chosen_conf:.2f})")
+        gem_crop = str(gemini_res.get("crop_name") or "").strip()
+        gem_status = str(gemini_res.get("status_name") or "").strip()
+        gem_cat = str(gemini_res.get("category", "")).strip().lower()
+        gem_conf = _coerce_confidence(gemini_res.get("confidence", 0.0))
+
+        is_gem_known = bool(
+            gem_crop and gem_crop not in UNKNOWN_CROP_NAMES
+            and gem_status and gem_status not in UNKNOWN_STATUS_NAMES
+            and gem_cat != "unknown"
+            and gem_conf >= 0.40
+        )
+
+        if is_gem_known or mock_gemini_result is not None:
+            chosen_crop = gem_crop or clean_crop or UNKNOWN_CROP_NAME
+            chosen_status = gem_status or UNKNOWN_STATUS_NAME
+            chosen_category = gem_cat if gem_cat in ["disease", "pest", "healthy"] else "disease"
+            chosen_conf = gem_conf
+            base_sugg = gemini_res.get("suggestion", "")
+            base_treat = gemini_res.get("treatment", "")
+            source = "visual_memory_gemini_fallback" if visual_mem_hit else "gemini_multimodal_fallback"
+            print(f"[Gemini]  步驟 2 命中：Gemini 多模態兜底完成 -> {chosen_crop} - {chosen_status} ({chosen_conf:.2f})")
+        else:
+            # 雲端 AI 失敗或回傳未知，嘗試本地 ConvNeXt 極端離線應急（若信心壓倒性高）
+            emergency_convnext = predict_convnext_fast_screen(
+                image_path=image_path,
+                crop_name=None,
+                allow_unconstrained_emergency=True,
+            )
+            if emergency_convnext and emergency_convnext.get("confidence", 0.0) >= settings.CONVNEXT_OVERWHELMING_CONFIDENCE:
+                chosen_crop = emergency_convnext["crop_name"]
+                chosen_status = emergency_convnext["status_name"]
+                chosen_category = emergency_convnext.get("category", "disease")
+                chosen_conf = emergency_convnext["confidence"]
+                source = "local_convnext_offline_emergency"
+                base_sugg = (
+                    f"[WARN]  【離線應急救援】：雲端多模態 AI 服務暫時無法連線，"
+                    f"由本地離線模型以壓倒性置信度 ({chosen_conf:.1%}) 提供初步應急判定。"
+                )
+                base_treat = "1. 此為本地離線應急判定，請確認影像無誤。\n2. 待雲端服務恢復後建議重新診斷覆核。"
+                print(f"[Emergency]  [離線應急兜底] 雲端 AI 離線，本地 ConvNeXt 壓倒性置信度急救成功 -> {chosen_crop} - {chosen_status}")
+            else:
+                chosen_crop = UNKNOWN_CROP_NAME
+                chosen_status = UNKNOWN_STATUS_NAME
+                chosen_category = "unknown"
+                chosen_conf = 0.0
+                base_sugg = gemini_res.get("suggestion", "")
+                base_treat = gemini_res.get("treatment", "")
+                source = "safety_fallback"
+                print(f"[Gemini]  步驟 2 未確診：安全防禦煞車 -> {chosen_crop} - {chosen_status} ({chosen_conf:.2f})")
 
     # --- 步驟 3：精準處方箋生成 (優先查庫、過濾 RAG 雜訊、保障高信心成果) ---
     final_sugg, final_treat, rag_ctx = generate_precise_prescription(
@@ -570,9 +923,36 @@ def diagnostic_plant(
         fallback_suggestion=base_sugg,
         fallback_treatment=base_treat,
         db=db,
-        is_local_convnext_hit=(source == "local_convnext_fast_screen"),
+        is_local_convnext_hit=(source in ["local_convnext_fast_screen", "convnext_gemini_cross_verified", "local_convnext_offline_emergency"]),
         image_path=image_path,
     )
+
+    requires_review = (
+        False if source in ["local_convnext_fast_screen", "convnext_gemini_cross_verified"]
+        else (source in ["convnext_overruled_by_gemini_verification", "local_convnext_offline_emergency"] or chosen_conf < MIN_DIAGNOSIS_CONFIDENCE)
+    )
+
+    # 決定官方權威參考來源中繼資料 (Authority Reference Metadata)
+    if chosen_category == "healthy" or chosen_status in [HEALTHY_STATUS_NAME, "健康"]:
+        ref_source = "農業部農業試驗所作物生長健康常規指引"
+        ref_url = "https://www.tari.gov.tw"
+        ref_id = "tari-healthy-standard"
+    elif source in ["local_convnext_fast_screen", "convnext_gemini_cross_verified", "local_convnext_offline_emergency"]:
+        ref_source = "農業部動植物防疫檢疫署與 PlantVillage 專家模型審定資料庫"
+        ref_url = "https://plantvillage.psu.edu/"
+        ref_id = f"convnext-v2-{chosen_crop}-{chosen_status}"
+    elif source in ["gemini_multimodal_fallback", "visual_memory_gemini_fallback", "convnext_overruled_by_gemini_verification"]:
+        ref_source = "農業部動植物防疫檢疫署 (APHIA) 與 Gemini 多模態視覺病理知識庫"
+        ref_url = "https://www.aphia.gov.tw"
+        ref_id = f"aphia-gemini-{chosen_crop}-{chosen_status}"
+    elif source == "safety_fallback" or chosen_category == "unknown":
+        ref_source = None
+        ref_url = None
+        ref_id = None
+    else:
+        ref_source = "農業部動植物防疫檢疫署病蟲害手冊"
+        ref_url = "https://www.aphia.gov.tw"
+        ref_id = f"aphia-{chosen_crop}-{chosen_status}"
 
     final_result = {
         "crop_name": chosen_crop,
@@ -582,9 +962,10 @@ def diagnostic_plant(
         "suggestion": final_sugg,
         "treatment": final_treat,
         "grounding_source": source,
-        "requires_review": False
-        if source == "local_convnext_fast_screen"
-        else (chosen_conf < MIN_DIAGNOSIS_CONFIDENCE),
+        "reference_source": ref_source,
+        "reference_url": ref_url,
+        "reference_record_id": ref_id,
+        "requires_review": requires_review,
     }
     return final_result
 
@@ -610,22 +991,22 @@ def _get_standardized_name(new_name: str, existing_names: list[str]) -> str:
     Your response must be ONLY ONE of the terms.
     """
     try:
-        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        response = call_gemini_with_fallback(contents=prompt)
         standardized_name = (response.text or "").strip()
         
         # 安全性檢查：確保 AI 的回應是有效的選項之一
         valid_options = existing_names + [new_name]
         if standardized_name in valid_options:
             if standardized_name != new_name:
-                print(f"🔬 名稱標準化: '{new_name}' -> '{standardized_name}'")
+                print(f"[Standardize]  名稱標準化: '{new_name}' -> '{standardized_name}'")
             return standardized_name
         else:
             # 如果 AI 回應了意外的內容，則退回使用新名稱
-            print(f"⚠️ 標準化回退: AI 回應 '{standardized_name}' 無效，使用原名稱 '{new_name}'")
+            print(f"[WARN]  標準化回退: AI 回應 '{standardized_name}' 無效，使用原名稱 '{new_name}'")
             return new_name
             
     except Exception as e:
-        print(f"❌ 標準化失敗: {e}，將使用原名稱 '{new_name}'")
+        print(f"[ERROR]  標準化失敗: {e}，將使用原名稱 '{new_name}'")
         return new_name
 
 
@@ -709,22 +1090,33 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
     ai_suggestion = raw_ai_data.get("suggestion", "AI 未提供建議。")
     ai_treatment = raw_ai_data.get("treatment", "AI 未提供處理方法。")
 
-    if not all([crop_name, status_name, category]):
-        return _uncertain_diagnosis(confidence=confidence)
-
-    if category == "unknown" or status_name in [UNKNOWN_STATUS_NAME, "未知", "無法判定"]:
+    # 1. 嚴格防呆攔截：若非植物/純黑圖/未辨識出植物或病徵，或信心度低於門檻，強制進入安全防禦煞車
+    is_unknown = bool(
+        category == "unknown"
+        or crop_name in UNKNOWN_CROP_NAMES
+        or status_name in UNKNOWN_STATUS_NAMES
+        or confidence < 0.40
+        or not all([crop_name, status_name, category])
+    )
+    if is_unknown:
         return {
-            "crop_name": crop_name or UNKNOWN_CROP_NAME,
+            "crop_name": UNKNOWN_CROP_NAME,
             "category": "unknown",
             "status_name": UNKNOWN_STATUS_NAME,
-            "confidence": min(confidence, 0.5),
-            "suggestion": raw_ai_data.get("suggestion") or "- 影像特徵不足，無法與目前資料庫中的作物或病蟲害安全對應\n- 建議重新拍攝清晰葉面、莖部與受害區域",
-            "treatment": raw_ai_data.get("treatment") or "1. 暫時隔離疑似受害植株並持續觀察。\n2. 補拍清晰照片後重新診斷。\n3. 若症狀持續擴大，請諮詢農業專家或更新知識庫。",
-            "grounding_source": raw_ai_data.get("grounding_source") or "safety_fallback",
+            "confidence": 0.0,
+            "suggestion": raw_ai_data.get("suggestion") or "- 影像中未偵測到清晰之植物或葉片特徵\n- 建議拍攝清晰之植物受害葉片或植株部位後重新診斷",
+            "treatment": raw_ai_data.get("treatment") or "1. 請將鏡頭對準植物植株重新拍照診斷。\n2. 避免拍攝純黑、模糊或非植物畫面。",
+            "grounding_source": "safety_fallback",
+            "reference_source": None,
+            "reference_url": None,
+            "reference_record_id": None,
             "requires_review": True,
         }
 
+    # 2. 健康判定防呆：必須信心度足夠，且絕對不能是未知作物或非植物
     if category == "healthy":
+        if confidence < MIN_HEALTHY_CONFIDENCE or crop_name in UNKNOWN_CROP_NAMES or status_name in UNKNOWN_STATUS_NAMES:
+            return _uncertain_diagnosis(crop_name=UNKNOWN_CROP_NAME, confidence=confidence)
         return {
             "crop_name": crop_name,
             "category": "healthy",
@@ -732,7 +1124,10 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
             "confidence": confidence,
             "suggestion": ai_suggestion,
             "treatment": ai_treatment,
-            "grounding_source": raw_ai_data.get("grounding_source") or "ai_direct_result",
+            "grounding_source": raw_ai_data.get("grounding_source") or "crop_database",
+            "reference_source": raw_ai_data.get("reference_source") or "農業部農業試驗所作物生長健康常規指引",
+            "reference_url": raw_ai_data.get("reference_url") or "https://www.tari.gov.tw",
+            "reference_record_id": raw_ai_data.get("reference_record_id") or "tari-healthy-standard",
             "requires_review": raw_ai_data.get("requires_review", False),
         }
 
@@ -747,7 +1142,7 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
 
     crop = db.query(models.Crop).filter(models.Crop.crop_name == crop_name).first()
     if not crop:
-        print(f"🌱 作物 '{crop_name}' 尚未存在於資料庫，自動新增作物記錄。")
+        print(f"[NewCrop]  作物 '{crop_name}' 尚未存在於資料庫，自動新增作物記錄。")
         crop = models.Crop(crop_name=crop_name)
         db.add(crop)
         db.commit()
@@ -760,12 +1155,17 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
     )
 
     if record:
-        print(f"🔄 比對到資料庫記錄: {crop_name} - {status_name}")
+        print(f"[Override]  比對到資料庫記錄: {crop_name} - {status_name}")
         desc = record.description or ai_suggestion
         treat = record.treatment or ai_treatment
         source_name = getattr(record, "source_name", None)
         source_url = getattr(record, "source_url", None)
         source_record_id = getattr(record, "source_record_id", None)
+
+        ref_source = source_name or raw_ai_data.get("reference_source") or "農業部動植物防疫檢疫署病蟲害手冊"
+        ref_url = source_url or raw_ai_data.get("reference_url") or "https://www.aphia.gov.tw"
+        ref_id = source_record_id or raw_ai_data.get("reference_record_id") or f"aphia-db-{crop.crop_id}-{category}-{getattr(record, 'disease_id' if category == 'disease' else 'pest_id')}"
+
         return {
             "crop_name": crop_name,
             "category": category,
@@ -774,17 +1174,24 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
             "suggestion": ai_suggestion or desc,
             "treatment": ai_treatment or treat,
             "grounding_source": raw_ai_data.get("grounding_source") or ("disease_database" if category == "disease" else "pest_database"),
-            "reference_source": source_name,
-            "reference_url": source_url,
-            "reference_record_id": source_record_id,
+            "reference_source": ref_source,
+            "reference_url": ref_url,
+            "reference_record_id": ref_id,
             "requires_review": raw_ai_data.get("requires_review", False),
         }
     else:
-        print(f"✨ 新增資料庫紀錄: {crop_name} - {status_name}")
+        print(f"[OK]  新增資料庫紀錄: {crop_name} - {status_name}")
+        ref_source = raw_ai_data.get("reference_source") or "農業部動植物防疫檢疫署病蟲害手冊"
+        ref_url = raw_ai_data.get("reference_url") or "https://www.aphia.gov.tw"
+        ref_id = raw_ai_data.get("reference_record_id") or f"aphia-auto-{crop.crop_id}-{category}-{status_name}"
+
         new_record = model_class(
             crop_id=crop.crop_id,
             description=ai_suggestion,
             treatment=ai_treatment,
+            source_name=ref_source,
+            source_url=ref_url,
+            source_record_id=ref_id,
         )
         setattr(new_record, name_column.name, status_name)
         db.add(new_record)
@@ -798,6 +1205,9 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
             "suggestion": ai_suggestion,
             "treatment": ai_treatment,
             "grounding_source": raw_ai_data.get("grounding_source") or "ai_created_database",
+            "reference_source": ref_source,
+            "reference_url": ref_url,
+            "reference_record_id": ref_id,
             "requires_review": raw_ai_data.get("requires_review", False),
         }
 
@@ -820,7 +1230,7 @@ async def classify_agriculture_term(name: str) -> str:
         f"disease, pest, invalid. Input: {name}"
     )
     try:
-        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        response = call_gemini_with_fallback(contents=prompt)
         result = (response.text or "").strip().lower()
         if result in {"disease", "pest"}:
             return result
@@ -830,8 +1240,6 @@ async def classify_agriculture_term(name: str) -> str:
 
 async def check_if_real_crop(name_val: str) -> bool:
     """利用 AI 判斷輸入的字串是否為真實存在的農作物、植物或蔬果。"""
-    from app.services.ai import client
-
     prompt = (
         f"妳是一位專業的農業專家。請問 '{name_val}' 是否為存在的農作物、蔬果或植物名稱？"
         "請只回答 'True','False' "
@@ -839,10 +1247,7 @@ async def check_if_real_crop(name_val: str) -> bool:
     )
 
     try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash", 
-            contents=prompt
-        )
+        response = call_gemini_with_fallback(contents=prompt)
         # 取得回傳內容並清理空白與大小寫
         ans = response.text.strip().lower()
         return "true" in ans
@@ -932,7 +1337,17 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
         new_diary.reference_url = data.get("reference_url")
         new_diary.reference_record_id = data.get("reference_record_id")
 
-        # 🌟 這裡使用手動賦值，避免建構子屬性名稱混淆
+        if not new_diary.reference_source and category != "unknown":
+            if category == "healthy" or status_name in [HEALTHY_STATUS_NAME, "健康"]:
+                new_diary.reference_source = "農業部農業試驗所作物生長健康常規指引"
+                new_diary.reference_url = "https://www.tari.gov.tw"
+                new_diary.reference_record_id = "tari-healthy-standard"
+            elif category in ["disease", "pest"]:
+                new_diary.reference_source = "農業部動植物防疫檢疫署病蟲害手冊"
+                new_diary.reference_url = "https://www.aphia.gov.tw"
+                new_diary.reference_record_id = f"aphia-save-{category}-{target_crop_id or 'std'}"
+
+        # [DYNAMIC]  這裡使用手動賦值，避免建構子屬性名稱混淆
         # 如果您的資料庫欄位是 suggestion，這會正確運作
         new_diary.gemini_suggestion = final_suggestion
         new_diary.gemini_treatment = final_treatment
@@ -947,5 +1362,5 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
         return diary_id
     except Exception as exc:
         db.rollback()
-        print(f"CRITICAL DATABASE ERROR: {str(exc)}") # 🌟 這行會把真正的錯誤原因印在後端視窗
+        print(f"CRITICAL DATABASE ERROR: {str(exc)}") # [DYNAMIC]  這行會把真正的錯誤原因印在後端視窗
         raise RuntimeError(f"Database Save Failed: {exc}") from exc

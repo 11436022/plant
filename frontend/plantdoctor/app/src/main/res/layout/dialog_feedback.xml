@@ -1,29 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dialog_card_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:layout_gravity="center"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="#FFFFFF">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="請問是哪個部分辨識有誤？"
-        android:textSize="16sp"
-        android:layout_marginBottom="16dp"/>
-
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/cb_plant_error"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="植物種類錯誤"
-        android:textSize="18sp"/>
+        android:padding="20dp">
 
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/cb_disease_error"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="疾病判斷錯誤"
-        android:textSize="18sp"/>
+        <ImageButton
+            android:id="@+id/dialog_btn_close"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="關閉"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/dialog_title"
+            app:layout_constraintVertical_chainStyle="packed" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="結果有誤？"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#1B5E20"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dialog_btn_close" />
+
+        <TextView
+            android:id="@+id/dialog_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="請告訴我們是哪個部分出錯了，\n這能幫助我們未來提供更準確的分析！"
+            android:textColor="#555555"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dialog_title" />
+
+        <LinearLayout
+            android:id="@+id/layout_checkboxes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/dialog_message">
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/cb_plant_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🌱 植物種類錯誤"
+                android:textColor="#333333"
+                android:textSize="16sp" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/cb_disease_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔬 疾病判斷錯誤"
+                android:textColor="#333333"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/dialog_btn_submit"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#4CAF50"
+            android:text="送出回饋"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            app:layout_constraintTop_toBottomOf="@id/layout_checkboxes" />
+
+        <Button
+            android:id="@+id/dialog_btn_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#757575"
+            android:text="取消"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            app:cornerRadius="12dp"
+            app:layout_constraintTop_toBottomOf="@id/dialog_btn_submit" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

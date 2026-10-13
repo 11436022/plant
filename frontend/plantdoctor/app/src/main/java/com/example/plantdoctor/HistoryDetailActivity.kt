@@ -389,7 +389,11 @@ class HistoryDetailActivity : AppCompatActivity() {
 
                     tvPlantName.text = "植物：${data.crop_name ?: "無法辨識"}"
 
-                    tvDiseaseName.text = "診斷：${data.status_name ?: "未知"}"
+                    if (!data.user_corrected_status.isNullOrBlank()) {
+                        tvDiseaseName.text = "原診斷：${data.status_name ?: "未知"}\n專家覆核定案：${data.user_corrected_status}"
+                    } else {
+                        tvDiseaseName.text = "診斷：${data.status_name ?: "未知"}"
+                    }
                     tvDiseaseName.setTextColor(tvPlantName.currentTextColor)
 
                     val fullAdvice = StringBuilder().apply {
@@ -511,6 +515,8 @@ class HistoryDetailActivity : AppCompatActivity() {
         val alertDialog = builder.create()
         alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         alertDialog.show()
+        val dialogWidth = (resources.displayMetrics.widthPixels * 0.90).toInt()
+        alertDialog.window?.setLayout(dialogWidth, android.view.ViewGroup.LayoutParams.WRAP_CONTENT)
 
         // 2. 綁定自訂對話框的畫面元件
         val cardRoot = dialogView.findViewById<CardView>(R.id.dialog_card_root)

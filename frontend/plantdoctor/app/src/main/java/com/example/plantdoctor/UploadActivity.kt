@@ -2,8 +2,12 @@ package com.example.plantdoctor
 
 import android.Manifest
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
+import android.view.ViewGroup
+import android.view.Window
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -17,10 +21,12 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -61,7 +67,7 @@ class UploadActivity : AppCompatActivity() {
         "甘藍", "青花菜", "洋蔥", "蘋果", "梨", "桃"
     )
     private val cropList: MutableList<String> = defaultCommonCrops.toMutableList()
-    private var cropDialog: androidx.appcompat.app.AlertDialog? = null
+    private var cropDialog: Dialog? = null
     private var cropAdapter: android.widget.ArrayAdapter<String>? = null
     private var cropDisplayList: ArrayList<String>? = null
     private lateinit var layoutCropSelector: LinearLayout
@@ -183,7 +189,7 @@ class UploadActivity : AppCompatActivity() {
                     return@setOnClickListener
                 }
 
-                cropDialog?.dismiss()
+                findViewById<View>(R.id.layout_crop_overlay)?.visibility = View.GONE
                 val intent = Intent(this, DiagnoseProgressActivity::class.java)
                 intent.putExtra("IMAGE_URI", selectedImageUri.toString())
                 intent.putExtra("CROP_NAME", selectedCropName)
@@ -194,6 +200,28 @@ class UploadActivity : AppCompatActivity() {
                 Toast.makeText(this, "請先選擇一張照片", Toast.LENGTH_SHORT).show()
             }
         }
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val overlay = findViewById<FrameLayout>(R.id.layout_crop_overlay)
+                if (overlay != null && overlay.visibility == View.VISIBLE) {
+                    overlay.visibility = View.GONE
+                    return
+                }
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+            }
+        })
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        val overlay = findViewById<FrameLayout>(R.id.layout_crop_overlay)
+        if (overlay != null && overlay.visibility == View.VISIBLE) {
+            overlay.visibility = View.GONE
+            return
+        }
+        super.onBackPressed()
     }
 
     override fun onResume() {
@@ -298,14 +326,9 @@ class UploadActivity : AppCompatActivity() {
     }
 
     private fun showCropSelectionDialog() {
-        cropDialog?.dismiss()
-        val dialogView = layoutInflater.inflate(R.layout.dialog_select_crop, null)
-        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
-            .setView(dialogView)
-            .create()
-        cropDialog = dialog
-
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        val overlay = findViewById<FrameLayout>(R.id.layout_crop_overlay) ?: return
+        val dialogView = findViewById<View>(R.id.included_crop_dialog) ?: return
+        overlay.visibility = View.VISIBLE
 
         val tvDialogTitle = dialogView.findViewById<TextView>(R.id.tv_dialog_title)
         val btnClose = dialogView.findViewById<ImageButton>(R.id.btn_dialog_close)
@@ -315,6 +338,8 @@ class UploadActivity : AppCompatActivity() {
 
         val themeColor = getThemeMainColor()
         tvDialogTitle.setTextColor(themeColor)
+
+        etSearch.setText("")
 
         val displayList = ArrayList(cropList)
         cropDisplayList = displayList
@@ -346,7 +371,7 @@ class UploadActivity : AppCompatActivity() {
                     selectedCropName = item
                     tvSelectedCrop.text = item
                     SoundManager.playBubblePop()
-                    dialog.dismiss()
+                    overlay.visibility = View.GONE
                 }
 
                 return view
@@ -360,7 +385,7 @@ class UploadActivity : AppCompatActivity() {
             selectedCropName = chosen
             tvSelectedCrop.text = chosen
             SoundManager.playBubblePop()
-            dialog.dismiss()
+            overlay.visibility = View.GONE
         }
 
         etSearch.addTextChangedListener(object : TextWatcher {
@@ -390,18 +415,17 @@ class UploadActivity : AppCompatActivity() {
 
         btnClose.setOnClickListener {
             SoundManager.playBubblePop()
-            dialog.dismiss()
+            overlay.visibility = View.GONE
         }
 
-        dialog.setOnDismissListener {
-            if (cropDialog === dialog) {
-                cropDialog = null
-                cropAdapter = null
-                cropDisplayList = null
-            }
+        overlay.setOnClickListener {
+            SoundManager.playBubblePop()
+            overlay.visibility = View.GONE
         }
 
-        dialog.show()
+        dialogView.setOnClickListener {
+            // consume clicks to prevent dismissing overlay when clicking the card itself
+        }
     }
 
     /**

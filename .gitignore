@@ -31,3 +31,14 @@ scratch/
 test_ext_*/
 documents/test*.docx
 documents/*.bak*
+*.bak
+
+# 本地暫存與產出物
+artifacts/
+dataset/
+static/feedback_uploads/
+Plant_Doctor*.pdf
+documents/Plant_Doctor*.pdf
+documents/*git最新版*.docx
+documents/*組員最新版*.docx
+documents/*本地修改留存*.docx

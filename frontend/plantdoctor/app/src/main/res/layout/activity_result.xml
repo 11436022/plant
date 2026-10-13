@@ -17,9 +17,10 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="52dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="返回主頁"
+            android:elevation="10dp"
             android:padding="8dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_back"
@@ -31,7 +32,8 @@
             android:id="@+id/tv_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="64dp"
             android:layout_marginTop="52dp"
             android:gravity="center"
             android:text="診斷報告"
@@ -41,8 +43,7 @@
             app:autoSizeMinTextSize="24sp"
             app:autoSizeTextType="uniform"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.25"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btn_back_home"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.cardview.widget.CardView
@@ -257,5 +258,45 @@
             android:scaleType="centerCrop"
             android:src="@android:drawable/ic_menu_gallery" />
     </androidx.cardview.widget.CardView>
+
+    <!-- 原生內嵌回饋浮層 (零 Window 死鎖) -->
+    <FrameLayout
+        android:id="@+id/layout_feedback_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        android:elevation="100dp">
+
+        <include
+            android:id="@+id/included_feedback_dialog"
+            layout="@layout/dialog_feedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="24dp" />
+    </FrameLayout>
+
+    <!-- 原生內嵌儲存確認浮層 (零 Window 死鎖) -->
+    <FrameLayout
+        android:id="@+id/layout_save_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        android:elevation="100dp">
+
+        <include
+            android:id="@+id/included_save_dialog"
+            layout="@layout/dialog_save_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="24dp" />
+    </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

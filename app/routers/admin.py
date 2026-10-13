@@ -74,12 +74,16 @@ async def admin_logout():
 ITEMS_PER_PAGE = 20  # 每頁顯示的紀錄數量
 
 @router.get("/", response_class=HTMLResponse)
-async def admin_dashboard(request: Request, search: str = None, page: int = Query(1, ge=1)):
-    """【查詢】功能：支援模糊搜尋、分頁，並顯示所有紀錄與統計數據"""
+async def admin_dashboard(
+    request: Request,
+    search: str = None,
+    filter_status: str = Query("all"),
+    page: int = Query(1, ge=1),
+):
+    """【查詢】功能：支援模糊搜尋、狀態篩選、分頁，並顯示所有紀錄與統計數據"""
     conn = get_db_connection()
     try:
         with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-            
             # 1. 數據總覽儀表板
             cursor.execute("SELECT COUNT(*) as count FROM user")
             total_users = cursor.fetchone()['count']
@@ -93,14 +97,28 @@ async def admin_dashboard(request: Request, search: str = None, page: int = Quer
             cursor.execute("SELECT COUNT(*) as count FROM plant_diary WHERE DATE(created_at) = CURDATE()")
             today_diaries = cursor.fetchone()['count']
 
-            # 2. 關聯使用者 & 3. AI vs. 使用者修正 & 5. 分頁
+            # 待審查案件數 (requires_review = 1 且尚未校正)
+            cursor.execute("SELECT COUNT(*) as count FROM plant_diary WHERE requires_review = 1 AND (user_corrected_status IS NULL OR user_corrected_status = '')")
+            review_count = cursor.fetchone()['count']
+
+            # 已專家校正案件數
+            cursor.execute("SELECT COUNT(*) as count FROM plant_diary WHERE user_corrected_status IS NOT NULL AND user_corrected_status != ''")
+            corrected_count = cursor.fetchone()['count']
+
+            # 2. 篩選條件
             base_sql = "FROM plant_diary d LEFT JOIN user u ON d.user_id = u.user_id"
-            where_clause = ""
+            where_conditions = []
             params = []
             if search:
-                # 讓搜尋功能也支援搜尋使用者名稱
-                where_clause = "WHERE d.status_name LIKE %s OR u.username LIKE %s"
+                where_conditions.append("(d.status_name LIKE %s OR u.username LIKE %s)")
                 params.extend([f"%{search}%", f"%{search}%"])
+
+            if filter_status == "review":
+                where_conditions.append("(d.requires_review = 1 AND (d.user_corrected_status IS NULL OR d.user_corrected_status = ''))")
+            elif filter_status == "corrected":
+                where_conditions.append("(d.user_corrected_status IS NOT NULL AND d.user_corrected_status != '')")
+
+            where_clause = ("WHERE " + " AND ".join(where_conditions)) if where_conditions else ""
 
             # 取得篩選後的總筆數，用於計算分頁
             count_sql = f"SELECT COUNT(d.id) as count {base_sql} {where_clause}"
@@ -113,6 +131,7 @@ async def admin_dashboard(request: Request, search: str = None, page: int = Quer
             main_sql = f"""
                 SELECT 
                     d.id, d.status_name, d.user_corrected_status, d.image_url, d.created_at,
+                    d.requires_review, d.confidence, d.grounding_source,
                     u.username
                 {base_sql} {where_clause}
                 ORDER BY d.created_at DESC
@@ -134,6 +153,9 @@ async def admin_dashboard(request: Request, search: str = None, page: int = Quer
                 "title": "植物神醫 - 管理者後台",
                 "diaries": rows,
                 "search_query": search or "",
+                "filter_status": filter_status or "all",
+                "review_count": review_count,
+                "corrected_count": corrected_count,
                 # 傳遞新的統計數據到模板
                 "summary": {
                     "total_users": total_users,
@@ -146,7 +168,7 @@ async def admin_dashboard(request: Request, search: str = None, page: int = Quer
                     "current_page": page,
                     "total_pages": total_pages,
                     "total_items": total_items,
-                    "base_url": str(request.url_for("admin_dashboard")), # 讓模板可以產生分頁連結
+                    "base_url": str(request.url_for("admin_dashboard")),
                 }
             })
             
@@ -190,29 +212,84 @@ async def admin_feedback_annotate(
     plant_name: str = Form(None),
     disease_name: str = Form(None)
 ):
-    """【更新】功能：儲存管理者對使用者回饋的標註"""
+    """【更新】功能：儲存管理者對使用者回饋的標註，並即時刻錄至視覺特徵記憶庫"""
     conn = get_db_connection()
+    raw_img_url = None
+    clean_plant = plant_name.strip() if plant_name else None
+    clean_disease = disease_name.strip() if disease_name else None
     try:
         with conn.cursor() as cursor:
+            cursor.execute("SELECT image_url FROM diagnosis_feedback WHERE id = %s", (feedback_id,))
+            img_row = cursor.fetchone()
+            if img_row:
+                raw_img_url = img_row.get("image_url")
+
             sql = """
                 UPDATE diagnosis_feedback
                 SET manager_corrected_plant_name = %s,
                     manager_corrected_disease_name = %s
                 WHERE id = %s
             """
-            # 如果表單欄位是空的，會收到空字串，將其轉為 None 存入資料庫
-            cursor.execute(sql, (plant_name or None, disease_name or None, feedback_id))
+            cursor.execute(sql, (clean_plant, clean_disease, feedback_id))
         conn.commit()
     finally:
         conn.close()
 
-    # 操作完成後，重定向回使用者回饋列表頁面，以查看更新結果
-    # 使用 303 See Other 狀態碼是 POST-Redirect-GET 模式的標準做法
+    # 即時同步至視覺特徵檢索記憶庫 (Zero-latency visual RAG flywheel)
+    if raw_img_url and clean_plant:
+        try:
+            from app.services.visual_memory import visual_memory
+            visual_memory.add_or_update(
+                feedback_id=feedback_id,
+                image_url=raw_img_url,
+                plant_name=clean_plant,
+                disease_name=clean_disease
+            )
+        except Exception as e:
+            print(f"[WARN] 即時刻錄視覺特徵記憶庫失敗: {e}")
+
     return RedirectResponse(url=request.url_for("admin_feedback_list"), status_code=303)
+
+
+@router.post("/feedback/rebuild-memory", response_class=RedirectResponse)
+async def admin_rebuild_visual_memory(request: Request):
+    """【視覺記憶】手動觸發重新構建特徵檢索索引"""
+    try:
+        from app.services.visual_memory import visual_memory
+        count = visual_memory.rebuild_index()
+        print(f"[OK] 管理者已手動觸發視覺特徵記憶索引重構，共索引 {count} 筆樣本。")
+    except Exception as e:
+        print(f"[WARN] 重建視覺記憶索引失敗: {e}")
+    return RedirectResponse(url=request.url_for("admin_feedback_list"), status_code=303)
+
+
+@router.post("/feedback/export-dataset", response_class=RedirectResponse)
+async def admin_export_feedback_dataset(request: Request):
+    """【資料集匯出】將已標註之回饋資料組織匯出為標準訓練集"""
+    try:
+        from scripts.export_feedback_dataset import export_feedback_dataset
+        manifest = export_feedback_dataset()
+        print(f"[OK] 成功匯出回饋訓練資料集: {manifest.get('total_images')} 張影像")
+    except Exception as e:
+        print(f"[WARN] 匯出回饋資料集失敗: {e}")
+    return RedirectResponse(url=request.url_for("admin_feedback_list"), status_code=303)
+
+
+@router.post("/feedback/retrain", response_class=RedirectResponse)
+async def admin_retrain_convnext(request: Request):
+    """【模型微調】啟動 ConvNeXt 持續微調管線"""
+    try:
+        from scripts.retrain_from_feedback import run_feedback_retraining
+        res = run_feedback_retraining(epochs=3, batch_size=4)
+        print(f"[OK] ConvNeXt 微調完成: {res.get('message')}")
+    except Exception as e:
+        print(f"[WARN] 執行微調失敗: {e}")
+    return RedirectResponse(url=request.url_for("admin_feedback_list"), status_code=303)
+
 
 @router.get("/feedback/", response_class=HTMLResponse)
 async def admin_feedback_list(request: Request, page: int = Query(1, ge=1)):
-    """【查詢】功能：顯示、搜尋和分頁所有使用者回饋"""
+    """【查詢】功能：顯示、搜尋和分頁所有使用者回饋，並整合視覺記憶與重訓工具"""
     conn = get_db_connection()
     try:
         with conn.cursor(pymysql.cursors.DictCursor) as cursor:
@@ -230,8 +307,8 @@ async def admin_feedback_list(request: Request, page: int = Query(1, ge=1)):
                     f.corrected_plant_name, 
                     f.corrected_disease_name, 
                     f.created_at,
-                    f.corrected_plant_name AS manager_corrected_plant_name, 
-                    f.corrected_disease_name AS manager_corrected_disease_name,
+                    COALESCE(f.manager_corrected_plant_name, f.corrected_plant_name) AS manager_corrected_plant_name, 
+                    COALESCE(f.manager_corrected_disease_name, f.corrected_disease_name) AS manager_corrected_disease_name,
                     u.username
                 FROM diagnosis_feedback f
                 LEFT JOIN user u ON f.user_id = u.user_id
@@ -246,12 +323,25 @@ async def admin_feedback_list(request: Request, page: int = Query(1, ge=1)):
                 if feedback.get("image_url"):
                     feedback["image_url"] = build_public_image_url(feedback["image_url"], relative=True)
 
+            # 載入視覺特徵記憶庫資訊
+            try:
+                from app.services.visual_memory import visual_memory
+                vm_stats = visual_memory.get_stats()
+                indexed_ids = {r["feedback_id"] for r in visual_memory.records}
+            except Exception:
+                vm_stats = {"total_records": 0, "unique_crops": [], "crop_count": 0}
+                indexed_ids = set()
+
+            for fb in feedbacks:
+                fb["is_in_visual_memory"] = fb["id"] in indexed_ids
+
             templates_engine = request.app.state.templates
             template = templates_engine.get_template("feedback.html")
             content = template.render({
                 "request": request,
-                "title": "使用者回饋 - 管理者後台",
+                "title": "使用者回饋與持續學習 - 管理者後台",
                 "feedbacks": feedbacks,
+                "visual_memory_stats": vm_stats,
                 "pagination": {
                     "current_page": page,
                     "total_pages": total_pages,
@@ -279,13 +369,25 @@ async def admin_add_diary(status_name: str = Form(...)):
 
 @router.post("/update/{diary_id}")
 async def admin_update_diary(diary_id: int, status_name: str = Form(...)):
-    """【修改】功能：更新特定紀錄的診斷結果"""
+    """【修改】功能：更新特定紀錄的診斷結果 (保留原始診斷，寫入專家校正與處方橫幅)"""
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
-            # A manual correction must not relabel the original AI advice.
-            sql = "UPDATE plant_diary SET user_corrected_status = %s WHERE id = %s"
-            cursor.execute(sql, (status_name, diary_id))
+            # 讀取原本的紀錄以取得原始 AI 診斷與處方
+            cursor.execute("SELECT status_name, suggestion FROM plant_diary WHERE id = %s", (diary_id,))
+            orig = cursor.fetchone()
+            orig_status = orig.get("status_name") if orig else ""
+            orig_sugg = orig.get("suggestion") or ""
+
+            # 建立專家覆核橫幅
+            banner = f"🌟 【專家覆核校正】：原診斷為【{orig_status or '未知'}】，經專家複審校正為【{status_name}】。"
+            # 清理舊橫幅避免重複疊加
+            clean_sugg_lines = [l for l in orig_sugg.split("\n") if "【專家覆核校正】" not in l]
+            new_sugg = f"{banner}\n" + "\n".join(clean_sugg_lines).strip()
+
+            # 保留原始 status_name 不抹除，寫入 user_corrected_status 並解除待審核 (requires_review = 0)
+            sql = "UPDATE plant_diary SET user_corrected_status = %s, suggestion = %s, requires_review = 0 WHERE id = %s"
+            cursor.execute(sql, (status_name, new_sugg.strip(), diary_id))
         conn.commit()
         return RedirectResponse(url="/admin/", status_code=303)
     finally:

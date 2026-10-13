@@ -53,6 +53,7 @@ def runtime(tmp_path, monkeypatch, password_hash):
     monkeypatch.setattr(webcam_service, "send_email", lambda **kwargs: None)
     monkeypatch.setattr(auth, "issue_email_verification", lambda *a, **kw: None)
     prediction.prediction_cache.clear()
+    prediction.image_diagnosis_cache.clear()
     app = FastAPI()
     app.include_router(admin.router)
     app.include_router(auth.router, prefix="/api/v1/auth")
@@ -106,13 +107,13 @@ def test_invalid_image_returns_client_error(runtime, path):
 
 
 def test_review_flag_survives_confirmation(runtime, monkeypatch):
-    monkeypatch.setattr(prediction, "diagnostic_plant", lambda *a: {"crop_name": "Tomato", "category": "unknown", "status_name": "Unknown", "confidence": 0.4})
+    monkeypatch.setattr(prediction, "diagnostic_plant", lambda *a: {"crop_name": "Tomato", "category": "disease", "status_name": "Test disease", "confidence": 0.55, "requires_review": True})
     c = runtime["client"]
     result = c.post("/api/v1/predict/", headers=runtime["headers"][1], files={"file": ("leaf.jpg", frame(), "image/jpeg")}).json()
     assert result["analysis_result"]["requires_review"]
     saved = c.post("/api/v1/diaries/confirm/" + result["prediction_id"], headers=runtime["headers"][1],
                    json={"disease_name": "forged", "gemini_advice": "forged"}).json()["data"]
-    assert saved["requires_review"] and saved["category"] == "unknown"
+    assert saved["requires_review"] and saved["category"] == "disease"
     assert runtime["db"].get(models.PlantDiary, saved["id"]).requires_review
 
 

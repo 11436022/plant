@@ -13,8 +13,8 @@
       .ret-line { stroke: #2563eb; stroke-width: 1.4; stroke-dasharray: 4,4; fill: none; marker-end: url(#blue-arrow); }
       .msg-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #1e293b; }
       .ret-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; fill: #1d4ed8; }
-      .msg-shield { fill: #ffffff; fill-opacity: 0.92; }
-      .alt-box { fill: #f8fafc; fill-opacity: 0.4; stroke: #64748b; stroke-width: 1.2; stroke-dasharray: 5,3; }
+      .msg-shield { fill: #ffffff; fill-opacity: 0.94; }
+      .alt-box { fill: #f8fafc; fill-opacity: 0.45; stroke: #64748b; stroke-width: 1.2; stroke-dasharray: 5,3; }
       .alt-header { fill: #e2e8f0; stroke: #64748b; stroke-width: 1.2; }
       .alt-tag { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; font-weight: bold; fill: #334155; }
       .alt-cond { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11px; font-weight: bold; fill: #1e40af; }
@@ -31,123 +31,148 @@
   <text x="380.0" y="32" class="title">▲圖 6-1-4 植物病害診斷分析循序圖</text>
 
   <!-- Lifelines -->
-  <line x1="65.0" y1="97" x2="65.0" y2="885" class="life-line" />
-  <rect x="10.0" y="55" width="110" height="42" class="life-box" />
-  <text x="65.0" y="73" class="life-title">使用者</text>
-  <text x="65.0" y="88" class="life-sub">User</text>
+  <!-- 1. 使用者 (User) -->
+  <line x1="60.0" y1="97" x2="60.0" y2="885" class="life-line" />
+  <rect x="10.0" y="55" width="100" height="42" class="life-box" />
+  <text x="60.0" y="73" class="life-title">使用者</text>
+  <text x="60.0" y="88" class="life-sub">User</text>
 
-  <line x1="191.0" y1="97" x2="191.0" y2="885" class="life-line" />
-  <rect x="136.0" y="55" width="110" height="42" class="life-box" />
-  <text x="191.0" y="73" class="life-title">Android App</text>
-  <text x="191.0" y="88" class="life-sub">Client</text>
+  <!-- 2. Android App (Client) -->
+  <line x1="175.0" y1="97" x2="175.0" y2="885" class="life-line" />
+  <rect x="125.0" y="55" width="100" height="42" class="life-box" />
+  <text x="175.0" y="73" class="life-title">Android App</text>
+  <text x="175.0" y="88" class="life-sub">Client</text>
 
-  <line x1="317.0" y1="97" x2="317.0" y2="885" class="life-line" />
-  <rect x="262.0" y="55" width="110" height="42" class="life-box" />
-  <text x="317.0" y="73" class="life-title">FastAPI</text>
-  <text x="317.0" y="88" class="life-sub">後端閘道</text>
+  <!-- 3. FastAPI (後端核心) -->
+  <line x1="295.0" y1="97" x2="295.0" y2="885" class="life-line" />
+  <rect x="245.0" y="55" width="100" height="42" class="life-box" />
+  <text x="295.0" y="73" class="life-title">FastAPI</text>
+  <text x="295.0" y="88" class="life-sub">後端閘道與核心</text>
 
-  <line x1="443.0" y1="97" x2="443.0" y2="885" class="life-line" />
-  <rect x="388.0" y="55" width="110" height="42" class="life-ai" />
-  <text x="443.0" y="73" class="life-title">ConvNeXt</text>
-  <text x="443.0" y="88" class="life-sub">本地自訓模型</text>
+  <!-- 4. ConvNeXt (自訓快篩/CAM) -->
+  <line x1="420.0" y1="97" x2="420.0" y2="885" class="life-line" />
+  <rect x="365.0" y="55" width="110" height="42" class="life-ai" />
+  <text x="420.0" y="73" class="life-title">ConvNeXt</text>
+  <text x="420.0" y="88" class="life-sub">本地快篩 &amp; CAM</text>
 
-  <line x1="569.0" y1="97" x2="569.0" y2="885" class="life-line" />
-  <rect x="514.0" y="55" width="110" height="42" class="life-ai" />
-  <text x="569.0" y="73" class="life-title">Gemini 3.8</text>
-  <text x="569.0" y="88" class="life-sub">Flash 雲端模型</text>
+  <!-- 5. 視覺記憶與雲端 (Visual Memory & Gemini) -->
+  <line x1="565.0" y1="97" x2="565.0" y2="885" class="life-line" />
+  <rect x="505.0" y="55" width="120" height="42" class="life-ai" />
+  <text x="565.0" y="73" class="life-title">記憶庫與 Gemini</text>
+  <text x="565.0" y="88" class="life-sub">Visual RAG &amp; 雲端</text>
 
-  <line x1="695.0" y1="97" x2="695.0" y2="885" class="life-line" />
-  <rect x="640.0" y="55" width="110" height="42" class="life-db" />
-  <text x="695.0" y="73" class="life-title">專家庫/FAISS</text>
-  <text x="695.0" y="88" class="life-sub">MySQL &amp; RAG</text>
+  <!-- 6. 權威資料庫 (MySQL & FAISS) -->
+  <line x1="700.0" y1="97" x2="700.0" y2="885" class="life-line" />
+  <rect x="645.0" y="55" width="110" height="42" class="life-db" />
+  <text x="700.0" y="73" class="life-title">權威處方庫</text>
+  <text x="700.0" y="88" class="life-sub">MySQL &amp; 專書 FAISS</text>
 
   <!-- Activations -->
-  <rect x="60.0" y="110" width="10" height="735" class="activation" />
-  <rect x="186.0" y="110" width="10" height="735" class="activation" />
-  <rect x="312.0" y="135" width="10" height="680" class="activation" />
-  <rect x="438.0" y="210" width="10" height="70" class="activation" />
-  <rect x="564.0" y="330" width="10" height="65" class="activation" />
-  <rect x="690.0" y="430" width="10" height="175" class="activation" />
-  <rect x="564.0" y="615" width="10" height="65" class="activation" />
+  <rect x="55.0" y="110" width="10" height="735" class="activation" />
+  <rect x="170.0" y="110" width="10" height="735" class="activation" />
+  <rect x="290.0" y="135" width="10" height="680" class="activation" />
+  <rect x="415.0" y="195" width="10" height="85" class="activation" />
+  <rect x="560.0" y="325" width="10" height="135" class="activation" />
+  <rect x="695.0" y="555" width="10" height="120" class="activation" />
 
-  <!-- Steps 1 to 5: Upload & ConvNeXt Fast Screen -->
-  <rect x="72.0" y="103" width="283" height="15" class="msg-shield" />
-  <line x1="70.0" y1="120" x2="186.0" y2="120" class="msg-line" />
-  <text x="75.0" y="115" class="msg-text" text-anchor="start">1: 拍攝病葉照片、選擇作物類型，點選「開始診斷」</text>
+  <!-- Step 1: User action -->
+  <rect x="67.0" y="103" width="280" height="15" class="msg-shield" />
+  <line x1="65.0" y1="120" x2="170.0" y2="120" class="msg-line" />
+  <text x="70.0" y="115" class="msg-text">1: 拍攝病葉照片、選擇作物類型，點選「開始診斷」</text>
 
-  <rect x="198.0" y="133" width="430" height="15" class="msg-shield" />
-  <line x1="196.0" y1="150" x2="312.0" y2="150" class="msg-line" />
-  <text x="201.0" y="145" class="msg-text" text-anchor="start">2: POST /api/v1/predict (multipart/form-data: image, crop, JWT)</text>
+  <!-- Step 2: HTTP POST -->
+  <rect x="182.0" y="133" width="415" height="15" class="msg-shield" />
+  <line x1="180.0" y1="150" x2="290.0" y2="150" class="msg-line" />
+  <text x="185.0" y="145" class="msg-text">2: POST /api/v1/predict (multipart/form-data: image, crop, JWT)</text>
 
-  <path d="M 322.0 172 L 350.0 172 L 350.0 194 L 322.0 194" class="msg-line" />
-  <rect x="353.0" y="175" width="250" height="15" class="msg-shield" />
-  <text x="355.0" y="187" class="msg-text" text-anchor="start">3: 影像預處理與品質濾波 (Laplacian 方差)</text>
+  <!-- Step 3: Image Preprocessing & Filter -->
+  <path d="M 300.0 165 L 328.0 165 L 328.0 185 L 300.0 185" class="msg-line" />
+  <rect x="331.0" y="167" width="260" height="15" class="msg-shield" />
+  <text x="333.0" y="179" class="msg-text">3: 影像預處理與品質濾波 (Laplacian 梯度清晰度檢驗)</text>
 
-  <rect x="324.0" y="205" width="260" height="15" class="msg-shield" />
-  <line x1="322.0" y1="222" x2="438.0" y2="222" class="msg-line" />
-  <text x="327.0" y="217" class="msg-text" text-anchor="start">4: 執行本地 ConvNeXt-Tiny 模型微觀特徵推論</text>
+  <!-- Step 4: ConvNeXt Inference -->
+  <rect x="302.0" y="195" width="255" height="15" class="msg-shield" />
+  <line x1="300.0" y1="210" x2="415.0" y2="210" class="msg-line" />
+  <text x="305.0" y="205" class="msg-text">4: 執行本地自訓 ConvNeXt 特徵推論與 Softmax 信心度計算</text>
 
-  <rect x="324.0" y="245" width="255" height="15" class="msg-shield" />
-  <line x1="438.0" y1="262" x2="322.0" y2="262" class="ret-line" />
-  <text x="327.0" y="257" class="ret-text" text-anchor="start">5: 回傳 Top-1 病害標籤與信心機率值 (prob)</text>
+  <!-- Step 5: Grad-CAM Saliency -->
+  <path d="M 425.0 220 L 450.0 220 L 450.0 240 L 425.0 240" class="msg-line" />
+  <rect x="453.0" y="222" width="265" height="15" class="msg-shield" />
+  <text x="455.0" y="234" class="msg-text">5: Grad-CAM 空間注意力前景驗證 (計算葉片前景對齊率)</text>
 
-  <!-- Opt Block 1: Gemini Fallback for Disease Identification when ConvNeXt < 0.75 -->
-  <rect x="292.0" y="285" width="300.0" height="120" class="alt-box" />
-  <polygon points="292.0,285 334.0,285 324.0,303 292.0,303" class="alt-header" />
-  <text x="297.0" y="298" class="alt-tag">opt</text>
-  <rect x="336.0" y="287" width="180" height="15" class="msg-shield" />
-  <text x="340.0" y="299" class="alt-cond">[ConvNeXt 信心度 &lt; 0.75 降級兜底]</text>
+  <!-- Step 6: Return ConvNeXt & CAM -->
+  <rect x="302.0" y="250" width="265" height="15" class="msg-shield" />
+  <line x1="415.0" y1="265" x2="300.0" y2="265" class="ret-line" />
+  <text x="305.0" y="260" class="ret-text">6: 回傳 Top-1 病名、信心值 (prob) 與前景對齊率 (cam_ratio)</text>
 
-  <rect x="324.0" y="323" width="236" height="15" class="msg-shield" />
-  <line x1="322.0" y1="340" x2="564.0" y2="340" class="msg-line" />
-  <text x="327.0" y="335" class="msg-text" text-anchor="start">6: 傳送影像與提示詞進行多模態病害辨識</text>
+  <!-- Alt Block 1: Dual Safety Gate (ConvNeXt vs Gemini/VisualMemory) -->
+  <rect x="270.0" y="285" width="455.0" height="185" class="alt-box" />
+  <polygon points="270.0,285 312.0,285 302.0,303 270.0,303" class="alt-header" />
+  <text x="277.0" y="298" class="alt-tag">alt</text>
+  <rect x="314.0" y="287" width="270" height="15" class="msg-shield" />
+  <text x="318.0" y="299" class="alt-cond">[雙重安全門檻通過：快篩≥75% 且 前景≥35%]</text>
 
-  <rect x="324.0" y="363" width="236" height="15" class="msg-shield" />
-  <line x1="564.0" y1="380" x2="322.0" y2="380" class="ret-line" />
-  <text x="327.0" y="375" class="ret-text" text-anchor="start">7: 回傳多模態廣域病害辨識結果與信心值</text>
+  <rect x="302.0" y="315" width="250" height="15" class="msg-shield" />
+  <line x1="300.0" y1="330" x2="560.0" y2="330" class="msg-line" />
+  <text x="305.0" y="325" class="msg-text">7a: 比對 Visual Memory 專家視覺特徵記憶庫</text>
 
-  <!-- Step 8: Query MySQL Official Prescription Database -->
-  <rect x="324.0" y="423" width="280" height="15" class="msg-shield" />
-  <line x1="322.0" y1="440" x2="690.0" y2="440" class="msg-line" />
-  <text x="327.0" y="435" class="msg-text" text-anchor="start">8: 依確診病名查詢 MySQL 本地官方防治資料庫</text>
+  <rect x="302.0" y="345" width="250" height="15" class="msg-shield" />
+  <line x1="560.0" y1="360" x2="300.0" y2="360" class="ret-line" />
+  <text x="305.0" y="355" class="ret-text">8a: 回傳特徵餘弦比對結果與歷史真值校驗校準</text>
 
-  <!-- Alt Block 2: DB Has Prescription vs DB Missing Prescription (FAISS + Gemini) -->
-  <rect x="292.0" y="460" width="428.0" height="235" class="alt-box" />
-  <polygon points="292.0,460 334.0,460 324.0,478 292.0,478" class="alt-header" />
-  <text x="299.0" y="473" class="alt-tag">alt</text>
-  <rect x="336.0" y="462" width="185" height="15" class="msg-shield" />
-  <text x="340.0" y="474" class="alt-cond">[MySQL 資料庫已有該病害處方]</text>
+  <!-- Divider -->
+  <line x1="270.0" y1="375" x2="725.0" y2="375" class="alt-div" />
+  <rect x="302.0" y="380" width="250" height="15" class="msg-shield" />
+  <text x="305.0" y="392" class="alt-cond">[未通過雙重門檻／疑義分流：雲端兜底]</text>
 
-  <rect x="324.0" y="493" width="280" height="15" class="msg-shield" />
-  <line x1="690.0" y1="510" x2="322.0" y2="510" class="ret-line" />
-  <text x="327.0" y="505" class="ret-text" text-anchor="start">9a: 回傳資料庫審定處方與官方文獻出處 (0 雲端消耗)</text>
+  <rect x="302.0" y="405" width="250" height="15" class="msg-shield" />
+  <line x1="300.0" y1="420" x2="560.0" y2="420" class="msg-line" />
+  <text x="305.0" y="415" class="msg-text">7b: 傳送影像至 Gemini 3.8 Flash 執行多模態廣域病徵推論</text>
 
-  <line x1="292.0" y1="532" x2="720.0" y2="532" class="alt-div" />
-  <rect x="324.0" y="536" width="285" height="15" class="msg-shield" />
-  <text x="327.0" y="548" class="alt-cond">[資料庫無現成處方：檢索 FAISS 專書 + Gemini 生成]</text>
+  <rect x="302.0" y="435" width="250" height="15" class="msg-shield" />
+  <line x1="560.0" y1="450" x2="300.0" y2="450" class="ret-line" />
+  <text x="305.0" y="445" class="ret-text">8b: 回傳多模態診斷病名、特徵描述與信心評估</text>
 
-  <rect x="324.0" y="568" width="290" height="15" class="msg-shield" />
-  <line x1="690.0" y1="585" x2="322.0" y2="585" class="ret-line" />
-  <text x="327.0" y="580" class="ret-text" text-anchor="start">9b: 向量檢索 FAISS 農業部專書並回傳相關文獻片段</text>
+  <!-- Alt Block 2: Safety Brake Decision -->
+  <rect x="270.0" y="485" width="455.0" height="215" class="alt-box" />
+  <polygon points="270.0,485 312.0,485 302.0,503 270.0,503" class="alt-header" />
+  <text x="277.0" y="498" class="alt-tag">alt</text>
+  <rect x="314.0" y="487" width="230" height="15" class="msg-shield" />
+  <text x="318.0" y="499" class="alt-cond">[綜合把握度 &lt; 65%：啟動安全防禦剎車]</text>
 
-  <rect x="324.0" y="610" width="236" height="15" class="msg-shield" />
-  <line x1="322.0" y1="627" x2="564.0" y2="627" class="msg-line" />
-  <text x="327.0" y="622" class="msg-text" text-anchor="start">10b: 結合專書文獻片段與病況影像請求生成處方</text>
+  <path d="M 300.0 515 L 328.0 515 L 328.0 535 L 300.0 535" class="msg-line" />
+  <rect x="331.0" y="517" width="310" height="15" class="msg-shield" />
+  <text x="333.0" y="529" class="msg-text">9a: 標記安全剎車 flag (無法判定/建議採樣送檢，不調用處方)</text>
 
-  <rect x="324.0" y="650" width="234" height="15" class="msg-shield" />
-  <line x1="564.0" y1="667" x2="322.0" y2="667" class="ret-line" />
-  <text x="327.0" y="662" class="ret-text" text-anchor="start">11b: 回傳動態生成之防治處方 (標記待覆核)</text>
+  <!-- Divider -->
+  <line x1="270.0" y1="545" x2="725.0" y2="545" class="alt-div" />
+  <rect x="302.0" y="550" width="270" height="15" class="msg-shield" />
+  <text x="305.0" y="562" class="alt-cond">[研判明確 (≥65%)：雙軌權威處方檢索與專書溯源]</text>
 
-  <!-- Steps 12 to 14: Package & Return JSON -->
-  <path d="M 322.0 715 L 350.0 715 L 350.0 737 L 322.0 737" class="msg-line" />
-  <rect x="353.0" y="718" width="350" height="15" class="msg-shield" />
-  <text x="355.0" y="730" class="msg-text" text-anchor="start">12: 組合結構化診斷報告 (prediction_id, recommendations)</text>
+  <rect x="302.0" y="575" width="290" height="15" class="msg-shield" />
+  <line x1="300.0" y1="590" x2="695.0" y2="590" class="msg-line" />
+  <text x="305.0" y="585" class="msg-text">9b: 優先查詢本地 MySQL 官方病蟲害審定處方庫</text>
 
-  <rect x="198.0" y="753" width="205" height="15" class="msg-shield" />
-  <line x1="312.0" y1="770" x2="196.0" y2="770" class="ret-line" />
-  <text x="201.0" y="765" class="ret-text" text-anchor="start">13: HTTP 200 OK (診斷報告 JSON)</text>
+  <rect x="302.0" y="605" width="320" height="15" class="msg-shield" />
+  <line x1="695.0" y1="620" x2="300.0" y2="620" class="ret-line" />
+  <text x="305.0" y="615" class="ret-text">10b: [若命中審定處方] 回傳官方標準防治處置 (零雲端消耗)</text>
 
-  <rect x="72.0" y="803" width="236" height="15" class="msg-shield" />
-  <line x1="186.0" y1="820" x2="70.0" y2="820" class="ret-line" />
-  <text x="75.0" y="815" class="ret-text" text-anchor="start">14: 渲染診斷結果頁面 (病名、可信度、防治卡片)</text>
+  <rect x="302.0" y="635" width="345" height="15" class="msg-shield" />
+  <line x1="695.0" y1="650" x2="300.0" y2="650" class="ret-line" />
+  <text x="305.0" y="645" class="ret-text">11b: [若無現成處方] FAISS 檢索專書片段並結合 Gemini 生成處方</text>
+
+  <!-- Step 12: Package Report -->
+  <path d="M 300.0 715 L 328.0 715 L 328.0 735 L 300.0 735" class="msg-line" />
+  <rect x="331.0" y="717" width="370" height="15" class="msg-shield" />
+  <text x="333.0" y="729" class="msg-text">12: 組合結構化診斷報告 (prediction_id, 處方建議, 推論路徑, 剎車旗標)</text>
+
+  <!-- Step 13: HTTP Response -->
+  <rect x="182.0" y="753" width="210" height="15" class="msg-shield" />
+  <line x1="290.0" y1="770" x2="180.0" y2="770" class="ret-line" />
+  <text x="185.0" y="765" class="ret-text">13: HTTP 200 OK (結構化診斷報告 JSON)</text>
+
+  <!-- Step 14: Client Render -->
+  <rect x="67.0" y="803" width="280" height="15" class="msg-shield" />
+  <line x1="170.0" y1="820" x2="65.0" y2="820" class="ret-line" />
+  <text x="70.0" y="815" class="ret-text">14: 渲染圖文診斷結果頁面 (病名、可信度、處方卡片或送檢警示)</text>
 </svg>

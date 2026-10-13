@@ -1,9 +1,12 @@
 package com.example.plantdoctor
 
 import android.Manifest
+import android.app.Dialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.graphics.drawable.ColorDrawable
+import android.view.Window
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -28,6 +31,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -333,6 +337,23 @@ class WebcamActivity : AppCompatActivity() {
             resetAutoPowerSaveTimer()
             addNewCropZone()
         }
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val cropOverlay = findViewById<FrameLayout>(R.id.layout_crop_overlay)
+                if (cropOverlay != null && cropOverlay.visibility == View.VISIBLE) {
+                    cropOverlay.visibility = View.GONE
+                    return
+                }
+                val customDialogOverlay = findViewById<FrameLayout>(R.id.layout_custom_dialog_overlay)
+                if (customDialogOverlay != null && customDialogOverlay.visibility == View.VISIBLE) {
+                    customDialogOverlay.visibility = View.GONE
+                    return
+                }
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+            }
+        })
     }
 
     /**
@@ -355,6 +376,10 @@ class WebcamActivity : AppCompatActivity() {
     private fun stopMonitoring() {
         isMonitoring = false
         cancelMonitoringRequests()
+        powerSaveHandler.removeCallbacks(autoPowerSaveRunnable)
+        if (::layoutPowerSaveOverlay.isInitialized && layoutPowerSaveOverlay.visibility == View.VISIBLE) {
+            exitPowerSaveMode()
+        }
         totalCaptureCount = 0
         backendStatusText = ""
         btnToggleMonitor.text = "開始即時監控"
@@ -436,27 +461,113 @@ class WebcamActivity : AppCompatActivity() {
         Toast.makeText(this, "已建立【${newZone.name}】選取框", Toast.LENGTH_SHORT).show()
     }
 
-    private fun showZoneOptionDialog(zone: CropZone) {
-        val options = arrayOf("修改名稱與採樣時間", "刪除此區域")
-        val mainColor = getThemeMainColor()
+    private fun showInLayoutCustomDialog(
+        title: String,
+        bodyView: View? = null,
+        items: List<String>? = null,
+        onItemClick: ((Int) -> Unit)? = null,
+        positiveText: String? = null,
+        onPositive: (() -> Unit)? = null,
+        negativeText: String? = "取消",
+        onNegative: (() -> Unit)? = null,
+        positiveColor: Int? = null
+    ) {
+        val overlay = findViewById<FrameLayout>(R.id.layout_custom_dialog_overlay) ?: return
+        val cardRoot = overlay.findViewById<androidx.cardview.widget.CardView>(R.id.card_custom_dialog)
+        val tvTitle = overlay.findViewById<TextView>(R.id.tv_custom_dialog_title)
+        val bodyContainer = overlay.findViewById<FrameLayout>(R.id.container_custom_dialog_body)
+        val btnPos = overlay.findViewById<Button>(R.id.btn_custom_dialog_positive)
+        val btnNeg = overlay.findViewById<Button>(R.id.btn_custom_dialog_negative)
 
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("管理區域：${zone.name}")
-            .setItems(options) { _, which ->
+        val mainColor = getThemeMainColor()
+        tvTitle.text = title
+        tvTitle.setTextColor(mainColor)
+
+        bodyContainer.removeAllViews()
+
+        if (items != null) {
+            val listView = ListView(this).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    (260 * resources.displayMetrics.density).toInt()
+                )
+                divider = ColorDrawable(Color.parseColor("#E0E0E0"))
+                dividerHeight = (1 * resources.displayMetrics.density).toInt()
+            }
+            val adapter = object : android.widget.ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items) {
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val view = super.getView(position, convertView, parent) as TextView
+                    view.setTextColor(Color.parseColor("#333333"))
+                    view.textSize = 16f
+                    view.setPadding(24, 32, 24, 32)
+                    return view
+                }
+            }
+            listView.adapter = adapter
+            listView.setOnItemClickListener { _, _, position, _ ->
+                SoundManager.playBubblePop()
+                overlay.visibility = View.GONE
+                onItemClick?.invoke(position)
+            }
+            bodyContainer.addView(listView)
+        } else if (bodyView != null) {
+            if (bodyView.parent != null) {
+                (bodyView.parent as? ViewGroup)?.removeView(bodyView)
+            }
+            bodyContainer.addView(bodyView)
+        }
+
+        if (positiveText != null) {
+            btnPos.visibility = View.VISIBLE
+            btnPos.text = positiveText
+            btnPos.setTextColor(positiveColor ?: Color.WHITE)
+            btnPos.backgroundTintList = ColorStateList.valueOf(positiveColor ?: mainColor)
+            btnPos.setOnClickListener {
+                SoundManager.playBubblePop()
+                overlay.visibility = View.GONE
+                onPositive?.invoke()
+            }
+        } else {
+            btnPos.visibility = View.GONE
+        }
+
+        if (negativeText != null) {
+            btnNeg.visibility = View.VISIBLE
+            btnNeg.text = negativeText
+            btnNeg.setTextColor(mainColor)
+            btnNeg.setOnClickListener {
+                SoundManager.playBubblePop()
+                overlay.visibility = View.GONE
+                onNegative?.invoke()
+            }
+        } else {
+            btnNeg.visibility = View.GONE
+        }
+
+        overlay.setOnClickListener {
+            SoundManager.playBubblePop()
+            overlay.visibility = View.GONE
+        }
+
+        cardRoot.setOnClickListener {
+            // consume clicks to prevent closing
+        }
+
+        overlay.visibility = View.VISIBLE
+    }
+
+    private fun showZoneOptionDialog(zone: CropZone) {
+        val options = listOf("修改名稱與採樣時間", "刪除此區域")
+        showInLayoutCustomDialog(
+            title = "管理區域：${zone.name}",
+            items = options,
+            onItemClick = { which ->
                 when (which) {
                     0 -> showEditZoneDialog(zone)
                     1 -> deleteCropZone(zone)
                 }
             }
-            .setNegativeButton("取消", null)
-            .create()
-
-        dialog.show()
-
-        // 🌟 注入主題深色圓角背景
-        applyDialogTheme(dialog)
-
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(mainColor)
+        )
     }
 
     private fun showEditZoneDialog(zone: CropZone) {
@@ -465,13 +576,11 @@ class WebcamActivity : AppCompatActivity() {
         val sbInterval = dialogView.findViewById<SeekBar>(R.id.sbDialogInterval)
         val etInterval = dialogView.findViewById<EditText>(R.id.etDialogInterval)
 
-        // 🌟 確保輸入框文字在深色主題底色下清晰可見
-        etName.setTextColor(android.graphics.Color.WHITE)
-        etInterval.setTextColor(android.graphics.Color.WHITE)
+        etName.setTextColor(Color.parseColor("#333333"))
+        etInterval.setTextColor(Color.parseColor("#333333"))
 
-        // 🌟 注入當前主題色至 Dialog 內的 SeekBar 與選作物按鈕
         val mainColor = getThemeMainColor()
-        val colorStateList = android.content.res.ColorStateList.valueOf(mainColor)
+        val colorStateList = ColorStateList.valueOf(mainColor)
         sbInterval.thumbTintList = colorStateList
         sbInterval.progressTintList = colorStateList
 
@@ -512,10 +621,11 @@ class WebcamActivity : AppCompatActivity() {
             }
         })
 
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("設定：${zone.name}")
-            .setView(dialogView)
-            .setPositiveButton("儲存") { _, _ ->
+        showInLayoutCustomDialog(
+            title = "設定：${zone.name}",
+            bodyView = dialogView,
+            positiveText = "儲存",
+            onPositive = {
                 val newName = etName.text.toString().trim()
                 val newSec: Int = etInterval.text.toString().toIntOrNull() ?: currentSec
 
@@ -527,17 +637,7 @@ class WebcamActivity : AppCompatActivity() {
                 saveSessionsToStorage()
                 Toast.makeText(this, "已更新設定！", Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("取消", null)
-            .create()
-
-        dialog.show()
-
-        // 🌟 注入主題深色圓角背景
-        applyDialogTheme(dialog)
-
-        // 🌟 按鈕字體顏色強制跟隨主題色
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(mainColor)
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(mainColor)
+        )
     }
 
     private fun deleteCropZone(zone: CropZone) {
@@ -845,7 +945,9 @@ class WebcamActivity : AppCompatActivity() {
 
     private fun resetAutoPowerSaveTimer() {
         powerSaveHandler.removeCallbacks(autoPowerSaveRunnable)
-        powerSaveHandler.postDelayed(autoPowerSaveRunnable, 30_000)
+        if (isMonitoring) {
+            powerSaveHandler.postDelayed(autoPowerSaveRunnable, 30_000)
+        }
     }
 
     private fun checkCameraPermission() {
@@ -1035,6 +1137,25 @@ class WebcamActivity : AppCompatActivity() {
         return super.onTouchEvent(event)
     }
 
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        val cropOverlay = findViewById<FrameLayout>(R.id.layout_crop_overlay)
+        if (cropOverlay != null && cropOverlay.visibility == View.VISIBLE) {
+            cropOverlay.visibility = View.GONE
+            return
+        }
+        val customDialogOverlay = findViewById<FrameLayout>(R.id.layout_custom_dialog_overlay)
+        if (customDialogOverlay != null && customDialogOverlay.visibility == View.VISIBLE) {
+            customDialogOverlay.visibility = View.GONE
+            return
+        }
+        if (::layoutPowerSaveOverlay.isInitialized && layoutPowerSaveOverlay.visibility == View.VISIBLE) {
+            exitPowerSaveMode()
+            return
+        }
+        super.onBackPressed()
+    }
+
     override fun onPause() {
         super.onPause()
         saveSessionsToStorage()
@@ -1077,7 +1198,9 @@ class WebcamActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val zone = list[position]
             holder.tvName.text = zone.name
+            holder.tvName.setTextColor(Color.WHITE)
             holder.tvSub.text = "採樣間隔：${zone.intervalMinutes} 秒"
+            holder.tvSub.setTextColor(Color.parseColor("#B0BEC5"))
             holder.itemView.setOnClickListener { onItemClick(zone) }
         }
 
@@ -1148,6 +1271,7 @@ class WebcamActivity : AppCompatActivity() {
         }
 
         dialog.window?.let { window ->
+            window.setWindowAnimations(0)
             val background = android.graphics.drawable.GradientDrawable().apply {
                 setColor(android.graphics.Color.parseColor(bgColorStr))
                 cornerRadius = 32f
@@ -1166,9 +1290,10 @@ class WebcamActivity : AppCompatActivity() {
 
         options.add("➕ 管理/增刪改組別")
 
-        val builder = AlertDialog.Builder(this)
-            .setTitle("選擇植物組別")
-            .setItems(options.toTypedArray()) { _, which ->
+        showInLayoutCustomDialog(
+            title = "選擇植物組別",
+            items = options,
+            onItemClick = { which ->
                 if (which == options.size - 1) {
                     showManageSessionDialog()
                 } else {
@@ -1178,48 +1303,41 @@ class WebcamActivity : AppCompatActivity() {
                     Toast.makeText(this, "已切換至：${currentSession?.name}", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("取消", null)
-
-        val dialog = builder.create()
-        dialog.show()
-        applyDialogTheme(dialog)
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(getThemeMainColor())
+        )
     }
 
     private fun showManageSessionDialog() {
-        val manageOptions = arrayOf("新增新組別", "修改當前組別名稱", "刪除當前組別")
-        val builder = AlertDialog.Builder(this)
-            .setTitle("管理組別：${currentSession?.name}")
-            .setItems(manageOptions) { _, which ->
+        val manageOptions = listOf("新增新組別", "修改當前組別名稱", "刪除當前組別")
+        showInLayoutCustomDialog(
+            title = "管理組別：${currentSession?.name}",
+            items = manageOptions,
+            onItemClick = { which ->
                 when (which) {
                     0 -> showAddSessionDialog()
                     1 -> showRenameSessionDialog()
                     2 -> deleteCurrentSession()
                 }
-            }
-            .setNegativeButton("返回", null)
-
-        val dialog = builder.create()
-        dialog.show()
-        applyDialogTheme(dialog)
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(getThemeMainColor())
+            },
+            negativeText = "返回"
+        )
     }
 
     private fun showAddSessionDialog() {
         val container = FrameLayout(this).apply {
-            setPadding(50, 30, 50, 10)
+            setPadding(30, 20, 30, 10)
         }
         val etInput = EditText(this).apply {
             hint = "例如：陽台花草組"
-            setTextColor(android.graphics.Color.WHITE)
-            setHintTextColor(android.graphics.Color.GRAY)
+            setTextColor(Color.parseColor("#333333"))
+            setHintTextColor(Color.GRAY)
         }
         container.addView(etInput)
 
-        val builder = AlertDialog.Builder(this)
-            .setTitle("新增植物組別")
-            .setView(container)
-            .setPositiveButton("建立") { _, _ ->
+        showInLayoutCustomDialog(
+            title = "新增植物組別",
+            bodyView = container,
+            positiveText = "建立",
+            onPositive = {
                 val name = etInput.text.toString().trim()
                 if (name.isNotEmpty()) {
                     val newSession = PlantSession(name = name)
@@ -1231,32 +1349,25 @@ class WebcamActivity : AppCompatActivity() {
                     Toast.makeText(this, "已建立並切換至：$name", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("取消", null)
-
-        val dialog = builder.create()
-        dialog.show()
-        applyDialogTheme(dialog)
-
-        val mainColor = getThemeMainColor()
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(mainColor)
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(mainColor)
+        )
     }
 
     private fun showRenameSessionDialog() {
         val session = currentSession ?: return
         val container = FrameLayout(this).apply {
-            setPadding(50, 30, 50, 10)
+            setPadding(30, 20, 30, 10)
         }
         val etInput = EditText(this).apply {
             setText(session.name)
-            setTextColor(android.graphics.Color.WHITE)
+            setTextColor(Color.parseColor("#333333"))
         }
         container.addView(etInput)
 
-        val builder = AlertDialog.Builder(this)
-            .setTitle("修改組別名稱")
-            .setView(container)
-            .setPositiveButton("確定") { _, _ ->
+        showInLayoutCustomDialog(
+            title = "修改組別名稱",
+            bodyView = container,
+            positiveText = "確定",
+            onPositive = {
                 val name = etInput.text.toString().trim()
                 if (name.isNotEmpty()) {
                     session.name = name
@@ -1265,15 +1376,7 @@ class WebcamActivity : AppCompatActivity() {
                     Toast.makeText(this, "已修改名稱為：$name", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("取消", null)
-
-        val dialog = builder.create()
-        dialog.show()
-        applyDialogTheme(dialog)
-
-        val mainColor = getThemeMainColor()
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(mainColor)
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(mainColor)
+        )
     }
 
     private fun deleteCurrentSession() {
@@ -1284,10 +1387,19 @@ class WebcamActivity : AppCompatActivity() {
             return
         }
 
-        val builder = AlertDialog.Builder(this)
-            .setTitle("刪除組別")
-            .setMessage("確定要刪除【${session.name}】及其內部所有區域設定嗎？")
-            .setPositiveButton("刪除") { _, _ ->
+        val tvMsg = TextView(this).apply {
+            text = "確定要刪除【${session.name}】及其內部所有區域設定嗎？"
+            textSize = 16f
+            setTextColor(Color.parseColor("#555555"))
+            setPadding(20, 10, 20, 10)
+        }
+
+        showInLayoutCustomDialog(
+            title = "刪除組別",
+            bodyView = tvMsg,
+            positiveText = "刪除",
+            positiveColor = Color.RED,
+            onPositive = {
                 sessionList.remove(session)
                 currentSession = sessionList[0]
                 updateSessionButtonText()
@@ -1295,15 +1407,7 @@ class WebcamActivity : AppCompatActivity() {
                 saveSessionsToStorage()
                 Toast.makeText(this, "已刪除該組別", Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("取消", null)
-
-        val dialog = builder.create()
-        dialog.show()
-        applyDialogTheme(dialog)
-
-        val mainColor = getThemeMainColor()
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(android.graphics.Color.RED)
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(mainColor)
+        )
     }
 
     /**
@@ -1445,12 +1549,9 @@ class WebcamActivity : AppCompatActivity() {
     }
 
     private fun showCropSelectionDialog(onCropSelected: ((String) -> Unit)? = null) {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_select_crop, null)
-        val dialog = AlertDialog.Builder(this)
-            .setView(dialogView)
-            .create()
-
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        val overlay = findViewById<FrameLayout>(R.id.layout_crop_overlay) ?: return
+        val dialogView = findViewById<View>(R.id.included_crop_dialog) ?: return
+        overlay.visibility = View.VISIBLE
 
         val tvDialogTitle = dialogView.findViewById<TextView>(R.id.tv_dialog_title)
         val btnClose = dialogView.findViewById<ImageButton>(R.id.btn_dialog_close)
@@ -1460,6 +1561,8 @@ class WebcamActivity : AppCompatActivity() {
 
         val themeColor = getThemeMainColor()
         tvDialogTitle.setTextColor(themeColor)
+
+        etSearch.setText("")
 
         val displayList = ArrayList(cropList)
         cropDisplayList = displayList
@@ -1497,7 +1600,7 @@ class WebcamActivity : AppCompatActivity() {
                         Toast.makeText(this@WebcamActivity, "目標植物已設為：$item", Toast.LENGTH_SHORT).show()
                     }
                     SoundManager.playBubblePop()
-                    dialog.dismiss()
+                    overlay.visibility = View.GONE
                 }
 
                 return view
@@ -1516,7 +1619,7 @@ class WebcamActivity : AppCompatActivity() {
                 Toast.makeText(this, "目標植物已設為：$chosen", Toast.LENGTH_SHORT).show()
             }
             SoundManager.playBubblePop()
-            dialog.dismiss()
+            overlay.visibility = View.GONE
         }
 
         etSearch.addTextChangedListener(object : TextWatcher {
@@ -1546,15 +1649,17 @@ class WebcamActivity : AppCompatActivity() {
 
         btnClose.setOnClickListener {
             SoundManager.playBubblePop()
-            dialog.dismiss()
+            overlay.visibility = View.GONE
         }
 
-        dialog.setOnDismissListener {
-            cropAdapter = null
-            cropDisplayList = null
+        overlay.setOnClickListener {
+            SoundManager.playBubblePop()
+            overlay.visibility = View.GONE
         }
 
-        dialog.show()
+        dialogView.setOnClickListener {
+            // consume clicks to prevent dismissing overlay when clicking card
+        }
     }
 
 }

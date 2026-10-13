@@ -1,28 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 780" width="1440" height="780">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 820" width="1440" height="820">
   <defs>
     <style>
-      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 23px; font-weight: bold; fill: #1A281E; }
-      .group-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 15px; font-weight: bold; fill: #223827; }
-      .state-name { font-family: 'Microsoft JhengHei', sans-serif; font-size: 14px; font-weight: bold; fill: #223827; }
-      .diamond-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12.5px; font-weight: bold; fill: #1A281E; text-anchor: middle; }
-      .action-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12px; fill: #2D3748; }
-      .transition-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12px; fill: #2D5837; font-weight: bold; paint-order: stroke fill; stroke: #FFFFFF; stroke-width: 4px; stroke-linejoin: round; }
-      .guard-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11.5px; fill: #993B36; font-style: italic; font-weight: bold; paint-order: stroke fill; stroke: #FFFFFF; stroke-width: 3.5px; }
+      .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 22px; font-weight: bold; fill: #1A281E; }
+      .group-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 14px; font-weight: bold; fill: #223827; }
+      .state-name { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12.5px; font-weight: bold; fill: #223827; }
+      .diamond-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11.5px; font-weight: bold; fill: #1A281E; text-anchor: middle; }
+      .action-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10.5px; fill: #2D3748; }
+      .transition-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10.5px; fill: #2D5837; font-weight: bold; paint-order: stroke fill; stroke: #FFFFFF; stroke-width: 3.5px; stroke-linejoin: round; }
+      .guard-text { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #993B36; font-style: italic; font-weight: bold; paint-order: stroke fill; stroke: #FFFFFF; stroke-width: 3px; }
 
       .composite-bg { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 1.5; stroke-dasharray: 6,4; rx: 8; ry: 8; }
       .composite-header { fill: #E5EDE3; stroke: #B5C6B3; stroke-width: 1.5; }
 
-      .state-box { fill: #FFFFFF; stroke: #4F7057; stroke-width: 1.5; rx: 6; ry: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.04)); }
-      .state-header { fill: #DDEAD7; stroke: #4F7057; stroke-width: 1.5; }
+      .state-box { fill: #FFFFFF; stroke: #4F7057; stroke-width: 1.4; rx: 5; ry: 5; }
+      .state-header { fill: #DDEAD7; stroke: #4F7057; stroke-width: 1.4; }
 
       .choice-diamond { fill: #E5EDE3; stroke: #334035; stroke-width: 1.5; }
 
-      .ai-box { fill: #FFFFFF; stroke: #4F7057; stroke-width: 1.5; rx: 6; ry: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.04)); }
-      .ai-header { fill: #DDEAD7; stroke: #4F7057; stroke-width: 1.5; }
-
-      .line { stroke: #334035; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
-      .line-branch { stroke: #4F7057; stroke-width: 1.5; fill: none; marker-end: url(#arrow-branch); }
-      .line-back { stroke: #BA5D57; stroke-width: 1.5; stroke-dasharray: 5,4; fill: none; marker-end: url(#arrow-back); }
+      .line { stroke: #334035; stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+      .line-branch { stroke: #4F7057; stroke-width: 1.4; fill: none; marker-end: url(#arrow-branch); }
+      .line-back { stroke: #BA5D57; stroke-width: 1.4; stroke-dasharray: 5,4; fill: none; marker-end: url(#arrow-back); }
     </style>
 
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -36,187 +33,230 @@
     </marker>
   </defs>
 
-  <!-- Root Background (Pure White to prevent dark mode transparency issues) -->
+  <!-- Root Background -->
   <rect width="100%" height="100%" fill="#ffffff" />
 
   <!-- Title -->
   <text x="720" y="34" class="title" text-anchor="middle">圖 7-4-5 檢視儀表板與日誌管理 狀態圖 (State Diagram)</text>
 
   <!-- ========================================================================= -->
-  <!-- 1. COMPOSITE 1: DASHBOARD OVERVIEW (x=70, y=60, w=340, h=660)              -->
+  <!-- 1. COMPOSITE 1: DASHBOARD OVERVIEW (x=50, y=60, w=340, h=720)             -->
   <!-- ========================================================================= -->
-  <g transform="translate(70, 60)">
-    <rect width="340" height="660" class="composite-bg" />
+  <g transform="translate(50, 60)">
+    <rect width="340" height="720" class="composite-bg" />
     <path d="M 0 8 Q 0 0 8 0 L 332 0 Q 340 0 340 8 L 340 32 L 0 32 Z" class="composite-header" />
     <text x="16" y="21" class="group-title">管理員儀表板狀態 (Admin Dashboard)</text>
 
-    <!-- State 1: 管理員鑑權 (w=290, h=82) -->
+    <!-- State 1: 管理員鑑權 -->
     <g transform="translate(25, 48)">
-      <rect width="290" height="82" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 284 0 Q 290 0 290 6 L 290 26 L 0 26 Z" class="state-header" />
-      <text x="145" y="18" class="state-name" text-anchor="middle">管理員鑑權 (Admin_Auth)</text>
-      <text x="12" y="46" class="action-text">entry / 驗證 JWT Token (Admin 角色)</text>
-      <text x="12" y="66" class="guard-text">guard / [無權限] 403 拒絕訪問</text>
+      <rect width="290" height="78" class="state-box" />
+      <path d="M 0 5 Q 0 0 5 0 L 285 0 Q 290 0 290 5 L 290 25 L 0 25 Z" class="state-header" />
+      <text x="145" y="17" class="state-name" text-anchor="middle">管理員鑑權 (Admin_Auth)</text>
+      <text x="12" y="44" class="action-text">entry / 驗證 Session Cookie 或 JWT (Admin 角色)</text>
+      <text x="12" y="63" class="guard-text">guard / [未授權] 303 重導登入或 403 拒絕訪問</text>
     </g>
 
     <!-- Transition S1 -> S2 -->
-    <line x1="170" y1="130" x2="170" y2="190" class="line" />
-    <text x="185" y="165" class="transition-text">身分查驗合格</text>
+    <line x1="170" y1="126" x2="170" y2="180" class="line" />
+    <text x="185" y="157" class="transition-text">身分查驗合格</text>
 
-    <!-- State 2: 儀表板總覽態 (w=290, h=106) -->
-    <g transform="translate(25, 190)">
-      <rect width="290" height="106" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 284 0 Q 290 0 290 6 L 290 26 L 0 26 Z" class="state-header" />
-      <text x="145" y="18" class="state-name" text-anchor="middle">儀表板總覽態 (Dashboard_Active)</text>
-      <text x="12" y="47" class="action-text">entry / 統計全站總診斷次數與健康率</text>
-      <text x="12" y="67" class="action-text">do / 渲染病害排行與用戶活躍圖表</text>
-      <text x="12" y="87" class="action-text">do / 顯示待審糾錯數與即時串流狀態</text>
+    <!-- State 2: 儀表板總覽態 (現行四大指標卡片) -->
+    <g transform="translate(25, 180)">
+      <rect width="290" height="98" class="state-box" />
+      <path d="M 0 5 Q 0 0 5 0 L 285 0 Q 290 0 290 5 L 290 25 L 0 25 Z" class="state-header" />
+      <text x="145" y="17" class="state-name" text-anchor="middle">儀表板總覽態 (Dashboard_Active)</text>
+      <text x="12" y="44" class="action-text">entry / 載入註冊用戶數 (total_users)</text>
+      <text x="12" y="63" class="action-text">do / 載入累計診斷數 (total_diaries) 與種類</text>
+      <text x="12" y="82" class="action-text">do / 呈現今日新增紀錄 (today_diaries) 統計卡片</text>
     </g>
 
     <!-- Transition S2 -> S3 -->
-    <line x1="170" y1="296" x2="170" y2="360" class="line" />
-    <text x="185" y="333" class="transition-text">進入會話就緒</text>
+    <line x1="170" y1="278" x2="170" y2="330" class="line" />
+    <text x="185" y="308" class="transition-text">進入會話就緒</text>
 
-    <!-- State 3: 後台會話就緒 (w=290, h=85) -->
-    <g transform="translate(25, 360)">
-      <rect width="290" height="85" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 284 0 Q 290 0 290 6 L 290 26 L 0 26 Z" class="state-header" />
-      <text x="145" y="18" class="state-name" text-anchor="middle">後台會話就緒 (Session_Ready)</text>
-      <text x="12" y="48" class="action-text">do / 支援多模組切換與審計日誌</text>
-      <text x="12" y="68" class="action-text">exit / 點擊登出銷毀管理者 Session</text>
+    <!-- State 3: 後台導覽與會話維持 -->
+    <g transform="translate(25, 330)">
+      <rect width="290" height="92" class="state-box" />
+      <path d="M 0 5 Q 0 0 5 0 L 285 0 Q 290 0 290 5 L 290 25 L 0 25 Z" class="state-header" />
+      <text x="145" y="17" class="state-name" text-anchor="middle">後台會話就緒 (Session_Ready)</text>
+      <text x="12" y="44" class="action-text">do / 支援「診斷管理 / 用戶管理 / 回饋工作台」</text>
+      <text x="12" y="63" class="action-text">do / 記錄安全審計狀態與分頁上下文</text>
+      <text x="12" y="81" class="action-text">exit / 點擊登出銷毀管理者 Session</text>
     </g>
 
     <!-- Final State: Logout -->
-    <line x1="170" y1="445" x2="170" y2="540" class="line" />
-    <text x="185" y="495" class="transition-text">登出系統</text>
-    <circle cx="170" cy="565" r="10" stroke="#1A281E" stroke-width="1.6" fill="none" />
-    <circle cx="170" cy="565" r="6" fill="#1A281E" />
-    <text x="170" y="595" class="action-text" font-weight="bold" text-anchor="middle">會話結束 [*]</text>
+    <line x1="170" y1="422" x2="170" y2="500" class="line" />
+    <text x="185" y="465" class="transition-text">POST /admin/logout</text>
+    <circle cx="170" cy="522" r="10" stroke="#1A281E" stroke-width="1.6" fill="none" />
+    <circle cx="170" cy="522" r="6" fill="#1A281E" />
+    <text x="170" y="548" class="action-text" font-weight="bold" text-anchor="middle">會話結束 [*]</text>
   </g>
 
   <!-- Initial State: Entry to Admin_Auth -->
-  <circle cx="28" cy="149" r="7" fill="#1A281E" />
-  <line x1="35" y1="149" x2="93" y2="149" class="line" />
+  <circle cx="20" cy="147" r="7" fill="#1A281E" />
+  <line x1="27" y1="147" x2="75" y2="147" class="line" />
 
   <!-- ========================================================================= -->
-  <!-- 2. SUB-PROCESS 1: LOG MANAGEMENT (x=680, y=60, w=680, h=295)              -->
+  <!-- 2. SUB-PROCESS 1: LOG MANAGEMENT (x=645, y=60, w=755, h=315)              -->
   <!-- ========================================================================= -->
-  <g transform="translate(680, 60)">
-    <rect width="680" height="295" class="composite-bg" />
-    <path d="M 0 8 Q 0 0 8 0 L 672 0 Q 680 0 680 8 L 680 32 L 0 32 Z" class="composite-header" fill="#E5EDE3" />
-    <text x="16" y="21" class="group-title" fill="#1A281E">管理功能 1：全站診斷日誌多維檢索與病徵審計 (日誌不可篡改原則)</text>
+  <g transform="translate(645, 60)">
+    <rect width="755" height="315" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 747 0 Q 755 0 755 8 L 755 32 L 0 32 Z" class="composite-header" />
+    <text x="16" y="21" class="group-title">管理功能 1：全站診斷紀錄多維檢索與運維維護 (UC-09)</text>
 
-    <!-- State 4: 檢閱全站日誌 (w=280, h=88) -->
+    <!-- State 4: 檢閱全站日誌 (w=215, h=86) -->
     <g transform="translate(25, 48)">
-      <rect width="280" height="88" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 26 L 0 26 Z" class="state-header" />
-      <text x="140" y="18" class="state-name" text-anchor="middle">檢閱全站日誌 (Browsing_All)</text>
-      <text x="12" y="46" class="action-text">entry / 載入 plant_diary 全站歷史記錄</text>
-      <text x="12" y="65" class="action-text">do / 支援帳號、作物與病害多維篩選</text>
-      <text x="12" y="82" class="action-text">do / 檢視病徵照片與備忘筆記</text>
+      <rect width="215" height="86" class="state-box" />
+      <path d="M 0 5 Q 0 0 5 0 L 210 0 Q 215 0 215 5 L 215 25 L 0 25 Z" class="state-header" />
+      <text x="107" y="17" class="state-name" text-anchor="middle">檢閱全站日誌 (Browsing_All)</text>
+      <text x="10" y="44" class="action-text">entry / 載入全站記錄 (每頁 20 筆)</text>
+      <text x="10" y="61" class="action-text">do / 縮圖懸停 2.5x 放大檢視特寫</text>
+      <text x="10" y="78" class="action-text">do / 檢閱使用者帳號與病斑標籤</text>
     </g>
 
-    <!-- Transition S4 -> S5 (gap = 65px) -->
-    <line x1="305" y1="92" x2="368" y2="92" class="line" />
-    <text x="337" y="82" class="transition-text" text-anchor="middle">條件篩選</text>
+    <!-- Transition S4 -> S5 (gap = 30px) -->
+    <line x1="240" y1="91" x2="270" y2="91" class="line" />
+    <text x="255" y="81" class="transition-text" text-anchor="middle">篩選</text>
 
-    <!-- State 5: 多維檢索與篩選 (w=280, h=88) -->
-    <g transform="translate(370, 48)">
-      <rect width="280" height="88" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 26 L 0 26 Z" class="state-header" />
-      <text x="140" y="18" class="state-name" text-anchor="middle">多維檢索與篩選 (Filtered_Search)</text>
-      <text x="12" y="46" class="action-text">entry / 條件過濾與比對診斷標籤</text>
-      <text x="12" y="65" class="action-text">do / 呈現關鍵字精準檢索結果</text>
-      <text x="12" y="82" class="action-text">exit / 點選特定記錄進入審查</text>
+    <!-- State 5: 多維檢索與篩選 (w=215, h=86) -->
+    <g transform="translate(270, 48)">
+      <rect width="215" height="86" class="state-box" />
+      <path d="M 0 5 Q 0 0 5 0 L 210 0 Q 215 0 215 5 L 215 25 L 0 25 Z" class="state-header" />
+      <text x="107" y="17" class="state-name" text-anchor="middle">多維搜尋 (Filtered_Search)</text>
+      <text x="10" y="44" class="action-text">entry / GET /admin/?search={query}</text>
+      <text x="10" y="61" class="action-text">do / 作物、病害關鍵字精準比對</text>
+      <text x="10" y="78" class="action-text">do / 篩選指定使用者歷史紀錄</text>
     </g>
 
-    <!-- Transition S5 -> S6 -->
-    <line x1="510" y1="136" x2="510" y2="178" class="line" />
-    <text x="520" y="162" class="transition-text">檢閱記錄</text>
+    <!-- Transition S5 -> S6 (gap = 30px) -->
+    <line x1="485" y1="91" x2="515" y2="91" class="line" />
+    <text x="500" y="81" class="transition-text" text-anchor="middle">運維</text>
 
-    <!-- State 6: 病理審查與審計留存 (w=440, h=92) -->
-    <g transform="translate(130, 180)">
-      <rect width="440" height="92" class="state-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 434 0 Q 440 0 440 6 L 440 26 L 0 26 Z" class="state-header" />
-      <text x="220" y="18" class="state-name" text-anchor="middle">病理審查與審計留存 (Audit_Inspection)</text>
-      <text x="12" y="46" class="action-text">entry / 放大檢視病斑特徵與高解析照片</text>
-      <text x="12" y="65" class="action-text">do / 遵循病歷不可篡改性 (Immutability)</text>
-      <text x="12" y="84" class="action-text">do / 永久留存診斷數據供模型審計追蹤</text>
+    <!-- State 6: 紀錄運維管理 (CRUD) (w=215, h=86) -->
+    <g transform="translate(515, 48)">
+      <rect width="215" height="86" class="state-box" />
+      <path d="M 0 5 Q 0 0 5 0 L 210 0 Q 215 0 215 5 L 215 25 L 0 25 Z" class="state-header" />
+      <text x="107" y="17" class="state-name" text-anchor="middle">紀錄運維 (Maintenance)</text>
+      <text x="10" y="44" class="action-text">do / [補錄] POST /admin/add</text>
+      <text x="10" y="61" class="action-text">do / [更新] POST /update/{id}</text>
+      <text x="10" y="78" class="action-text">do / [刪除] POST /delete/{id}</text>
     </g>
 
-    <!-- Loop back Return Path S6 -> S4 (Cleanly routes outside cards directly into State 4 bottom) -->
-    <path d="M 130 226 L 70 226 L 70 138" class="line-back" />
-    <text x="100" y="216" class="transition-text" text-anchor="middle">返回列表</text>
+    <!-- Return Path S6 -> S4 -->
+    <path d="M 622 134 L 622 185 L 132 185 L 132 134" class="line-back" />
+    <text x="377" y="176" class="transition-text" text-anchor="middle">完成維護 / 刷新清單</text>
   </g>
 
   <!-- ========================================================================= -->
-  <!-- 3. SUB-PROCESS 2: FEEDBACK & ANNOTATION (x=680, y=390, w=680, h=330)      -->
+  <!-- 3. SUB-PROCESS 2: FEEDBACK & ACTIVE LEARNING (x=645, y=400, w=755, h=380) -->
   <!-- ========================================================================= -->
-  <g transform="translate(680, 390)">
-    <rect width="680" height="330" class="composite-bg" />
-    <path d="M 0 8 Q 0 0 8 0 L 672 0 Q 680 0 680 8 L 680 32 L 0 32 Z" class="composite-header" fill="#E5EDE3" />
-    <text x="16" y="21" class="group-title" fill="#1A281E">管理功能 2：使用者糾錯反饋審核與專家真值標註 (UC-14)</text>
+  <g transform="translate(645, 400)">
+    <rect width="755" height="380" class="composite-bg" />
+    <path d="M 0 8 Q 0 0 8 0 L 747 0 Q 755 0 755 8 L 755 32 L 0 32 Z" class="composite-header" />
+    <text x="16" y="21" class="group-title">管理功能 2：使用者糾錯反饋審核與主動學習自進化閉環 (UC-14)</text>
 
-    <!-- State 7: 反饋審查 (w=280, h=92) -->
-    <g transform="translate(25, 50)">
-      <rect width="280" height="92" class="ai-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 26 L 0 26 Z" class="ai-header" />
-      <text x="140" y="18" class="state-name" text-anchor="middle">反饋審查 (Reviewing_Feedback)</text>
-      <text x="12" y="46" class="action-text">entry / GET /admin/feedback/ (待審清單)</text>
-      <text x="12" y="65" class="action-text">do / 比對原始 AI 診斷與用戶回報內容</text>
-      <text x="12" y="84" class="action-text">do / 輸入專家校正之作物與病害名稱</text>
+    <!-- Row 1: S7 -> S8 -> S9 (w=215, h=86) -->
+    <!-- State 7: 反饋審查 -->
+    <g transform="translate(25, 48)">
+      <rect width="215" height="86" class="state-box" />
+      <path d="M 0 5 Q 0 0 5 0 L 210 0 Q 215 0 215 5 L 215 25 L 0 25 Z" class="state-header" />
+      <text x="107" y="17" class="state-name" text-anchor="middle">反饋審查 (Review_Feedback)</text>
+      <text x="10" y="44" class="action-text">entry / GET /admin/feedback/ 載入清單</text>
+      <text x="10" y="61" class="action-text">do / 檢視視覺記憶庫現況與病斑特寫</text>
+      <text x="10" y="78" class="action-text">do / 比對原始 AI 判斷與用戶回報</text>
     </g>
 
-    <!-- Transition S7 -> S8 (gap = 65px) -->
-    <line x1="305" y1="96" x2="368" y2="96" class="line" />
-    <text x="337" y="86" class="transition-text" text-anchor="middle">儲存標註</text>
+    <!-- Transition S7 -> S8 -->
+    <line x1="240" y1="91" x2="270" y2="91" class="line" />
+    <text x="255" y="81" class="transition-text" text-anchor="middle">真值</text>
 
-    <!-- State 8: 專家標註寫入 (w=280, h=92) -->
-    <g transform="translate(370, 50)">
-      <rect width="280" height="92" class="ai-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 274 0 Q 280 0 280 6 L 280 26 L 0 26 Z" class="ai-header" />
-      <text x="140" y="18" class="state-name" text-anchor="middle">專家標註寫入 (Annotation_Saving)</text>
-      <text x="12" y="46" class="action-text">entry / POST /admin/feedback/annotate/{id}</text>
-      <text x="12" y="65" class="action-text">do / UPDATE diagnosis_feedback 寫入真值</text>
-      <text x="12" y="84" class="action-text">exit / 發送 HTTP 303 See Other 重導向</text>
+    <!-- State 8: 專家標註寫入 -->
+    <g transform="translate(270, 48)">
+      <rect width="215" height="86" class="state-box" />
+      <path d="M 0 5 Q 0 0 5 0 L 210 0 Q 215 0 215 5 L 215 25 L 0 25 Z" class="state-header" />
+      <text x="107" y="17" class="state-name" text-anchor="middle">專家標註 (Expert_Annotate)</text>
+      <text x="10" y="44" class="action-text">entry / 填寫作物與病害標準名稱</text>
+      <text x="10" y="61" class="action-text">do / POST /feedback/annotate/{id}</text>
+      <text x="10" y="78" class="action-text">do / 寫入專家真值 (Ground Truth)</text>
     </g>
 
     <!-- Transition S8 -> S9 -->
-    <line x1="510" y1="142" x2="510" y2="188" class="line" />
-    <text x="520" y="168" class="transition-text">重導向刷新</text>
+    <line x1="485" y1="91" x2="515" y2="91" class="line" />
+    <text x="500" y="81" class="transition-text" text-anchor="middle">重構</text>
 
-    <!-- State 9: 標註真值留存與列表更新 (w=440, h=96) -->
-    <g transform="translate(130, 190)">
-      <rect width="440" height="96" class="ai-box" />
-      <path d="M 0 6 Q 0 0 6 0 L 434 0 Q 440 0 440 6 L 440 26 L 0 26 Z" class="ai-header" />
-      <text x="220" y="18" class="state-name" text-anchor="middle">標註真值留存與列表更新 (Feedback_Updated)</text>
-      <text x="12" y="46" class="action-text">entry / 重新載入 feedback.html 呈現校正狀態</text>
-      <text x="12" y="66" class="action-text">do / 永久留存專家標註真值與圖片於資料庫</text>
-      <text x="12" y="86" class="action-text">do / 累積標註樣本作為後續模型離線重訓依據</text>
+    <!-- State 9: 視覺記憶重構 (Visual Memory) -->
+    <g transform="translate(515, 48)">
+      <rect width="215" height="86" class="state-box" />
+      <path d="M 0 5 Q 0 0 5 0 L 210 0 Q 215 0 215 5 L 215 25 L 0 25 Z" class="state-header" />
+      <text x="107" y="17" class="state-name" text-anchor="middle">記憶重構 (Memory_Sync)</text>
+      <text x="10" y="44" class="action-text">entry / POST /feedback/rebuild-memory</text>
+      <text x="10" y="61" class="action-text">do / 提取 768 維特徵向量重建快取</text>
+      <text x="10" y="78" class="action-text">do / 免重啟服務，即刻注入專家先驗！</text>
     </g>
 
-    <!-- Loop back Return Path S9 -> S7 -->
-    <path d="M 130 238 L 70 238 L 70 144" class="line-back" />
-    <text x="100" y="228" class="transition-text" text-anchor="middle">繼續審核</text>
+    <!-- Transition S9 -> S10 (Downward Arrow) -->
+    <path d="M 622 134 L 622 185" class="line" />
+    <text x="632" y="163" class="transition-text">導出重訓集</text>
+
+    <!-- Row 2: S10 -> S11 -> S12 (Leftward Flow) -->
+    <!-- State 10: 增量訓練集導出 -->
+    <g transform="translate(515, 185)">
+      <rect width="215" height="86" class="state-box" />
+      <path d="M 0 5 Q 0 0 5 0 L 210 0 Q 215 0 215 5 L 215 25 L 0 25 Z" class="state-header" />
+      <text x="107" y="17" class="state-name" text-anchor="middle">資料集導出 (Dataset_Export)</text>
+      <text x="10" y="44" class="action-text">entry / POST /feedback/export-dataset</text>
+      <text x="10" y="61" class="action-text">do / 沉澱標註樣本為規範目錄結構</text>
+      <text x="10" y="78" class="action-text">do / 打包生成 PyTorch ImageFolder</text>
+    </g>
+
+    <!-- Transition S10 -> S11 -->
+    <line x1="515" y1="228" x2="485" y2="228" class="line" />
+    <text x="500" y="218" class="transition-text" text-anchor="middle">微調</text>
+
+    <!-- State 11: 本機增量微調 -->
+    <g transform="translate(270, 185)">
+      <rect width="215" height="86" class="state-box" />
+      <path d="M 0 5 Q 0 0 5 0 L 210 0 Q 215 0 215 5 L 215 25 L 0 25 Z" class="state-header" />
+      <text x="107" y="17" class="state-name" text-anchor="middle">模型微調 (Model_FineTune)</text>
+      <text x="10" y="44" class="action-text">entry / POST /feedback/retrain</text>
+      <text x="10" y="61" class="action-text">do / 非同步 3 Epoch 微調 ConvNeXt</text>
+      <text x="10" y="78" class="action-text">do / 評估合格後熱更新最佳權重檔！</text>
+    </g>
+
+    <!-- Transition S11 -> S12 -->
+    <line x1="270" y1="228" x2="240" y2="228" class="line" />
+    <text x="255" y="218" class="transition-text" text-anchor="middle">閉環</text>
+
+    <!-- State 12: 自進化閉環就緒 -->
+    <g transform="translate(25, 185)">
+      <rect width="215" height="86" class="state-box" />
+      <path d="M 0 5 Q 0 0 5 0 L 210 0 Q 215 0 215 5 L 215 25 L 0 25 Z" class="state-header" />
+      <text x="107" y="17" class="state-name" text-anchor="middle">閉環就緒 (Active_Learned)</text>
+      <text x="10" y="44" class="action-text">entry / 重新整理 feedback.html 清單</text>
+      <text x="10" y="61" class="action-text">do / 達成「真值已存/記憶已更/權重已新」</text>
+      <text x="10" y="78" class="action-text">do / 累積可溯源模型自進化審計記錄</text>
+    </g>
+
+    <!-- Return Path S12 -> S7 (Direct Vertical Line between stacked boxes) -->
+    <path d="M 132 185 L 132 134" class="line-back" />
+    <text x="122" y="163" class="transition-text" text-anchor="end">繼續審核</text>
   </g>
 
   <!-- ========================================================================= -->
-  <!-- 4. CHOICE DIAMOND & ROUTING (Center: x=510, y=340)                        -->
+  <!-- 4. CHOICE DIAMOND & ROUTING (Center: x=510, y=360)                        -->
   <!-- ========================================================================= -->
-  <!-- From Dashboard State 2 (x=385, y=290) -> Diamond Left Tip (x=465, y=340)  -->
-  <path d="M 385 290 L 425 290 L 425 340 L 463 340" class="line" />
-  <text x="425" y="315" class="transition-text" text-anchor="middle">選擇維護功能</text>
+  <path d="M 390 229 L 440 229 L 440 360 L 465 360" class="line" />
+  <text x="430" y="300" class="transition-text" text-anchor="middle">選擇功能</text>
 
-  <!-- Choice Diamond (Center: x=510, y=340; w=90, h=50) -->
-  <polygon points="510,315 555,340 510,365 465,340" class="choice-diamond" />
-  <text x="510" y="344" class="diamond-text">模組分支</text>
+  <polygon points="510,335 555,360 510,385 465,360" class="choice-diamond" />
+  <text x="510" y="364" class="diamond-text">模組分支</text>
 
-  <!-- Branch 1: Top tip (510, 315) -> Up to y=150 -> Right to Sub-process 1 (678, 150) -->
-  <path d="M 510 315 L 510 150 L 678 150" class="line-branch" />
-  <text x="530" y="140" class="transition-text">進入日誌列表 (UC-09)</text>
+  <!-- Branch 1: Top tip (510, 335) -> Up to y=150 -> Right to Sub-process 1 (645, 150) -->
+  <path d="M 510 335 L 510 150 L 645 150" class="line-branch" />
+  <text x="535" y="140" class="transition-text">進入日誌管理 (UC-09)</text>
 
-  <!-- Branch 2: Bottom tip (510, 365) -> Down to y=520 -> Right to Sub-process 2 (678, 520) -->
-  <path d="M 510 365 L 510 520 L 678 520" class="line-branch" />
-  <text x="530" y="510" class="transition-text">審核糾錯反饋 (UC-14)</text>
+  <!-- Branch 2: Bottom tip (510, 385) -> Down to y=515 -> Right to Sub-process 2 (645, 515) -->
+  <path d="M 510 385 L 510 515 L 645 515" class="line-branch" />
+  <text x="535" y="505" class="transition-text">審核糾錯反饋 (UC-14)</text>
 
 </svg>

@@ -105,7 +105,23 @@
             </div>
         </div>
 
-        <p>目前資料顯示：<strong>{{ pagination.total_items }}</strong> 筆紀錄</p>
+        <div style="margin: 15px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <strong>篩選檢視：</strong>
+            <a href="/admin/?filter_status=all{% if search_query %}&search={{ search_query }}{% endif %}" 
+               style="padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: bold; {{ 'background:#2E7D32; color:white;' if filter_status == 'all' else 'background:#e0e0e0; color:#333;' }}">
+               全部紀錄 ({{ summary.total_diaries }})
+            </a>
+            <a href="/admin/?filter_status=review{% if search_query %}&search={{ search_query }}{% endif %}" 
+               style="padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: bold; {{ 'background:#e65100; color:white;' if filter_status == 'review' else 'background:#fff3e0; color:#e65100; border:1px solid #ffe0b2;' }}">
+               ⚠️ 待專家覆核 ({{ review_count }})
+            </a>
+            <a href="/admin/?filter_status=corrected{% if search_query %}&search={{ search_query }}{% endif %}" 
+               style="padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: bold; {{ 'background:#1976D2; color:white;' if filter_status == 'corrected' else 'background:#e3f2fd; color:#1976D2; border:1px solid #bbdefb;' }}">
+               ✅ 已專家校正 ({{ corrected_count }})
+            </a>
+        </div>
+
+        <p>目前條件顯示：<strong>{{ pagination.total_items }}</strong> 筆紀錄</p>
         
         <table>
             <thead>
@@ -113,9 +129,10 @@
                     <th>圖片</th>
                     <th>ID</th>
                     <th>使用者</th>
-                    <th>診斷</th>
-                    <th>使用者備註</th>
+                    <th>診斷 (AI)</th>
+                    <th>專家校正</th>
                     <th>診斷時間</th>
+                    <th>操作</th>
                 </tr>
             </thead>
             <tbody>
@@ -131,7 +148,15 @@
                     <td>{{ diary.id }}</td>
                     <td>{{ diary.username or 'N/A' }}</td>
 
-                    <td><span class="status-badge ai-status">{{ diary.status_name }}</span></td>
+                    <td>
+                        <span class="status-badge ai-status">{{ diary.status_name }}</span>
+                        {% if diary.requires_review and not diary.user_corrected_status %}
+                        <span class="status-badge" style="background:#fff3e0; color:#e65100; font-size:11px; margin-left:4px;">⚠️ 待覆核</span>
+                        {% endif %}
+                        {% if diary.confidence %}
+                        <span style="font-size:11px; color:#888;">({{ "%.0f"|format(diary.confidence * 100) }}%)</span>
+                        {% endif %}
+                    </td>
                     <td>
                         {% if diary.user_corrected_status %}
                         <span class="status-badge user-corrected-status">{{ diary.user_corrected_status }}</span>
@@ -141,6 +166,14 @@
                     </td>
 
                     <td>{{ diary.created_at.strftime('%Y-%m-%d %H:%M') if diary.created_at else '' }}</td>
+                    <td>
+                        <div class="edit-group">
+                            <form action="/admin/update/{{ diary.id }}" method="post" style="display:inline-flex; gap:4px; margin:0;">
+                                <input type="text" name="status_name" placeholder="修正病害..." value="{{ diary.user_corrected_status or '' }}" style="width:100px; font-size:12px; padding:4px 6px;">
+                                <button type="submit" class="btn-save">校正</button>
+                            </form>
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

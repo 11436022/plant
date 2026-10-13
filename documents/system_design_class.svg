@@ -2,14 +2,14 @@
   <defs>
     <style>
       .title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 23px; font-weight: bold; fill: #1A281E; }
-      .layer-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 16px; font-weight: bold; fill: #223827; }
-      .class-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 14px; font-weight: bold; fill: #1A281E; text-anchor: middle; }
-      .member-text { font-family: 'Consolas', 'Courier New', monospace; font-size: 12px; fill: #2D3748; }
-      .member-method { font-family: 'Consolas', 'Courier New', monospace; font-size: 12px; fill: #2D5837; }
+      .layer-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 15px; font-weight: bold; fill: #223827; }
+      .class-title { font-family: 'Microsoft JhengHei', sans-serif; font-size: 13.5px; font-weight: bold; fill: #1A281E; text-anchor: middle; }
+      .member-text { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; fill: #2D3748; }
+      .member-method { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; fill: #2D5837; }
       
-      .cardinality { font-family: 'Consolas', monospace; font-size: 13px; font-weight: bold; fill: #1A281E; paint-order: stroke fill; stroke: #ffffff; stroke-width: 3.5px; }
-      .rel-label { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12px; font-weight: bold; fill: #223827; text-anchor: middle; paint-order: stroke fill; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
-      .pipeline-label { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12px; font-weight: bold; fill: #223827; text-anchor: middle; paint-order: stroke fill; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
+      .cardinality { font-family: 'Consolas', monospace; font-size: 12.5px; font-weight: bold; fill: #1A281E; paint-order: stroke fill; stroke: #ffffff; stroke-width: 3.5px; }
+      .rel-label { font-family: 'Microsoft JhengHei', sans-serif; font-size: 11.5px; font-weight: bold; fill: #223827; text-anchor: middle; paint-order: stroke fill; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
+      .pipeline-label { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10.5px; font-weight: bold; fill: #1e3a24; text-anchor: middle; paint-order: stroke fill; stroke: #ffffff; stroke-width: 3.5px; }
       
       .layer-bg { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 1.2; rx: 8; ry: 8; }
       
@@ -39,183 +39,199 @@
   <!-- Diagram Title -->
   <text x="640" y="32" class="title" text-anchor="middle">圖 6-2-1 系統設計類別圖 (Design Class Diagram)</text>
 
-
   <!-- ========================================================================= -->
-  <!-- LAYER 1: CLIENT & CONTROLLER LAYER (y=50, h=165)                           -->
+  <!-- LAYER 1: CLIENT & CONTROLLER LAYER (y=50, h=175)                           -->
   <!-- ========================================================================= -->
-  <rect x="30" y="50" width="1220" height="165" class="layer-bg" />
+  <rect x="30" y="50" width="1220" height="175" class="layer-bg" />
   <text x="50" y="73" class="layer-title">客戶端通訊與介面控制器層 (Client &amp; Controller Layer)</text>
 
-  <!-- 1. PlantApiService (Retrofit2) (x: 50..290, w: 240, h: 115) -->
+  <!-- 1. PlantApiService (Retrofit2) -->
   <g transform="translate(50, 85)">
-    <rect width="240" height="115" class="class-box" />
-    <path d="M 0 4 Q 0 0 4 0 L 236 0 Q 240 0 240 4 L 240 28 L 0 28 Z" class="class-header-blue" />
-    <text x="120" y="19" class="class-title">PlantApiService (Retrofit2)</text>
+    <rect width="230" height="125" class="class-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 226 0 Q 230 0 230 4 L 230 28 L 0 28 Z" class="class-header-blue" />
+    <text x="115" y="19" class="class-title">PlantApiService (Retrofit2)</text>
     <text x="12" y="47" class="member-text">- client: OkHttpClient (JWT)</text>
-    <line x1="0" y1="55" x2="240" y2="55" class="divider" />
+    <line x1="0" y1="55" x2="230" y2="55" class="divider" />
     <text x="12" y="72" class="member-method">+ login(dto): AuthToken</text>
     <text x="12" y="90" class="member-method">+ predict(image): PredRes</text>
     <text x="12" y="108" class="member-method">+ confirmDiary(dto): Diary</text>
   </g>
 
-  <!-- 2. AuthRouter (x: 315..520, w: 205, h: 115) -->
-  <g transform="translate(315, 85)">
-    <rect width="205" height="115" class="class-box" />
-    <path d="M 0 4 Q 0 0 4 0 L 201 0 Q 205 0 205 4 L 205 28 L 0 28 Z" class="class-header-blue" />
-    <text x="102" y="19" class="class-title">AuthRouter</text>
+  <!-- 2. AuthRouter -->
+  <g transform="translate(300, 85)">
+    <rect width="200" height="125" class="class-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 196 0 Q 200 0 200 4 L 200 28 L 0 28 Z" class="class-header-blue" />
+    <text x="100" y="19" class="class-title">AuthRouter</text>
     <text x="12" y="47" class="member-text">- oauth2: OAuth2Bearer</text>
-    <line x1="0" y1="55" x2="205" y2="55" class="divider" />
+    <line x1="0" y1="55" x2="200" y2="55" class="divider" />
     <text x="12" y="72" class="member-method">+ login(form): Token</text>
     <text x="12" y="90" class="member-method">+ register(dto): Status</text>
     <text x="12" y="108" class="member-method">+ verifyEmail(t): bool</text>
   </g>
 
-  <!-- 3. PredictionRouter (x: 545..770, w: 225, h: 115) -->
-  <g transform="translate(545, 85)">
-    <rect width="225" height="115" class="class-box" />
-    <path d="M 0 4 Q 0 0 4 0 L 221 0 Q 225 0 225 4 L 225 28 L 0 28 Z" class="class-header-blue" />
-    <text x="112" y="19" class="class-title">PredictionRouter</text>
-    <text x="12" y="47" class="member-text">- conf_limit: Float = 0.70</text>
-    <line x1="0" y1="55" x2="225" y2="55" class="divider" />
+  <!-- 3. PredictionRouter -->
+  <g transform="translate(520, 85)">
+    <rect width="220" height="125" class="class-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 216 0 Q 220 0 220 4 L 220 28 L 0 28 Z" class="class-header-blue" />
+    <text x="110" y="19" class="class-title">PredictionRouter</text>
+    <text x="12" y="47" class="member-text">- conf_limit: Float = 0.65</text>
+    <line x1="0" y1="55" x2="220" y2="55" class="divider" />
     <text x="12" y="72" class="member-method">+ predict(file, u): PredRes</text>
     <text x="12" y="90" class="member-method">+ webcamAlert(): Alert</text>
     <text x="12" y="108" class="member-method">+ confirmDiary(): Diary</text>
   </g>
 
-  <!-- 4. Diaries & FeedbackRouter (x: 795..1030, w: 235, h: 115) -->
-  <g transform="translate(795, 85)">
-    <rect width="235" height="115" class="class-box" />
-    <path d="M 0 4 Q 0 0 4 0 L 231 0 Q 235 0 235 4 L 235 28 L 0 28 Z" class="class-header-blue" />
-    <text x="117" y="19" class="class-title">Diaries &amp; FeedbackRouter</text>
+  <!-- 4. Diaries & FeedbackRouter -->
+  <g transform="translate(760, 85)">
+    <rect width="230" height="125" class="class-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 226 0 Q 230 0 230 4 L 230 28 L 0 28 Z" class="class-header-blue" />
+    <text x="115" y="19" class="class-title">Diaries &amp; FeedbackRouter</text>
     <text x="12" y="47" class="member-text">- db: Session (Depends)</text>
-    <line x1="0" y1="55" x2="235" y2="55" class="divider" />
+    <line x1="0" y1="55" x2="230" y2="55" class="divider" />
     <text x="12" y="72" class="member-method">+ getDiaries(): List&lt;Diary&gt;</text>
     <text x="12" y="90" class="member-method">+ updateNote(id, note): Res</text>
     <text x="12" y="108" class="member-method">+ sendFeedback(dto): Res</text>
   </g>
 
-  <!-- 5. AdminDashboard (x: 1055..1250, w: 195, h: 115) -->
-  <g transform="translate(1055, 85)">
-    <rect width="195" height="115" class="class-box" />
-    <path d="M 0 4 Q 0 0 4 0 L 191 0 Q 195 0 195 4 L 195 28 L 0 28 Z" class="class-header-blue" />
-    <text x="97" y="19" class="class-title">AdminDashboard</text>
-    <text x="12" y="45" class="member-text">- templates: Jinja2</text>
-    <text x="12" y="60" class="member-text">- require_admin: Dep</text>
-    <line x1="0" y1="67" x2="195" y2="67" class="divider" />
-    <text x="12" y="84" class="member-method">+ showDashboard(): HTML</text>
-    <text x="12" y="102" class="member-method">+ auditFeedback(): Res</text>
+  <!-- 5. AdminDashboard -->
+  <g transform="translate(1010, 85)">
+    <rect width="240" height="125" class="class-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 236 0 Q 240 0 240 4 L 240 28 L 0 28 Z" class="class-header-blue" />
+    <text x="120" y="19" class="class-title">AdminDashboard (後台管理)</text>
+    <text x="12" y="45" class="member-text">- templates: Jinja2 | require_admin</text>
+    <line x1="0" y1="53" x2="240" y2="53" class="divider" />
+    <text x="12" y="68" class="member-method">+ annotateFeedback(id, tr): Res</text>
+    <text x="12" y="85" class="member-method">+ rebuildMemory(): Redirect</text>
+    <text x="12" y="102" class="member-method">+ exportDataset(): Redirect</text>
+    <text x="12" y="119" class="member-method">+ retrainModel(epochs=3): Res</text>
   </g>
 
 
   <!-- ========================================================================= -->
-  <!-- LAYER 2: BUSINESS LOGIC & SERVICE LAYER (y=270, h=210)                     -->
+  <!-- LAYER 2: BUSINESS LOGIC & DUAL AI SERVICES (y=245, h=230)                  -->
   <!-- ========================================================================= -->
-  <rect x="30" y="270" width="1220" height="210" class="layer-bg" />
-  <text x="50" y="293" class="layer-title">業務邏輯與階層式推論服務層 (Business Logic &amp; Dual AI Services)</text>
+  <rect x="30" y="245" width="1220" height="230" class="layer-bg" />
+  <text x="50" y="268" class="layer-title">業務邏輯與階層式推論服務層 (Business Logic &amp; Dual AI Services)</text>
 
-  <!-- 6. AuthService (認證服務) (x: 50..255, w: 205, h: 155) -->
-  <g transform="translate(50, 310)">
-    <rect width="205" height="155" class="service-box" />
-    <path d="M 0 4 Q 0 0 4 0 L 201 0 Q 205 0 205 4 L 205 28 L 0 28 Z" class="class-header-green" />
-    <text x="102" y="19" class="class-title">AuthService (認證服務)</text>
-    <text x="12" y="45" class="member-text">- pwd_ctx: CryptContext</text>
-    <text x="12" y="61" class="member-text">- secret_key: str (JWT)</text>
-    <line x1="0" y1="69" x2="205" y2="69" class="divider" />
-    <text x="12" y="86" class="member-method">+ verifyPassword(): bool</text>
-    <text x="12" y="104" class="member-method">+ createJwtToken(): str</text>
-    <text x="12" y="122" class="member-method">+ sendEmail(token): Void</text>
+  <!-- 6. AuthService (認證服務) -->
+  <g transform="translate(45, 280)">
+    <rect width="180" height="175" class="service-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 176 0 Q 180 0 180 4 L 180 28 L 0 28 Z" class="class-header-green" />
+    <text x="90" y="19" class="class-title">AuthService (認證服務)</text>
+    <text x="10" y="45" class="member-text">- pwd_ctx: CryptContext</text>
+    <text x="10" y="61" class="member-text">- secret_key: str (JWT)</text>
+    <line x1="0" y1="69" x2="180" y2="69" class="divider" />
+    <text x="10" y="86" class="member-method">+ verifyPassword(): bool</text>
+    <text x="10" y="104" class="member-method">+ createJwtToken(): str</text>
+    <text x="10" y="122" class="member-method">+ sendEmail(token): Void</text>
   </g>
 
-  <!-- 7. PredictionService (階層調度) (x: 280..520, w: 240, h: 155) -->
-  <g transform="translate(280, 310)">
-    <rect width="240" height="155" class="service-box" />
-    <path d="M 0 4 Q 0 0 4 0 L 236 0 Q 240 0 240 4 L 240 28 L 0 28 Z" class="class-header-green" />
-    <text x="120" y="19" class="class-title">PredictionService (階層調度)</text>
-    <text x="12" y="45" class="member-text">- convnet_svc: LocalConvNet</text>
-    <text x="12" y="61" class="member-text">- gemini_svc: GeminiService</text>
-    <text x="12" y="77" class="member-text">- threshold: Float = 0.70</text>
-    <line x1="0" y1="85" x2="240" y2="85" class="divider" />
-    <text x="12" y="102" class="member-method">+ cascadePredict(img): Dict</text>
-    <text x="12" y="120" class="member-method">+ arbitrateAndFuse(): Dict</text>
-    <text x="12" y="138" class="member-method">+ confirmAndSave(): Diary</text>
-  </g>
-
-  <!-- 8. LocalConvNetService (快篩) (x: 545..760, w: 215, h: 155) -->
-  <g transform="translate(545, 310)">
-    <rect width="215" height="155" class="service-box" />
+  <!-- 7. PredictionService (階層調度與安全剎車) -->
+  <g transform="translate(235, 280)">
+    <rect width="215" height="175" class="service-box" />
     <path d="M 0 4 Q 0 0 4 0 L 211 0 Q 215 0 215 4 L 215 28 L 0 28 Z" class="class-header-green" />
-    <text x="107" y="19" class="class-title">LocalConvNetService (快篩)</text>
-    <text x="12" y="45" class="member-text">- weights: 'convnet.pth'</text>
-    <text x="12" y="61" class="member-text">- threshold: Float = 0.75</text>
-    <line x1="0" y1="69" x2="215" y2="69" class="divider" />
-    <text x="12" y="88" class="member-method">+ classify(image): Dict</text>
-    <text x="12" y="108" class="member-method">+ getTopK(k=3): List</text>
+    <text x="107" y="19" class="class-title">PredictionService (調度/剎車)</text>
+    <text x="10" y="45" class="member-text">- convnext_svc: ConvNeXt</text>
+    <text x="10" y="61" class="member-text">- gemini_svc: GeminiService</text>
+    <text x="10" y="77" class="member-text">- threshold: Float = 0.65</text>
+    <line x1="0" y1="85" x2="215" y2="85" class="divider" />
+    <text x="10" y="102" class="member-method">+ cascadePredict(img): Dict</text>
+    <text x="10" y="120" class="member-method">+ arbitrateAndFuse(): Dict</text>
+    <text x="10" y="138" class="member-method">+ applySafetyBrake(): Dict</text>
+    <text x="10" y="156" class="member-method">+ confirmAndSave(): Diary</text>
   </g>
 
-  <!-- 9. GeminiService (雲端兜底) (x: 785..1005, w: 220, h: 155) -->
-  <g transform="translate(785, 310)">
-    <rect width="220" height="155" class="service-box" />
-    <path d="M 0 4 Q 0 0 4 0 L 216 0 Q 220 0 220 4 L 220 28 L 0 28 Z" class="class-header-green" />
-    <text x="110" y="19" class="class-title">GeminiService (雲端兜底)</text>
-    <text x="12" y="45" class="member-text">- model: 'gemini-flash'</text>
-    <text x="12" y="61" class="member-text">- schema: DiagnosisSchema</text>
-    <line x1="0" y1="69" x2="220" y2="69" class="divider" />
-    <text x="12" y="86" class="member-method">+ analyze(image): JSON</text>
-    <text x="12" y="104" class="member-method">+ extractSymptoms(): Text</text>
-    <text x="12" y="122" class="member-method">+ explain(): Text</text>
-  </g>
-
-  <!-- 10. RAGService (知識檢索) (x: 1030..1245, w: 215, h: 155) -->
-  <g transform="translate(1030, 310)">
-    <rect width="215" height="155" class="service-box" />
+  <!-- 8. LocalConvNeXtService (快篩 & CAM 前景驗證) -->
+  <g transform="translate(460, 280)">
+    <rect width="215" height="175" class="service-box" />
     <path d="M 0 4 Q 0 0 4 0 L 211 0 Q 215 0 215 4 L 215 28 L 0 28 Z" class="class-header-green" />
-    <text x="107" y="19" class="class-title">RAGService (知識檢索)</text>
-    <text x="12" y="45" class="member-text">- faiss_index: IndexFlatIP</text>
-    <text x="12" y="61" class="member-text">- content: 農業知識手冊</text>
-    <line x1="0" y1="69" x2="215" y2="69" class="divider" />
-    <text x="12" y="86" class="member-method">+ searchKnowledge(q): str</text>
-    <text x="12" y="104" class="member-method">+ crossValidate(): Dict</text>
-    <text x="12" y="122" class="member-method">+ genPrescription(): Tuple</text>
+    <text x="107" y="19" class="class-title">ConvNeXtService (快篩/CAM)</text>
+    <text x="10" y="45" class="member-text">- weights: 'convnext_best.pth'</text>
+    <text x="10" y="61" class="member-text">- min_cam_ratio: Float = 0.35</text>
+    <text x="10" y="77" class="member-text">- fast_threshold: Float = 0.75</text>
+    <line x1="0" y1="85" x2="215" y2="85" class="divider" />
+    <text x="10" y="102" class="member-method">+ classify(image): Dict</text>
+    <text x="10" y="120" class="member-method">+ computeCAMAlignment(): F</text>
+    <text x="10" y="138" class="member-method">+ extractFeatures(): Tensor</text>
+  </g>
+
+  <!-- 9. VisualMemoryManager (視覺特徵檢索飛輪) -->
+  <g transform="translate(685, 280)">
+    <rect width="215" height="175" class="service-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 211 0 Q 215 0 215 4 L 215 28 L 0 28 Z" class="class-header-green" />
+    <text x="107" y="19" class="class-title">VisualMemory (特徵飛輪)</text>
+    <text x="10" y="45" class="member-text">- records: List&lt;Dict&gt;</text>
+    <text x="10" y="61" class="member-text">- embeddings: Tensor [N,768]</text>
+    <text x="10" y="77" class="member-text">- cache_file: 'memory_cache.pt'</text>
+    <line x1="0" y1="85" x2="215" y2="85" class="divider" />
+    <text x="10" y="102" class="member-method">+ addOrUpdate(id, url, tr): V</text>
+    <text x="10" y="120" class="member-method">+ rebuildIndex(): int</text>
+    <text x="10" y="138" class="member-method">+ searchNearest(img): Dict</text>
+  </g>
+
+  <!-- 10. GeminiService (雲端多模態兜底) -->
+  <g transform="translate(910, 280)">
+    <rect width="180" height="175" class="service-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 176 0 Q 180 0 180 4 L 180 28 L 0 28 Z" class="class-header-green" />
+    <text x="90" y="19" class="class-title">GeminiService (雲端兜底)</text>
+    <text x="10" y="45" class="member-text">- model: 'gemini-3.8-flash'</text>
+    <text x="10" y="61" class="member-text">- client: genai.Client</text>
+    <line x1="0" y1="69" x2="180" y2="69" class="divider" />
+    <text x="10" y="86" class="member-method">+ callGemini(): Response</text>
+    <text x="10" y="104" class="member-method">+ analyze(image): JSON</text>
+    <text x="10" y="122" class="member-method">+ explain(): Text</text>
+  </g>
+
+  <!-- 11. RAGService (農業部專書溯源檢索) -->
+  <g transform="translate(1100, 280)">
+    <rect width="145" height="175" class="service-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 141 0 Q 145 0 145 4 L 145 28 L 0 28 Z" class="class-header-green" />
+    <text x="72" y="19" class="class-title">RAGService (專書溯源)</text>
+    <text x="8" y="45" class="member-text">- faiss_index: Index</text>
+    <text x="8" y="61" class="member-text">- content: 農業專書</text>
+    <line x1="0" y1="69" x2="145" y2="69" class="divider" />
+    <text x="8" y="86" class="member-method">+ searchKnowledge(): s</text>
+    <text x="8" y="104" class="member-method">+ crossValidate(): Dict</text>
+    <text x="8" y="122" class="member-method">+ genPrescription(): T</text>
   </g>
 
 
   <!-- ========================================================================= -->
-  <!-- LAYER 3: DATA PERSISTENCE LAYER (y=535, h=415)                             -->
+  <!-- LAYER 3: DATA PERSISTENCE LAYER (y=500, h=450)                             -->
   <!-- ========================================================================= -->
-  <rect x="30" y="535" width="1220" height="415" class="layer-bg" />
-  <text x="50" y="558" class="layer-title">領域實體與資料庫持久化層 (Domain Entities &amp; SQLAlchemy Models - 8 大核心資料表)</text>
+  <rect x="30" y="500" width="1220" height="450" class="layer-bg" />
+  <text x="50" y="523" class="layer-title">領域實體與資料庫持久化層 (Domain Entities &amp; SQLAlchemy Models - 8 大核心資料表)</text>
 
-  <!-- Row 1: Core Diagnostic Pipeline (y=575, h=145) -->
-  <!-- 11. User (x: 50..240, w: 190, h: 145) -->
-  <g transform="translate(50, 575)">
-    <rect width="190" height="145" class="entity-box" />
+  <!-- Row 1: Core Diagnostic Pipeline (y=540, h=155) -->
+  <!-- User -->
+  <g transform="translate(50, 540)">
+    <rect width="190" height="155" class="entity-box" />
     <path d="M 0 4 Q 0 0 4 0 L 186 0 Q 190 0 190 4 L 190 28 L 0 28 Z" class="class-header-amber" />
     <text x="95" y="19" class="class-title">User</text>
-    <text x="12" y="46" class="member-text">+ id: int (PK)</text>
-    <text x="12" y="64" class="member-text">+ username: str</text>
-    <text x="12" y="82" class="member-text">+ email: str (UK)</text>
-    <text x="12" y="100" class="member-text">+ hashed_password: str</text>
-    <text x="12" y="118" class="member-text">+ role: UserRole</text>
+    <text x="12" y="48" class="member-text">+ id: int (PK)</text>
+    <text x="12" y="68" class="member-text">+ username: str</text>
+    <text x="12" y="88" class="member-text">+ email: str (UK)</text>
+    <text x="12" y="108" class="member-text">+ hashed_password: str</text>
+    <text x="12" y="128" class="member-text">+ role: UserRole</text>
   </g>
 
-  <!-- 12. PlantDiary (x: 275..520, w: 245, h: 145) -->
-  <g transform="translate(275, 575)">
-    <rect width="245" height="145" class="entity-box" />
-    <path d="M 0 4 Q 0 0 4 0 L 241 0 Q 245 0 245 4 L 245 28 L 0 28 Z" class="class-header-amber" />
-    <text x="122" y="19" class="class-title">PlantDiary</text>
-    <text x="12" y="40" class="member-text">+ id: int (PK)</text>
-    <text x="12" y="53" class="member-text">+ user_id: int (FK)</text>
-    <text x="12" y="66" class="member-text">+ crop_id: int (FK)</text>
-    <text x="12" y="79" class="member-text">+ disease_id: int (FK)</text>
-    <text x="12" y="92" class="member-text">+ pest_id: int (FK)</text>
-    <text x="12" y="105" class="member-text">+ image_url: str</text>
-    <text x="12" y="118" class="member-text">+ confidence: float</text>
-    <text x="12" y="131" class="member-text">+ user_note: text (筆記)</text>
+  <!-- PlantDiary -->
+  <g transform="translate(275, 540)">
+    <rect width="250" height="155" class="entity-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 246 0 Q 250 0 250 4 L 250 28 L 0 28 Z" class="class-header-amber" />
+    <text x="125" y="19" class="class-title">PlantDiary</text>
+    <text x="12" y="44" class="member-text">+ id: int (PK)</text>
+    <text x="12" y="59" class="member-text">+ user_id: int (FK)</text>
+    <text x="12" y="74" class="member-text">+ crop_id, disease_id: int (FK)</text>
+    <text x="12" y="89" class="member-text">+ confidence: float</text>
+    <text x="12" y="104" class="member-text">+ requires_review: bool</text>
+    <text x="12" y="119" class="member-text">+ grounding_source: str</text>
+    <text x="12" y="134" class="member-text">+ user_note: text (筆記)</text>
   </g>
 
-  <!-- 13. Crop (x: 565..755, w: 190, h: 145) -->
-  <g transform="translate(565, 575)">
-    <rect width="190" height="145" class="entity-box" />
+  <!-- Crop -->
+  <g transform="translate(565, 540)">
+    <rect width="190" height="155" class="entity-box" />
     <path d="M 0 4 Q 0 0 4 0 L 186 0 Q 190 0 190 4 L 190 28 L 0 28 Z" class="class-header-amber" />
     <text x="95" y="19" class="class-title">Crop</text>
     <text x="12" y="50" class="member-text">+ id: int (PK)</text>
@@ -223,34 +239,34 @@
     <text x="12" y="98" class="member-text">+ description: text</text>
   </g>
 
-  <!-- 14. Disease (病害字典) (x: 800..1005, w: 205, h: 145) -->
-  <g transform="translate(800, 575)">
-    <rect width="205" height="145" class="entity-box" />
+  <!-- Disease -->
+  <g transform="translate(800, 540)">
+    <rect width="205" height="155" class="entity-box" />
     <path d="M 0 4 Q 0 0 4 0 L 201 0 Q 205 0 205 4 L 205 28 L 0 28 Z" class="class-header-amber" />
     <text x="102" y="19" class="class-title">Disease (病害字典)</text>
     <text x="12" y="46" class="member-text">+ id: int (PK)</text>
     <text x="12" y="64" class="member-text">+ crop_id: int (FK)</text>
     <text x="12" y="82" class="member-text">+ name: str (100)</text>
     <text x="12" y="100" class="member-text">+ symptoms: text (病徵)</text>
-    <text x="12" y="118" class="member-text">+ treatment: text (藥劑)</text>
+    <text x="12" y="118" class="member-text">+ treatment: text (官方處方)</text>
   </g>
 
-  <!-- 15. Pest (蟲害字典) (x: 1050..1250, w: 200, h: 145) -->
-  <g transform="translate(1050, 575)">
-    <rect width="200" height="145" class="entity-box" />
-    <path d="M 0 4 Q 0 0 4 0 L 196 0 Q 200 0 200 4 L 200 28 L 0 28 Z" class="class-header-amber" />
-    <text x="100" y="19" class="class-title">Pest (蟲害字典)</text>
+  <!-- Pest -->
+  <g transform="translate(1045, 540)">
+    <rect width="205" height="155" class="entity-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 201 0 Q 205 0 205 4 L 205 28 L 0 28 Z" class="class-header-amber" />
+    <text x="102" y="19" class="class-title">Pest (蟲害字典)</text>
     <text x="12" y="46" class="member-text">+ id: int (PK)</text>
     <text x="12" y="64" class="member-text">+ crop_id: int (FK)</text>
     <text x="12" y="82" class="member-text">+ name: str (100)</text>
     <text x="12" y="100" class="member-text">+ signs: text (徵兆)</text>
-    <text x="12" y="118" class="member-text">+ control: text (防治)</text>
+    <text x="12" y="118" class="member-text">+ control: text (官方防治)</text>
   </g>
 
-  <!-- Row 2: Tokens, Feedback, Webcam (y=765, h=135) -->
-  <!-- 16. UserOneTimeToken (x: 50..240, w: 190, h: 135) -->
-  <g transform="translate(50, 765)">
-    <rect width="190" height="135" class="entity-box" />
+  <!-- Row 2: Tokens, Feedback, ActiveLearning, Webcam (y=745, h=165) -->
+  <!-- UserOneTimeToken -->
+  <g transform="translate(50, 745)">
+    <rect width="190" height="155" class="entity-box" />
     <path d="M 0 4 Q 0 0 4 0 L 186 0 Q 190 0 190 4 L 190 28 L 0 28 Z" class="class-header-amber" />
     <text x="95" y="19" class="class-title">UserOneTimeToken</text>
     <text x="12" y="48" class="member-text">+ id: int (PK)</text>
@@ -259,129 +275,120 @@
     <text x="12" y="108" class="member-text">+ expires_at: datetime</text>
   </g>
 
-  <!-- 17. DiagnosisFeedback (x: 275..520, w: 245, h: 135) -->
-  <g transform="translate(275, 765)">
-    <rect width="245" height="135" class="entity-box" />
+  <!-- DiagnosisFeedback -->
+  <g transform="translate(275, 745)">
+    <rect width="245" height="155" class="entity-box" />
     <path d="M 0 4 Q 0 0 4 0 L 241 0 Q 245 0 245 4 L 245 28 L 0 28 Z" class="class-header-amber" />
-    <text x="122" y="19" class="class-title">DiagnosisFeedback</text>
-    <text x="12" y="46" class="member-text">+ id: int (PK)</text>
-    <text x="12" y="63" class="member-text">+ diary_id: int (FK)</text>
-    <text x="12" y="80" class="member-text">+ user_id: int (FK)</text>
-    <text x="12" y="97" class="member-text">+ corrected_status: str</text>
-    <text x="12" y="114" class="member-text">+ is_error: bool</text>
+    <text x="122" y="19" class="class-title">DiagnosisFeedback (回饋/真值)</text>
+    <text x="12" y="44" class="member-text">+ id: int (PK)</text>
+    <text x="12" y="59" class="member-text">+ diary_id, user_id: int (FK)</text>
+    <text x="12" y="74" class="member-text">+ corrected_disease_name: str</text>
+    <text x="12" y="89" class="member-text">+ manager_truth: str (真值)</text>
+    <text x="12" y="104" class="member-text">+ is_in_visual_memory: bool</text>
+    <text x="12" y="119" class="member-text">+ is_reviewed: bool</text>
   </g>
 
-  <!-- 18. WebcamAlert (x: 565..755, w: 190, h: 135) -->
-  <g transform="translate(565, 765)">
-    <rect width="190" height="135" class="entity-box" />
-    <path d="M 0 4 Q 0 0 4 0 L 186 0 Q 190 0 190 4 L 190 28 L 0 28 Z" class="class-header-amber" />
-    <text x="95" y="19" class="class-title">WebcamAlert</text>
+  <!-- ActiveLearningDataset (接在 Feedback 右側，直接連線零穿透) -->
+  <g transform="translate(555, 745)">
+    <rect width="210" height="155" class="entity-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 206 0 Q 210 0 210 4 L 210 28 L 0 28 Z" class="class-header-amber" />
+    <text x="105" y="19" class="class-title">ActiveLearningDataset</text>
+    <text x="12" y="48" class="member-text">+ manifest_path: Path</text>
+    <text x="12" y="68" class="member-text">+ total_samples: int</text>
+    <text x="12" y="88" class="member-text">+ exported_at: datetime</text>
+    <text x="12" y="108" class="member-text">+ finetuned_epochs: int</text>
+  </g>
+
+  <!-- WebcamAlert -->
+  <g transform="translate(800, 745)">
+    <rect width="205" height="155" class="entity-box" />
+    <path d="M 0 4 Q 0 0 4 0 L 201 0 Q 205 0 205 4 L 205 28 L 0 28 Z" class="class-header-amber" />
+    <text x="102" y="19" class="class-title">WebcamAlert</text>
     <text x="12" y="48" class="member-text">+ id: int (PK)</text>
     <text x="12" y="68" class="member-text">+ user_id: int (FK)</text>
     <text x="12" y="88" class="member-text">+ image_url: str</text>
     <text x="12" y="108" class="member-text">+ alert_time: datetime</text>
   </g>
 
+  <!-- ================= ASSOCIATIONS ================= -->
+  <!-- 1. User to PlantDiary -->
+  <line x1="240" y1="615" x2="275" y2="615" class="assoc-line" />
+  <text x="248" y="607" class="cardinality">1</text>
+  <text x="262" y="607" class="cardinality">0..*</text>
 
-  <!-- ========================================================================= -->
-  <!-- ASSOCIATIONS & CARDINALITIES (CLEAN BASELINES, NO TANGLES)                 -->
-  <!-- ========================================================================= -->
-  <!-- 1. User to PlantDiary (1 to 0..*) -->
-  <line x1="240" y1="645" x2="275" y2="645" class="assoc-line" />
-  <text x="248" y="637" class="cardinality">1</text>
-  <text x="262" y="637" class="cardinality">0..*</text>
+  <!-- 2. PlantDiary to Crop -->
+  <line x1="525" y1="615" x2="565" y2="615" class="assoc-line" />
+  <text x="532" y="607" class="cardinality">0..*</text>
+  <text x="552" y="607" class="cardinality">1</text>
 
-  <!-- 2. PlantDiary to Crop (0..* to 1) -->
-  <line x1="520" y1="645" x2="565" y2="645" class="assoc-line" />
-  <text x="528" y="637" class="cardinality">0..*</text>
-  <text x="552" y="637" class="cardinality">1</text>
+  <!-- 3. Crop to Disease -->
+  <line x1="755" y1="615" x2="800" y2="615" class="assoc-line" />
+  <text x="763" y="607" class="cardinality">1</text>
+  <text x="781" y="607" class="cardinality">0..*</text>
 
-  <!-- 3. Crop to Disease (1 to 0..*) -->
-  <line x1="755" y1="645" x2="800" y2="645" class="assoc-line" />
-  <text x="763" y="637" class="cardinality">1</text>
-  <text x="781" y="637" class="cardinality">0..*</text>
+  <!-- 4. Disease to Pest -->
+  <line x1="1005" y1="615" x2="1045" y2="615" class="assoc-line" />
+  <text x="1012" y="607" class="cardinality">1</text>
+  <text x="1030" y="607" class="cardinality">0..*</text>
 
-  <!-- 4. Disease to Pest (1 to 0..*) -->
-  <line x1="1005" y1="645" x2="1050" y2="645" class="assoc-line" />
-  <text x="1012" y="637" class="cardinality">1</text>
-  <text x="1033" y="637" class="cardinality">0..*</text>
+  <!-- 5. User to UserOneTimeToken -->
+  <line x1="145" y1="695" x2="145" y2="745" class="assoc-line" />
+  <text x="153" y="715" class="cardinality">1</text>
+  <text x="153" y="735" class="cardinality">0..*</text>
 
-  <!-- 5. User to UserOneTimeToken (1 to 0..*) - Straight Vertical -->
-  <line x1="145" y1="720" x2="145" y2="765" class="assoc-line" />
-  <text x="153" y="736" class="cardinality">1</text>
-  <text x="153" y="756" class="cardinality">0..*</text>
+  <!-- 6. PlantDiary to DiagnosisFeedback -->
+  <line x1="395" y1="695" x2="395" y2="745" class="assoc-line" />
+  <text x="403" y="715" class="cardinality">1</text>
+  <text x="403" y="735" class="cardinality">0..1</text>
 
-  <!-- 6. PlantDiary to DiagnosisFeedback (1 to 0..1) - Straight Vertical -->
-  <line x1="395" y1="720" x2="395" y2="765" class="assoc-line" />
-  <text x="405" y="736" class="cardinality">1</text>
-  <text x="405" y="756" class="cardinality">0..1</text>
+  <!-- 7. User to DiagnosisFeedback -->
+  <line x1="240" y1="820" x2="275" y2="820" class="assoc-line" />
+  <text x="248" y="812" class="cardinality">1</text>
+  <text x="262" y="812" class="cardinality">0..*</text>
+  <text x="257" y="840" class="rel-label">反饋歸屬</text>
 
-  <!-- 7. User to DiagnosisFeedback (1 to 0..*, FK user_id) -->
-  <line x1="240" y1="830" x2="275" y2="830" class="assoc-line" />
-  <text x="248" y="822" class="cardinality">1</text>
-  <text x="262" y="822" class="cardinality">0..*</text>
-  <text x="257" y="848" class="rel-label">反饋歸屬</text>
+  <!-- 8. DiagnosisFeedback to ActiveLearningDataset (直接相鄰水平連線，零穿透！) -->
+  <line x1="520" y1="820" x2="555" y2="820" class="assoc-line" />
+  <text x="526" y="812" class="cardinality">0..*</text>
+  <text x="546" y="812" class="cardinality">1</text>
+  <text x="537" y="836" class="rel-label">匯出沉澱</text>
 
-  <!-- 8. User to WebcamAlert (1 to 0..*) -->
-  <path d="M 145 900 L 145 925 L 660 925 L 660 900" class="assoc-line" />
+  <!-- 9. User to WebcamAlert (底端走線) -->
+  <path d="M 145 900 L 145 925 L 902 925 L 902 900" class="assoc-line" />
   <text x="153" y="915" class="cardinality">1</text>
-  <text x="650" y="915" class="cardinality">0..*</text>
-  <text x="400" y="921" class="rel-label">智慧警報關聯</text>
+  <text x="892" y="915" class="cardinality">0..*</text>
+  <text x="525" y="921" class="rel-label">智慧警報關聯</text>
 
+  <!-- ================= INTER-LAYER CALLS ================= -->
+  <!-- Client to PredictionRouter -->
+  <path d="M 280 150 L 300 150 L 300 230 L 630 230 L 630 210" class="dep-line" />
+  <text x="460" y="225" class="rel-label">影像診斷 REST 請求</text>
 
-  <!-- ========================================================================= -->
-  <!-- INTER-LAYER & INTRA-SERVICE DEPENDENCY ARROWS (55PX GUTTER CHANNELS)       -->
-  <!-- ========================================================================= -->
-  <!-- 9. Client to AuthRouter (HTTPS) - Straight Horizontal -->
-  <line x1="290" y1="135" x2="315" y2="135" class="dep-line" />
-  <text x="302" y="125" class="rel-label">HTTPS</text>
+  <!-- PredictionRouter to PredictionService -->
+  <path d="M 630 210 L 630 240 L 342 240 L 342 280" class="dep-line" />
+  <text x="490" y="238" class="rel-label">派發診斷請求</text>
 
-  <!-- 10. Client to PredictionRouter (REST Predict API) - Channel y=235 -->
-  <path d="M 290 170 L 305 170 L 305 235 L 657 235 L 657 200" class="dep-line" />
-  <text x="480" y="230" class="rel-label">影像診斷 REST 請求</text>
+  <!-- Cascade: PredictionService -> ConvNeXt -->
+  <line x1="450" y1="365" x2="460" y2="365" class="cascade-line" />
+  <text x="455" y="353" class="pipeline-label">快篩/CAM</text>
 
-  <!-- 11. AuthRouter to AuthService (Call Auth) - Channel y=248 -->
-  <path d="M 417 200 L 417 248 L 152 248 L 152 310" class="dep-line" />
-  <text x="270" y="244" class="rel-label">密碼雜湊與 JWT 簽發</text>
+  <!-- Cascade: ConvNeXt -> VisualMemory -->
+  <line x1="675" y1="365" x2="685" y2="365" class="cascade-line" />
+  <text x="680" y="353" class="pipeline-label">記憶比對</text>
 
-  <!-- 12. PredictionRouter to PredictionService (Call Dispatch) - Channel y=260 -->
-  <path d="M 657 200 L 657 260 L 400 260 L 400 310" class="dep-line" />
-  <text x="530" y="256" class="rel-label">派發診斷請求</text>
+  <!-- Cascade: VisualMemory -> Gemini -->
+  <line x1="900" y1="365" x2="910" y2="365" class="cascade-line" />
+  <text x="905" y="353" class="pipeline-label">雲端兜底</text>
 
-  <!-- 13. Cascade AI Pipeline - Step 1: PredictionService -> LocalConvNetService -->
-  <line x1="520" y1="375" x2="545" y2="375" class="cascade-line" />
-  <text x="532" y="365" class="pipeline-label">步驟1: 快篩</text>
+  <!-- Cascade: Gemini -> RAG -->
+  <line x1="1090" y1="365" x2="1100" y2="365" class="cascade-line" />
+  <text x="1095" y="353" class="pipeline-label">專書檢索</text>
 
-  <!-- 14. Cascade AI Pipeline - Step 2: LocalConvNetService -> GeminiService -->
-  <line x1="760" y1="375" x2="785" y2="375" class="cascade-line" />
-  <text x="772" y="365" class="pipeline-label">步驟2: 兜底</text>
+  <!-- AdminDashboard to VisualMemory (Rebuild) -->
+  <path d="M 1130 210 L 1130 235 L 792 235 L 792 280" class="dep-line" />
+  <text x="960" y="230" class="rel-label">觸發記憶重構與微調演進</text>
 
-  <!-- 15. Cascade AI Pipeline - Step 3: GeminiService -> RAGService -->
-  <line x1="1005" y1="375" x2="1030" y2="375" class="cascade-line" />
-  <text x="1017" y="365" class="pipeline-label">步驟3: 檢索</text>
-
-  <!-- 16. AI Pipeline Return: RAGService -> PredictionService - Channel y=500 -->
-  <path d="M 1137 465 L 1137 500 L 420 500 L 420 465" class="dep-line" />
-  <text x="778" y="495" class="rel-label">回傳精準處方與病蟲害比對結果</text>
-
-  <!-- 17. PredictionService to PlantDiary (Persistence) - Straight Vertical -->
-  <line x1="370" y1="465" x2="370" y2="575" class="dep-line" />
-  <text x="310" y="525" class="rel-label">持久化病歷日誌</text>
-
-  <!-- 18. AuthService to User (Security Account Lookup) - Straight Vertical -->
-  <line x1="145" y1="465" x2="145" y2="575" class="dep-line" />
-  <text x="95" y="525" class="rel-label">驗證帳號身分</text>
-
-  <!-- 19. RAGService to Disease (Official Disease Knowledge Lookup) - Channel y=515 -->
-  <path d="M 1085 465 L 1085 515 L 902 515 L 902 575" class="dep-line" />
-  <text x="980" y="510" class="rel-label">比對病害指引</text>
-
-  <!-- 20. RAGService to Pest (Official Pest Knowledge Lookup) - Straight Vertical -->
-  <line x1="1150" y1="465" x2="1150" y2="575" class="dep-line" />
-  <text x="1200" y="525" class="rel-label">比對害蟲指引</text>
-
-  <!-- 21. AdminDashboard to Feedback & Diaries Router - Clean Horizontal Call -->
-  <line x1="1055" y1="135" x2="1030" y2="135" class="dep-line" />
-  <text x="1042" y="125" class="rel-label">審計調用</text>
-
+  <!-- PredictionService to PlantDiary (Persistence) - Gutter y=485 -->
+  <line x1="342" y1="455" x2="342" y2="540" class="dep-line" />
+  <text x="342" y="488" class="rel-label">持久化病歷日誌</text>
 </svg>

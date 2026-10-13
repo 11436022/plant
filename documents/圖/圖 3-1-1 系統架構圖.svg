@@ -1,187 +1,595 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="880" viewBox="0 0 1600 880">
-  <defs>
-    <style>
-      .title { font: 700 36px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #000000; }
-      .subtitle { font: 500 16px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #000000; }
-      .lane { font: 700 21px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #000000; }
-      .head { font: 700 17px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #000000; }
-      .text { font: 500 14px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #000000; }
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1600"
+   height="920"
+   viewBox="0 0 1600 920"
+   version="1.1"
+   id="svg64"
+   sodipodi:docname="圖 3-1-1 系統架構圖.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview64"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.87717391"
+     inkscape:cx="799.72739"
+     inkscape:cy="460"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg64" />
+  <defs
+     id="defs3">
+    <style
+       id="style1">
+      .title { font: 700 32px 'Microsoft JhengHei', sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 15px 'Microsoft JhengHei', sans-serif; fill: #334155; }
+      .lane-title { font: 700 20px 'Microsoft JhengHei', sans-serif; fill: #0f172a; text-anchor: middle; }
+      .head { font: 700 16px 'Microsoft JhengHei', sans-serif; fill: #0f172a; text-anchor: middle; }
+      .subhead { font: 700 13px 'Microsoft JhengHei', sans-serif; fill: #1e3a8a; text-anchor: middle; }
+      .text { font: 500 13px 'Microsoft JhengHei', sans-serif; fill: #334155; text-anchor: middle; }
+      .badge-text { font: 700 11px 'Microsoft JhengHei', sans-serif; fill: #ffffff; text-anchor: middle; }
       
-      .lane-box { fill: #F8FAF7; stroke: #8FA892; stroke-width: 2; }
-      .client { fill: #E2EFE0; stroke: #2D5837; stroke-width: 2; }
-      .service { fill: #ffffff; stroke: #2D5837; stroke-width: 2; }
-      .safety { fill: #E2EFE0; stroke: #2D5837; stroke-width: 2.2; }
-      .external { fill: #F0F6EE; stroke: #2D5837; stroke-width: 2; }
-      .ai-box { fill: #E2EFE0; stroke: #2D5837; stroke-width: 2; }
+      .lane { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.5; rx: 12; }
+      .lane-hdr { fill: #e2e8f0; stroke: #cbd5e1; stroke-width: 1.5; rx: 12; }
       
-      .line { stroke: #1A281E; stroke-width: 2; fill: none; marker-end: url(#arrow); }
-      .return { stroke: #1A281E; stroke-width: 1.8; stroke-dasharray: 6 4; fill: none; marker-end: url(#arrow2); }
+      .client-box { fill: #ffffff; stroke: #3b82f6; stroke-width: 1.6; rx: 8; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+      .core-box { fill: #ffffff; stroke: #10b981; stroke-width: 1.6; rx: 8; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+      .ai-box { fill: #f0fdf4; stroke: #059669; stroke-width: 1.8; rx: 8; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+      .db-box { fill: #fefce8; stroke: #d97706; stroke-width: 1.8; rx: 8; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+      .ext-box { fill: #f1f5f9; stroke: #64748b; stroke-width: 1.5; rx: 8; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
       
-      .flow-label {
-        font: 700 13px 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-        fill: #000000;
-        paint-order: stroke fill;
-        stroke: #ffffff;
-        stroke-width: 4px;
-        stroke-linejoin: round;
-      }
-      .halo-text {
-        font: 700 13px 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-        fill: #000000;
-        paint-order: stroke fill;
-        stroke: #ffffff;
-        stroke-width: 4px;
-        stroke-linejoin: round;
-      }
+      .line { stroke: #475569; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
+      .line-accent { stroke: #2563eb; stroke-width: 1.8; fill: none; marker-end: url(#blue-arrow); }
+      .line-green { stroke: #059669; stroke-width: 1.8; fill: none; marker-end: url(#green-arrow); }
+      .line-dash { stroke: #059669; stroke-width: 1.5; stroke-dasharray: 4,4; fill: none; marker-end: url(#green-arrow); }
+      
+      .tag-bg { fill: #dbeafe; stroke: #3b82f6; stroke-width: 1; rx: 4; }
+      .tag-green { fill: #d1fae5; stroke: #10b981; stroke-width: 1; rx: 4; }
+      .tag-yellow { fill: #fef3c7; stroke: #f59e0b; stroke-width: 1; rx: 4; }
     </style>
-    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
-      <path d="M0 0 L9 4.5 L0 9 Z" fill="#1A281E"/>
+    <marker
+       id="arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1 L 10 5 L 0 9 z"
+         fill="#475569"
+         id="path1" />
     </marker>
-    <marker id="arrow2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
-      <path d="M0 0 L9 4.5 L0 9 Z" fill="#1A281E"/>
+    <marker
+       id="blue-arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1 L 10 5 L 0 9 z"
+         fill="#2563eb"
+         id="path2" />
+    </marker>
+    <marker
+       id="green-arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 1 L 10 5 L 0 9 z"
+         fill="#059669"
+         id="path3" />
     </marker>
   </defs>
-
-  <!-- Background Canvas -->
-  <rect width="1600" height="880" fill="#ffffff"/>
-  
-  <!-- Diagram Title -->
-  <text x="60" y="52" class="title">圖 3-1-1 系統架構圖 (System Architecture)</text>
-  <text x="60" y="82" class="subtitle">前端展示介面、FastAPI 後端核心服務、ConvNeXt 快篩與 Gemini 兜底階層推論、RAG 知識檢索與資料庫持久層</text>
-
-  <!-- ================= LANE 1: 客戶端展示層 ================= -->
-  <rect x="50" y="110" width="380" height="730" rx="8" class="lane-box"/>
-  <text x="240" y="152" text-anchor="middle" class="lane">客戶端展示層</text>
-
-  <!-- 1. Android Client App -->
-  <rect x="86" y="185" width="308" height="145" rx="8" class="client"/>
-  <text x="240" y="232" text-anchor="middle" class="head">Android 行動端 App</text>
-  <text x="240" y="268" text-anchor="middle" class="text">拍照診斷與病害處方查閱</text>
-  <text x="240" y="298" text-anchor="middle" class="text">個人備忘筆記與糾錯反饋</text>
-
-  <!-- 2. Webcam Edge Monitor -->
-  <rect x="86" y="365" width="308" height="145" rx="8" class="client"/>
-  <text x="240" y="412" text-anchor="middle" class="head">Webcam 即時監控介面</text>
-  <text x="240" y="448" text-anchor="middle" class="text">連續影像串流與定時取樣</text>
-  <text x="240" y="478" text-anchor="middle" class="text">即時病害警報響應與鈴聲提示</text>
-
-  <!-- 3. Web Admin Dashboard -->
-  <rect x="86" y="545" width="308" height="145" rx="8" class="client"/>
-  <text x="240" y="592" text-anchor="middle" class="head">Web 管理者後台</text>
-  <text x="240" y="628" text-anchor="middle" class="text">統計儀表板與全站病歷維護</text>
-  <text x="240" y="658" text-anchor="middle" class="text">使用者糾錯審核與資料標註</text>
-
-  <!-- ================= LANE 2: 後端微服務應用層 ================= -->
-  <rect x="470" y="110" width="650" height="730" rx="8" class="lane-box"/>
-  <text x="795" y="152" text-anchor="middle" class="lane">FastAPI 後端核心服務</text>
-
-  <!-- 1. API Route & Security Gateway -->
-  <rect x="510" y="185" width="570" height="80" rx="8" class="service"/>
-  <text x="795" y="218" text-anchor="middle" class="head">API 路由與安全層</text>
-  <text x="795" y="248" text-anchor="middle" class="text">OAuth2 / JWT 驗證與各模組端點請求分派</text>
-
-  <!-- 2A. Webcam Edge Monitoring Service (Left) -->
-  <rect x="510" y="295" width="270" height="150" rx="8" class="service"/>
-  <text x="645" y="342" text-anchor="middle" class="head">Webcam 邊緣監控服務</text>
-  <text x="645" y="378" text-anchor="middle" class="text">連續 3 影格共識判定</text>
-  <text x="645" y="408" text-anchor="middle" class="text">過濾晃動、快取異常狀態</text>
-
-  <!-- 2B. Cascade Diagnosis Dispatch Service (Right) -->
-  <rect x="810" y="295" width="270" height="150" rx="8" class="service"/>
-  <text x="945" y="342" text-anchor="middle" class="head">階層式診斷調度服務</text>
-  <text x="945" y="378" text-anchor="middle" class="text">步驟 1: 優先本地快篩</text>
-  <text x="945" y="408" text-anchor="middle" class="text">步驟 2: 未命中 Gemini 兜底</text>
-
-  <!-- 3. Decision Integration & RAG Core -->
-  <rect x="510" y="480" width="570" height="130" rx="8" class="safety"/>
-  <text x="795" y="522" text-anchor="middle" class="head">決策整合與 RAG 校驗核心</text>
-  <text x="795" y="558" text-anchor="middle" class="text">步驟 3: 查詢 MySQL 防治庫 / 缺漏時檢索 FAISS + Gemini</text>
-  <text x="795" y="588" text-anchor="middle" class="text">動態精準處方生成；信心度門檻評估 (75% / 65%)</text>
-
-  <!-- 4. Diary, Feedback & Training Data Operations -->
-  <rect x="510" y="645" width="570" height="105" rx="8" class="service"/>
-  <text x="795" y="688" text-anchor="middle" class="head">日誌與回饋數據管理服務</text>
-  <text x="795" y="722" text-anchor="middle" class="text">診斷病歷存檔、檢索與個人備忘筆記維護</text>
-
-  <!-- ================= LANE 3: 資料層與外部服務 ================= -->
-  <rect x="1160" y="110" width="390" height="730" rx="8" class="lane-box"/>
-  <text x="1355" y="152" text-anchor="middle" class="lane">資料層與外部服務</text>
-
-  <!-- 1. MySQL Relational DB -->
-  <rect x="1196" y="185" width="318" height="100" rx="8" class="external"/>
-  <text x="1355" y="228" text-anchor="middle" class="head">MySQL 關聯式資料庫</text>
-  <text x="1355" y="262" text-anchor="middle" class="text">帳號、診斷病歷與警報紀錄</text>
-
-  <!-- 2. Local ConvNeXt Fast Screen (Step 1) -->
-  <rect x="1196" y="315" width="318" height="105" rx="8" class="ai-box"/>
-  <text x="1355" y="358" text-anchor="middle" class="head">本地自訓 ConvNeXt 模型</text>
-  <text x="1355" y="392" text-anchor="middle" class="text">步驟 1: 特定作物病斑分類快篩</text>
-
-  <!-- 3. Gemini Multimodal Fallback (Step 2) -->
-  <rect x="1196" y="435" width="318" height="105" rx="8" class="ai-box"/>
-  <text x="1355" y="478" text-anchor="middle" class="head">Gemini 3.8 Flash 雲端模型</text>
-  <text x="1355" y="512" text-anchor="middle" class="text">步驟 2: 多模態影像初判與兜底</text>
-
-  <!-- 4. Agricultural Knowledge Base & FAISS (Step 3) -->
-  <rect x="1196" y="555" width="318" height="100" rx="8" class="external"/>
-  <text x="1355" y="598" text-anchor="middle" class="head">官方知識庫與 FAISS</text>
-  <text x="1355" y="632" text-anchor="middle" class="text">步驟 3: 農業部病害知識檢索</text>
-
-  <!-- 5. External Services: SMTP, Weather -->
-  <rect x="1196" y="670" width="318" height="95" rx="8" class="external"/>
-  <text x="1355" y="710" text-anchor="middle" class="head">外部支援服務 (SMTP / CWA)</text>
-  <text x="1355" y="744" text-anchor="middle" class="text">Gmail SMTP 驗證與警報推播</text>
-
-  <!-- ================= Connecting Flows & Arrows ================= -->
-  <!-- 1. Lane 1 -> Lane 2 -->
-  <path d="M394 225 H510" class="line"/>
-  <path d="M394 410 H510" class="line"/>
-  <path d="M394 595 H510" class="line"/>
-  <text x="452" y="216" text-anchor="middle" class="halo-text">HTTPS / JSON</text>
-  <text x="452" y="401" text-anchor="middle" class="halo-text">Frame Stream</text>
-  <text x="452" y="586" text-anchor="middle" class="halo-text">REST / Admin</text>
-
-  <!-- 2. Inside Lane 2 -->
-  <path d="M645 265 V295" class="line"/>
-  <path d="M945 265 V295" class="line"/>
-  <path d="M645 445 V480" class="line"/>
-  <path d="M945 445 V480" class="line"/>
-  <path d="M795 610 V645" class="line"/>
-
-  <!-- 3. Lane 2 <-> Lane 3 Connections -->
-  <!-- Flow 1: API Layer <-> MySQL (y=215 & y=245) -->
-  <path d="M1080 215 H1196" class="line"/>
-  <path d="M1196 245 H1080" class="return"/>
-  <text x="1138" y="204" text-anchor="middle" class="flow-label">查詢／驗證</text>
-
-  <!-- Flow 2: 診斷調度 -> 本地 ConvNeXt (y=348 & y=380) -->
-  <path d="M1080 348 H1196" class="line"/>
-  <path d="M1196 380 H1080" class="return"/>
-  <text x="1138" y="336" text-anchor="middle" class="flow-label">步驟 1: 本地快篩</text>
-  <text x="1138" y="398" text-anchor="middle" class="flow-label">回傳病斑特徵</text>
-
-  <!-- Flow 3: 診斷調度 -> Gemini 兜底 (y=468 & y=500) -->
-  <path d="M1080 468 H1196" class="line"/>
-  <path d="M1196 500 H1080" class="return"/>
-  <text x="1138" y="456" text-anchor="middle" class="flow-label">步驟 2: 雲端兜底</text>
-  <text x="1138" y="518" text-anchor="middle" class="flow-label">回傳多模態初判</text>
-
-  <!-- Flow 4: 決策整合核心 <-> FAISS RAG (y=580 & y=612) -->
-  <path d="M1080 580 H1196" class="line"/>
-  <path d="M1196 612 H1080" class="return"/>
-  <text x="1138" y="568" text-anchor="middle" class="flow-label">步驟 3: RAG 檢索</text>
-  <text x="1138" y="630" text-anchor="middle" class="flow-label">回傳官方處方</text>
-
-  <!-- Flow 5: 決策整合核心 -> SMTP 外部郵件 (x=1168 track) -->
-  <path d="M1080 600 H1168 V700 H1196" class="line"/>
-  <text x="1168" y="692" text-anchor="middle" class="flow-label">觸發警報</text>
-
-  <!-- Flow 6: 日誌管理服務 -> MySQL (x=1148 track up to MySQL) -->
-  <path d="M1080 675 H1148 V270 H1196" class="line"/>
-  <text x="1148" y="262" text-anchor="middle" class="flow-label">寫入紀錄</text>
-
-  <!-- Flow 7: CWA 氣象開放資料 -> 服務層 (y=735) -->
-  <path d="M1196 735 H1080" class="return"/>
-  <text x="1138" y="726" text-anchor="middle" class="flow-label">氣象回傳</text>
-
+  <!-- Background -->
+  <rect
+     width="100%"
+     height="100%"
+     fill="#ffffff"
+     id="rect3" />
+  <!-- Title & Subtitle -->
+  <text
+     x="60"
+     y="48"
+     class="title"
+     id="text3">圖 3-1-1 系統架構圖 (System Architecture)</text>
+  <text
+     x="60"
+     y="78"
+     class="subtitle"
+     id="text4">前端展示層 ➔ FastAPI 後端微服務 ➔ 五重空間注意力與記憶增強瀑布流 ➔ 雙軌 RAG 處方 ➔ 主動學習本機微調閉環</text>
+  <!-- ================= 3 Major Swimlanes ================= -->
+  <!-- Lane 1: Client Layer (x=45, w=350) -->
+  <rect
+     x="45"
+     y="105"
+     width="350"
+     height="780"
+     class="lane"
+     id="rect4" />
+  <rect
+     x="45"
+     y="105"
+     width="350"
+     height="48"
+     class="lane-hdr"
+     id="rect5" />
+  <text
+     x="220"
+     y="136"
+     class="lane-title"
+     id="text5">客戶端展示層 (Client Layer)</text>
+  <!-- Lane 2: FastAPI Core Services (x=425, w=720) -->
+  <rect
+     x="425"
+     y="105"
+     width="720"
+     height="780"
+     class="lane"
+     id="rect6" />
+  <rect
+     x="425"
+     y="105"
+     width="720"
+     height="48"
+     class="lane-hdr"
+     id="rect7" />
+  <text
+     x="785"
+     y="136"
+     class="lane-title"
+     id="text7">FastAPI 後端核心服務中樞 (Application  Core Engine)</text>
+  <!-- Lane 3: Data & AI Engine (x=1175, w=380) -->
+  <rect
+     x="1175"
+     y="105"
+     width="380"
+     height="780"
+     class="lane"
+     id="rect8" />
+  <rect
+     x="1175"
+     y="105"
+     width="380"
+     height="48"
+     class="lane-hdr"
+     id="rect9" />
+  <text
+     x="1365"
+     y="136"
+     class="lane-title"
+     id="text9">資料層與雙核 AI 引擎 (Data  AI)</text>
+  <!-- ================= Lane 1 Boxes ================= -->
+  <!-- Box 1-1: Android Mobile App -->
+  <rect
+     x="65"
+     y="180"
+     width="310"
+     height="150"
+     class="client-box"
+     id="rect10" />
+  <text
+     x="253.5938"
+     y="193.29895"
+     class="head"
+     id="text10"
+     transform="scale(0.8810831,1.1349667)"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:16px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif;stroke-width:1.17183">Android 行動端 App (Kotlin)</text>
+  <text
+     x="220"
+     y="242"
+     class="text"
+     id="text11">• CameraX 對焦拍攝與相簿多圖上傳</text>
+  <text
+     x="220"
+     y="265"
+     class="text"
+     id="text12">• 拍照防手抖品質檢驗 (Laplacian  5.0)</text>
+  <text
+     x="220"
+     y="288"
+     class="text"
+     id="text13">• 未儲存防呆返回對話框 (In-Layout Overlay)</text>
+  <text
+     x="220"
+     y="311"
+     class="text"
+     id="text14">• 個人日誌備忘錄與嵌入式糾錯提報</text>
+  <!-- Box 1-2: Webcam Monitoring Client -->
+  <rect
+     x="65"
+     y="370"
+     width="310"
+     height="135"
+     class="client-box"
+     id="rect14" />
+  <text
+     x="273.15173"
+     y="328.75842"
+     class="head"
+     id="text15"
+     transform="scale(0.79502655,1.2578196)"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:16px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif;stroke-width:1.3008">Webcam 即時監控介面</text>
+  <text
+     x="220"
+     y="432"
+     class="text"
+     id="text16">• CropZone 多分區自訂劃分與命名</text>
+  <text
+     x="220"
+     y="455"
+     class="text"
+     id="text17">• 定時週期連續影格排程採樣</text>
+  <text
+     x="220"
+     y="478"
+     class="text"
+     id="text18">• 田間異常即時聲光與瀏覽器警報</text>
+  <!-- Box 1-3: Web Admin Console -->
+  <rect
+     x="65"
+     y="555"
+     width="310"
+     height="160"
+     class="client-box"
+     id="rect18" />
+  <text
+     x="262.67053"
+     y="505.39755"
+     class="head"
+     id="text19"
+     transform="scale(0.84845196,1.1786171)"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:16px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif;stroke-width:1.20941">Web 管理者後台 (Dashboard)</text>
+  <text
+     x="220"
+     y="617"
+     class="text"
+     id="text20">• 審核農民回報 ➔ 填寫專家標註真值</text>
+  <text
+     x="220"
+     y="640"
+     class="text"
+     id="text21">• 一鍵重建 Visual Memory 視覺記憶庫</text>
+  <text
+     x="220"
+     y="663"
+     class="text"
+     id="text22">• 一鍵匯出 PyTorch ImageFolder 訓練集</text>
+  <text
+     x="220"
+     y="686"
+     class="text"
+     id="text23">• 一鍵觸發本機 ConvNeXt 模型增量微調</text>
+  <!-- ================= Lane 2 Boxes ================= -->
+  <!-- Box 2-1: API Gateway -->
+  <rect
+     x="455"
+     y="180"
+     width="660"
+     height="85"
+     class="core-box"
+     id="rect23" />
+  <text
+     x="875.66766"
+     y="192.14478"
+     class="head"
+     id="text24"
+     transform="scale(0.88802428,1.1260953)"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:16px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif;stroke-width:1.17805">API 路由閘門與安全認證 (Gateway Security)</text>
+  <text
+     x="785"
+     y="238"
+     class="text"
+     id="text25">OAuth2 / JWT 權杖鑑權 • BCrypt 密碼安全雜湊 • CORS  限流防護 • Request 結構驗證</text>
+  <!-- Box 2-2: Webcam Continuous Service -->
+  <rect
+     x="455"
+     y="295"
+     width="315"
+     height="120"
+     class="core-box"
+     id="rect25" />
+  <text
+     x="725.98938"
+     y="284.49026"
+     class="head"
+     id="text26"
+     transform="scale(0.85086695,1.1752719)"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:16px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif;stroke-width:1.25552">Webcam 連續監控服務</text>
+  <text
+     x="612"
+     y="355"
+     class="text"
+     id="text27">多區域 CropZone 採樣流排程</text>
+  <text
+     x="612"
+     y="378"
+     class="text"
+     id="text28">連續 3 幀時序共識防抖機制 (≥ 80%)</text>
+  <text
+     x="612"
+     y="401"
+     class="text"
+     id="text29">異常觸發 SMTP 郵件與日誌寫入</text>
+  <!-- Box 2-3: Hierarchical AI Dispatcher -->
+  <rect
+     x="795"
+     y="295"
+     width="320"
+     height="120"
+     class="core-box"
+     id="rect29" />
+  <text
+     x="1153.6935"
+     y="276.05872"
+     class="head"
+     id="text30"
+     transform="scale(0.82034305,1.2190022)"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:16px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif;stroke-width:1.34451">階層式 AI 推論調度中樞</text>
+  <text
+     x="955"
+     y="355"
+     class="text"
+     id="text31">步驟 1: 邊緣 ConvNeXt 卷積特徵快篩</text>
+  <text
+     x="955"
+     y="378"
+     class="text"
+     id="text32">步驟 2: Grad-CAM 空間前景對齊檢驗 (≥35%)</text>
+  <text
+     x="955"
+     y="401"
+     class="text"
+     id="text33">步驟 3: Visual Memory 記憶檢索與 Prompt 注入</text>
+  <!-- Box 2-4: Decision, Cross-Verification & RAG -->
+  <rect
+     x="455"
+     y="445"
+     width="660"
+     height="145"
+     class="core-box"
+     id="rect33" />
+  <text
+     x="911.44885"
+     y="421.38446"
+     class="head"
+     id="text34"
+     transform="scale(0.87189032,1.1469332)"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:16px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif;stroke-width:1.21819">多模態雙模型會診與雙軌 RAG 處方決策核心</text>
+  <text
+     x="785"
+     y="508"
+     class="text"
+     id="text35">步驟 4: Google Gemini 3.8 Flash 雲端多模態會診 ➔ 軟標籤覆核推翻機制 (Cross-Modal Overrule)</text>
+  <text
+     x="785"
+     y="533"
+     class="text"
+     id="text36">步驟 5: 雙軌處方驗證：優先查詢 MySQL 專家庫 ➔ 缺漏時強檢 FAISS 農業部專書生成 (附 SHA-256)</text>
+  <text
+     x="785"
+     y="558"
+     class="text"
+     id="text37">安全防禦剎車：綜合信心度  65% 或 OOD 異物 ➔ 強制安全拒答標記「無法判定」</text>
+  <!-- Box 2-5: Active Learning & Retraining Pipeline -->
+  <rect
+     x="455"
+     y="620"
+     width="660"
+     height="145"
+     class="core-box"
+     id="rect37" />
+  <text
+     x="884.75238"
+     y="578.59473"
+     class="head"
+     id="text38"
+     transform="scale(0.88016792,1.1361468)"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:16px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif;stroke-width:1.16866">主動學習數據閉環與本機微調管線 (Active Learning Pipeline)</text>
+  <text
+     x="785"
+     y="683"
+     class="text"
+     id="text39">• 專家真值標註持久化 (manager_corrected_plant / disease 寫入 MySQL)</text>
+  <text
+     x="785"
+     y="708"
+     class="text"
+     id="text40">• Visual Memory 向量快取即時更新 (visual_memory_index.pt)</text>
+  <text
+     x="785"
+     y="733"
+     class="text"
+     id="text41">• 一鍵匯出標準訓練集 ➔ 本機調用 retrain_from_feedback.py 執行 3-Epoch 增量微調熱更新</text>
+  <!-- ================= Lane 3 Boxes ================= -->
+  <!-- Box 3-1: MySQL Database -->
+  <rect
+     x="1200"
+     y="180"
+     width="330"
+     height="100"
+     class="db-box"
+     id="rect41" />
+  <text
+     x="1650.6808"
+     y="183.3681"
+     class="head"
+     id="text42"
+     transform="scale(0.82277455,1.2153998)"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:16px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif;stroke-width:1.30776">MySQL 8.0 關聯式資料庫</text>
+  <text
+     x="1365"
+     y="242"
+     class="text"
+     id="text43"
+     style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:13px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif">8 大核心體表 • 專家真值標註欄位</text>
+  <text
+     x="1365"
+     y="265"
+     class="text"
+     id="text44">植物日誌 • 視訊警報 • 官方病蟲害主檔</text>
+  <!-- Box 3-2: Local ConvNeXt Model + Grad-CAM -->
+  <rect
+     x="1200"
+     y="305"
+     width="330"
+     height="120"
+     class="ai-box"
+     id="rect44" />
+  <text
+     x="1927.3481"
+     y="244.06499"
+     class="head"
+     id="text45"
+     transform="scale(0.70749192,1.4134437)"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:16px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif;stroke-width:1.60707">本地自訓 ConvNeXt 模型 + Grad-CAM</text>
+  <text
+     x="1365"
+     y="367"
+     class="text"
+     id="text46">步驟 1: 常見 38 類病害極速快篩 (93.9% 分流)</text>
+  <text
+     x="1365"
+     y="390"
+     class="text"
+     id="text47">步驟 2: Grad-CAM 葉片空間前景對齊 (≥ 35%)</text>
+  <text
+     x="1365"
+     y="413"
+     class="text"
+     id="text48">動態特徵原型管理器 (EMA 自適應門檻)</text>
+  <!-- Box 3-3: Cloud Gemini 3.8 Flash -->
+  <rect
+     x="1200"
+     y="450"
+     width="330"
+     height="100"
+     class="ai-box"
+     id="rect48" />
+  <text
+     x="1849.7272"
+     y="363.28357"
+     class="head"
+     id="text49"
+     transform="scale(0.73949598,1.3522724)"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:16px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif;stroke-width:1.60091">Google Gemini 3.8 Flash 雲端模型</text>
+  <text
+     x="1365"
+     y="512"
+     class="text"
+     id="text50">步驟 4: 全株長尾病徵鑑別與環境理解</text>
+  <text
+     x="1365"
+     y="535"
+     class="text"
+     id="text51">雙模型會診二次覆核 • 族群容災降級備援</text>
+  <!-- Box 3-4: FAISS & Visual Memory -->
+  <rect
+     x="1200"
+     y="575"
+     width="330"
+     height="110"
+     class="ext-box"
+     id="rect51" />
+  <text
+     x="1710.8645"
+     y="482.65097"
+     class="head"
+     id="text52"
+     transform="scale(0.79216575,1.2623621)"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:16px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif;stroke-width:1.35789">FAISS 專書向量庫 + 專家視覺記憶庫</text>
+  <text
+     x="1365"
+     y="637"
+     class="text"
+     id="text53">步驟 3: 視覺記憶檢索 (相似度 ≥ 82% 提示注入)</text>
+  <text
+     x="1365"
+     y="660"
+     class="text"
+     id="text54">步驟 5: 農業部官方審定專書 RAG 檢索</text>
+  <!-- Box 3-5: External SMTP Service -->
+  <rect
+     x="1200"
+     y="710"
+     width="330"
+     height="75"
+     class="ext-box"
+     id="rect54" />
+  <text
+     x="1701.4697"
+     y="588.89923"
+     class="head"
+     id="text55"
+     transform="scale(0.79488673,1.2580409)"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:16px;line-height:normal;font-family:'Microsoft JhengHei', sans-serif;stroke-width:1.41366">外部支援服務 (Gmail SMTP)</text>
+  <text
+     x="1365"
+     y="768"
+     class="text"
+     id="text56">會員信箱啟用驗證 • 離線病害警報推播</text>
+  <!-- ================= Arrows & Connecting Flows ================= -->
+  <!-- Client -> Gateway -->
+  <path
+     d="M 375 225 L 455 225"
+     class="line-accent"
+     id="path56" />
+  <!-- Webcam Stream -> Webcam Service -->
+  <path
+     d="M 375 435 L 455 355"
+     class="line-accent"
+     id="path57" />
+  <!-- Admin -> Active Learning Pipeline -->
+  <path
+     d="M 375 635 L 455 690"
+     class="line-green"
+     id="path58" />
+  <!-- Core Dispatcher -> ConvNeXt -->
+  <path
+     d="M 1115 355 L 1200 355"
+     class="line-green"
+     id="path59" />
+  <!-- Core -> Gemini -->
+  <path
+     d="M 1115 500 L 1200 500"
+     class="line-green"
+     id="path60" />
+  <!-- Core -> FAISS & Visual Memory -->
+  <path
+     d="M 1115 540 L 1200 620"
+     class="line"
+     id="path61" />
+  <!-- Active Learning -> Retrain ConvNeXt -->
+  <path
+     d="M 1115 670 C 1170 670, 1170 380, 1200 380"
+     class="line-dash"
+     id="path62" />
+  <!-- Active Learning -> Update Visual Memory -->
+  <path
+     d="M 1115 710 L 1200 650"
+     class="line-dash"
+     id="path63" />
+  <!-- Gateway <-> MySQL -->
+  <path
+     d="M 1115 225 L 1200 225"
+     class="line"
+     id="path64" />
 </svg>

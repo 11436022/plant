@@ -213,9 +213,11 @@ class HistoryAdapter(
         holder.tvName.text = item.crop_name ?: "未知作物"
         holder.tvDate.text = item.created_at
         holder.tvStatus.text = buildString {
-            append("診斷：${item.status_name ?: "無法判定"}")
-            item.user_corrected_status?.takeIf { it.isNotBlank() }?.let {
-                append("\n使用者修正：$it（非重新診斷）")
+            if (!item.user_corrected_status.isNullOrBlank()) {
+                append("原診斷：${item.status_name ?: "無法判定"}")
+                append("\n專家覆核定案：${item.user_corrected_status}")
+            } else {
+                append("診斷：${item.status_name ?: "無法判定"}")
             }
             if (item.requires_review == true) append("\n需要人工複核")
         }

@@ -115,7 +115,7 @@
   <ellipse cx="1180" cy="605" rx="155" ry="30" class="case"/>
   <text x="1180" y="611" text-anchor="middle" class="uc">UC-12 查詢使用者列表</text>
   <ellipse cx="1180" cy="685" rx="155" ry="30" class="case"/>
-  <text x="1180" y="691" text-anchor="middle" class="uc">UC-14 審核回饋與模型標註</text>
+  <text x="1180" y="691" text-anchor="middle" class="uc">UC-14 回饋審核與主動學習標註微調</text>
 
   <!-- Bottom Annotation -->
   <rect x="278" y="772" width="1044" height="44" rx="6" fill="#DDEAD7" stroke="#B5C6B3"/>

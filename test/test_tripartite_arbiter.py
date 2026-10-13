@@ -122,7 +122,7 @@ def test_scenario_4_disease_conflict_hibiscus_albinism():
     assert verdict["confidence"] == 0.88
     assert verdict["grounding_source"] == "tripartite_conflict_flagged_for_review"
     assert verdict["requires_review"] is True
-    assert "⚠️ 診斷分歧提醒" in verdict["suggestion"]
+    assert "診斷分歧提醒" in verdict["suggestion"]
 
 
 def test_scenario_5_safety_fallback_both_uncertain():

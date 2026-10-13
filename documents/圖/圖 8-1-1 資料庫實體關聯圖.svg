@@ -59,9 +59,9 @@
     <text x="18" y="178" class="field">created_at</text>
   </g>
 
-  <!-- 3. diagnosis_feedback (y=680, h=265) -->
+  <!-- 3. diagnosis_feedback (y=680, h=285) -->
   <g transform="translate(70, 680)">
-    <rect width="330" height="265" class="table-box" />
+    <rect width="330" height="285" class="table-box" />
     <path d="M 0 6 Q 0 0 6 0 L 324 0 Q 330 0 330 6 L 330 42 L 0 42 Z" class="table-header" />
     <text x="165" y="27" text-anchor="middle" class="head">diagnosis_feedback (診斷回饋)</text>
     
@@ -71,10 +71,11 @@
     <text x="56" y="94" class="field">user_id (可為匿名)</text>
     <text x="18" y="120" class="field">prediction_id (日誌序號對應)</text>
     <text x="18" y="146" class="field">image_url</text>
-    <text x="18" y="172" class="field">original_plant_name · original_disease</text>
-    <text x="18" y="198" class="field">is_plant_error · is_disease_error</text>
-    <text x="18" y="224" class="field">corrected_plant · corrected_disease</text>
-    <text x="18" y="250" class="field">created_at</text>
+    <text x="18" y="170" class="field">original_plant_name · original_disease</text>
+    <text x="18" y="194" class="field">is_plant_error · is_disease_error</text>
+    <text x="18" y="218" class="field">corrected_plant · corrected_disease</text>
+    <text x="18" y="242" class="field">manager_corrected_plant · disease</text>
+    <text x="18" y="266" class="field">created_at</text>
   </g>
 
 

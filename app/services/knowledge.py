@@ -4,7 +4,7 @@ from fastapi import HTTPException
 async def get_or_complete_knowledge(table_name, name_val, db):
     """查詢知識表，若不存在則補齊資料。"""
 
-    from app.services.ai import client,check_if_real_crop
+    from app.services.ai import client, check_if_real_crop, call_gemini_with_fallback
 
     if table_name == "crop":
         model = models.Crop
@@ -51,7 +51,7 @@ async def get_or_complete_knowledge(table_name, name_val, db):
     )
 
     try:
-        response = client.models.generate_content(model="models/gemini-3.8-flash", contents=prompt)
+        response = call_gemini_with_fallback(contents=prompt)
         ai_text = response.text or ""
     except Exception:
         ai_text = ""

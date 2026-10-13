@@ -1,8 +1,12 @@
 package com.example.plantdoctor
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -10,11 +14,14 @@ import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
+import android.view.Window
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.bumptech.glide.Glide
@@ -110,9 +117,11 @@ class ResultActivity : AppCompatActivity() {
             binding.tvAdvice.text = fullAdvice
             binding.tvAdvice.setTextIsSelectable(true)
 
-            isUnknownResult = (plantName.isNullOrEmpty() || plantName in listOf("未知作物", "未知", "無法判定")
-                    || diseaseName.isNullOrEmpty() || diseaseName in listOf("無法判定", "未知")
-                    || data.category?.lowercase() == "unknown")
+            val unknownCrops = listOf("未知作物", "未知", "無法判定", "無法辨識", "非植物", "無植物特徵")
+            val unknownStatuses = listOf("無法判定", "未知", "無植物特徵", "無法辨識", "非植物")
+            isUnknownResult = (plantName.isNullOrEmpty() || plantName in unknownCrops
+                    || diseaseName.isNullOrEmpty() || diseaseName in unknownStatuses
+                    || data.category?.lowercase() in listOf("unknown", "invalid", "none"))
 
             if (isUnknownResult) {
                 // 方案 A：無法判定或未知作物時，隱藏「儲存至日記」，只保留「結果有誤？（回饋）」選項
@@ -168,6 +177,28 @@ class ResultActivity : AppCompatActivity() {
             confirmAndSaveDiary(predictionId)
         }
 
+        // 註冊系統返回鍵監聽，確保 Android 13+ 預測性返回與實體返回鍵皆能正確觸發退出確認/關閉彈窗
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val feedbackOverlay = binding.root.findViewById<FrameLayout>(R.id.layout_feedback_overlay)
+                if (feedbackOverlay?.visibility == View.VISIBLE) {
+                    feedbackOverlay.visibility = View.GONE
+                    return
+                }
+                val saveOverlay = binding.root.findViewById<FrameLayout>(R.id.layout_save_overlay)
+                if (saveOverlay?.visibility == View.VISIBLE) {
+                    saveOverlay.visibility = View.GONE
+                    return
+                }
+                if (isUnknownResult) {
+                    goToHome()
+                } else {
+                    val currentPredId = intent.getStringExtra("PREDICTION_ID")
+                    showSaveConfirmationDialog(currentPredId)
+                }
+            }
+        })
+
         // 5. 啟動音效
         windHandler.postDelayed(windRunnable, 500)
     }
@@ -192,6 +223,16 @@ class ResultActivity : AppCompatActivity() {
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
+        val feedbackOverlay = binding.root.findViewById<FrameLayout>(R.id.layout_feedback_overlay)
+        if (feedbackOverlay?.visibility == View.VISIBLE) {
+            feedbackOverlay.visibility = View.GONE
+            return
+        }
+        val saveOverlay = binding.root.findViewById<FrameLayout>(R.id.layout_save_overlay)
+        if (saveOverlay?.visibility == View.VISIBLE) {
+            saveOverlay.visibility = View.GONE
+            return
+        }
         if (isUnknownResult) {
             goToHome()
         } else {
@@ -241,33 +282,46 @@ class ResultActivity : AppCompatActivity() {
     }
 
     private fun showSaveConfirmationDialog(predictionId: String?) {
-        val dialogBinding = DialogSaveConfirmBinding.inflate(layoutInflater)
-        val builder = AlertDialog.Builder(this).setView(dialogBinding.root).setCancelable(true)
-        val alertDialog = builder.create().apply {
-            window?.setBackgroundDrawableResource(android.R.color.transparent)
-            show()
+        val overlay = binding.root.findViewById<FrameLayout>(R.id.layout_save_overlay) ?: return
+        val cardRoot = overlay.findViewById<CardView>(R.id.included_save_dialog)
+            ?: overlay.findViewById<CardView>(R.id.dialog_card_root)
+        val btnClose = overlay.findViewById<ImageButton>(R.id.dialog_btn_close)
+        val tvTitle = overlay.findViewById<TextView>(R.id.dialog_title)
+        val tvMessage = overlay.findViewById<TextView>(R.id.dialog_message)
+        val btnSave = overlay.findViewById<Button>(R.id.dialog_btn_save)
+        val btnDontSave = overlay.findViewById<Button>(R.id.dialog_btn_dont_save)
+
+        if (cardRoot != null && btnClose != null && tvTitle != null && tvMessage != null) {
+            ThemeManager.applyThemeToDialog(
+                this,
+                cardRoot,
+                btnClose,
+                tvTitle,
+                tvMessage
+            )
         }
 
-        ThemeManager.applyThemeToDialog(
-            this,
-            dialogBinding.dialogCardRoot,
-            dialogBinding.dialogBtnClose,
-            dialogBinding.dialogTitle,
-            dialogBinding.dialogMessage
-        )
+        overlay.visibility = View.VISIBLE
 
-        dialogBinding.dialogBtnClose.setOnClickListener {
+        btnClose?.setOnClickListener {
             SoundManager.playBubblePop()
-            alertDialog.dismiss()
+            overlay.visibility = View.GONE
         }
-        dialogBinding.dialogBtnSave.setOnClickListener {
-            alertDialog.dismiss()
+        btnSave?.setOnClickListener {
+            overlay.visibility = View.GONE
             confirmAndSaveDiary(predictionId)
         }
-        dialogBinding.dialogBtnDontSave.setOnClickListener {
-            alertDialog.dismiss()
+        btnDontSave?.setOnClickListener {
+            overlay.visibility = View.GONE
             SoundManager.playBubblePop()
             goToHome()
+        }
+        overlay.setOnClickListener {
+            SoundManager.playBubblePop()
+            overlay.visibility = View.GONE
+        }
+        cardRoot?.setOnClickListener {
+            // consume clicks to prevent closing
         }
     }
 
@@ -305,14 +359,15 @@ class ResultActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     Toast.makeText(this@ResultActivity, "紀錄已成功儲存！", Toast.LENGTH_SHORT).show()
                     binding.btnSave.text = "已儲存"
+                    binding.btnSave.isEnabled = false
                     Handler(Looper.getMainLooper()).postDelayed({
-                        val intent = Intent(this@ResultActivity, HomeActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                        startActivity(intent)
-                        finish()
-                    }, 1000)
+                        if (!isFinishing && !isDestroyed) {
+                            goToHome()
+                        }
+                    }, 800)
                 } else {
-                    Toast.makeText(this@ResultActivity, "儲存失敗: ${response.errorBody()?.string()}", Toast.LENGTH_LONG).show()
+                    val errorMsg = response.errorBody()?.string() ?: "未知錯誤"
+                    Toast.makeText(this@ResultActivity, "儲存失敗: $errorMsg", Toast.LENGTH_LONG).show()
                     binding.btnSave.isEnabled = true
                     binding.btnSave.text = "儲存至日記"
                 }
@@ -327,27 +382,79 @@ class ResultActivity : AppCompatActivity() {
     }
 
     private fun showFeedbackDialog(predictionId: String?) {
-        val dialogBinding = DialogFeedbackBinding.inflate(layoutInflater)
-        AlertDialog.Builder(this)
-            .setView(dialogBinding.root)
-            .setTitle("結果有誤？")
-            .setMessage("請告訴我們是哪個部分出錯了，這能幫助我們未來提供更準確的分析！")
-            .setCancelable(true)
-            .setPositiveButton("送出") { _, _ ->
-                val isPlantError = dialogBinding.cbPlantError.isChecked
-                val isDiseaseError = dialogBinding.cbDiseaseError.isChecked
+        val overlay = binding.root.findViewById<FrameLayout>(R.id.layout_feedback_overlay) ?: return
+        val cardRoot = overlay.findViewById<CardView>(R.id.included_feedback_dialog)
+            ?: overlay.findViewById<CardView>(R.id.dialog_card_root)
+        val btnClose = overlay.findViewById<ImageButton>(R.id.dialog_btn_close)
+        val tvTitle = overlay.findViewById<TextView>(R.id.dialog_title)
+        val tvMessage = overlay.findViewById<TextView>(R.id.dialog_message)
+        val cbPlantError = overlay.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.cb_plant_error)
+        val cbDiseaseError = overlay.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.cb_disease_error)
+        val btnSubmit = overlay.findViewById<Button>(R.id.dialog_btn_submit)
+        val btnCancel = overlay.findViewById<Button>(R.id.dialog_btn_cancel)
 
-                if (isPlantError || isDiseaseError) {
-                    sendFeedback(predictionId, isPlantError = isPlantError, isDiseaseError = isDiseaseError)
-                } else {
-                    Toast.makeText(this, "您未選擇任何項目，即將返回首頁", Toast.LENGTH_SHORT).show()
-                    goToHome()
-                }
+        if (cardRoot != null && btnClose != null && tvTitle != null && tvMessage != null) {
+            ThemeManager.applyThemeToDialog(
+                this,
+                cardRoot,
+                btnClose,
+                tvTitle,
+                tvMessage
+            )
+        }
+
+        val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+        val themeId = sharedPref.getInt("THEME_COLOR_ID", 0)
+        val cbTextColor = if (themeId == 0) Color.parseColor("#333333") else Color.WHITE
+        cbPlantError?.setTextColor(cbTextColor)
+        cbDiseaseError?.setTextColor(cbTextColor)
+
+        cbPlantError?.isChecked = false
+        cbDiseaseError?.isChecked = false
+
+        val mainColorStr = when (themeId) {
+            1 -> "#1565C0"
+            2 -> "#D84315"
+            3 -> "#AD1457"
+            else -> "#2E7D32"
+        }
+        val mainColor = Color.parseColor(mainColorStr)
+        btnSubmit?.backgroundTintList = ColorStateList.valueOf(mainColor)
+
+        overlay.visibility = View.VISIBLE
+
+        btnClose?.setOnClickListener {
+            SoundManager.playBubblePop()
+            overlay.visibility = View.GONE
+        }
+
+        btnCancel?.setOnClickListener {
+            SoundManager.playBubblePop()
+            overlay.visibility = View.GONE
+        }
+
+        btnSubmit?.setOnClickListener {
+            SoundManager.playBubblePop()
+            val isPlantError = cbPlantError?.isChecked == true
+            val isDiseaseError = cbDiseaseError?.isChecked == true
+
+            if (!isPlantError && !isDiseaseError) {
+                Toast.makeText(this, "請至少勾選一項錯誤項目", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-            .setNegativeButton("取消") { _, _ ->
-                goToHome()
-            }
-            .show()
+
+            overlay.visibility = View.GONE
+            sendFeedback(predictionId, isPlantError = isPlantError, isDiseaseError = isDiseaseError)
+        }
+
+        overlay.setOnClickListener {
+            SoundManager.playBubblePop()
+            overlay.visibility = View.GONE
+        }
+
+        cardRoot?.setOnClickListener {
+            // consume clicks to prevent closing
+        }
     }
 
     private fun goToHome() {

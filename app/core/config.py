@@ -62,6 +62,10 @@ class Settings(BaseSettings):
     CWB_API_KEY: Optional[str] = None
     # Google Gemini API 金鑰
     GEMINI_API_KEY: Optional[str] = None
+    OPENAI_API_KEY: Optional[str] = None
+    GEMINI_PRIMARY_MODEL: str = "models/gemini-3.8-flash"
+    GEMINI_FALLBACK_MODELS: list[str] = []
+    GEMINI_MAX_RETRIES: int = 2
     SMTP_USE_TLS: bool = True
     SMTP_USE_SSL: bool = False
 
@@ -69,12 +73,16 @@ class Settings(BaseSettings):
     EMAIL_VERIFICATION_EXPIRE_MINUTES: int = 1440
     PASSWORD_RESET_EXPIRE_MINUTES: int = 30
 
-    # 本地 ConvNeXt 輕量快篩模型設定
+    # 本地 ConvNeXt 輕量快篩與混合學習架構設定
     CONVNEXT_MODEL_PATH: str = "convnext_plant_best.pth"
     CONVNEXT_CLASS_INDEX_PATH: str = "idx_to_class.json"
     CONVNEXT_MIN_CONFIDENCE: float = 0.75
     CONVNEXT_OVERWHELMING_CONFIDENCE: float = 0.85
     CONVNEXT_MIN_COSINE_SIMILARITY: float = 0.68
+    CONVNEXT_MIN_CAM_FOREGROUND_RATIO: float = 0.35  # 弱監督 CAM 注意力前景對齊門檻
+    CONVNEXT_ENABLE_DYNAMIC_PROTOTYPES: bool = True  # 啟用非監督式特徵原型與自適應門檻
+    CONVNEXT_TOP_K: int = 3  # 軟標籤候選數量
+    ENABLE_GEMINI_CROSS_VERIFICATION: bool = True  # 啟用多模態視覺覆核推翻機制
 
     def __init__(self, **values):
         super().__init__(**values)

@@ -1,0 +1,206 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <style>
+      .title { font: 700 32px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #111827; }
+      .gate-tag { font: 700 13px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #2e4418; }
+      .purple-tag { font: 700 13px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #5b21b6; }
+      .box-title { font: 700 16px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #1a2e05; }
+      .box-desc { font: 500 12px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #243b0d; }
+      .box-desc-bold { font: 700 12px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #112204; }
+      
+      .red-tag { font: 700 14px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #c02626; }
+      .red-desc { font: 500 12px 'Microsoft JhengHei', 'PingFang TC', sans-serif; fill: #b91c1c; }
+      
+      .flow-text {
+        font: 700 12px 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+        fill: #334e1c;
+        paint-order: stroke fill;
+        stroke: #ffffff;
+        stroke-width: 4px;
+        stroke-linejoin: round;
+      }
+      .flow-text-orange {
+        font: 700 11.5px 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+        fill: #b45309;
+        paint-order: stroke fill;
+        stroke: #ffffff;
+        stroke-width: 4px;
+        stroke-linejoin: round;
+      }
+      .flow-text-red {
+        font: 700 11.5px 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+        fill: #dc2626;
+        paint-order: stroke fill;
+        stroke: #ffffff;
+        stroke-width: 4px;
+        stroke-linejoin: round;
+      }
+      .flow-text-purple {
+        font: 700 11.5px 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+        fill: #6d28d9;
+        paint-order: stroke fill;
+        stroke: #ffffff;
+        stroke-width: 4px;
+        stroke-linejoin: round;
+      }
+
+      /* Box Styles */
+      .green-box { fill: #97ba63; stroke: #6b8f36; stroke-width: 2.2; rx: 12px; }
+      .sub-green-box { fill: #e8f4d9; stroke: #6b8f36; stroke-width: 2; rx: 10px; }
+      .sub-orange-box { fill: #fef3e2; stroke: #d97706; stroke-width: 2; rx: 10px; }
+      .purple-box { fill: #f5f3ff; stroke: #8b5cf6; stroke-width: 2.2; rx: 12px; }
+      .red-box { fill: #fef2f2; stroke: #ef4444; stroke-width: 2; stroke-dasharray: 6 4; rx: 10px; }
+      
+      /* Line Styles */
+      .arrow-green { stroke: #557929; stroke-width: 2.5; fill: none; marker-end: url(#arrow-green-m); }
+      .arrow-orange { stroke: #d97706; stroke-width: 2.2; stroke-dasharray: 6 4; fill: none; marker-end: url(#arrow-orange-m); }
+      .arrow-red { stroke: #dc2626; stroke-width: 2; stroke-dasharray: 5 4; fill: none; marker-end: url(#arrow-red-m); }
+      .arrow-purple { stroke: #7c3aed; stroke-width: 2.2; stroke-dasharray: 6 4; fill: none; marker-end: url(#arrow-purple-m); }
+    </style>
+
+    <!-- Markers -->
+    <marker id="arrow-green-m" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 1 L8 4.5 L0 8 Z" fill="#557929"/>
+    </marker>
+    <marker id="arrow-orange-m" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 1 L8 4.5 L0 8 Z" fill="#d97706"/>
+    </marker>
+    <marker id="arrow-red-m" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 1 L8 4.5 L0 8 Z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrow-purple-m" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 1 L8 4.5 L0 8 Z" fill="#7c3aed"/>
+    </marker>
+  </defs>
+
+  <!-- Slide Canvas Outer Border -->
+  <rect x="10" y="10" width="1580" height="880" rx="14" fill="#ffffff" stroke="#1f2937" stroke-width="2.5"/>
+
+  <!-- Slide Title -->
+  <text x="800" y="65" text-anchor="middle" class="title">R02：如何防範 AI 幻覺與錯誤？（五重防禦與混合學習會診架構）</text>
+
+  <!-- ==================== GATE 1 ==================== -->
+  <text x="145" y="125" text-anchor="middle" class="gate-tag">【第 1 關：輸入品質過濾】</text>
+  <rect x="40" y="140" width="210" height="135" class="green-box"/>
+  <text x="145" y="172" text-anchor="middle" class="box-title">1. 影像品質快篩</text>
+  <text x="58" y="202" class="box-desc">• 使用後端清晰度分析</text>
+  <text x="58" y="222" class="box-desc">  (拉普拉斯梯度邊緣方差)</text>
+  <text x="58" y="247" class="box-desc">• 拒絕模糊、過暗、全黑白壞幀</text>
+
+  <!-- Gate 1 -> Gate 1 Intercept -->
+  <line x1="145" y1="275" x2="145" y2="475" class="arrow-red"/>
+  <text x="150" y="380" class="flow-text-red">邊緣方差 &lt; 5.0 (模糊)</text>
+
+  <rect x="40" y="480" width="210" height="90" class="red-box"/>
+  <text x="145" y="515" text-anchor="middle" class="red-tag">【攔截】前置壞幀過濾</text>
+  <text x="145" y="545" text-anchor="middle" class="red-desc">拒絕推論，引導重新拍攝清晰影像</text>
+
+  <!-- Gate 1 -> Gate 2 Line -->
+  <line x1="250" y1="207" x2="315" y2="207" class="arrow-green"/>
+  <text x="283" y="197" text-anchor="middle" class="flow-text">&gt; 5.0 合格</text>
+
+  <!-- ==================== GATE 2 ==================== -->
+  <text x="475" y="125" text-anchor="middle" class="gate-tag">【第 2 關：混合學習特徵快篩】</text>
+  <rect x="320" y="140" width="310" height="180" class="green-box"/>
+  <text x="475" y="170" text-anchor="middle" class="box-title">2. ConvNeXt 混合學習快篩</text>
+  <text x="336" y="198" class="box-desc-bold">• 弱監督 Grad-CAM 前景對齊 (≥ 35%)</text>
+  <text x="348" y="217" class="box-desc">  (排除泥土、雜草、花盆背景偽陽性)</text>
+  <text x="336" y="238" class="box-desc-bold">• 非監督動態原型幾何約束 (≥ 0.68)</text>
+  <text x="348" y="257" class="box-desc">  (OOD 離群值檢測，防範未知病害亂猜)</text>
+  <text x="336" y="278" class="box-desc">• 輸出 Top-3 軟標籤矩陣 (Soft Labels)</text>
+  <text x="336" y="298" class="box-desc">• 部位感知守門 (防果實套葉病) / 反轉校正</text>
+
+  <!-- ==================== GATE 3A (MAIN DUAL-MODEL VERIFICATION) ==================== -->
+  <text x="860" y="125" text-anchor="middle" class="gate-tag">【第 3 關：多模態病理特徵二次覆核（雙模型會診）】</text>
+  <rect x="685" y="140" width="350" height="180" class="green-box"/>
+  <text x="860" y="170" text-anchor="middle" class="box-title">3. Gemini 視覺覆核 (雙模型會診)</text>
+  <text x="702" y="198" class="box-desc-bold">• 結合 FAISS 農業部 RAG 官方標準病理特徵</text>
+  <text x="702" y="220" class="box-desc-bold">• Gemini 親眼看圖進行【視覺病理覆核】：</text>
+  <text x="714" y="242" class="box-desc">  ✔ 吻合第一候選 → 達成雙模型共識確診</text>
+  <text x="714" y="264" class="box-desc-bold" fill="#78350f">  ✖ 病徵違背 → 推翻修正標籤！(標記爭議)</text>
+  <text x="702" y="292" class="box-desc">• 破除順從偏誤，拒絕盲目接受 ConvNeXt 標籤</text>
+
+  <!-- Gate 2 -> Gate 3A (Solid Green Arrow) -->
+  <line x1="630" y1="210" x2="680" y2="210" class="arrow-green"/>
+  <text x="655" y="195" text-anchor="middle" class="flow-text">Top-3 軟標籤</text>
+
+  <!-- ==================== GATE 3B (FALLBACK) ==================== -->
+  <text x="860" y="380" text-anchor="middle" class="gate-tag">【第 3B 關：雲端多模態開集長尾兜底】</text>
+  <rect x="685" y="395" width="350" height="150" class="green-box"/>
+  <text x="860" y="425" text-anchor="middle" class="box-title">3B. Gemini 全局開集兜底</text>
+  <text x="702" y="453" class="box-desc">• 廣域多模態視覺開集初判 (支援長尾罕見病害)</text>
+  <text x="702" y="475" class="box-desc-bold">• 官方知識庫白名單校準 (拒絕幻覺名詞)</text>
+  <text x="702" y="497" class="box-desc-bold">• 非對稱門檻煞車 (確診 ≥ 65% / 健康 ≥ 85%)</text>
+  <text x="702" y="520" class="box-desc">• 自動標記 requires_review 供專家後台覆核</text>
+
+  <!-- Gate 2 -> Gate 3B (Dashed Orange Line, down and right) -->
+  <path d="M 475 320 L 475 465 L 680 465" class="arrow-orange"/>
+  <text x="485" y="438" class="flow-text-orange">&lt; 75% / 特徵偏離 / CAM 脫靶</text>
+  <text x="485" y="456" class="flow-text-orange">(本地無法判定，轉交雲端開集)</text>
+
+  <!-- Gate 3B -> Gate 3B Intercept -->
+  <line x1="860" y1="545" x2="860" y2="635" class="arrow-red"/>
+  <text x="868" y="590" class="flow-text-red">信心度 &lt; 65%</text>
+
+  <rect x="735" y="640" width="250" height="85" class="red-box"/>
+  <text x="860" y="672" text-anchor="middle" class="red-tag">【攔截】OOD 安全防禦煞車</text>
+  <text x="860" y="700" text-anchor="middle" class="red-desc">回傳「無法判定」並引導補拍</text>
+
+  <!-- ==================== GATE 4 ==================== -->
+  <text x="1205" y="125" text-anchor="middle" class="gate-tag">【第 4 關：動態精準處方生成】</text>
+  <rect x="1090" y="140" width="230" height="180" class="green-box"/>
+  <text x="1205" y="170" text-anchor="middle" class="box-title">4. 雙重知識庫處方拘束</text>
+  <text x="1104" y="202" class="box-desc">• 依照片病斑實際嚴重度</text>
+  <text x="1114" y="222" class="box-desc">  (初期/擴散/壞死)</text>
+  <text x="1114" y="242" class="box-desc">  動態開立專屬醫囑處方</text>
+  <text x="1104" y="272" class="box-desc">• 離線保險備援：</text>
+  <text x="1114" y="292" class="box-desc">  MySQL 專家庫審定指引</text>
+
+  <!-- Gate 3A -> Gate 4 -->
+  <line x1="1035" y1="210" x2="1085" y2="210" class="arrow-green"/>
+  <text x="1060" y="195" text-anchor="middle" class="flow-text">共識 / 覆核確診</text>
+
+  <!-- Gate 3B -> Gate 4 -->
+  <path d="M 1035 440 L 1058 440 L 1058 270 L 1085 270" class="arrow-green"/>
+  <text x="1060" y="365" text-anchor="middle" class="flow-text">&gt; 65% 確診</text>
+
+  <!-- Sub-prescriptions 4A and 4B -->
+  <path d="M 1320 185 L 1375 185" class="arrow-green"/>
+  <text x="1348" y="175" text-anchor="middle" class="flow-text">① 離線備援</text>
+  <rect x="1380" y="155" width="180" height="60" class="sub-green-box"/>
+  <text x="1470" y="190" text-anchor="middle" class="box-title" font-size="14">4A. MySQL 官方防治庫</text>
+
+  <path d="M 1320 265 L 1375 265" class="arrow-orange"/>
+  <text x="1348" y="255" text-anchor="middle" class="flow-text-orange">② 專書檢索</text>
+  <rect x="1380" y="235" width="180" height="60" class="sub-orange-box"/>
+  <text x="1470" y="270" text-anchor="middle" class="box-title" font-size="14">4B. FAISS 專書 + Gemini</text>
+
+  <!-- ==================== GATE 5: WEBCAM STREAMING ==================== -->
+  <text x="1320" y="380" text-anchor="middle" class="gate-tag">【第 5 關：邊緣時序監控防抖】</text>
+  <rect x="1090" y="395" width="460" height="150" class="green-box"/>
+  <text x="1320" y="425" text-anchor="middle" class="box-title">5. Webcam 連續 3 幀穩定共識 (≥ 80%)</text>
+  <text x="1108" y="455" class="box-desc">• 連續 3 影格判定同一病害 ＋ 官方資料庫依據 ＋ 信心度 ≥ 80%</text>
+  <text x="1108" y="480" class="box-desc">• 時序平滑消除風吹晃動誤報 (誤報機率由 p 降至 p³)</text>
+  <text x="1108" y="505" class="box-desc">• 門檻未達標進入靜默冷卻期，防範連續蜂鳴騷擾</text>
+
+  <!-- Gate 4 -> Gate 5 Line (Webcam Monitor Mode) -->
+  <line x1="1205" y1="320" x2="1205" y2="390" class="arrow-green"/>
+  <text x="1212" y="360" class="flow-text">[Webcam 串流模式]</text>
+
+  <!-- ==================== ACTIVE LEARNING LOOP MODULE (INDEPENDENT) ==================== -->
+  <text x="1320" y="590" text-anchor="middle" class="purple-tag">【主動學習進化閉環 (Active Learning Loop)】</text>
+  <rect x="1090" y="605" width="460" height="145" class="purple-box"/>
+  <text x="1320" y="635" text-anchor="middle" font-size="15" font-weight="700" fill="#4c1d95">🌟 困難樣本閉環：自動標記與動態原型微調</text>
+  <text x="1108" y="665" font-size="12" font-weight="500" fill="#5b21b6">• 凡經 Gemini 視覺覆核【推翻修正】之爭議案例，自動標記 requires_review</text>
+  <text x="1108" y="690" font-size="12" font-weight="500" fill="#5b21b6">• 寫入困難樣本資料庫，由後台專家審核驗證</text>
+  <text x="1108" y="715" font-size="12" font-weight="700" fill="#4338ca">• 驗證樣本透過 EMA 線上更新特徵原型，反饋微調第 2 關 ConvNeXt！</text>
+
+  <!-- ACTIVE LEARNING FEEDBACK LOOP: Gate 3A -> Active Learning Box -->
+  <path d="M 860 320 L 860 355 L 1050 355 L 1050 670 L 1085 670" class="arrow-purple"/>
+  <text x="955" y="347" text-anchor="middle" class="flow-text-purple">⚡ 爭議樣本主動學習反饋 (推翻案例寫入病歷庫)</text>
+
+  <!-- Retraining Feedback: Active Learning Box -> Gate 2 (Bottom path) -->
+  <path d="M 1090 715 L 475 715 L 475 325" class="arrow-purple"/>
+  <text x="780" y="735" text-anchor="middle" class="flow-text-purple">🔄 動態原型 EMA 線上微調反饋 (提升田間特徵中心純度)</text>
+
+</svg>

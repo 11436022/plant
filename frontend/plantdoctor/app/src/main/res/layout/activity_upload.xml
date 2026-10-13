@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/upload_scroll_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="@drawable/gradient_background"
-    tools:context=".UploadActivity">
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/upload_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="@drawable/gradient_background"
+        tools:context=".UploadActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/upload_root_layout"
@@ -199,4 +202,25 @@
             app:layout_constraintTop_toBottomOf="@id/layout_btns" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- 原生內嵌作物選擇浮層 (絕不產生系統次視窗死鎖) -->
+    <FrameLayout
+        android:id="@+id/layout_crop_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        android:elevation="50dp">
+
+        <include
+            android:id="@+id/included_crop_dialog"
+            layout="@layout/dialog_select_crop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="24dp" />
+    </FrameLayout>
+</FrameLayout>

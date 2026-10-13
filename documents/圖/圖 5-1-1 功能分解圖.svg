@@ -83,11 +83,11 @@
     <rect x="308" y="335" width="224" height="44" rx="6" class="item-box"/>
     <text x="420" y="362" text-anchor="middle" class="item">拍照或選取照片與作物</text>
     <rect x="308" y="391" width="224" height="44" rx="6" class="item-box"/>
-    <text x="420" y="418" text-anchor="middle" class="item">本地 ConvNeXt 優先快篩</text>
+    <text x="420" y="418" text-anchor="middle" class="item">ConvNeXt 快篩與 CAM 驗證</text>
     <rect x="308" y="447" width="224" height="44" rx="6" class="item-box"/>
     <text x="420" y="474" text-anchor="middle" class="item">Gemini 雲端多模態兜底</text>
     <rect x="308" y="503" width="224" height="44" rx="6" class="item-box"/>
-    <text x="420" y="530" text-anchor="middle" class="item">FAISS 向量檢索與防幻覺</text>
+    <text x="420" y="530" text-anchor="middle" class="item">FAISS 專書與視覺記憶檢索</text>
     <rect x="308" y="559" width="224" height="44" rx="6" class="item-box"/>
     <text x="420" y="586" text-anchor="middle" class="item">精準處方與官方來源回傳</text>
   </g>
@@ -143,9 +143,9 @@
     <rect x="1322" y="447" width="224" height="44" rx="6" class="item-box"/>
     <text x="1434" y="474" text-anchor="middle" class="item">使用者帳號列表與管理</text>
     <rect x="1322" y="503" width="224" height="44" rx="6" class="item-box"/>
-    <text x="1434" y="530" text-anchor="middle" class="item">回饋審核與專家人工標註</text>
+    <text x="1434" y="530" text-anchor="middle" class="item">回饋審核與專家真值標註</text>
     <rect x="1322" y="559" width="224" height="44" rx="6" class="item-box"/>
-    <text x="1434" y="586" text-anchor="middle" class="item">專家標註真值儲存與維護</text>
+    <text x="1434" y="586" text-anchor="middle" class="item">記憶庫重建與一鍵增量微調</text>
   </g>
 
   <!-- Bottom Academic Principles & Guidance -->
@@ -154,10 +154,10 @@
   <text x="235" y="662" class="note">F1–F6 為唯一之一級業務功能分類；Android 端、Web 端與 FastAPI 技術元件屬於系統架構，不重複列入功能層級。</text>
   
   <text x="82" y="700" class="note" font-weight="700">階層式推論與防幻覺：</text>
-  <text x="235" y="700" class="note">採用本地自訓 ConvNeXt 優先快篩，未命中則由 Gemini 多模態兜底；處方優先查詢 MySQL 防治庫，缺漏時檢索 FAISS 結合 Gemini 生成。</text>
+  <text x="235" y="700" class="note">整合 Grad-CAM 前景對齊、Visual Memory 專家記憶、ConvNeXt 快篩與 Gemini 多模態兜底；處方雙軌鎖定農業部專書。</text>
   
   <text x="82" y="738" class="note" font-weight="700">主動學習閉環：</text>
-  <text x="235" y="738" class="note">提供診斷結果反饋機制，管理者透過後台進行專家人工標註並留存真值於資料庫，為專屬模型提供持續迭代優化之依據。</text>
+  <text x="235" y="738" class="note">提供專家真值標註、視覺記憶向量庫即時生效、標準訓練集匯出，以及後端一鍵本機增量微調重訓之完整主動學習閉環。</text>
 
   <text x="1546" y="805" text-anchor="end" class="subtitle" font-size="14px">版本：現行已實作完整功能（畢業專題正式版本）</text>
 </svg>

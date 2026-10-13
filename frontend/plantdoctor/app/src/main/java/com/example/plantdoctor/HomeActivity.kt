@@ -96,7 +96,11 @@ class HomeActivity : AppCompatActivity() {
         val isFirstTime = sharedPref.getBoolean("IS_FIRST_TIME_HOME", true)
 
         if (isFirstTime) {
-            showTutorial()
+            cardDiagnose.post {
+                if (!isFinishing && !isDestroyed) {
+                    showTutorial()
+                }
+            }
         }
     }
 
@@ -369,16 +373,21 @@ private fun stopLocationUpdates() {
         val targetColorRes = android.R.color.holo_green_dark
         val sharedPref = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
 
+        if (cardDiagnose.width <= 0 || cardDiagnose.height <= 0) {
+            sharedPref.edit().putBoolean("IS_FIRST_TIME_HOME", false).apply()
+            return
+        }
+
         val sequence = TapTargetSequence(this)
             .targets(
                 TapTarget.forView(cardDiagnose, "植物診斷", "點擊這裡開始辨識您的植物")
-                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
+                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(true).tintTarget(false).transparentTarget(true).drawShadow(true),
                 TapTarget.forView(cardWebcam, "即時診斷監控", "開啟相機進行定時自動即時偵測診斷")
-                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
+                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(true).tintTarget(false).transparentTarget(true).drawShadow(true),
                 TapTarget.forView(cardHistory, "歷史紀錄", "查看過去的辨識結果")
-                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
+                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(true).tintTarget(false).transparentTarget(true).drawShadow(true),
                 TapTarget.forView(cardSettings, "設定", "調整應用程式設定")
-                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true)
+                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(true).tintTarget(false).transparentTarget(true).drawShadow(true)
             )
             .listener(object : TapTargetSequence.Listener {
                 override fun onSequenceFinish() {

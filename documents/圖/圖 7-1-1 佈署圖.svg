@@ -41,7 +41,7 @@
       .protocol-label { font-family: 'Microsoft JhengHei', sans-serif; font-size: 12px; font-weight: bold; fill: #2D5837; text-anchor: middle; }
       .protocol-sub { font-family: 'Microsoft JhengHei', sans-serif; font-size: 10px; fill: #2D3748; text-anchor: middle; }
       
-      .device-box { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 1.5; rx: 6; ry: 6; ); }
+      .device-box { fill: #F8FAF7; stroke: #B5C6B3; stroke-width: 1.5; rx: 6; ry: 6; }
       .device-header { fill: #E5EDE3; stroke: #B5C6B3; stroke-width: 1.5; }
       .container-box { fill: #ffffff; stroke: #4F7057; stroke-width: 1.5; rx: 4; ry: 4; }
       .ai-box { fill: #FFFFFF; stroke: #4F7057; stroke-width: 1.5; rx: 4; ry: 4; }
@@ -409,7 +409,7 @@
        x="35"
        y="410"
        class="artifact-desc"
-       id="text37">• PyTorch / TorchVision 卷積神經網路 )</text>
+       id="text37">• PyTorch / TorchVision 卷積神經網路</text>
     <text
        x="35"
        y="423"
@@ -555,7 +555,7 @@
        x="15"
        y="16"
        class="node-sub"
-       id="text55">&gt;</text>
+       id="text55">&lt;&lt;device&gt;&gt;</text>
     <text
        x="15"
        y="28"

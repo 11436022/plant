@@ -1,3 +1,5 @@
+import copy
+import hashlib
 import time
 import uuid
 from pathlib import Path
@@ -19,6 +21,11 @@ from app.services.files import ensure_image_upload, validate_image_content
 prediction_cache = {}
 PREDICTION_TTL_SECONDS = 900
 MAX_PENDING_PREDICTIONS = 100
+
+# 影像雜湊冪等診斷快取 (Image SHA-256 Diagnosis Cache)
+# 確保同一張圖片在短時間內重複上傳或測試時，獲得 100% 決定性、零延遲、一致的診斷結果
+image_diagnosis_cache = {}
+IMAGE_CACHE_TTL_SECONDS = 1800
 
 router = APIRouter(
     prefix="/predict",
@@ -83,11 +90,28 @@ async def predict_plant_status(
         temp_file_path = TEMP_DIR / f"{uuid.uuid4().hex}{suffix}"
         temp_file_path.write_bytes(content)
 
-        # 2. 呼叫 AI 進行診斷 (三層瀑布流階層式架構)
-        crops, diseases, pests = get_reference_lists(db)
-        if crop_name:
-            crops = [crop_name]
-        raw_ai_result = diagnostic_plant(str(temp_file_path), crops, diseases, pests)
+        img_sha256 = hashlib.sha256(content).hexdigest()
+        cache_key = (img_sha256, (crop_name or "").strip())
+        now = time.monotonic()
+
+        cached_entry = image_diagnosis_cache.get(cache_key)
+        if cached_entry and (now - cached_entry["cached_at"] < IMAGE_CACHE_TTL_SECONDS):
+            print(f"[CACHE] 命中相同圖片 SHA-256 冪等診斷快取 ({img_sha256[:8]}...) -> 保證 100% 決定性一致輸出！")
+            raw_ai_result = copy.deepcopy(cached_entry["result"])
+        else:
+            # 2. 呼叫 AI 進行診斷 (三層瀑布流階層式架構)
+            crops, diseases, pests = get_reference_lists(db)
+            if crop_name:
+                crops = [crop_name]
+            raw_ai_result = diagnostic_plant(str(temp_file_path), crops, diseases, pests)
+            if raw_ai_result and raw_ai_result.get("category") != "unknown":
+                image_diagnosis_cache[cache_key] = {
+                    "result": copy.deepcopy(raw_ai_result),
+                    "cached_at": now
+                }
+                if len(image_diagnosis_cache) > 200:
+                    oldest_k = min(image_diagnosis_cache.keys(), key=lambda k: image_diagnosis_cache[k]["cached_at"])
+                    image_diagnosis_cache.pop(oldest_k, None)
 
         # --- DEBUG: 印出 AI 原始預測結果 ---
         if raw_ai_result:

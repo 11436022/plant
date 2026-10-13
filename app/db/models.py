@@ -140,6 +140,9 @@ class DiagnosisFeedback(Base):
     corrected_plant_name = Column(String(100))
     corrected_disease_name = Column(String(100))
 
+    manager_corrected_plant_name = Column(String(100), nullable=True)
+    manager_corrected_disease_name = Column(String(100), nullable=True)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User")
