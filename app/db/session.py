@@ -2,6 +2,7 @@ import os
 
 import pymysql
 from sqlalchemy import create_engine
+from sqlalchemy.engine import URL
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 from app.db.base import Base
@@ -11,12 +12,16 @@ load_dotenv()
 user = os.getenv("DB_USER")
 password = os.getenv("DB_PASSWORD")
 host = os.getenv("DB_HOST")
+port = int(os.getenv("DB_PORT", "3306"))
 db_name = os.getenv("DB_NAME")
 
 if not all([user, host, db_name]):
     raise ValueError("無法從 .env 讀取資料庫設定，請檢查檔案是否存在且格式正確。")
 
-DATABASE_URL = f"mysql+pymysql://{user}:{password}@{host}/{db_name}"
+DATABASE_URL = URL.create(
+    "mysql+pymysql", username=user, password=password, host=host,
+    port=port, database=db_name,
+)
 
 # SQLAlchemy 連線與 Session 工廠。
 engine = create_engine(DATABASE_URL)
@@ -40,6 +45,7 @@ def get_db_connection():
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
         host=os.getenv("DB_HOST"),
+        port=int(os.getenv("DB_PORT", "3306")),
         database=os.getenv("DB_NAME"),
         cursorclass=pymysql.cursors.DictCursor,
     )
