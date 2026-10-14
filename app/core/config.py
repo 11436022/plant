@@ -62,7 +62,6 @@ class Settings(BaseSettings):
     CWB_API_KEY: Optional[str] = None
     # Google Gemini API 金鑰
     GEMINI_API_KEY: Optional[str] = None
-    OPENAI_API_KEY: Optional[str] = None
     GEMINI_PRIMARY_MODEL: str = "models/gemini-3.8-flash"
     GEMINI_FALLBACK_MODELS: list[str] = []
     GEMINI_MAX_RETRIES: int = 2

@@ -533,78 +533,13 @@ def generate_precise_prescription(
     return safe_sugg, safe_treat, "general_safe_prescription"
 
 
-def _call_openai_fallback(image_path: str, crop_hint: str | None = None) -> dict | None:
-    """跨雲供應商備援：當 Google Gemini 被風控 (403) 或額度超限 (429) 時，由 OpenAI 接棒視覺分析。"""
-    openai_key = getattr(settings, "OPENAI_API_KEY", None) or os.getenv("OPENAI_API_KEY")
-    if not openai_key:
-        return None
-    try:
-        from openai import OpenAI
-        client_oa = OpenAI(api_key=openai_key)
-        with open(image_path, "rb") as f:
-            b64 = base64.b64encode(f.read()).decode("utf-8")
-
-        if crop_hint:
-            user_crop_instruction = (
-                f"已知使用者指定/選定的作物名稱為：【{crop_hint}】。"
-                f"請以該作物為基準，專注鑑別長尾、罕見病徵、生理障礙或害蟲，並回傳精確病害名稱（或判定為 '健康'）。"
-            )
-        else:
-            user_crop_instruction = (
-                "請辨識影像中的植物名稱（crop_name）及其健康狀態（status_name，如特定病害、蟲害，或 '健康'）。\n"
-                "【關鍵防呆規範】：若影像非植物、純黑、純色、嚴重模糊無特徵、日常非植物用品或手機截圖，"
-                "crop_name 必須填寫 '未知作物'，status_name 必須填寫 '無法判定'，category 必須填寫 'unknown'，confidence 填寫 0.0。"
-            )
-
-        prompt = f"""
-        You are a top-tier plant pathologist.
-        {user_crop_instruction}
-
-        IMPORTANT:
-        - All text MUST be in Traditional Chinese.
-        - Standardize the crop and issue names to their most common and correct form.
-        - If the image contains NO plant leaves/organs, or is completely black/invalid/non-plant, category MUST be 'unknown', crop_name MUST be '未知作物', status_name MUST be '無法判定', confidence MUST be 0.0.
-        - 若影像中同時出現多種病蟲害跡象（如葉斑、蟲害、焦枯等複合徵候），請以【受害最顯著、最影響植株生長之首要病徵】為唯一確診依據，確保診斷具有高度一致性與決定性。
-        - Respond in a valid, non-nested, single-level JSON format.
-
-        JSON Output Structure:
-        {{
-          "crop_name": "string (標準化的作物名稱，非植物請填 '未知作物')",
-          "status_name": "string (標準化的病害/害蟲名稱，健康填 '健康'，非植物請填 '無法判定')",
-          "category": "string (One of 'disease', 'pest', 'healthy', 'unknown')",
-          "confidence": 0.90,
-          "suggestion": "string (2 點核心病徵與風險分析，每點以 '-' 開頭，每點約 30-50 字，'\\n' 換行)",
-          "treatment": "string (3 點行動導向防治步驟，以 '1.' '2.' '3.' 開頭，格式為『步驟名稱：具體作法與稀釋倍率』，去除冗長理論贅述，每點精簡控制在 40-60 字以內，'\\n' 換行)"
-        }}
-        """
-        resp = client_oa.chat.completions.create(
-            model="gpt-4o-mini",
-            temperature=0.0,
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64}"}}
-                ]
-            }],
-            response_format={"type": "json_object"},
-            max_tokens=600,
-        )
-        data = json.loads(resp.choices[0].message.content)
-        print(f"[OK]  [跨雲備援成功] Google Gemini 異常，已由 OpenAI gpt-4o-mini 接棒多模態視覺診斷！")
-        return data
-    except Exception as e:
-        print(f"[WARN]  OpenAI 備援兜底失敗: {e}")
-        return None
-
-
 def _call_gemini_fallback(
     image_path: str,
     crop_hint: str | None = None,
     visual_memory_hint: dict | None = None,
     mock_result: dict | None = None,
 ) -> dict:
-    """步驟 3：Gemini 多模態兜底推論 (若失敗自動嘗試 OpenAI 跨雲備援)。"""
+    """步驟 2：Gemini 多模態兜底推論。"""
     if mock_result is not None:
         return mock_result
 
@@ -659,9 +594,6 @@ def _call_gemini_fallback(
         return json.loads(clean_text)
     except Exception as e:
         print(f"[ERROR]  Gemini 多模態兜底失敗: {e}")
-        oa_res = _call_openai_fallback(image_path=image_path, crop_hint=crop_hint)
-        if oa_res:
-            return oa_res
         return _uncertain_diagnosis(crop_name=crop_hint)
 
 
