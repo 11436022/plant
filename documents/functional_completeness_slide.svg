@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 562" width="1024" height="562">
+  <defs>
+    <!-- Background Grid Pattern: 32px x 32px -->
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#C5D9A7" stroke-width="1.3" stroke-opacity="0.85" />
+    </pattern>
+
+    <!-- Drop Shadow for Central Card -->
+    <filter id="card-shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="5" stdDeviation="10" flood-color="#2D4022" flood-opacity="0.05" />
+    </filter>
+
+    <!-- Feature Cube & Star Gradients -->
+    <linearGradient id="cube-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+    <linearGradient id="cube-grad-2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14B8A6" />
+      <stop offset="100%" stop-color="#2DD4BF" />
+    </linearGradient>
+    <linearGradient id="cube-grad-3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0D9488" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+
+    <linearGradient id="ai-star-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00D4FF" />
+      <stop offset="40%" stop-color="#38BDF8" />
+      <stop offset="80%" stop-color="#818CF8" />
+      <stop offset="100%" stop-color="#C084FC" />
+    </linearGradient>
+
+    <linearGradient id="emerald-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+  </defs>
+
+  <style>
+    .font-tc { font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", -apple-system, sans-serif; }
+    .font-en { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  </style>
+
+  <!-- Slide Background (Pure white base + grid) -->
+  <rect width="1024" height="562" fill="#FFFFFF" />
+  <rect width="1024" height="562" fill="url(#grid)" />
+
+  <!-- ============================================================ -->
+  <!-- ORGANIC CORNER SHAPES (No top-right badge, clean curve) -->
+  <!-- ============================================================ -->
+  <path d="M 0 0 L 195 0 C 190 70 160 118 110 122 C 70 125 18 112 0 102 Z" fill="#C2D6A4" />
+  <path d="M 760 0 C 780 40 820 62 880 62 C 940 62 985 45 1024 35 L 1024 0 Z" fill="#C2D6A4" />
+  <path d="M 1024 150 C 975 175 960 230 970 290 C 980 345 1002 375 1024 395 Z" fill="#C2D6A4" />
+  <path d="M 1024 562 L 885 562 C 895 490 935 442 990 428 C 1010 422 1020 424 1024 426 Z" fill="#C2D6A4" />
+
+  <!-- Botanical Line-Art Leaves -->
+  <g transform="translate(10, 10)" stroke="#648252" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 10 10 Q 75 95 160 165" stroke-width="2.2" />
+    <path d="M 30 30 Q 45 5 65 15 Q 55 45 30 30 Z" />
+    <path d="M 30 30 Q 45 18 65 15" stroke-width="1.2" />
+    <path d="M 65 65 Q 100 35 115 50 Q 95 80 65 65 Z" />
+    <path d="M 65 65 Q 90 50 115 50" stroke-width="1.2" />
+    <path d="M 85 95 Q 65 70 60 95 Q 80 115 85 95 Z" />
+    <path d="M 85 95 Q 70 82 60 95" stroke-width="1.2" />
+    <path d="M 105 115 Q 150 95 165 110 Q 135 135 105 115 Z" />
+    <path d="M 105 115 Q 135 105 165 110" stroke-width="1.2" />
+  </g>
+
+  <g transform="translate(865, 415)" stroke="#648252" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 130 135 Q 65 65 20 10" stroke-width="2.2" />
+    <path d="M 115 115 Q 80 135 65 120 Q 90 95 115 115 Z" />
+    <path d="M 115 115 Q 90 125 65 120" stroke-width="1.2" />
+    <path d="M 90 90 Q 125 65 140 80 Q 115 105 90 90 Z" />
+    <path d="M 90 90 Q 115 75 140 80" stroke-width="1.2" />
+    <path d="M 65 60 Q 40 75 30 60 Q 50 40 65 60 Z" />
+    <path d="M 65 60 Q 45 67 30 60" stroke-width="1.2" />
+  </g>
+
+  <!-- Cute Yellow Flowers -->
+  <g transform="translate(125, 435) rotate(-10)">
+    <ellipse cx="0" cy="-20" rx="9" ry="15" fill="#FAE053" />
+    <ellipse cx="18" cy="-7" rx="9" ry="14" transform="rotate(28 18 -7)" fill="#FAE053" />
+    <ellipse cx="12" cy="16" rx="9" ry="14" transform="rotate(72 12 16)" fill="#FAE053" />
+    <ellipse cx="-12" cy="16" rx="9" ry="14" transform="rotate(-72 -12 16)" fill="#FAE053" />
+    <ellipse cx="-18" cy="-7" rx="9" ry="14" transform="rotate(-28 -18 -7)" fill="#FAE053" />
+    <path d="M -3 -24 Q 0 -12 3 -24" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.85" />
+    <circle cx="0" cy="0" r="6" fill="#E8C32E" />
+  </g>
+
+  <g transform="translate(875, 290) rotate(20) scale(0.92)">
+    <ellipse cx="0" cy="-20" rx="9" ry="15" fill="#FAE053" />
+    <ellipse cx="18" cy="-7" rx="9" ry="14" transform="rotate(28 18 -7)" fill="#FAE053" />
+    <ellipse cx="12" cy="16" rx="9" ry="14" transform="rotate(72 12 16)" fill="#FAE053" />
+    <ellipse cx="-12" cy="16" rx="9" ry="14" transform="rotate(-72 -12 16)" fill="#FAE053" />
+    <ellipse cx="-18" cy="-7" rx="9" ry="14" transform="rotate(-28 -18 -7)" fill="#FAE053" />
+    <path d="M -3 -24 Q 0 -12 3 -24" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.85" />
+    <circle cx="0" cy="0" r="6" fill="#E8C32E" />
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- CENTRAL WHITE CARD -->
+  <!-- ============================================================ -->
+  <rect x="122" y="74" width="778" height="412" rx="32" fill="#FFFFFF" filter="url(#card-shadow)" />
+
+  <!-- ============================================================ -->
+  <!-- LEFT COLUMN: FUNCTIONAL COMPLETENESS EMBLEM & TITLE -->
+  <!-- Center: x = 285, y = 280 -->
+  <!-- ============================================================ -->
+  <g transform="translate(285, 245)">
+    <circle cx="0" cy="-15" r="105" fill="url(#emerald-glow)" opacity="0.08" />
+
+    <!-- Isometric Modular Feature Cube (Multi-Functional App Suite) -->
+    <!-- Top Face -->
+    <polygon points="0,-72 58,-40 0,-8 -58,-40" fill="url(#cube-grad-2)" />
+    <!-- Left Face -->
+    <polygon points="-58,-40 0,-8 0,62 -58,30" fill="url(#cube-grad-1)" />
+    <!-- Right Face -->
+    <polygon points="0,-8 58,-40 58,30 0,62" fill="url(#cube-grad-3)" />
+
+    <!-- Inner Grid Pattern on Top Face -->
+    <line x1="-29" y1="-24" x2="29" y2="-56" stroke="#FFFFFF" stroke-width="1.8" opacity="0.6" />
+    <line x1="29" y1="-24" x2="-29" y2="-56" stroke="#FFFFFF" stroke-width="1.8" opacity="0.6" />
+
+    <!-- Floating 4-Pointed Sparkle Star -->
+    <g transform="translate(42, -75) scale(0.68)">
+      <path d="M 0 -58 Q 0 0 58 0 Q 0 0 0 58 Q 0 0 -58 0 Q 0 0 0 -58 Z" fill="url(#ai-star-grad)" />
+    </g>
+    <!-- Micro Sparkle -->
+    <g transform="translate(-48, 15) scale(0.32)">
+      <path d="M 0 -50 Q 0 0 50 0 Q 0 0 0 50 Q 0 0 -50 0 Q 0 0 0 -50 Z" fill="#38BDF8" />
+    </g>
+  </g>
+
+  <!-- Big Bold Title: 功能完整度 -->
+  <text x="285" y="398" text-anchor="middle" class="font-tc" font-size="34" font-weight="900" fill="#000000" letter-spacing="2">功能完整度</text>
+  <text x="285" y="426" text-anchor="middle" class="font-en" font-size="15" font-weight="700" fill="#4B633F" letter-spacing="1">Functional Completeness</text>
+
+  <!-- ============================================================ -->
+  <!-- RIGHT COLUMN: THREE SAGE GREEN PILLS -->
+  <!-- X: 445, Width: 385, Height: 66, Gap: 21 -->
+  <!-- ============================================================ -->
+  <!-- Pill 1: 12 項核心需求 100% 交付 -->
+  <g transform="translate(445, 160)">
+    <rect x="0" y="0" width="385" height="66" rx="33" fill="#C2D6A4" stroke="#000000" stroke-width="2.6" />
+    <text x="192.5" y="42" text-anchor="middle" class="font-tc font-en" font-size="20" font-weight="800" fill="#000000" letter-spacing="1">12 項核心功能需求 100% 交付</text>
+  </g>
+
+  <!-- Pill 2: 雙模型快篩與官方 RAG 處方 -->
+  <g transform="translate(445, 247)">
+    <rect x="0" y="0" width="385" height="66" rx="33" fill="#C2D6A4" stroke="#000000" stroke-width="2.6" />
+    <text x="192.5" y="42" text-anchor="middle" class="font-tc font-en" font-size="20" font-weight="800" fill="#000000" letter-spacing="1">雙模型快篩與官方 RAG 處方</text>
+  </g>
+
+  <!-- Pill 3: Webcam 防抖監控與糾錯閉環 -->
+  <g transform="translate(445, 334)">
+    <rect x="0" y="0" width="385" height="66" rx="33" fill="#C2D6A4" stroke="#000000" stroke-width="2.6" />
+    <text x="192.5" y="42" text-anchor="middle" class="font-tc font-en" font-size="20" font-weight="800" fill="#000000" letter-spacing="1">Webcam 監控與糾錯學習閉環</text>
+  </g>
+
+</svg>

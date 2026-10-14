@@ -65,5 +65,5 @@ websockets==16.0
 python-jose[cryptography]==3.3.0
 pydantic-settings==2.15.0
 --extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.5.1+cpu
-torchvision==0.20.1+cpu
+torch==2.14.1+cpu
+torchvision==0.18.1+cpu
