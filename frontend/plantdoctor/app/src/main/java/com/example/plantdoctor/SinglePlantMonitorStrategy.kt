@@ -52,7 +52,7 @@ class SinglePlantMonitorStrategy(private val activity: WebcamActivity) {
     }
 
     /**
-     * 🌟 NV21 轉 Bitmap，裁切正中心 1:1 區域 + 80% JPEG 壓縮
+     * 🌟 NV21 轉 Bitmap，裁切正中心 1:1 區域
      */
     private fun processImageToCompressedBytes(image: ImageProxy): ByteArray? {
         return try {
@@ -87,7 +87,7 @@ class SinglePlantMonitorStrategy(private val activity: WebcamActivity) {
             }
 
             val finalStream = ByteArrayOutputStream()
-            croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, finalStream)
+            croppedBitmap.compress(Bitmap.CompressFormat.PNG, 100, finalStream)
             val finalBytes = finalStream.toByteArray()
 
             croppedBitmap.recycle()

@@ -43,6 +43,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var cardWebcam: CardView
     private lateinit var cardHistory: CardView
     private lateinit var cardSettings: CardView
+    private lateinit var cardWeather: CardView
     private lateinit var tvhomeTitle: TextView
 
     // 🌟 天氣建議相關 UI 元件
@@ -72,6 +73,7 @@ class HomeActivity : AppCompatActivity() {
         cardHistory = findViewById(R.id.card_history)
         cardSettings = findViewById(R.id.card_settings)
         tvhomeTitle = findViewById(R.id.tv_home_title)
+        cardWeather = findViewById(R.id.weather_card)
         // 🌟 綁定天氣資訊相關的 TextView (假設 ID 已在 activity_home.xml 中定義)
         tvWeatherLocation = findViewById(R.id.tv_weather_location)
         tvWeatherInfo = findViewById(R.id.tv_weather_info)
@@ -96,11 +98,7 @@ class HomeActivity : AppCompatActivity() {
         val isFirstTime = sharedPref.getBoolean("IS_FIRST_TIME_HOME", true)
 
         if (isFirstTime) {
-            cardDiagnose.post {
-                if (!isFinishing && !isDestroyed) {
-                    showTutorial()
-                }
-            }
+            showTutorial()
         }
     }
 
@@ -373,25 +371,47 @@ private fun stopLocationUpdates() {
         val targetColorRes = android.R.color.holo_green_dark
         val sharedPref = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
 
-        if (cardDiagnose.width <= 0 || cardDiagnose.height <= 0) {
-            sharedPref.edit().putBoolean("IS_FIRST_TIME_HOME", false).apply()
-            return
+        val tutorialCards = listOf(cardDiagnose, cardWebcam, cardHistory, cardSettings, cardWeather)
+
+        // 1. 導覽開始前：強行把卡片的 translationZ 設為負數，逼它們退到導覽工具的後方
+        tutorialCards.forEach {
+            it.cardElevation = 0f
+            it.translationZ = -100f // 往螢幕後方推
         }
+
+
+
+        // 2. 轉像素值 (4dp)，用於最後還原高度
+        val density = resources.displayMetrics.density
+
+
+
+
+
 
         val sequence = TapTargetSequence(this)
             .targets(
                 TapTarget.forView(cardDiagnose, "植物診斷", "點擊這裡開始辨識您的植物")
-                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(true).tintTarget(false).transparentTarget(true).drawShadow(true),
+                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true) ,
                 TapTarget.forView(cardWebcam, "即時診斷監控", "開啟相機進行定時自動即時偵測診斷")
-                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(true).tintTarget(false).transparentTarget(true).drawShadow(true),
+                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
                 TapTarget.forView(cardHistory, "歷史紀錄", "查看過去的辨識結果")
-                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(true).tintTarget(false).transparentTarget(true).drawShadow(true),
+                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
                 TapTarget.forView(cardSettings, "設定", "調整應用程式設定")
-                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(true).tintTarget(false).transparentTarget(true).drawShadow(true)
+                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true),
+                TapTarget.forView(cardWeather, "今日天氣", "依照每日天氣提供簡易的照顧方案")
+                    .outerCircleColor(targetColorRes).targetCircleColor(android.R.color.white).titleTextColor(android.R.color.white).descriptionTextColor(android.R.color.white).cancelable(false).tintTarget(false).transparentTarget(true).drawShadow(true)
             )
             .listener(object : TapTargetSequence.Listener {
                 override fun onSequenceFinish() {
                     sharedPref.edit().putBoolean("IS_FIRST_TIME_HOME", false).apply()
+                    // 2. 導覽完成：將高度與 Z 軸位置全部歸位
+                    val originalElevationPx = 4f * resources.displayMetrics.density
+                    tutorialCards.forEach {
+                        it.cardElevation = originalElevationPx
+                        it.translationZ = 0f
+                    }
+
                 }
 
                 override fun onSequenceStep(lastTarget: TapTarget?, targetClicked: Boolean) {
@@ -399,12 +419,19 @@ private fun stopLocationUpdates() {
                 }
 
                 override fun onSequenceCanceled(lastTarget: TapTarget?) {
-                    // 如果用戶取消，也標記為已完成，避免下次再跳出
                     sharedPref.edit().putBoolean("IS_FIRST_TIME_HOME", false).apply()
+                    // 2. 導覽完成：將高度與 Z 軸位置全部歸位
+                    val originalElevationPx = 4f * resources.displayMetrics.density
+                    tutorialCards.forEach {
+                        it.cardElevation = originalElevationPx
+                        it.translationZ = 0f
+                    }
+
                 }
             })
         sequence.start()
     }
+
 
     override fun onStop() {
         super.onStop()

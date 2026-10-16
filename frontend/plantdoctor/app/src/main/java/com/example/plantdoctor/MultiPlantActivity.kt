@@ -183,9 +183,9 @@ class MultiPlantActivity : AppCompatActivity() {
 
         val croppedBitmap = Bitmap.createBitmap(fullBitmap, left, top, right - left, bottom - top)
 
-        val outputFile = File(cacheDir, "crop_plant_$plantIndex.jpg")
+        val outputFile = File(cacheDir, "crop_plant_$plantIndex.png")
         FileOutputStream(outputFile).use { out ->
-            croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 92, out)
+            croppedBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
         }
         return outputFile
     }
