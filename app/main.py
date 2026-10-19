@@ -47,6 +47,12 @@ def create_app() -> FastAPI:
         ensure_auth_schema()
         # 載入 RAG 知識庫
         rag.load_knowledge_base()
+        # 預載本地 ConvNeXt 快篩模型
+        try:
+            from app.services.convnext import get_convnext_model
+            get_convnext_model()
+        except Exception as e:
+            print(f"[WARN] 預載 ConvNeXt 失敗: {e}")
 
     # API routers (v1)
     # ----------------
@@ -76,4 +82,4 @@ app = create_app()
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host=settings.API_HOST, port=settings.API_PORT)
+    uvicorn.run("app.main:app", host=settings.API_HOST, port=settings.API_PORT, reload=True)

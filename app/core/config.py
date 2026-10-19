@@ -63,7 +63,11 @@ class Settings(BaseSettings):
     # Google Gemini API 金鑰
     GEMINI_API_KEY: Optional[str] = None
     GEMINI_PRIMARY_MODEL: str = "models/gemini-3.8-flash"
-    GEMINI_FALLBACK_MODELS: list[str] = []
+    GEMINI_FALLBACK_MODELS: list[str] = [
+        "models/gemini-2.5-flash",
+        "models/gemini-3.5-flash",
+        "models/gemini-flash-latest",
+    ]
     GEMINI_MAX_RETRIES: int = 2
     SMTP_USE_TLS: bool = True
     SMTP_USE_SSL: bool = False

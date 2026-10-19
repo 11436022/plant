@@ -104,9 +104,19 @@ def get_convnext_model(force_reload: bool = False):
 
         load_class_index(force_reload=force_reload)
         num_classes = len(_idx_to_class) if _idx_to_class else 38
-        model = timm.create_model("convnext_small", num_classes=num_classes, pretrained=False)
         state_dict = torch.load(str(model_path), map_location="cpu")
-        model.load_state_dict(state_dict)
+        ckpt_classes = state_dict["head.fc.weight"].shape[0] if "head.fc.weight" in state_dict else num_classes
+        model = timm.create_model("convnext_small", num_classes=ckpt_classes, pretrained=False)
+        model.load_state_dict(state_dict, strict=False)
+        if num_classes > ckpt_classes:
+            old_fc = model.head.fc
+            in_feats = old_fc.in_features
+            new_fc = torch.nn.Linear(in_feats, num_classes)
+            with torch.no_grad():
+                new_fc.weight[:ckpt_classes] = old_fc.weight
+                if old_fc.bias is not None:
+                    new_fc.bias[:ckpt_classes] = old_fc.bias
+            model.head.fc = new_fc
         model.eval()
         _convnext_model = model
         print(f"[OK] 本地 ConvNeXt 模型載入成功 ({model_path}, 類別數: {num_classes})")
