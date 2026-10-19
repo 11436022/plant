@@ -1225,8 +1225,8 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
                 new_disease = models.Disease(
                     crop_id=target_crop_id,
                     disease_name=status_name,
-                    description=final_suggestion,
-                    treatment=final_treatment,
+                    description=final_suggestion or "暫無病徵描述",
+                    treatment=final_treatment or "暫無防治處方",
                 )
                 db.add(new_disease)
                 db.flush()
@@ -1242,8 +1242,8 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
                 new_pest = models.Pest(
                     crop_id=target_crop_id,
                     pest_name=status_name,
-                    description=final_suggestion,
-                    treatment=final_treatment,
+                    description=final_suggestion or "暫無病徵描述",
+                    treatment=final_treatment or "暫無防治處方",
                 )
                 db.add(new_pest)
                 db.flush()

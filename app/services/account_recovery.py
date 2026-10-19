@@ -31,8 +31,29 @@ def ensure_auth_schema() -> None:
             # 2. PlantDiary 表相關 (解決 500 錯誤的關鍵)
             if not _column_exists(cursor, "plant_diary", "user_corrected_status"):
                 cursor.execute("ALTER TABLE plant_diary ADD COLUMN user_corrected_status VARCHAR(100) NULL DEFAULT NULL")
+            if not _column_exists(cursor, "plant_diary", "category"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN category VARCHAR(20) NOT NULL DEFAULT 'unknown'")
+            if not _column_exists(cursor, "plant_diary", "requires_review"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN requires_review TINYINT(1) NOT NULL DEFAULT 1")
+            if not _column_exists(cursor, "plant_diary", "grounding_source"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN grounding_source VARCHAR(64) NOT NULL DEFAULT 'legacy_unverified'")
+            if not _column_exists(cursor, "plant_diary", "reference_source"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_source VARCHAR(100) NULL DEFAULT NULL")
+            if not _column_exists(cursor, "plant_diary", "reference_url"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_url VARCHAR(2048) NULL DEFAULT NULL")
+            if not _column_exists(cursor, "plant_diary", "reference_record_id"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_record_id VARCHAR(128) NULL DEFAULT NULL")
 
-            # 3. Token 表相關
+            # 3. Disease 與 Pests 參考來源欄位
+            for tbl in ("disease", "pests"):
+                if not _column_exists(cursor, tbl, "source_name"):
+                    cursor.execute(f"ALTER TABLE {tbl} ADD COLUMN source_name VARCHAR(100) NULL DEFAULT NULL")
+                if not _column_exists(cursor, tbl, "source_url"):
+                    cursor.execute(f"ALTER TABLE {tbl} ADD COLUMN source_url VARCHAR(2048) NULL DEFAULT NULL")
+                if not _column_exists(cursor, tbl, "source_record_id"):
+                    cursor.execute(f"ALTER TABLE {tbl} ADD COLUMN source_record_id VARCHAR(128) NULL DEFAULT NULL")
+
+            # 4. Token 表相關
             if not _table_exists(cursor, "user_one_time_tokens"):
                 cursor.execute(
                     """
@@ -50,6 +71,59 @@ def ensure_auth_schema() -> None:
                             FOREIGN KEY (user_id) REFERENCES user(user_id)
                             ON DELETE CASCADE
                     )
+                    """
+                )
+
+            # 5. 回饋與標註資料表 (DiagnosisFeedback)
+            if not _table_exists(cursor, "diagnosis_feedback"):
+                cursor.execute(
+                    """
+                    CREATE TABLE diagnosis_feedback (
+                        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                        prediction_id VARCHAR(64) NULL,
+                        user_id INT NULL,
+                        image_url VARCHAR(255) NOT NULL,
+                        original_plant_name VARCHAR(100) NULL,
+                        original_disease_name VARCHAR(100) NULL,
+                        is_plant_error TINYINT(1) DEFAULT 0,
+                        is_disease_error TINYINT(1) DEFAULT 0,
+                        corrected_plant_name VARCHAR(100) NULL,
+                        corrected_disease_name VARCHAR(100) NULL,
+                        admin_reviewed TINYINT(1) DEFAULT 0,
+                        admin_notes TEXT NULL,
+                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        KEY ix_diagnosis_feedback_prediction_id (prediction_id),
+                        KEY ix_diagnosis_feedback_user_id (user_id)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+                    """
+                )
+
+            # 6. Webcam 告警紀錄資料表 (WebcamAlert)
+            if not _table_exists(cursor, "webcam_alert"):
+                cursor.execute(
+                    """
+                    CREATE TABLE webcam_alert (
+                        alert_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                        user_id INT NOT NULL,
+                        crop_id INT NULL,
+                        disease_id INT NULL,
+                        status_name VARCHAR(100) NOT NULL,
+                        confidence FLOAT NOT NULL,
+                        category VARCHAR(20) NOT NULL DEFAULT 'unknown',
+                        image_url VARCHAR(2048) NOT NULL,
+                        session_id VARCHAR(64) NOT NULL DEFAULT 'legacy',
+                        region_id VARCHAR(64) NOT NULL DEFAULT 'full-frame',
+                        consecutive_matches INT NOT NULL DEFAULT 3,
+                        requires_review TINYINT(1) NOT NULL DEFAULT 1,
+                        grounding_source VARCHAR(64) NOT NULL DEFAULT 'legacy_unverified',
+                        reference_source VARCHAR(100) NULL,
+                        reference_url VARCHAR(2048) NULL,
+                        reference_record_id VARCHAR(128) NULL,
+                        is_acknowledged TINYINT(1) NOT NULL DEFAULT 0,
+                        acknowledged_at DATETIME NULL,
+                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        KEY ix_webcam_alert_user_id (user_id)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
                     """
                 )
         conn.commit()
