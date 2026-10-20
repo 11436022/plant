@@ -303,7 +303,10 @@ async def admin_feedback_annotate(
         except Exception as e:
             print(f"[WARN] 即時刻錄視覺特徵記憶庫失敗: {e}")
     else:
-        print(f"[SECURITY FILTER] 回饋標註 #{feedback_id} 包含無效作物或病害標籤【{clean_plant} - {clean_disease}】，已攔截未進入 Visual Memory。")
+        try:
+            print(f"[SECURITY FILTER] 回饋標註 #{feedback_id} 包含無效作物或病害標籤【{clean_plant} - {clean_disease}】，已攔截未進入 Visual Memory。")
+        except Exception:
+            pass
 
     return RedirectResponse(url="/admin/feedback/?msg=saved", status_code=303)
 
