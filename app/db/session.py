@@ -20,7 +20,16 @@ db_name = "plant_db"
 db_url_env = os.getenv("DATABASE_URL") or os.getenv("MYSQL_URL") or os.getenv("MYSQL_PRIVATE_URL")
 if db_url_env:
     try:
-        parsed = urlparse(db_url_env)
+        # 清洗可能多帶的變數名稱與等號 (例如 'MYSQL_URL = mysql://...')
+        clean_url = db_url_env.strip()
+        if "mysql://" in clean_url:
+            clean_url = "mysql://" + clean_url.split("mysql://", 1)[1].strip()
+        elif "mysql+pymysql://" in clean_url:
+            clean_url = "mysql+pymysql://" + clean_url.split("mysql+pymysql://", 1)[1].strip()
+        elif "=" in clean_url:
+            clean_url = clean_url.split("=", 1)[1].strip()
+
+        parsed = urlparse(clean_url)
         if parsed.username:
             user = unquote(parsed.username)
         if parsed.password:
