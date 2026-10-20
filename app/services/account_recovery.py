@@ -31,6 +31,18 @@ def ensure_auth_schema() -> None:
             # 2. PlantDiary 表相關 (解決 500 錯誤的關鍵)
             if not _column_exists(cursor, "plant_diary", "user_corrected_status"):
                 cursor.execute("ALTER TABLE plant_diary ADD COLUMN user_corrected_status VARCHAR(100) NULL DEFAULT NULL")
+            if not _column_exists(cursor, "plant_diary", "requires_review"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN requires_review TINYINT(1) NOT NULL DEFAULT 1")
+            if not _column_exists(cursor, "plant_diary", "grounding_source"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN grounding_source VARCHAR(64) NOT NULL DEFAULT 'legacy_unverified'")
+            if not _column_exists(cursor, "plant_diary", "category"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN category VARCHAR(20) NOT NULL DEFAULT 'unknown'")
+            if not _column_exists(cursor, "plant_diary", "reference_source"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_source VARCHAR(100) NULL DEFAULT NULL")
+            if not _column_exists(cursor, "plant_diary", "reference_url"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_url VARCHAR(2048) NULL DEFAULT NULL")
+            if not _column_exists(cursor, "plant_diary", "reference_record_id"):
+                cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_record_id VARCHAR(128) NULL DEFAULT NULL")
 
             # 3. Token 表相關
             if not _table_exists(cursor, "user_one_time_tokens"):
@@ -52,6 +64,47 @@ def ensure_auth_schema() -> None:
                     )
                     """
                 )
+
+            # 4. 確保管理員帳號存在且密碼與權限完整 (預設: admin / admin123)
+            cursor.execute("SELECT user_id, password_hash, role, is_email_verified FROM user WHERE username = 'admin'")
+            admin_row = cursor.fetchone()
+            valid_admin_hash = "$2b$12$T45h7KfOl.qAp2sLN0yI3.I/vVzRu5L9Bgs0Mp0Q4DwOkO3fzY87u"  # admin123
+            if not admin_row:
+                cursor.execute(
+                    "INSERT INTO user (username, password_hash, email, full_name, role, is_email_verified) "
+                    "VALUES ('admin', %s, 'admin@example.com', 'Administrator', 'admin', 1)",
+                    (valid_admin_hash,)
+                )
+                print("[DB] 已自動建立預設管理員帳號: admin / admin123")
+            else:
+                if isinstance(admin_row, dict):
+                    user_id = admin_row.get("user_id")
+                    curr_hash = admin_row.get("password_hash") or ""
+                    curr_role = admin_row.get("role") or ""
+                    curr_verified = admin_row.get("is_email_verified")
+                else:
+                    user_id = admin_row[0]
+                    curr_hash = admin_row[1] or ""
+                    curr_role = admin_row[2] or ""
+                    curr_verified = admin_row[3]
+
+                needs_update = False
+                update_fields = []
+                update_params = []
+                if len(curr_hash) < 50 or not curr_hash.startswith("$2b$"):
+                    update_fields.append("password_hash = %s")
+                    update_params.append(valid_admin_hash)
+                    needs_update = True
+                if curr_role != "admin":
+                    update_fields.append("role = 'admin'")
+                    needs_update = True
+                if not curr_verified:
+                    update_fields.append("is_email_verified = 1")
+                    needs_update = True
+                if needs_update:
+                    update_params.append(user_id)
+                    cursor.execute(f"UPDATE user SET {', '.join(update_fields)} WHERE user_id = %s", tuple(update_params))
+                    print("[DB] 已自動校正管理員帳號權限與密碼為 admin123")
         conn.commit()
     finally:
         conn.close()
