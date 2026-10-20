@@ -30,10 +30,8 @@ docx_summary.txt
 # 暫存與產生圖片檔案
 augmented_images/
 temp_images/
-static/uploads/*
-static/feedback_uploads/*
-!static/uploads/.gitkeep
-!static/feedback_uploads/.gitkeep
+static/tmp/*
+!static/tmp/.gitkeep
 
 # 腳本與測試檔案
 test/
