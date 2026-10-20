@@ -44,9 +44,24 @@ def create_app() -> FastAPI:
     @app.on_event("startup")
     async def startup_event() -> None:
         # 啟動時主動補齊驗證信與忘記密碼所需的 schema，避免舊資料庫缺欄位。
-        ensure_auth_schema()
+        try:
+            from app.db.base import Base
+            from app.db.session import engine
+            import app.db.models
+            Base.metadata.create_all(bind=engine)
+            print("[DB] 所有資料表結構驗證/建立成功！")
+        except Exception as e:
+            print(f"[WARN] 自動建立資料表略過: {e}")
+
+        try:
+            ensure_auth_schema()
+        except Exception as e:
+            print(f"[WARN] ensure_auth_schema 略過: {e}")
         # 載入 RAG 知識庫
-        rag.load_knowledge_base()
+        try:
+            rag.load_knowledge_base()
+        except Exception as e:
+            print(f"[WARN] 載入 RAG 知識庫略過: {e}")
 
     # API routers (v1)
     # ----------------

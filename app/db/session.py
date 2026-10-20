@@ -15,8 +15,9 @@ host = os.getenv("DB_HOST") or os.getenv("MYSQL_HOST")
 port = int(os.getenv("DB_PORT") or os.getenv("MYSQL_PORT") or "3306")
 db_name = os.getenv("DB_NAME") or os.getenv("MYSQL_DATABASE") or "plant_db"
 
-if not all([user, host, db_name]):
-    raise ValueError("無法從 .env 讀取資料庫設定，請檢查檔案是否存在且格式正確。")
+if not host:
+    host = "127.0.0.1"
+    print("[WARN] 尚未設定 DB_HOST 環境變數，暫以 127.0.0.1 佔位避免容器直接崩潰。")
 
 DATABASE_URL = URL.create(
     "mysql+pymysql", username=user, password=password, host=host,
