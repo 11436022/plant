@@ -234,7 +234,7 @@ async def admin_dashboard(
                     "current_page": page,
                     "total_pages": total_pages,
                     "total_items": total_items,
-                    "base_url": str(request.url_for("admin_dashboard")),
+                    "base_url": "/admin/",
                 }
             })
             
@@ -305,7 +305,7 @@ async def admin_feedback_annotate(
     else:
         print(f"[SECURITY FILTER] 回饋標註 #{feedback_id} 包含無效作物或病害標籤【{clean_plant} - {clean_disease}】，已攔截未進入 Visual Memory。")
 
-    return RedirectResponse(url=request.url_for("admin_feedback_list"), status_code=303)
+    return RedirectResponse(url="/admin/feedback/", status_code=303)
 
 
 @router.post("/feedback/rebuild-memory", response_class=RedirectResponse)
@@ -317,7 +317,7 @@ async def admin_rebuild_visual_memory(request: Request):
         print(f"[OK] 管理者已手動觸發視覺特徵記憶索引重構，共索引 {count} 筆樣本。")
     except Exception as e:
         print(f"[WARN] 重建視覺記憶索引失敗: {e}")
-    return RedirectResponse(url=request.url_for("admin_feedback_list"), status_code=303)
+    return RedirectResponse(url="/admin/feedback/", status_code=303)
 
 
 @router.post("/feedback/export-dataset", response_class=RedirectResponse)
@@ -329,19 +329,23 @@ async def admin_export_feedback_dataset(request: Request):
         print(f"[OK] 成功匯出回饋訓練資料集: {manifest.get('total_images')} 張影像")
     except Exception as e:
         print(f"[WARN] 匯出回饋資料集失敗: {e}")
-    return RedirectResponse(url=request.url_for("admin_feedback_list"), status_code=303)
+    return RedirectResponse(url="/admin/feedback/", status_code=303)
 
 
 @router.post("/feedback/retrain", response_class=RedirectResponse)
 async def admin_retrain_convnext(request: Request):
-    """【模型微調】啟動 ConvNeXt 持續微調管線"""
-    try:
-        from scripts.retrain_from_feedback import run_feedback_retraining
-        res = run_feedback_retraining(epochs=3, batch_size=4)
-        print(f"[OK] ConvNeXt 微調完成: {res.get('message')}")
-    except Exception as e:
-        print(f"[WARN] 執行微調失敗: {e}")
-    return RedirectResponse(url=request.url_for("admin_feedback_list"), status_code=303)
+    """【模型微調】啟動 ConvNeXt 持續微調管線 (背景非同步執行避免 HTTP 逾時)"""
+    import threading
+    def _bg_train():
+        try:
+            from scripts.retrain_from_feedback import run_feedback_retraining
+            res = run_feedback_retraining(epochs=3, batch_size=4)
+            print(f"[OK] ConvNeXt 微調完成: {res.get('message')}")
+        except Exception as e:
+            print(f"[WARN] 執行微調失敗: {e}")
+
+    threading.Thread(target=_bg_train, daemon=True).start()
+    return RedirectResponse(url="/admin/feedback/", status_code=303)
 
 
 @router.get("/feedback/", response_class=HTMLResponse)
@@ -403,7 +407,7 @@ async def admin_feedback_list(request: Request, page: int = Query(1, ge=1)):
                     "current_page": page,
                     "total_pages": total_pages,
                     "total_items": total_items,
-                    "base_url": str(request.url_for("admin_feedback_list")),
+                    "base_url": "/admin/feedback/",
                 }
             })
             
@@ -603,7 +607,7 @@ async def admin_users_list(request: Request, search: str = None, page: int = Que
                     "current_page": page,
                     "total_pages": total_pages,
                     "total_items": total_items,
-                    "base_url": str(request.url_for("admin_users_list")),
+                    "base_url": "/admin/users/",
                 }
             })
             
