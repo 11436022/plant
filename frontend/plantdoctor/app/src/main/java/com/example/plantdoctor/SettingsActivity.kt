@@ -89,6 +89,11 @@ class SettingsActivity : AppCompatActivity() {
             showColorSelectDialog()
         }
 
+        btnVolumeMixer.setOnClickListener {
+            SoundManager.playBubblePop()
+            showVolumeMixerDialog()
+        }
+
         btnLogout.setOnClickListener {
             SoundManager.playBubblePop()
             with(sharedPref.edit()) {
