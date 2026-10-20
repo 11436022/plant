@@ -53,23 +53,24 @@ def create_app() -> FastAPI:
         except Exception as e:
             print(f"[WARN] 自動建立資料表略過: {e}")
 
-        # 若是全新空資料庫，自動載入 init_db.sql 建立基礎作物、病害與初始帳號
+        # 若是全新空資料庫或舊版資料庫 (診斷紀錄少於 50 筆)，自動同步最新種子資料
         try:
             from sqlalchemy import text
             from app.db.session import engine, get_db_connection
             needs_seed = False
             try:
                 with engine.connect() as conn:
-                    crop_cnt = conn.execute(text("SELECT count(*) FROM crop")).scalar()
-                if not crop_cnt or crop_cnt == 0:
+                    diary_cnt = conn.execute(text("SELECT count(*) FROM plant_diary")).scalar()
+                if not diary_cnt or diary_cnt < 50:
                     needs_seed = True
             except Exception:
                 needs_seed = True
 
             if needs_seed:
-                sql_path = Path("init_db.sql")
+                # 優先使用包含 56 筆與最新資料的 latest_seed.sql
+                sql_path = Path("latest_seed.sql") if Path("latest_seed.sql").exists() else Path("init_db.sql")
                 if sql_path.exists():
-                    print("[DB] 檢測到全新資料庫，自動執行 init_db.sql 匯入基礎資料...")
+                    print(f"[DB] 自動執行 {sql_path.name} 同步最新資料庫紀錄...")
                     raw_sql = sql_path.read_text(encoding="utf-8")
                     db_conn = get_db_connection()
                     with db_conn.cursor() as cur:
@@ -82,9 +83,9 @@ def create_app() -> FastAPI:
                                     pass
                         db_conn.commit()
                     db_conn.close()
-                    print("[DB] 基礎資料庫自動匯入完成！")
+                    print("[DB] 資料庫同步完成！")
         except Exception as seed_err:
-            print(f"[WARN] 檢查/匯入 init_db.sql 略過: {seed_err}")
+            print(f"[WARN] 檢查/同步資料庫種子略過: {seed_err}")
 
         try:
             ensure_auth_schema()
