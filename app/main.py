@@ -57,9 +57,16 @@ def create_app() -> FastAPI:
         try:
             from sqlalchemy import text
             from app.db.session import engine, get_db_connection
-            with engine.connect() as conn:
-                crop_cnt = conn.execute(text("SELECT count(*) FROM crop")).scalar()
-            if not crop_cnt or crop_cnt == 0:
+            needs_seed = False
+            try:
+                with engine.connect() as conn:
+                    crop_cnt = conn.execute(text("SELECT count(*) FROM crop")).scalar()
+                if not crop_cnt or crop_cnt == 0:
+                    needs_seed = True
+            except Exception:
+                needs_seed = True
+
+            if needs_seed:
                 sql_path = Path("init_db.sql")
                 if sql_path.exists():
                     print("[DB] 檢測到全新資料庫，自動執行 init_db.sql 匯入基礎資料...")
