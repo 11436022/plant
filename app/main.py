@@ -1,7 +1,7 @@
 from pathlib import Path
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -40,6 +40,12 @@ def create_app() -> FastAPI:
     async def get_reset_password_web_page():
         """提供重設密碼的 HTML 中介頁。"""
         return str(STATIC_PATH / "reset_password.html")
+
+    @app.get("/photo", response_class=HTMLResponse)
+    async def get_photo_diagnosis_page(request: Request):
+        """提供跨平台（包含 iPhone / Safari 與 Android）即時拍照快篩與病害診斷網頁。"""
+        template = templates.get_template("photo.html")
+        return HTMLResponse(content=template.render({"request": request}))
 
     @app.on_event("startup")
     async def startup_event() -> None:

@@ -13,7 +13,7 @@ from app.db.session import get_db
 from app.db.models import User
 from app.schemas.prediction import PredictionResponse
 from app.services.ai import diagnostic_plant, get_reference_lists, ground_diagnosis_in_database, process_and_update_diagnosis
-from app.services.auth import get_current_user
+from app.services.auth import get_current_user, get_optional_current_user
 from app.services.files import ensure_image_upload, validate_image_content
 
 # 暫存區：使用一個簡單的 Python 字典來模擬 Redis
@@ -80,7 +80,7 @@ async def predict_plant_status(
     file: UploadFile = File(...),
     crop_name: Optional[str] = Form(None),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_optional_current_user),
 ):
     """
     接收圖片，執行 AI 分析，並將結果暫存。
@@ -96,7 +96,8 @@ async def predict_plant_status(
     temp_file_path = None
     try:
         prune_expired_predictions()
-        pending = sum(entry.get("user_id") == current_user.user_id for entry in prediction_cache.values())
+        eff_user_id = current_user.user_id if current_user else 1
+        pending = sum(entry.get("user_id") == eff_user_id for entry in prediction_cache.values())
         if len(prediction_cache) >= MAX_PENDING_PREDICTIONS or pending >= 10:
             raise HTTPException(status_code=429, detail="Too many pending predictions. Confirm or wait for expiry.")
         content = await file.read(settings.WEBCAM_MAX_IMAGE_BYTES + 1)
@@ -170,7 +171,7 @@ async def predict_plant_status(
         prediction_cache[prediction_id] = {
             "result": final_diagnosis,
             "temp_path": str(temp_file_path),
-            "user_id": current_user.user_id,
+            "user_id": eff_user_id,
             "expires_at": time.monotonic() + PREDICTION_TTL_SECONDS,
         }
         

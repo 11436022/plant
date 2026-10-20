@@ -14,6 +14,7 @@ WORKDIR /app
 # - libgomp1: FAISS 向量檢索函式庫所必需之 OpenMP 支援
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    ca-certificates \
     libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 

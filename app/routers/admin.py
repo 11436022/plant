@@ -305,7 +305,7 @@ async def admin_feedback_annotate(
     else:
         print(f"[SECURITY FILTER] 回饋標註 #{feedback_id} 包含無效作物或病害標籤【{clean_plant} - {clean_disease}】，已攔截未進入 Visual Memory。")
 
-    return RedirectResponse(url="/admin/feedback/", status_code=303)
+    return RedirectResponse(url="/admin/feedback/?msg=saved", status_code=303)
 
 
 @router.post("/feedback/rebuild-memory", response_class=RedirectResponse)
@@ -317,7 +317,7 @@ async def admin_rebuild_visual_memory(request: Request):
         print(f"[OK] 管理者已手動觸發視覺特徵記憶索引重構，共索引 {count} 筆樣本。")
     except Exception as e:
         print(f"[WARN] 重建視覺記憶索引失敗: {e}")
-    return RedirectResponse(url="/admin/feedback/", status_code=303)
+    return RedirectResponse(url="/admin/feedback/?msg=reindexed", status_code=303)
 
 
 @router.post("/feedback/export-dataset", response_class=RedirectResponse)
@@ -329,7 +329,7 @@ async def admin_export_feedback_dataset(request: Request):
         print(f"[OK] 成功匯出回饋訓練資料集: {manifest.get('total_images')} 張影像")
     except Exception as e:
         print(f"[WARN] 匯出回饋資料集失敗: {e}")
-    return RedirectResponse(url="/admin/feedback/", status_code=303)
+    return RedirectResponse(url="/admin/feedback/?msg=exported", status_code=303)
 
 
 @router.post("/feedback/retrain", response_class=RedirectResponse)
@@ -345,7 +345,7 @@ async def admin_retrain_convnext(request: Request):
             print(f"[WARN] 執行微調失敗: {e}")
 
     threading.Thread(target=_bg_train, daemon=True).start()
-    return RedirectResponse(url="/admin/feedback/", status_code=303)
+    return RedirectResponse(url="/admin/feedback/?msg=retrain_started", status_code=303)
 
 
 @router.get("/feedback/", response_class=HTMLResponse)

@@ -11,6 +11,7 @@ venv/
 # 模型權重檔（超過 GitHub 100MB 限制，請於 GitHub Releases 下載）
 *.pth
 *.pt
+!static/visual_memory_cache.pt
 
 # 排除上傳的測試暫存檔
 static/tmp/*

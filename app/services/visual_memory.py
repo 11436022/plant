@@ -273,10 +273,15 @@ class VisualMemoryManager:
                 print(f"[WARN] 儲存視覺記憶快取失敗: {e}")
             print(f"[OK] [VisualMemory] 視覺特徵記憶庫索引重建完成，共收錄 {len(self.records)} 筆田間專家覆核樣本！")
         else:
-            self.embeddings = None
-            self.records = []
-            self.last_sync_time = datetime.now()
-            print("[INFO] 視覺特徵記憶庫暫無有效標註樣本。")
+            if not self.records and CACHE_FILE.exists():
+                try:
+                    cache_data = torch.load(str(CACHE_FILE), map_location="cpu", weights_only=False)
+                    self.records = cache_data.get("records", [])
+                    self.embeddings = cache_data.get("embeddings", None)
+                    self.last_sync_time = cache_data.get("last_sync_time", datetime.now())
+                except Exception:
+                    pass
+            print(f"[INFO] 視覺特徵記憶庫未產生新特徵，維持現有記憶庫 ({len(self.records)} 筆樣本)。")
 
         # 視覺記憶庫重構完成，同步清空舊有影像診斷快取，保證重新上傳即時生效
         try:
@@ -319,8 +324,6 @@ class VisualMemoryManager:
             return False
 
         emb = self.extract_image_embedding(str(img_path))
-        if emb is None:
-            return False
 
         # 唯一識別碼區分 feedback 或 diary
         if diary_id is not None:
@@ -344,9 +347,9 @@ class VisualMemoryManager:
             self.records[existing_idx]["source"] = source
             if diary_id is not None:
                 self.records[existing_idx]["diary_id"] = diary_id
-            if self.embeddings is not None:
+            if emb is not None and self.embeddings is not None:
                 self.embeddings[existing_idx] = emb
-        else:
+        elif emb is not None:
             new_record = {
                 "unique_key": unique_key,
                 "feedback_id": eff_feedback_id,
@@ -362,6 +365,18 @@ class VisualMemoryManager:
                 self.embeddings = torch.cat([self.embeddings, emb.unsqueeze(0)], dim=0)
             else:
                 self.embeddings = emb.unsqueeze(0)
+        else:
+            return False
+
+        self.last_sync_time = datetime.now()
+        try:
+            torch.save({
+                "records": self.records,
+                "embeddings": self.embeddings,
+                "last_sync_time": self.last_sync_time,
+            }, str(CACHE_FILE))
+        except Exception as e:
+            print(f"[WARN] 即時儲存視覺記憶快取失敗: {e}")
 
         # 刷新磁碟快取與同步時間
         self.last_sync_time = datetime.now()
