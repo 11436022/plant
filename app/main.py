@@ -53,6 +53,32 @@ def create_app() -> FastAPI:
         except Exception as e:
             print(f"[WARN] 自動建立資料表略過: {e}")
 
+        # 若是全新空資料庫，自動載入 init_db.sql 建立基礎作物、病害與初始帳號
+        try:
+            from sqlalchemy import text
+            from app.db.session import engine, get_db_connection
+            with engine.connect() as conn:
+                crop_cnt = conn.execute(text("SELECT count(*) FROM crop")).scalar()
+            if not crop_cnt or crop_cnt == 0:
+                sql_path = Path("init_db.sql")
+                if sql_path.exists():
+                    print("[DB] 檢測到全新資料庫，自動執行 init_db.sql 匯入基礎資料...")
+                    raw_sql = sql_path.read_text(encoding="utf-8")
+                    db_conn = get_db_connection()
+                    with db_conn.cursor() as cur:
+                        for stmt in raw_sql.split(";\n"):
+                            clean_s = stmt.strip()
+                            if clean_s:
+                                try:
+                                    cur.execute(clean_s)
+                                except Exception:
+                                    pass
+                        db_conn.commit()
+                    db_conn.close()
+                    print("[DB] 基礎資料庫自動匯入完成！")
+        except Exception as seed_err:
+            print(f"[WARN] 檢查/匯入 init_db.sql 略過: {seed_err}")
+
         try:
             ensure_auth_schema()
         except Exception as e:

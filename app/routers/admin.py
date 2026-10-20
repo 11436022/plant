@@ -15,7 +15,9 @@ ADMIN_COOKIE = "plant_admin_session"
 def check_form_origin(request: Request):
     if request.method not in {"GET", "HEAD", "OPTIONS"}:
         origin = request.headers.get("origin")
-        if origin and origin != str(request.base_url).rstrip("/"):
+        origin_host = origin.split("://")[-1].split("/")[0].split(":")[0].lower() if origin else ""
+        req_host = (request.headers.get("x-forwarded-host") or request.headers.get("host") or request.url.netloc).split(":")[0].lower()
+        if origin and origin_host != req_host and origin != str(request.base_url).rstrip("/"):
             raise HTTPException(status_code=403, detail="Cross-origin form submission denied.")
 
 
