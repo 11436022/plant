@@ -28,6 +28,12 @@ RUN pip install --no-cache-dir --upgrade pip \
 # 複製整個專案到工作目錄
 COPY . .
 
+# 若目錄下無模型權重檔，自動由官方 GitHub Release 下載 ConvNeXt 權重
+RUN if [ ! -f convnext_plant_best.pth ]; then \
+        echo "Downloading convnext_plant_best.pth from GitHub Releases..." && \
+        curl -L -o convnext_plant_best.pth https://github.com/11436022/plant/releases/download/v1.0-weights/convnext_plant_best.pth; \
+    fi
+
 # 預先建立靜態資源與上傳檔案目錄，並建立非 root 使用者以強化容器安全性
 RUN mkdir -p /app/static/uploads /app/static/feedback_uploads \
     && useradd --create-home appuser \

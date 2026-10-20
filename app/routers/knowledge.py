@@ -49,7 +49,8 @@ async def get_all_diagnoses(db: Session = Depends(get_db)):
 async def get_all_crops(db: Session = Depends(get_db)):
     """
     獲取資料庫中所有作物的完整參考列表，供使用者拍照前或 Webcam 執行前下拉選取。
-    第一項固定為「未知」，隨後包含資料庫中全部 1,000+ 種作物名稱。
+    第一項固定為「未知」，隨後包含資料庫與主動學習記憶庫中全部作物名稱。
+    支援【主動學習自動登錄】：任何經專家校正之新作物，均會自動登錄並出現在下拉選單中。
     """
     try:
         crop_records = (
@@ -58,7 +59,19 @@ async def get_all_crops(db: Session = Depends(get_db)):
             .distinct()
             .all()
         )
-        db_crops = sorted(list({c[0].strip() for c in crop_records if c[0] and c[0].strip()}))
+        crop_set = {c[0].strip() for c in crop_records if c[0] and c[0].strip()}
+
+        # 動態補足主動學習與視覺特徵記憶庫中專家覆核之作物
+        from app.services.visual_memory import visual_memory, is_valid_crop_name
+        from app.services.knowledge import ensure_crop_exists_in_db
+
+        vm_crops = {r["crop_name"].strip() for r in visual_memory.records if is_valid_crop_name(r.get("crop_name"))}
+        for vmc in vm_crops:
+            if vmc not in crop_set:
+                ensure_crop_exists_in_db(vmc, db=db)
+                crop_set.add(vmc)
+
+        db_crops = sorted(list(crop_set))
         if "未知" in db_crops:
             db_crops.remove("未知")
 

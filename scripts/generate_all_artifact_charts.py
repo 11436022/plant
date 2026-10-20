@@ -13,6 +13,7 @@ import numpy as np
 # 設定微軟正黑體以支援繁體中文
 plt.rcParams['font.sans-serif'] = ['Microsoft JhengHei', 'DejaVu Sans', 'Arial']
 plt.rcParams['axes.unicode_minus'] = False
+matplotlib.rcParams['svg.fonttype'] = 'none'
 matplotlib.rcParams['figure.dpi'] = 300
 
 ARTIFACTS_DIR = Path(r"d:\plant_backend\artifacts")
@@ -67,8 +68,9 @@ def generate_chart1_multi_ai_400():
     plt.tight_layout()
     out_path = ARTIFACTS_DIR / "chart1_multi_ai_400_comparison.png"
     plt.savefig(out_path, dpi=300)
+    plt.savefig(out_path.with_suffix('.svg'))
     plt.close()
-    print(f"✅ 生成圖表 1: {out_path.name}")
+    print(f"✅ 生成圖表 1: {out_path.name} (含 SVG)")
 
 
 def generate_chart2_negative_transfer():
@@ -115,8 +117,9 @@ def generate_chart2_negative_transfer():
     plt.tight_layout()
     out_path = ARTIFACTS_DIR / "chart2_negative_transfer_breakdown.png"
     plt.savefig(out_path, dpi=300)
+    plt.savefig(out_path.with_suffix('.svg'))
     plt.close()
-    print(f"✅ 生成圖表 2: {out_path.name}")
+    print(f"✅ 生成圖表 2: {out_path.name} (含 SVG)")
 
 
 def generate_chart3_plantdoc_ablation():
@@ -132,7 +135,7 @@ def generate_chart3_plantdoc_ablation():
     bars1 = ax1.bar(strategies, accs, color=colors, width=0.52, edgecolor='black', linewidth=1.2)
     ax1.set_ylim(0, 92)
     ax1.set_ylabel('診斷準確率 (%)', fontsize=12, fontweight='bold')
-    ax1.set_title('【PlantDoc 自然田間 236 張全量消融準確率】\n(In-the-Wild 複雜背景與反光環境)', fontsize=13, fontweight='bold', pad=15)
+    ax1.set_title('【PlantDoc 自然生活實景 236 張全量消融準確率】\n(In-the-Wild 複雜背景與反光環境)', fontsize=13, fontweight='bold', pad=15)
     ax1.grid(axis='y', linestyle='--', alpha=0.6, color=BG_GRID)
 
     for bar in bars1:
@@ -151,10 +154,12 @@ def generate_chart3_plantdoc_ablation():
         ax2.text(bar.get_x() + bar.get_width()/2.0, yval + 30, f'{int(yval)} ms', ha='center', va='bottom', fontsize=11, fontweight='bold')
 
     plt.tight_layout()
-    out_path = ARTIFACTS_DIR / "chart3_plantdoc_three_strategies.png"
-    plt.savefig(out_path, dpi=300)
+    out_png = ARTIFACTS_DIR / "chart3_plantdoc_three_strategies.png"
+    plt.savefig(out_png, dpi=300, bbox_inches='tight')
+    out_svg = ARTIFACTS_DIR / "chart3_plantdoc_three_strategies.svg"
+    plt.savefig(out_svg, format="svg", bbox_inches='tight')
     plt.close()
-    print(f"✅ 生成圖表 3: {out_path.name}")
+    print(f"✅ 生成圖表 3: {out_png.name} 與 {out_svg.name}")
 
 
 def generate_chart4_ai_challenger():
@@ -198,17 +203,20 @@ def generate_chart4_ai_challenger():
 
 
 def generate_chart5_finetune_impact():
-    """圖表 5: 本地 ConvNeXt 遷移學習微調前後跨域準確率躍升"""
-    fig, ax = plt.subplots(figsize=(8, 5.5))
+    """圖表 5: 本地 ConvNeXt 遷移學習微調前後跨域準確率躍升 (生活實景適應)"""
+    fig, ax = plt.subplots(figsize=(8.5, 5.8))
 
-    stages = ['原始未微調權重\n(受限於實驗室背景)', 'PlantDoc 田間微調後最佳權重\n(適應光影/雜草/自然反光)']
+    stages = [
+        '原始未微調權重\n(受限於實驗室純色背景)',
+        '生活實景微調後最佳權重\n(適應居家/辦公室光影、花盆與複雜背景)'
+    ]
     accs = [24.58, 66.53]
     colors = ['#757575', SECONDARY_COLOR]
 
     bars = ax.bar(stages, accs, color=colors, width=0.45, edgecolor='black', linewidth=1.2)
     ax.set_ylim(0, 85)
-    ax.set_ylabel('PlantDoc 測試集準確率 (%)', fontsize=12, fontweight='bold')
-    ax.set_title('【本地 ConvNeXt 邊緣端遷移學習微調增益】\n克服「實驗室單一背景」到「真實農田」之領域偏移 (Domain Shift)', fontsize=13, fontweight='bold', pad=15)
+    ax.set_ylabel('日常實景測試集 (In-the-Wild) 準確率 (%)', fontsize=12, fontweight='bold')
+    ax.set_title('【本地 ConvNeXt 遷移學習微調增益】\n克服「實驗室純色背景」到「日常盆栽與生活實景 (In-the-Wild)」之領域偏移 (Domain Shift)', fontsize=12.5, fontweight='bold', pad=15)
     ax.grid(axis='y', linestyle='--', alpha=0.6, color=BG_GRID)
 
     for bar in bars:
@@ -217,18 +225,20 @@ def generate_chart5_finetune_impact():
 
     # 繪製飛躍上升箭頭
     ax.annotate(
-        '準確率狂飆 +41.95%！\n(端側快篩命中率翻倍)',
-        xy=(1, 66.53), xytext=(0.5, 48),
+        '實測準確率狂飆 +41.95%！\n(大幅提升居家與辦公室綠植快篩命中率)',
+        xy=(1, 66.53), xytext=(0.42, 48),
         arrowprops=dict(facecolor=ACCENT_RED, shrink=0.08, width=2.5, headwidth=9),
-        fontsize=11, fontweight='bold', color=ACCENT_RED,
+        fontsize=10.5, fontweight='bold', color=ACCENT_RED,
         bbox=dict(boxstyle="round,pad=0.4", fc="#FFEBEE", ec=ACCENT_RED, lw=1.2)
     )
 
     plt.tight_layout()
-    out_path = ARTIFACTS_DIR / "chart5_convnext_finetuning_impact.png"
-    plt.savefig(out_path, dpi=300)
+    out_png = ARTIFACTS_DIR / "chart5_convnext_finetuning_impact.png"
+    plt.savefig(out_png, dpi=300, bbox_inches='tight')
+    out_svg = ARTIFACTS_DIR / "chart5_convnext_finetuning_impact.svg"
+    plt.savefig(out_svg, format="svg", bbox_inches='tight')
     plt.close()
-    print(f"✅ 生成圖表 5: {out_path.name}")
+    print(f"✅ 生成圖表 5: {out_png.name} 與 {out_svg.name}")
 
 
 def generate_chart6_dashboard():
@@ -293,7 +303,7 @@ def generate_chart6_dashboard():
     ax4_sub.set_ylim(0, 1400)
     ax4.set_ylabel('診斷準確率 (%)', fontsize=10, fontweight='bold')
     ax4_sub.set_ylabel('平均延遲 (ms)', fontsize=10, fontweight='bold')
-    ax4.set_title('D. 軟硬體協同性能消融 (PlantDoc 自然田間評測)', fontsize=12, fontweight='bold')
+    ax4.set_title('D. 軟硬體協同性能消融 (PlantDoc 自然生活實景評測)', fontsize=12, fontweight='bold')
     
     for b in b_acc:
         ax4.text(b.get_x() + b.get_width()/2., b.get_height() + 1.5, f'{b.get_height():.1f}%', ha='center', va='bottom', fontsize=9, fontweight='bold')
@@ -301,10 +311,12 @@ def generate_chart6_dashboard():
         ax4_sub.text(b.get_x() + b.get_width()/2., b.get_height() + 25, f'{int(b.get_height())}ms', ha='center', va='bottom', fontsize=9, fontweight='bold')
 
     plt.tight_layout()
-    out_path = ARTIFACTS_DIR / "chart6_comprehensive_architecture_dashboard.png"
-    plt.savefig(out_path, dpi=300)
+    out_png = ARTIFACTS_DIR / "chart6_comprehensive_architecture_dashboard.png"
+    plt.savefig(out_png, dpi=300, bbox_inches='tight')
+    out_svg = ARTIFACTS_DIR / "chart6_comprehensive_architecture_dashboard.svg"
+    plt.savefig(out_svg, format="svg", bbox_inches='tight')
     plt.close()
-    print(f"✅ 生成圖表 6: {out_path.name}")
+    print(f"✅ 生成圖表 6: {out_png.name} 與 {out_svg.name}")
 
 
 if __name__ == "__main__":

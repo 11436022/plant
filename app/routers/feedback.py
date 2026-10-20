@@ -53,6 +53,11 @@ def create_diagnosis_feedback(
         
         # 5. 清除已處理完畢的快取
         del prediction_cache[feedback_data.prediction_id]
+        try:
+            from app.routers.prediction import clear_image_diagnosis_cache
+            clear_image_diagnosis_cache()
+        except Exception:
+            pass
 
         return db_feedback
 

@@ -184,39 +184,18 @@ async def admin_feedback_annotate(
     plant_name: str = Form(None),
     disease_name: str = Form(None)
 ):
-    """【更新】功能：儲存管理者對使用者回饋的標註"""
-    conn = get_db_connection()
-    try:
-        with conn.cursor() as cursor:
-            sql = """
-                UPDATE diagnosis_feedback
-                SET corrected_plant_name = %s,
-                    corrected_disease_name = %s
-                WHERE id = %s
-            """
-            # 如果表單欄位是空的，會收到空字串，將其轉為 None 存入資料庫
-            cursor.execute(sql, (plant_name or None, disease_name or None, feedback_id))
-        conn.commit()
-    finally:
-        conn.close()
+    """【更新】功能：儲存管理者對使用者回饋的標註，具備防污染驗證，並即時刻錄至視覺特徵記憶庫"""
+    from app.services.visual_memory import is_valid_crop_name, is_valid_disease_status, visual_memory
 
-    # 操作完成後，重定向回使用者回饋列表頁面，以查看更新結果
-    # 使用 303 See Other 狀態碼是 POST-Redirect-GET 模式的標準做法
-    return RedirectResponse(url=request.url_for("admin_feedback_list"), status_code=303)
-
-
-@router.post("/feedback/annotate/{feedback_id}", response_class=RedirectResponse)
-async def admin_feedback_annotate(
-    request: Request,
-    feedback_id: int,
-    plant_name: str = Form(None),
-    disease_name: str = Form(None)
-):
-    """【更新】功能：儲存管理者對使用者回饋的標註，並即時刻錄至視覺特徵記憶庫"""
-    conn = get_db_connection()
-    raw_img_url = None
     clean_plant = plant_name.strip() if plant_name else None
     clean_disease = disease_name.strip() if disease_name else None
+
+    # 防污染檢驗：若非合法農業標籤則標記攔截
+    valid_plant = is_valid_crop_name(clean_plant)
+    valid_disease = is_valid_disease_status(clean_disease) if clean_disease else True
+
+    conn = get_db_connection()
+    raw_img_url = None
     try:
         with conn.cursor() as cursor:
             cursor.execute("SELECT image_url FROM diagnosis_feedback WHERE id = %s", (feedback_id,))
@@ -235,18 +214,30 @@ async def admin_feedback_annotate(
     finally:
         conn.close()
 
-    # 即時同步至視覺特徵檢索記憶庫 (Zero-latency visual RAG flywheel)
-    if raw_img_url and clean_plant:
+    # 只有通過防污染檢驗的乾淨資料，才刻錄至特徵記憶庫
+    if raw_img_url and valid_plant and valid_disease:
+        # 1. 自動動態登錄新作物與新病害至官方資料庫 (確保 App 下拉選單即時可選)
         try:
-            from app.services.visual_memory import visual_memory
+            from app.services.knowledge import ensure_crop_exists_in_db, ensure_disease_exists_in_db
+            new_cid = ensure_crop_exists_in_db(clean_plant)
+            if new_cid and clean_disease:
+                ensure_disease_exists_in_db(new_cid, clean_disease)
+        except Exception as err:
+            print(f"[WARN] 自動登錄新作物/新病害至資料庫失敗: {err}")
+
+        # 2. 刻錄至視覺特徵記憶庫
+        try:
             visual_memory.add_or_update(
                 feedback_id=feedback_id,
                 image_url=raw_img_url,
                 plant_name=clean_plant,
-                disease_name=clean_disease
+                disease_name=clean_disease,
+                source="feedback"
             )
         except Exception as e:
             print(f"[WARN] 即時刻錄視覺特徵記憶庫失敗: {e}")
+    else:
+        print(f"[SECURITY FILTER] 回饋標註 #{feedback_id} 包含無效作物或病害標籤【{clean_plant} - {clean_disease}】，已攔截未進入 Visual Memory。")
 
     return RedirectResponse(url=request.url_for("admin_feedback_list"), status_code=303)
 
@@ -369,29 +360,110 @@ async def admin_add_diary(status_name: str = Form(...)):
 
 @router.post("/update/{diary_id}")
 async def admin_update_diary(diary_id: int, status_name: str = Form(...)):
-    """【修改】功能：更新特定紀錄的診斷結果 (保留原始診斷，寫入專家校正與處方橫幅)"""
+    """【修改】功能：更新特定紀錄的診斷結果 (具備防污染校驗、保留原始診斷，寫入專家校正橫幅，並即時同步至主動學習特徵記憶庫)"""
+    from app.services.visual_memory import is_valid_disease_status, is_valid_crop_name, visual_memory
+
+    clean_status = status_name.strip() if status_name else ""
+    is_valid = is_valid_disease_status(clean_status)
+
     conn = get_db_connection()
+    raw_img_url = None
+    crop_name = None
+    orig_status = ""
     try:
         with conn.cursor() as cursor:
-            # 讀取原本的紀錄以取得原始 AI 診斷與處方
-            cursor.execute("SELECT status_name, suggestion FROM plant_diary WHERE id = %s", (diary_id,))
+            # 讀取原本的紀錄以取得原始 AI 診斷、處方、圖片與作物
+            cursor.execute("""
+                SELECT d.status_name, d.suggestion, d.image_url, d.crop_id, c.crop_name
+                FROM plant_diary d
+                LEFT JOIN crop c ON d.crop_id = c.crop_id
+                WHERE d.id = %s
+            """, (diary_id,))
             orig = cursor.fetchone()
-            orig_status = orig.get("status_name") if orig else ""
-            orig_sugg = orig.get("suggestion") or ""
+            if orig:
+                orig_status = orig.get("status_name") or ""
+                orig_sugg = orig.get("suggestion") or ""
+                raw_img_url = orig.get("image_url")
+                crop_name = orig.get("crop_name")
+            else:
+                orig_sugg = ""
 
-            # 建立專家覆核橫幅
-            banner = f"🌟 【專家覆核校正】：原診斷為【{orig_status or '未知'}】，經專家複審校正為【{status_name}】。"
             # 清理舊橫幅避免重複疊加
-            clean_sugg_lines = [l for l in orig_sugg.split("\n") if "【專家覆核校正】" not in l]
-            new_sugg = f"{banner}\n" + "\n".join(clean_sugg_lines).strip()
+            clean_sugg_lines = [
+                l for l in orig_sugg.split("\n") 
+                if "【專家覆核校正】" not in l and "【防污染安全攔截】" not in l
+            ]
 
-            # 保留原始 status_name 不抹除，寫入 user_corrected_status 並解除待審核 (requires_review = 0)
-            sql = "UPDATE plant_diary SET user_corrected_status = %s, suggestion = %s, requires_review = 0 WHERE id = %s"
-            cursor.execute(sql, (status_name, new_sugg.strip(), diary_id))
+            if is_valid:
+                # 1. 通過防污染檢驗：標準專家校正流程
+                banner = f"🌟 【專家覆核校正】：原診斷為【{orig_status or '未知'}】，經專家複審校正為【{clean_status}】。"
+                new_sugg = f"{banner}\n" + "\n".join(clean_sugg_lines).strip()
+
+                # 保留原始 status_name 不抹除，寫入 user_corrected_status 並解除待審核 (requires_review = 0)
+                sql = "UPDATE plant_diary SET user_corrected_status = %s, suggestion = %s, requires_review = 0 WHERE id = %s"
+                cursor.execute(sql, (clean_status, new_sugg.strip(), diary_id))
+            else:
+                # 2. 未通過防污染檢驗（如輸入 123、test、純數字等髒資料）：啟動防呆攔截
+                banner = f"⚠️ 【防污染安全攔截】：輸入【{clean_status}】非農業部標準病害名稱，已啟動防呆過濾（保留待審核，不納入 AI 訓練庫與特徵記憶）。"
+                new_sugg = f"{banner}\n" + "\n".join(clean_sugg_lines).strip()
+
+                # 拒絕寫入 user_corrected_status，保持 requires_review = 1
+                sql = "UPDATE plant_diary SET suggestion = %s WHERE id = %s"
+                cursor.execute(sql, (new_sugg.strip(), diary_id))
+                print(f"[SECURITY FILTER] 攔截日記 #{diary_id} 髒資料輸入【{clean_status}】，拒絕寫入 Visual Memory 與訓練集！")
+
         conn.commit()
-        return RedirectResponse(url="/admin/", status_code=303)
     finally:
         conn.close()
+
+    # 3. 主動學習飛輪同步：只有通過防污染校驗且具備圖片之案件，才刻錄至 Visual Memory
+    if is_valid and raw_img_url:
+        effective_crop = crop_name
+        if not effective_crop or not is_valid_crop_name(effective_crop):
+            for kw, cp in [
+                ("柑橘", "柑橘"), ("番茄", "番茄"), ("馬鈴薯", "馬鈴薯"),
+                ("蘋果", "蘋果"), ("玉米", "玉米"), ("葡萄", "葡萄"),
+                ("草莓", "草莓"), ("甜椒", "甜椒")
+            ]:
+                if kw in clean_status or kw in orig_status:
+                    effective_crop = cp
+                    break
+            if not effective_crop:
+                effective_crop = "常見農作"
+
+        # 自動登錄作物與病害至官方資料庫 (確保 App 下拉選單即時可選)，並補齊病歷關聯 ID
+        try:
+            from app.services.knowledge import ensure_crop_exists_in_db, ensure_disease_exists_in_db
+            resolved_crop_id = ensure_crop_exists_in_db(effective_crop)
+            resolved_disease_id = ensure_disease_exists_in_db(resolved_crop_id, clean_status) if resolved_crop_id else None
+
+            # 更新 plant_diary 外鍵關聯
+            conn_link = get_db_connection()
+            try:
+                with conn_link.cursor() as cur_link:
+                    cur_link.execute(
+                        "UPDATE plant_diary SET crop_id = COALESCE(%s, crop_id), disease_id = COALESCE(%s, disease_id) WHERE id = %s",
+                        (resolved_crop_id, resolved_disease_id, diary_id)
+                    )
+                conn_link.commit()
+            finally:
+                conn_link.close()
+        except Exception as link_err:
+            print(f"[WARN] 關聯更新 crop_id/disease_id 失敗: {link_err}")
+
+        try:
+            visual_memory.add_or_update(
+                diary_id=diary_id,
+                image_url=raw_img_url,
+                plant_name=effective_crop,
+                disease_name=clean_status,
+                source="diary"
+            )
+            print(f"[ActiveLearning] 日記 #{diary_id} 校正成功並刻錄至特徵記憶庫：【{effective_crop} - {clean_status}】")
+        except Exception as e:
+            print(f"[WARN] 即時刻錄視覺特徵記憶庫失敗: {e}")
+
+    return RedirectResponse(url="/admin/", status_code=303)
 
 
 @router.post("/delete/{diary_id}")
