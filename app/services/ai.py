@@ -18,7 +18,13 @@ from app.services.files import prepare_optimized_image_for_ai
 
 def get_gemini_client():
     api_key = getattr(settings, "GEMINI_API_KEY", None) or os.getenv("GEMINI_API_KEY")
-    return genai.Client(api_key=api_key)
+    if not api_key:
+        return None
+    try:
+        return genai.Client(api_key=api_key)
+    except Exception as exc:
+        print(f"[WARN] 初始化 Gemini Client 失敗: {exc}")
+        return None
 
 
 client = get_gemini_client()
