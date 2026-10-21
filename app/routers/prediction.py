@@ -48,7 +48,7 @@ router = APIRouter(
 )
 
 # 建立一個臨時資料夾來存放待確認的圖片
-TEMP_DIR = Path("static/tmp")
+TEMP_DIR = settings.TEMP_DIR
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -193,9 +193,11 @@ async def predict_plant_status(
             temp_file_path.unlink()
         raise
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"❌ [PREDICT SERVER ERROR] error={e}")
         if temp_file_path and temp_file_path.exists():
             temp_file_path.unlink()
-        raise HTTPException(status_code=500, detail="Image analysis failed.") from e
+        raise HTTPException(status_code=500, detail=f"Image analysis failed: {type(e).__name__}: {e}") from e
     finally:
         await file.close()

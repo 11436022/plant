@@ -36,7 +36,7 @@ RUN if [ ! -f convnext_plant_best.pth ]; then \
     fi
 
 # 預先建立靜態資源與上傳檔案目錄，並建立非 root 使用者以強化容器安全性
-RUN mkdir -p /app/static/uploads /app/static/feedback_uploads \
+RUN mkdir -p /app/static/uploads /app/static/feedback_uploads /app/static/tmp \
     && useradd --create-home appuser \
     && chown -R appuser:appuser /app
 
