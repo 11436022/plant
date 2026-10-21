@@ -76,8 +76,8 @@ def create_app() -> FastAPI:
             needs_seed = False
             try:
                 with engine.connect() as conn:
-                    diary_cnt = conn.execute(text("SELECT count(*) FROM plant_diary")).scalar()
-                if not diary_cnt or diary_cnt < 50:
+                    crop_cnt = conn.execute(text("SELECT count(*) FROM crop")).scalar()
+                if not crop_cnt or crop_cnt == 0:
                     needs_seed = True
             except Exception:
                 needs_seed = True
