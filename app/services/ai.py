@@ -70,6 +70,8 @@ def call_gemini_with_fallback(
     last_exception = None
 
     active_client = client or get_gemini_client()
+    if not active_client:
+        raise RuntimeError("Gemini Client 尚未就緒（請確認 GEMINI_API_KEY 是否已配置）")
     try:
         from google.genai import types
         gen_config = types.GenerateContentConfig(temperature=0.0, seed=42)

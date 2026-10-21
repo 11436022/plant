@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, Form, Query
+from fastapi import APIRouter, Depends, HTTPException, Request, Form, Query, BackgroundTasks
 from fastapi.responses import HTMLResponse, RedirectResponse
 import pymysql
 from sqlalchemy.orm import Session
@@ -243,15 +243,39 @@ async def admin_dashboard(
         conn.close()
 
 
+def _sync_annotation_to_memory(feedback_id: int, raw_img_url: str, clean_plant: str, clean_disease: str | None):
+    """背景非同步執行特徵向量擷取與知識庫登錄，避免阻塞使用者 HTTP 請求"""
+    from app.services.visual_memory import visual_memory
+    try:
+        from app.services.knowledge import ensure_crop_exists_in_db, ensure_disease_exists_in_db
+        new_cid = ensure_crop_exists_in_db(clean_plant)
+        if new_cid and clean_disease:
+            ensure_disease_exists_in_db(new_cid, clean_disease)
+    except Exception as err:
+        print(f"[WARN] 自動登錄新作物/新病害至資料庫失敗: {err}")
+
+    try:
+        visual_memory.add_or_update(
+            feedback_id=feedback_id,
+            image_url=raw_img_url,
+            plant_name=clean_plant,
+            disease_name=clean_disease,
+            source="feedback"
+        )
+    except Exception as e:
+        print(f"[WARN] 即時刻錄視覺特徵記憶庫失敗: {e}")
+
+
 @router.post("/feedback/annotate/{feedback_id}", response_class=RedirectResponse)
 async def admin_feedback_annotate(
     request: Request,
     feedback_id: int,
+    background_tasks: BackgroundTasks,
     plant_name: str = Form(None),
     disease_name: str = Form(None)
 ):
-    """【更新】功能：儲存管理者對使用者回饋的標註，具備防污染驗證，並即時刻錄至視覺特徵記憶庫"""
-    from app.services.visual_memory import is_valid_crop_name, is_valid_disease_status, visual_memory
+    """【更新】功能：儲存管理者對使用者回饋的標註，具備防污染驗證，並以 BackgroundTasks 背景非同步刻錄至特徵記憶庫，達成毫秒級極速儲存回應"""
+    from app.services.visual_memory import is_valid_crop_name, is_valid_disease_status
 
     clean_plant = plant_name.strip() if plant_name else None
     clean_disease = disease_name.strip() if disease_name else None
@@ -282,28 +306,15 @@ async def admin_feedback_annotate(
     finally:
         conn.close()
 
-    # 只有通過防污染檢驗的乾淨資料，才刻錄至特徵記憶庫
+    # 只有通過防污染檢驗的乾淨資料，才非同步刻錄至特徵記憶庫 (透過 BackgroundTasks 免除等待 ConvNeXt 計算延遲)
     if raw_img_url and valid_plant and valid_disease:
-        # 1. 自動動態登錄新作物與新病害至官方資料庫 (確保 App 下拉選單即時可選)
-        try:
-            from app.services.knowledge import ensure_crop_exists_in_db, ensure_disease_exists_in_db
-            new_cid = ensure_crop_exists_in_db(clean_plant)
-            if new_cid and clean_disease:
-                ensure_disease_exists_in_db(new_cid, clean_disease)
-        except Exception as err:
-            print(f"[WARN] 自動登錄新作物/新病害至資料庫失敗: {err}")
-
-        # 2. 刻錄至視覺特徵記憶庫
-        try:
-            visual_memory.add_or_update(
-                feedback_id=feedback_id,
-                image_url=raw_img_url,
-                plant_name=clean_plant,
-                disease_name=clean_disease,
-                source="feedback"
-            )
-        except Exception as e:
-            print(f"[WARN] 即時刻錄視覺特徵記憶庫失敗: {e}")
+        background_tasks.add_task(
+            _sync_annotation_to_memory,
+            feedback_id,
+            raw_img_url,
+            clean_plant,
+            clean_disease
+        )
     else:
         try:
             print(f"[SECURITY FILTER] 回饋標註 #{feedback_id} 包含無效作物或病害標籤【{clean_plant} - {clean_disease}】，已攔截未進入 Visual Memory。")

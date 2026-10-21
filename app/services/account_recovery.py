@@ -29,20 +29,68 @@ def ensure_auth_schema() -> None:
                 cursor.execute("ALTER TABLE user ADD COLUMN email_verified_at DATETIME NULL DEFAULT NULL")
 
             # 2. PlantDiary 表相關 (解決 500 錯誤的關鍵)
-            if not _column_exists(cursor, "plant_diary", "user_corrected_status"):
-                cursor.execute("ALTER TABLE plant_diary ADD COLUMN user_corrected_status VARCHAR(100) NULL DEFAULT NULL")
-            if not _column_exists(cursor, "plant_diary", "requires_review"):
-                cursor.execute("ALTER TABLE plant_diary ADD COLUMN requires_review TINYINT(1) NOT NULL DEFAULT 1")
-            if not _column_exists(cursor, "plant_diary", "grounding_source"):
-                cursor.execute("ALTER TABLE plant_diary ADD COLUMN grounding_source VARCHAR(64) NOT NULL DEFAULT 'legacy_unverified'")
-            if not _column_exists(cursor, "plant_diary", "category"):
-                cursor.execute("ALTER TABLE plant_diary ADD COLUMN category VARCHAR(20) NOT NULL DEFAULT 'unknown'")
-            if not _column_exists(cursor, "plant_diary", "reference_source"):
-                cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_source VARCHAR(100) NULL DEFAULT NULL")
-            if not _column_exists(cursor, "plant_diary", "reference_url"):
-                cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_url VARCHAR(2048) NULL DEFAULT NULL")
-            if not _column_exists(cursor, "plant_diary", "reference_record_id"):
-                cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_record_id VARCHAR(128) NULL DEFAULT NULL")
+            if _table_exists(cursor, "plant_diary"):
+                if not _column_exists(cursor, "plant_diary", "user_corrected_status"):
+                    cursor.execute("ALTER TABLE plant_diary ADD COLUMN user_corrected_status VARCHAR(100) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "plant_diary", "requires_review"):
+                    cursor.execute("ALTER TABLE plant_diary ADD COLUMN requires_review TINYINT(1) NOT NULL DEFAULT 1")
+                if not _column_exists(cursor, "plant_diary", "grounding_source"):
+                    cursor.execute("ALTER TABLE plant_diary ADD COLUMN grounding_source VARCHAR(64) NOT NULL DEFAULT 'legacy_unverified'")
+                if not _column_exists(cursor, "plant_diary", "category"):
+                    cursor.execute("ALTER TABLE plant_diary ADD COLUMN category VARCHAR(20) NOT NULL DEFAULT 'unknown'")
+                if not _column_exists(cursor, "plant_diary", "reference_source"):
+                    cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_source VARCHAR(100) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "plant_diary", "reference_url"):
+                    cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_url VARCHAR(2048) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "plant_diary", "reference_record_id"):
+                    cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_record_id VARCHAR(128) NULL DEFAULT NULL")
+
+            # 2.1 Disease 與 Pests 知識來源欄位 (避免模型查詢未知欄位 1054 錯誤)
+            if _table_exists(cursor, "disease"):
+                if not _column_exists(cursor, "disease", "source_name"):
+                    cursor.execute("ALTER TABLE disease ADD COLUMN source_name VARCHAR(100) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "disease", "source_url"):
+                    cursor.execute("ALTER TABLE disease ADD COLUMN source_url VARCHAR(2048) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "disease", "source_record_id"):
+                    cursor.execute("ALTER TABLE disease ADD COLUMN source_record_id VARCHAR(128) NULL DEFAULT NULL")
+                cursor.execute("UPDATE disease SET source_name = '農業部動植物防疫檢疫署病蟲害手冊' WHERE source_name IS NULL")
+
+            if _table_exists(cursor, "pests"):
+                if not _column_exists(cursor, "pests", "source_name"):
+                    cursor.execute("ALTER TABLE pests ADD COLUMN source_name VARCHAR(100) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "pests", "source_url"):
+                    cursor.execute("ALTER TABLE pests ADD COLUMN source_url VARCHAR(2048) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "pests", "source_record_id"):
+                    cursor.execute("ALTER TABLE pests ADD COLUMN source_record_id VARCHAR(128) NULL DEFAULT NULL")
+                cursor.execute("UPDATE pests SET source_name = '農業部動植物防疫檢疫署害蟲防治指引' WHERE source_name IS NULL")
+
+            # 2.2 DiagnosisFeedback 表相關 (管理者審核與特徵刻錄)
+            if _table_exists(cursor, "diagnosis_feedback"):
+                if not _column_exists(cursor, "diagnosis_feedback", "prediction_id"):
+                    cursor.execute("ALTER TABLE diagnosis_feedback ADD COLUMN prediction_id VARCHAR(64) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "diagnosis_feedback", "manager_corrected_plant_name"):
+                    cursor.execute("ALTER TABLE diagnosis_feedback ADD COLUMN manager_corrected_plant_name VARCHAR(100) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "diagnosis_feedback", "manager_corrected_disease_name"):
+                    cursor.execute("ALTER TABLE diagnosis_feedback ADD COLUMN manager_corrected_disease_name VARCHAR(100) NULL DEFAULT NULL")
+
+            # 2.3 WebcamAlert 即時警報表相關
+            if _table_exists(cursor, "webcam_alert"):
+                if not _column_exists(cursor, "webcam_alert", "session_id"):
+                    cursor.execute("ALTER TABLE webcam_alert ADD COLUMN session_id VARCHAR(64) NOT NULL DEFAULT 'legacy'")
+                if not _column_exists(cursor, "webcam_alert", "region_id"):
+                    cursor.execute("ALTER TABLE webcam_alert ADD COLUMN region_id VARCHAR(64) NOT NULL DEFAULT 'full-frame'")
+                if not _column_exists(cursor, "webcam_alert", "category"):
+                    cursor.execute("ALTER TABLE webcam_alert ADD COLUMN category VARCHAR(20) NOT NULL DEFAULT 'unknown'")
+                if not _column_exists(cursor, "webcam_alert", "requires_review"):
+                    cursor.execute("ALTER TABLE webcam_alert ADD COLUMN requires_review TINYINT(1) NOT NULL DEFAULT 1")
+                if not _column_exists(cursor, "webcam_alert", "grounding_source"):
+                    cursor.execute("ALTER TABLE webcam_alert ADD COLUMN grounding_source VARCHAR(64) NOT NULL DEFAULT 'legacy_unverified'")
+                if not _column_exists(cursor, "webcam_alert", "reference_source"):
+                    cursor.execute("ALTER TABLE webcam_alert ADD COLUMN reference_source VARCHAR(100) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "webcam_alert", "reference_url"):
+                    cursor.execute("ALTER TABLE webcam_alert ADD COLUMN reference_url VARCHAR(2048) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "webcam_alert", "reference_record_id"):
+                    cursor.execute("ALTER TABLE webcam_alert ADD COLUMN reference_record_id VARCHAR(128) NULL DEFAULT NULL")
 
             # 3. Token 表相關
             if not _table_exists(cursor, "user_one_time_tokens"):
