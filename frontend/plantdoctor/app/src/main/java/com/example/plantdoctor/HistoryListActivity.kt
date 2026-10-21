@@ -256,31 +256,40 @@ class HistoryAdapter(
             return rawUrl
         }
 
-        // 2. 🌟 核心進化：直接跟 API 拿目前已經探路成功的正確 IP，零延遲、不阻塞！
+        // 2. 🌟 核心進化：直接跟 API 拿目前已經探路成功的正確主機或 IP
         val resolvedIp = com.example.plantdoctor.PlantApiService.currentRunningIp
+        val isCloud = resolvedIp.contains("railway.app")
+        val schemeAndHost = when {
+            isCloud -> "https://$resolvedIp"
+            resolvedIp.startsWith("http://") || resolvedIp.startsWith("https://") -> resolvedIp.trimEnd('/')
+            else -> "http://$resolvedIp:8000"
+        }
 
-        // 3. 把後端傳來的 127.0.0.1 或 localhost，通通置換成當前可通的 IP
-        var url = rawUrl.replace("127.0.0.1", resolvedIp)
+        // 3. 把後端傳來的 127.0.0.1 或 localhost 置換為正確主機
+        var url = rawUrl
+            .replace("http://127.0.0.1:8000", schemeAndHost)
+            .replace("http://localhost:8000", schemeAndHost)
+            .replace("127.0.0.1", resolvedIp)
             .replace("localhost", resolvedIp)
 
         // 4. 基本相對路徑防禦
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             val safePath = if (url.startsWith("/")) url else "/$url"
-            url = "http://$resolvedIp:8000$safePath"
+            url = "$schemeAndHost$safePath"
         }
 
         // 5. static/ 路由防禦
         val keywordStatic = "static/"
         if (url.contains(keywordStatic)) {
             val startIndex = url.indexOf(keywordStatic)
-            url = "http://$resolvedIp:8000/$keywordStatic" + url.substring(startIndex + keywordStatic.length)
+            url = "$schemeAndHost/$keywordStatic" + url.substring(startIndex + keywordStatic.length)
         }
 
         // 6. uploads/ 路由防禦
         val keywordUploads = "uploads/"
         if (url.contains(keywordUploads)) {
             val startIndex = url.indexOf(keywordUploads)
-            url = "http://$resolvedIp:8000/$keywordUploads" + url.substring(startIndex + keywordUploads.length)
+            url = "$schemeAndHost/$keywordUploads" + url.substring(startIndex + keywordUploads.length)
         }
 
         android.util.Log.d("FixImageUrl", "🖼️ 圖片網址最終修復為: $url")

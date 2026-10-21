@@ -383,10 +383,21 @@ interface PlantApiService {
     companion object {
         private val WIFI_HOST = BuildConfig.WIFI_HOST
 
+        // 🌟 雲端伺服器 (Railway 雲端模式)
+        const val CLOUD_HOST = "plant-production-922a.up.railway.app"
+        const val CLOUD_BASE_URL = "https://plant-production-922a.up.railway.app/api/v1/"
+
+        // 🌟 連線模式開關：true = 直接連雲端 (免開電腦後端，4G/WiFi皆可展示)
+        const val FORCE_CLOUD_MODE = true
+
         // 🌟 全域變數，用來即時同步目前能通的 IP 門牌
-        var currentRunningIp: String = WIFI_HOST
+        var currentRunningIp: String = if (FORCE_CLOUD_MODE) CLOUD_HOST else WIFI_HOST
 
         private fun getSmartBaseUrl(): String {
+            if (FORCE_CLOUD_MODE) {
+                currentRunningIp = CLOUD_HOST
+                return CLOUD_BASE_URL
+            }
             val isEmulator = android.os.Build.FINGERPRINT.startsWith("generic")
                     || android.os.Build.MODEL.contains("google_sdk")
                     || android.os.Build.HARDWARE.contains("goldfish")
@@ -416,12 +427,12 @@ interface PlantApiService {
                     currentRunningIp = "127.0.0.1" // 🔌 有線插線
                     "http://127.0.0.1:8000/api/v1/"
                 } else {
-                    currentRunningIp = WIFI_HOST // 📱 無線區網
-                    "http://$WIFI_HOST:8000/api/v1/"
+                    currentRunningIp = CLOUD_HOST // ☁️ 無線走雲端
+                    CLOUD_BASE_URL
                 }
             } catch (e: Exception) {
-                currentRunningIp = WIFI_HOST
-                "http://$WIFI_HOST:8000/api/v1/"
+                currentRunningIp = CLOUD_HOST
+                CLOUD_BASE_URL
             }
         }
 
