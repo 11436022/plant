@@ -108,7 +108,7 @@ def create_app() -> FastAPI:
         except Exception as e:
             print(f"[WARN] ensure_auth_schema 略過: {e}")
         # 載入 RAG 知識庫
-try:
+        try:
             rag.load_knowledge_base()
         except Exception as e:
             print(f"[WARN] 載入 RAG 知識庫略過: {e}")
