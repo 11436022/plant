@@ -120,7 +120,44 @@
         .upload-area strong {
             color: var(--primary);
         }
-        #photoInput {
+        .picker-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .btn-picker {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: 1.5px solid var(--primary);
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .btn-picker:hover, .btn-picker:active {
+            background: #1b4d3e;
+            border-color: #1b4d3e;
+        }
+        .btn-picker-secondary {
+            background: white;
+            color: var(--primary);
+            border-color: #a8c1b2;
+        }
+        .btn-picker-secondary:hover, .btn-picker-secondary:active {
+            background: #f0f7f3;
+            color: #1b4d3e;
+            border-color: var(--primary);
+        }
+        #cameraInput, #galleryInput {
             display: none;
         }
         .preview-box {
@@ -269,11 +306,20 @@
             <!-- 步驟 2：拍照或選擇照片 -->
             <div class="form-group">
                 <div class="step-label"><i data-lucide="camera"></i> 步驟 2：拍攝或上傳照片</div>
-                <div class="upload-area" id="dropZone" onclick="document.getElementById('photoInput').click()">
-                    <i data-lucide="camera"></i>
-                    <p>點擊<strong>開啟相機拍照</strong> 或 選擇照片</p>
+                <div class="upload-area" id="dropZone" onclick="if(event.target.closest('button')) return; document.getElementById('galleryInput').click();">
+                    <i data-lucide="image-plus"></i>
+                    <p>請選擇<strong>即時拍照</strong>或從<strong>手機相簿</strong>挑選照片</p>
+                    <div class="picker-buttons">
+                        <button type="button" class="btn-picker" onclick="event.stopPropagation(); document.getElementById('cameraInput').click();">
+                            <i data-lucide="camera"></i> 開啟相機拍照
+                        </button>
+                        <button type="button" class="btn-picker btn-picker-secondary" onclick="event.stopPropagation(); document.getElementById('galleryInput').click();">
+                            <i data-lucide="images"></i> 從相簿選擇照片
+                        </button>
+                    </div>
                 </div>
-                <input type="file" id="photoInput" accept="image/*" capture="environment">
+                <input type="file" id="cameraInput" accept="image/*" capture="environment">
+                <input type="file" id="galleryInput" accept="image/*">
                 
                 <div class="preview-box" id="previewBox">
                     <img id="previewImg" alt="預覽照片">
@@ -346,17 +392,29 @@
         }
         loadCrops();
 
-        // 監聽照片選擇
-        document.getElementById('photoInput').addEventListener('change', function(e) {
+        // 處理照片選擇與預覽
+        function handleFileChosen(file) {
+            if (!file) return;
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                document.getElementById('previewImg').src = evt.target.result;
+                document.getElementById('previewBox').style.display = 'block';
+                document.getElementById('submitBtn').disabled = false;
+                lucide.createIcons();
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+
+        document.getElementById('cameraInput').addEventListener('change', function(e) {
             if (e.target.files && e.target.files[0]) {
-                selectedFile = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    document.getElementById('previewImg').src = evt.target.result;
-                    document.getElementById('previewBox').style.display = 'block';
-                    document.getElementById('submitBtn').disabled = false;
-                };
-                reader.readAsDataURL(selectedFile);
+                handleFileChosen(e.target.files[0]);
+            }
+        });
+
+        document.getElementById('galleryInput').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                handleFileChosen(e.target.files[0]);
             }
         });
 
