@@ -174,7 +174,7 @@
                                 <td>{{ feedback.corrected_plant_name or '-' }}</td>
                                 <td>{{ feedback.corrected_disease_name or '-' }}</td>
                                 <td class="text-muted small">{{ feedback.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                                <td class="text-center">
+                                <td class="text-center" id="mem-status-{{ feedback.id }}">
                                     {% if feedback.is_in_visual_memory %}
                                         <span class="badge bg-success-subtle text-success border border-success">
                                             🧠 已同步
@@ -186,7 +186,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <form action="/admin/feedback/annotate/{{ feedback.id }}" method="post" class="annotation-form">
+                                    <form action="/admin/feedback/annotate/{{ feedback.id }}" method="post" class="annotation-form" data-id="{{ feedback.id }}">
                                         <input type="text" name="plant_name" class="form-control form-control-sm" placeholder="正確植物名" value="{{ feedback.manager_corrected_plant_name or '' }}">
                                         <input type="text" name="disease_name" class="form-control form-control-sm" placeholder="正確病名" value="{{ feedback.manager_corrected_disease_name or '' }}">
                                         <button type="submit" class="btn btn-success btn-sm px-3">儲存</button>
@@ -222,21 +222,64 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // 為所有操作按鈕增加即時點擊反應 (防呆與載入回饋)
-        document.querySelectorAll('form').forEach(form => {
+        // 1. 每筆資料列的「儲存」按鈕：使用 AJAX (fetch) 實現 0.3 秒無刷新秒存！
+        document.querySelectorAll('.annotation-form').forEach(form => {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault(); // 阻止整頁傳統跳轉，避免瀏覽器卡在 loading
+                const btn = this.querySelector('button[type="submit"]');
+                const fbId = this.getAttribute('data-id');
+                const originalText = '儲存';
+                
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> 儲存中...';
+
+                try {
+                    const formData = new FormData(this);
+                    const res = await fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (res.ok) {
+                        btn.className = 'btn btn-success btn-sm px-3';
+                        btn.innerHTML = '✅ 已儲存';
+                        
+                        // 即時將記憶狀態改為「🧠 已同步」
+                        const statusCell = document.getElementById('mem-status-' + fbId);
+                        if (statusCell) {
+                            statusCell.innerHTML = '<span class="badge bg-success-subtle text-success border border-success">🧠 已同步</span>';
+                        }
+                    } else {
+                        btn.className = 'btn btn-danger btn-sm px-3';
+                        btn.innerHTML = '❌ 失敗';
+                    }
+                } catch (err) {
+                    btn.className = 'btn btn-danger btn-sm px-3';
+                    btn.innerHTML = '❌ 錯誤';
+                } finally {
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.className = 'btn btn-success btn-sm px-3';
+                        btn.innerHTML = originalText;
+                    }, 1500);
+                }
+            });
+        });
+
+        // 2. 頂部管理按鈕 (重新整理視覺記憶、導出、微調)：防重複提交
+        document.querySelectorAll('form:not(.annotation-form)').forEach(form => {
             form.addEventListener('submit', function() {
                 const btn = this.querySelector('button[type="submit"]');
                 if (btn) {
-                    btn.disabled = true;
+                    btn.style.pointerEvents = 'none';
                     if (btn.classList.contains('btn-primary')) {
                         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> 啟動中...';
                     } else if (btn.classList.contains('btn-outline-primary')) {
                         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> 重整中...';
                     } else if (btn.classList.contains('btn-outline-success')) {
                         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> 導出中...';
-                    } else {
-                        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> 儲存中...';
                     }
+                    setTimeout(() => { btn.disabled = true; }, 0);
                 }
             });
         });
