@@ -171,8 +171,20 @@
                                         <span class="badge bg-secondary">否</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ feedback.corrected_plant_name or '-' }}</td>
-                                <td>{{ feedback.corrected_disease_name or '-' }}</td>
+                                <td id="disp-plant-{{ feedback.id }}">
+                                    {% if feedback.display_plant_name %}
+                                        <span class="fw-bold text-success">{{ feedback.display_plant_name }}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td id="disp-disease-{{ feedback.id }}">
+                                    {% if feedback.display_disease_name %}
+                                        <span class="fw-bold text-success">{{ feedback.display_disease_name }}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
                                 <td class="text-muted small">{{ feedback.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                                 <td class="text-center" id="mem-status-{{ feedback.id }}">
                                     {% if feedback.is_in_visual_memory %}
@@ -244,6 +256,18 @@
                         btn.className = 'btn btn-success btn-sm px-3';
                         btn.innerHTML = '✅ 已儲存';
                         
+                        // 即時同步「修正植物」與「修正病名」欄位文字
+                        const plantVal = this.querySelector('input[name="plant_name"]').value.trim();
+                        const diseaseVal = this.querySelector('input[name="disease_name"]').value.trim();
+                        const plantCell = document.getElementById('disp-plant-' + fbId);
+                        const diseaseCell = document.getElementById('disp-disease-' + fbId);
+                        if (plantCell && plantVal) {
+                            plantCell.innerHTML = '<span class="fw-bold text-success">' + plantVal + '</span>';
+                        }
+                        if (diseaseCell && diseaseVal) {
+                            diseaseCell.innerHTML = '<span class="fw-bold text-success">' + diseaseVal + '</span>';
+                        }
+
                         // 即時將記憶狀態改為「🧠 已同步」
                         const statusCell = document.getElementById('mem-status-' + fbId);
                         if (statusCell) {

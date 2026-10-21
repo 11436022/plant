@@ -272,10 +272,12 @@ async def admin_feedback_annotate(
             sql = """
                 UPDATE diagnosis_feedback
                 SET manager_corrected_plant_name = %s,
-                    manager_corrected_disease_name = %s
+                    manager_corrected_disease_name = %s,
+                    corrected_plant_name = COALESCE(NULLIF(corrected_plant_name, ''), %s),
+                    corrected_disease_name = COALESCE(NULLIF(corrected_disease_name, ''), %s)
                 WHERE id = %s
             """
-            cursor.execute(sql, (clean_plant, clean_disease, feedback_id))
+            cursor.execute(sql, (clean_plant, clean_disease, clean_plant, clean_disease, feedback_id))
         conn.commit()
     finally:
         conn.close()
@@ -368,6 +370,8 @@ async def admin_feedback_list(request: Request, page: int = Query(1, ge=1)):
                 SELECT 
                     f.id, f.image_url, f.original_plant_name, f.original_disease_name, 
                     f.is_plant_error, f.is_disease_error, 
+                    COALESCE(f.manager_corrected_plant_name, f.corrected_plant_name) AS display_plant_name,
+                    COALESCE(f.manager_corrected_disease_name, f.corrected_disease_name) AS display_disease_name,
                     f.corrected_plant_name, 
                     f.corrected_disease_name, 
                     f.created_at,
