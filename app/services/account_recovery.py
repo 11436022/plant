@@ -54,6 +54,11 @@ def ensure_auth_schema() -> None:
                 if not _column_exists(cursor, "disease", "source_record_id"):
                     cursor.execute("ALTER TABLE disease ADD COLUMN source_record_id VARCHAR(128) NULL DEFAULT NULL")
                 cursor.execute("UPDATE disease SET source_name = '農業部動植物防疫檢疫署病蟲害手冊' WHERE source_name IS NULL")
+                try:
+                    cursor.execute("ALTER TABLE disease MODIFY COLUMN treatment TEXT NULL")
+                    cursor.execute("ALTER TABLE disease MODIFY COLUMN description TEXT NULL")
+                except Exception as e:
+                    print(f"[WARN] 擴充 disease.treatment 欄位型態略過: {e}")
 
             if _table_exists(cursor, "pests"):
                 if not _column_exists(cursor, "pests", "source_name"):
@@ -63,6 +68,11 @@ def ensure_auth_schema() -> None:
                 if not _column_exists(cursor, "pests", "source_record_id"):
                     cursor.execute("ALTER TABLE pests ADD COLUMN source_record_id VARCHAR(128) NULL DEFAULT NULL")
                 cursor.execute("UPDATE pests SET source_name = '農業部動植物防疫檢疫署害蟲防治指引' WHERE source_name IS NULL")
+                try:
+                    cursor.execute("ALTER TABLE pests MODIFY COLUMN treatment TEXT NULL")
+                    cursor.execute("ALTER TABLE pests MODIFY COLUMN description TEXT NULL")
+                except Exception as e:
+                    print(f"[WARN] 擴充 pests.treatment 欄位型態略過: {e}")
 
             # 2.2 DiagnosisFeedback 表相關 (管理者審核與特徵刻錄)
             if _table_exists(cursor, "diagnosis_feedback"):

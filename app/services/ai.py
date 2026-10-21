@@ -1284,15 +1284,23 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
             if disease:
                 disease_id = disease.disease_id
             elif target_crop_id is not None and status_name not in [UNKNOWN_STATUS_NAME, "未知", "無法判定"]:
-                new_disease = models.Disease(
-                    crop_id=target_crop_id,
-                    disease_name=status_name,
-                    description=final_suggestion,
-                    treatment=final_treatment,
-                )
-                db.add(new_disease)
-                db.flush()
-                disease_id = new_disease.disease_id
+                try:
+                    new_disease = models.Disease(
+                        crop_id=target_crop_id,
+                        disease_name=status_name,
+                        description=final_suggestion,
+                        treatment=final_treatment,
+                        source_name=data.get("reference_source") or "農業部動植物防疫檢疫署病蟲害手冊",
+                        source_url=data.get("reference_url") or "https://www.aphia.gov.tw",
+                        source_record_id=data.get("reference_record_id") or f"aphia-dis-{target_crop_id}-{status_name}",
+                    )
+                    db.add(new_disease)
+                    db.flush()
+                    disease_id = new_disease.disease_id
+                except Exception as err:
+                    print(f"[WARN] 動態新增病害至 disease 資料庫略過: {err}")
+                    db.rollback()
+                    disease_id = None
         elif category == "pest":
             pest = db.query(models.Pest).filter(
                 models.Pest.pest_name == status_name,
@@ -1301,15 +1309,23 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
             if pest:
                 pest_id = pest.pest_id
             elif target_crop_id is not None and status_name not in [UNKNOWN_STATUS_NAME, "未知", "無法判定"]:
-                new_pest = models.Pest(
-                    crop_id=target_crop_id,
-                    pest_name=status_name,
-                    description=final_suggestion,
-                    treatment=final_treatment,
-                )
-                db.add(new_pest)
-                db.flush()
-                pest_id = new_pest.pest_id
+                try:
+                    new_pest = models.Pest(
+                        crop_id=target_crop_id,
+                        pest_name=status_name,
+                        description=final_suggestion,
+                        treatment=final_treatment,
+                        source_name=data.get("reference_source") or "農業部動植物防疫檢疫署害蟲防治指引",
+                        source_url=data.get("reference_url") or "https://www.aphia.gov.tw",
+                        source_record_id=data.get("reference_record_id") or f"aphia-pest-{target_crop_id}-{status_name}",
+                    )
+                    db.add(new_pest)
+                    db.flush()
+                    pest_id = new_pest.pest_id
+                except Exception as err:
+                    print(f"[WARN] 動態新增蟲害至 pests 資料庫略過: {err}")
+                    db.rollback()
+                    pest_id = None
 
         if category == "unknown" or status_name in [UNKNOWN_STATUS_NAME, "無法判定", "未知"]:
             data = _uncertain_diagnosis(crop_name, _coerce_confidence(data.get("confidence")))
