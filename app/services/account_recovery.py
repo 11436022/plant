@@ -89,6 +89,8 @@ def ensure_auth_schema() -> None:
                         is_disease_error TINYINT(1) DEFAULT 0,
                         corrected_plant_name VARCHAR(100) NULL,
                         corrected_disease_name VARCHAR(100) NULL,
+                        manager_corrected_plant_name VARCHAR(100) NULL,
+                        manager_corrected_disease_name VARCHAR(100) NULL,
                         admin_reviewed TINYINT(1) DEFAULT 0,
                         admin_notes TEXT NULL,
                         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -97,13 +99,18 @@ def ensure_auth_schema() -> None:
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
                     """
                 )
+            else:
+                if not _column_exists(cursor, "diagnosis_feedback", "manager_corrected_plant_name"):
+                    cursor.execute("ALTER TABLE diagnosis_feedback ADD COLUMN manager_corrected_plant_name VARCHAR(100) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "diagnosis_feedback", "manager_corrected_disease_name"):
+                    cursor.execute("ALTER TABLE diagnosis_feedback ADD COLUMN manager_corrected_disease_name VARCHAR(100) NULL DEFAULT NULL")
 
             # 6. Webcam 告警紀錄資料表 (WebcamAlert)
             if not _table_exists(cursor, "webcam_alert"):
                 cursor.execute(
                     """
                     CREATE TABLE webcam_alert (
-                        alert_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                        id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                         user_id INT NOT NULL,
                         crop_id INT NULL,
                         disease_id INT NULL,
@@ -119,6 +126,7 @@ def ensure_auth_schema() -> None:
                         reference_source VARCHAR(100) NULL,
                         reference_url VARCHAR(2048) NULL,
                         reference_record_id VARCHAR(128) NULL,
+                        email_sent TINYINT(1) NOT NULL DEFAULT 0,
                         is_acknowledged TINYINT(1) NOT NULL DEFAULT 0,
                         acknowledged_at DATETIME NULL,
                         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -126,6 +134,11 @@ def ensure_auth_schema() -> None:
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
                     """
                 )
+            else:
+                if _column_exists(cursor, "webcam_alert", "alert_id") and not _column_exists(cursor, "webcam_alert", "id"):
+                    cursor.execute("ALTER TABLE webcam_alert CHANGE COLUMN alert_id id BIGINT NOT NULL AUTO_INCREMENT")
+                if not _column_exists(cursor, "webcam_alert", "email_sent"):
+                    cursor.execute("ALTER TABLE webcam_alert ADD COLUMN email_sent TINYINT(1) NOT NULL DEFAULT 0")
         conn.commit()
     finally:
         conn.close()
