@@ -20,7 +20,30 @@ EMBEDDING_DIMENSION = 768
 # --- 全域變數，儲存載入的知識庫 ---
 faiss_index = None
 knowledge_content = []
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+client = None
+
+def get_rag_client():
+    global client
+    if client is not None:
+        return client
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        try:
+            from app.core.config import settings
+            api_key = getattr(settings, "GEMINI_API_KEY", None)
+        except Exception:
+            pass
+    if not api_key:
+        return None
+    try:
+        client = genai.Client(api_key=api_key)
+        return client
+    except Exception as exc:
+        print(f"[WARN] 初始化 RAG Gemini Client 失敗: {exc}")
+        return None
+
+
+client = get_rag_client()
 
 
 def load_knowledge_base():
@@ -82,7 +105,11 @@ def search_knowledge_base(query: str, k: int = 3) -> str:
 
     try:
         # 1. 為查詢產生向量
-        response = client.models.embed_content(
+        active_client = client or get_rag_client()
+        if not active_client:
+            print(" RAG Search: 尚未配置有效 GEMINI_API_KEY，略過檢索。")
+            return ""
+        response = active_client.models.embed_content(
             model=EMBEDDING_MODEL,
             contents=query,
             config=types.EmbedContentConfig(

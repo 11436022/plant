@@ -74,6 +74,41 @@
             </div>
         </div>
 
+        <!-- 操作成功提示訊息 -->
+        {% if request.query_params.get('msg') == 'saved' %}
+        <div class="alert alert-success alert-dismissible fade show shadow-sm d-flex align-items-center py-2 px-3 mb-3" role="alert">
+            <span class="fs-4 me-2">✅</span>
+            <div>
+                <strong>標註儲存成功！</strong> 專家修正之作物與病害名稱已成功寫入資料庫，並已同步更新至視覺特徵記憶庫 (Visual Memory)。
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% elif request.query_params.get('msg') == 'reindexed' %}
+        <div class="alert alert-primary alert-dismissible fade show shadow-sm d-flex align-items-center py-2 px-3 mb-3" role="alert">
+            <span class="fs-4 me-2">🔄</span>
+            <div>
+                <strong>視覺記憶重整完成！</strong> 視覺特徵檢索飛輪索引已成功重建並持久化快取。
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% elif request.query_params.get('msg') == 'exported' %}
+        <div class="alert alert-success alert-dismissible fade show shadow-sm d-flex align-items-center py-2 px-3 mb-3" role="alert">
+            <span class="fs-4 me-2">📦</span>
+            <div>
+                <strong>資料集導出成功！</strong> 已將標註影像與標籤組織導出為標準 PyTorch 訓練集目錄。
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% elif request.query_params.get('msg') == 'retrain_started' %}
+        <div class="alert alert-warning alert-dismissible fade show shadow-sm d-flex align-items-center py-2 px-3 mb-3" role="alert">
+            <span class="fs-4 me-2">🚀</span>
+            <div>
+                <strong>持續學習微調管線已啟動！</strong> 系統已在背景執行 ConvNeXt 增量微調，不會阻斷伺服器對外服務。
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+
         <!-- 視覺特徵記憶庫狀態橫幅 -->
         <div class="alert alert-info d-flex align-items-center justify-content-between py-2 px-3 mb-3 border-info-subtle">
             <div class="d-flex align-items-center gap-2">
@@ -136,10 +171,22 @@
                                         <span class="badge bg-secondary">否</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ feedback.corrected_plant_name or '-' }}</td>
-                                <td>{{ feedback.corrected_disease_name or '-' }}</td>
+                                <td id="disp-plant-{{ feedback.id }}">
+                                    {% if feedback.display_plant_name %}
+                                        <span class="fw-bold text-success">{{ feedback.display_plant_name }}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td id="disp-disease-{{ feedback.id }}">
+                                    {% if feedback.display_disease_name %}
+                                        <span class="fw-bold text-success">{{ feedback.display_disease_name }}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
                                 <td class="text-muted small">{{ feedback.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                                <td class="text-center">
+                                <td class="text-center" id="mem-status-{{ feedback.id }}">
                                     {% if feedback.is_in_visual_memory %}
                                         <span class="badge bg-success-subtle text-success border border-success">
                                             🧠 已同步
@@ -151,7 +198,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <form action="/admin/feedback/annotate/{{ feedback.id }}" method="post" class="annotation-form">
+                                    <form action="/admin/feedback/annotate/{{ feedback.id }}" method="post" class="annotation-form" data-id="{{ feedback.id }}">
                                         <input type="text" name="plant_name" class="form-control form-control-sm" placeholder="正確植物名" value="{{ feedback.manager_corrected_plant_name or '' }}">
                                         <input type="text" name="disease_name" class="form-control form-control-sm" placeholder="正確病名" value="{{ feedback.manager_corrected_disease_name or '' }}">
                                         <button type="submit" class="btn btn-success btn-sm px-3">儲存</button>
@@ -186,5 +233,80 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 1. 每筆資料列的「儲存」按鈕：使用 AJAX (fetch) 實現 0.3 秒無刷新秒存！
+        document.querySelectorAll('.annotation-form').forEach(form => {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault(); // 阻止整頁傳統跳轉，避免瀏覽器卡在 loading
+                const btn = this.querySelector('button[type="submit"]');
+                const fbId = this.getAttribute('data-id');
+                const originalText = '儲存';
+                
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> 儲存中...';
+
+                try {
+                    const formData = new FormData(this);
+                    const res = await fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (res.ok) {
+                        btn.className = 'btn btn-success btn-sm px-3';
+                        btn.innerHTML = '✅ 已儲存';
+                        
+                        // 即時同步「修正植物」與「修正病名」欄位文字
+                        const plantVal = this.querySelector('input[name="plant_name"]').value.trim();
+                        const diseaseVal = this.querySelector('input[name="disease_name"]').value.trim();
+                        const plantCell = document.getElementById('disp-plant-' + fbId);
+                        const diseaseCell = document.getElementById('disp-disease-' + fbId);
+                        if (plantCell && plantVal) {
+                            plantCell.innerHTML = '<span class="fw-bold text-success">' + plantVal + '</span>';
+                        }
+                        if (diseaseCell && diseaseVal) {
+                            diseaseCell.innerHTML = '<span class="fw-bold text-success">' + diseaseVal + '</span>';
+                        }
+
+                        // 即時將記憶狀態改為「🧠 已同步」
+                        const statusCell = document.getElementById('mem-status-' + fbId);
+                        if (statusCell) {
+                            statusCell.innerHTML = '<span class="badge bg-success-subtle text-success border border-success">🧠 已同步</span>';
+                        }
+                    } else {
+                        btn.className = 'btn btn-danger btn-sm px-3';
+                        btn.innerHTML = '❌ 失敗';
+                    }
+                } catch (err) {
+                    btn.className = 'btn btn-danger btn-sm px-3';
+                    btn.innerHTML = '❌ 錯誤';
+                } finally {
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.className = 'btn btn-success btn-sm px-3';
+                        btn.innerHTML = originalText;
+                    }, 1500);
+                }
+            });
+        });
+
+        // 2. 頂部管理按鈕 (重新整理視覺記憶、導出、微調)：防重複提交
+        document.querySelectorAll('form:not(.annotation-form)').forEach(form => {
+            form.addEventListener('submit', function() {
+                const btn = this.querySelector('button[type="submit"]');
+                if (btn) {
+                    btn.style.pointerEvents = 'none';
+                    if (btn.classList.contains('btn-primary')) {
+                        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> 啟動中...';
+                    } else if (btn.classList.contains('btn-outline-primary')) {
+                        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> 重整中...';
+                    } else if (btn.classList.contains('btn-outline-success')) {
+                        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> 導出中...';
+                    }
+                    setTimeout(() => { btn.disabled = true; }, 0);
+                }
+            });
+        });
+    </script>
 </body>
 </html>

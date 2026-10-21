@@ -13,7 +13,7 @@ from app.db.session import get_db
 from app.db.models import User
 from app.schemas.prediction import PredictionResponse
 from app.services.ai import diagnostic_plant, get_reference_lists, ground_diagnosis_in_database, process_and_update_diagnosis
-from app.services.auth import get_current_user
+from app.services.auth import get_current_user, get_optional_current_user
 from app.services.files import ensure_image_upload, validate_image_content
 
 # 暫存區：使用一個簡單的 Python 字典來模擬 Redis
@@ -24,8 +24,23 @@ MAX_PENDING_PREDICTIONS = 100
 
 # 影像雜湊冪等診斷快取 (Image SHA-256 Diagnosis Cache)
 # 確保同一張圖片在短時間內重複上傳或測試時，獲得 100% 決定性、零延遲、一致的診斷結果
+# 注意：當使用者提報回饋、專家標註校正或重建視覺記憶庫時，快取會立即自動清空失效！
 image_diagnosis_cache = {}
 IMAGE_CACHE_TTL_SECONDS = 1800
+
+
+def clear_image_diagnosis_cache(img_sha256: Optional[str] = None):
+    """清除影像診斷快取。若未指定 hash 則清空全域快取，確保主動學習修正即時生效。"""
+    global image_diagnosis_cache
+    if img_sha256:
+        to_del = [k for k in image_diagnosis_cache if k[0] == img_sha256]
+        for k in to_del:
+            image_diagnosis_cache.pop(k, None)
+        print(f"[CACHE] 已清除特定影像 SHA-256 快取: {img_sha256[:8]}...")
+    else:
+        count = len(image_diagnosis_cache)
+        image_diagnosis_cache.clear()
+        print(f"[CACHE] 已清空影像診斷快取 (共 {count} 筆)，確保最新專家標註與主動學習即時生效！")
 
 router = APIRouter(
     prefix="/predict",
@@ -33,7 +48,7 @@ router = APIRouter(
 )
 
 # 建立一個臨時資料夾來存放待確認的圖片
-TEMP_DIR = Path("static/tmp")
+TEMP_DIR = settings.TEMP_DIR
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -65,7 +80,7 @@ async def predict_plant_status(
     file: UploadFile = File(...),
     crop_name: Optional[str] = Form(None),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_optional_current_user),
 ):
     """
     接收圖片，執行 AI 分析，並將結果暫存。
@@ -81,7 +96,8 @@ async def predict_plant_status(
     temp_file_path = None
     try:
         prune_expired_predictions()
-        pending = sum(entry.get("user_id") == current_user.user_id for entry in prediction_cache.values())
+        eff_user_id = current_user.user_id if current_user else 1
+        pending = sum(entry.get("user_id") == eff_user_id for entry in prediction_cache.values())
         if len(prediction_cache) >= MAX_PENDING_PREDICTIONS or pending >= 10:
             raise HTTPException(status_code=429, detail="Too many pending predictions. Confirm or wait for expiry.")
         content = await file.read(settings.WEBCAM_MAX_IMAGE_BYTES + 1)
@@ -94,11 +110,29 @@ async def predict_plant_status(
         cache_key = (img_sha256, (crop_name or "").strip())
         now = time.monotonic()
 
+        from datetime import datetime
+        from app.services.visual_memory import visual_memory
+
         cached_entry = image_diagnosis_cache.get(cache_key)
-        if cached_entry and (now - cached_entry["cached_at"] < IMAGE_CACHE_TTL_SECONDS):
+        is_stale = False
+        if cached_entry:
+            # 檢查快取有效性：
+            # 1. 超過 TTL (30 分鐘)
+            if now - cached_entry["cached_at"] >= IMAGE_CACHE_TTL_SECONDS:
+                is_stale = True
+            # 2. 視覺記憶庫在快取生成之後曾有過任何更新/重建 (主動學習閉環即時失效)
+            elif visual_memory.last_sync_time and cached_entry.get("cached_at_datetime"):
+                if cached_entry["cached_at_datetime"] < visual_memory.last_sync_time:
+                    is_stale = True
+
+        if cached_entry and not is_stale:
             print(f"[CACHE] 命中相同圖片 SHA-256 冪等診斷快取 ({img_sha256[:8]}...) -> 保證 100% 決定性一致輸出！")
             raw_ai_result = copy.deepcopy(cached_entry["result"])
         else:
+            if cached_entry and is_stale:
+                image_diagnosis_cache.pop(cache_key, None)
+                print(f"[CACHE] 偵測到視覺特徵記憶庫已重整更新，舊快取 ({img_sha256[:8]}...) 已主動失效，穿透重新執行完整 AI 級聯診斷！")
+
             # 2. 呼叫 AI 進行診斷 (三層瀑布流階層式架構)
             crops, diseases, pests = get_reference_lists(db)
             if crop_name:
@@ -107,7 +141,8 @@ async def predict_plant_status(
             if raw_ai_result and raw_ai_result.get("category") != "unknown":
                 image_diagnosis_cache[cache_key] = {
                     "result": copy.deepcopy(raw_ai_result),
-                    "cached_at": now
+                    "cached_at": now,
+                    "cached_at_datetime": datetime.now(),
                 }
                 if len(image_diagnosis_cache) > 200:
                     oldest_k = min(image_diagnosis_cache.keys(), key=lambda k: image_diagnosis_cache[k]["cached_at"])
@@ -136,7 +171,7 @@ async def predict_plant_status(
         prediction_cache[prediction_id] = {
             "result": final_diagnosis,
             "temp_path": str(temp_file_path),
-            "user_id": current_user.user_id,
+            "user_id": eff_user_id,
             "expires_at": time.monotonic() + PREDICTION_TTL_SECONDS,
         }
         
@@ -158,9 +193,11 @@ async def predict_plant_status(
             temp_file_path.unlink()
         raise
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"❌ [PREDICT SERVER ERROR] error={e}")
         if temp_file_path and temp_file_path.exists():
             temp_file_path.unlink()
-        raise HTTPException(status_code=500, detail="Image analysis failed.") from e
+        raise HTTPException(status_code=500, detail=f"Image analysis failed: {type(e).__name__}: {e}") from e
     finally:
         await file.close()

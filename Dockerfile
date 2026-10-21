@@ -14,6 +14,7 @@ WORKDIR /app
 # - libgomp1: FAISS 向量檢索函式庫所必需之 OpenMP 支援
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    ca-certificates \
     libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -28,8 +29,14 @@ RUN pip install --no-cache-dir --upgrade pip \
 # 複製整個專案到工作目錄
 COPY . .
 
+# 若目錄下無模型權重檔，自動由官方 GitHub Release 下載 ConvNeXt 權重
+RUN if [ ! -f convnext_plant_best.pth ]; then \
+        echo "Downloading convnext_plant_best.pth from GitHub Releases..." && \
+        curl -L -o convnext_plant_best.pth https://github.com/11436022/plant/releases/download/v1.0-weights/convnext_plant_best.pth; \
+    fi
+
 # 預先建立靜態資源與上傳檔案目錄，並建立非 root 使用者以強化容器安全性
-RUN mkdir -p /app/static/uploads /app/static/feedback_uploads \
+RUN mkdir -p /app/static/uploads /app/static/feedback_uploads /app/static/tmp \
     && useradd --create-home appuser \
     && chown -R appuser:appuser /app
 
@@ -41,7 +48,7 @@ EXPOSE 8000
 
 # 容器健康檢查設定
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-    CMD curl -f http://localhost:8000/ || exit 1
+    CMD curl -f http://localhost:${PORT:-8000}/ || exit 1
 
 # 設定容器啟動指令
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]

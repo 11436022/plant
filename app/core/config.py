@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     STATIC_DIR: Path = BASE_DIR / "static"
     UPLOAD_DIR: Path = STATIC_DIR / "uploads" # 使用者日記圖片
     FEEDBACK_UPLOAD_DIR: Path = STATIC_DIR / "feedback_uploads" # 診斷回饋圖片
+    TEMP_DIR: Path = STATIC_DIR / "tmp"
 
     # API 基本設定
     API_TITLE: str = "Plant API"
@@ -92,6 +93,7 @@ class Settings(BaseSettings):
         # 確保上傳目錄存在
         self.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
         self.FEEDBACK_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+        self.TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
         # 如果沒有設定 FROM_EMAIL，預設使用 USERNAME
         if self.SMTP_USERNAME and not self.SMTP_FROM_EMAIL:

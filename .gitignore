@@ -11,16 +11,11 @@ venv/
 # 模型權重檔（超過 GitHub 100MB 限制，請於 GitHub Releases 下載）
 *.pth
 *.pt
+!static/visual_memory_cache.pt
 
-# 排除上傳的測試圖片與暫存檔
+# 排除上傳的測試暫存檔
 static/tmp/*
 !static/tmp/.gitkeep
-
-# 忽略 uploads 資料夾中的所有內容
-static/uploads/*
-
-# 但保留 .gitkeep，以便 Git 追蹤這個空目錄
-!static/uploads/.gitkeep
 
 # 忽略 Office 暫存檔與本地參考複本
 ~$*
@@ -36,9 +31,8 @@ documents/*.bak*
 # 本地暫存與產出物
 artifacts/
 dataset/
-static/feedback_uploads/
 Plant_Doctor*.pdf
 documents/Plant_Doctor*.pdf
 documents/*git最新版*.docx
 documents/*組員最新版*.docx
-documents/*本地修改留存*.docx
+documents/*本地修改留存*.docx

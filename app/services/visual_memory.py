@@ -1,4 +1,5 @@
 import os
+import re
 import json
 from pathlib import Path
 from typing import Optional, List, Dict, Any
@@ -12,6 +13,55 @@ from app.db.session import get_db_connection
 
 # 快取檔案路徑
 CACHE_FILE = settings.STATIC_DIR / "visual_memory_cache.pt"
+
+# 髒資料黑名單（嚴格攔截非專業測試字串，防止模型訓練與視覺記憶被污染）
+DIRTY_TERMS_BLACKLIST = {
+    "123", "1234", "test", "測試", "none", "null", "asdf", "abc", "unknown", 
+    "未知", "無", "0", "n/a", "na", "nan", "nil", "undefined", "待查", "待審核",
+    "測試用", "假資料", "隨便", "亂打", "xxx", "yyy", "zzz", "111", "999"
+}
+
+
+def is_valid_disease_status(status_name: Optional[str]) -> bool:
+    """
+    【資料清洗與防污染過濾器】
+    驗證輸入的病害/健康狀態是否為合法的農業標籤，阻擋髒資料（如 123、測試、純數字）進入訓練集與記憶庫。
+    """
+    if not status_name:
+        return False
+    clean = str(status_name).strip()
+    if len(clean) < 2 or len(clean) > 50:
+        return False
+    # 純數字或含符號的純數字直接攔截 (例如 123, 999, 1.2.3)
+    if clean.isdigit() or re.match(r"^[\d\s\.,_\-]+$", clean):
+        return False
+    # 必須包含中文字或英文字母
+    if not re.search(r"[\u4e00-\u9fa5a-zA-Z]", clean):
+        return False
+    # 黑名單完全匹配
+    if clean.lower() in DIRTY_TERMS_BLACKLIST:
+        return False
+    # 前綴黑名單 (例如 test1, 123測試)
+    if any(clean.lower().startswith(b) and len(clean) <= len(b) + 3 for b in ["test", "123", "測試"]):
+        return False
+    return True
+
+
+def is_valid_crop_name(crop_name: Optional[str]) -> bool:
+    """驗證作物名稱是否合法，防止髒資料與未定名標籤入庫"""
+    from app.services.ai import UNKNOWN_CROP_NAMES
+    if not crop_name:
+        return False
+    clean = str(crop_name).strip()
+    if len(clean) < 2 or len(clean) > 30:
+        return False
+    if clean.isdigit() or re.match(r"^[\d\s\.,_\-]+$", clean):
+        return False
+    if clean in UNKNOWN_CROP_NAMES or clean.lower() in DIRTY_TERMS_BLACKLIST:
+        return False
+    if not re.search(r"[\u4e00-\u9fa5a-zA-Z]", clean):
+        return False
+    return True
 
 
 class VisualMemoryManager:
@@ -89,12 +139,14 @@ class VisualMemoryManager:
         self.rebuild_index()
 
     def rebuild_index(self) -> int:
-        """從資料庫讀取所有具備管理者/專家標註的回饋影像，提取特徵並持久化。"""
+        """從資料庫讀取所有具備管理者/專家標註的回饋影像與病歷校正，經防污染過濾後提取特徵並持久化。"""
         conn = get_db_connection()
         db_rows = []
+        diary_rows = []
         try:
             import pymysql
             with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                # 1. 載入使用者回饋中心專家標註 (UC-14)
                 sql = """
                     SELECT id, image_url, original_plant_name, original_disease_name,
                            corrected_plant_name, corrected_disease_name,
@@ -107,20 +159,34 @@ class VisualMemoryManager:
                 """
                 cursor.execute(sql)
                 db_rows = cursor.fetchall()
+
+                # 2. 載入植物病歷簿中經專家校正且具備圖片之樣本 (UC-08)
+                sql_diary = """
+                    SELECT d.id, d.image_url, d.status_name, d.user_corrected_status, d.created_at, c.crop_name
+                    FROM plant_diary d
+                    LEFT JOIN crop c ON d.crop_id = c.crop_id
+                    WHERE d.user_corrected_status IS NOT NULL 
+                      AND d.user_corrected_status != ''
+                      AND d.image_url IS NOT NULL
+                    ORDER BY d.id ASC
+                """
+                cursor.execute(sql_diary)
+                diary_rows = cursor.fetchall()
+        except Exception as err:
+            print(f"[WARN] 讀取標註樣本異常: {err}")
         finally:
             conn.close()
 
         records = []
         emb_list = []
 
-        from app.services.ai import UNKNOWN_CROP_NAMES
-
+        # 處理 feedback 標註樣本
         for row in db_rows:
-            # 優先採用管理者標註，若無則採用回饋修正
             plant = (row.get("manager_corrected_plant_name") or row.get("corrected_plant_name") or "").strip()
             disease = (row.get("manager_corrected_disease_name") or row.get("corrected_disease_name") or row.get("original_disease_name") or "").strip()
 
-            if not plant or plant in UNKNOWN_CROP_NAMES:
+            # 嚴格防污染清洗：非合法作物或病名直接過濾
+            if not is_valid_crop_name(plant) or not is_valid_disease_status(disease):
                 continue
 
             rel_img = str(row.get("image_url", "")).replace("\\", "/")
@@ -136,10 +202,59 @@ class VisualMemoryManager:
             if emb is not None:
                 emb_list.append(emb)
                 records.append({
+                    "unique_key": f"feedback_{row['id']}",
                     "feedback_id": row["id"],
+                    "source": "feedback",
                     "image_url": clean_rel,
                     "crop_name": plant,
                     "status_name": disease or "無法判定",
+                    "created_at": row.get("created_at"),
+                })
+
+        # 處理 diary 專家校正樣本
+        for row in diary_rows:
+            plant = (row.get("crop_name") or "").strip()
+            disease = (row.get("user_corrected_status") or "").strip()
+
+            # 若作物名稱缺失，嘗試從原病害標記或病名反推
+            if not plant and disease:
+                for pv_data in [
+                    {"crop": "番茄", "keywords": ["番茄", "晚疫", "早疫", "黃化捲葉"]},
+                    {"crop": "馬鈴薯", "keywords": ["馬鈴薯"]},
+                    {"crop": "柑橘", "keywords": ["柑橘", "黃龍病", "葉蟎"]},
+                    {"crop": "蘋果", "keywords": ["蘋果", "黑星病"]},
+                    {"crop": "玉米", "keywords": ["玉米", "銹病", "煤紋病"]},
+                    {"crop": "葡萄", "keywords": ["葡萄", "黑腐病"]},
+                    {"crop": "草莓", "keywords": ["草莓"]},
+                ]:
+                    if any(k in disease or k in (row.get("status_name") or "") for k in pv_data["keywords"]):
+                        plant = pv_data["crop"]
+                        break
+
+            # 嚴格防污染清洗：非合法作物或病名直接過濾（例如 123、測試、純數字）
+            if not is_valid_crop_name(plant) or not is_valid_disease_status(disease):
+                continue
+
+            rel_img = str(row.get("image_url", "")).replace("\\", "/")
+            if "static/" in rel_img:
+                clean_rel = "static/" + rel_img.split("static/", 1)[1]
+            else:
+                clean_rel = rel_img.lstrip("/")
+            img_path = settings.BASE_DIR / clean_rel
+            if not img_path.exists():
+                continue
+
+            emb = self.extract_image_embedding(str(img_path))
+            if emb is not None:
+                emb_list.append(emb)
+                records.append({
+                    "unique_key": f"diary_{row['id']}",
+                    "feedback_id": -row["id"],
+                    "diary_id": row["id"],
+                    "source": "diary",
+                    "image_url": clean_rel,
+                    "crop_name": plant,
+                    "status_name": disease,
                     "created_at": row.get("created_at"),
                 })
 
@@ -158,22 +273,45 @@ class VisualMemoryManager:
                 print(f"[WARN] 儲存視覺記憶快取失敗: {e}")
             print(f"[OK] [VisualMemory] 視覺特徵記憶庫索引重建完成，共收錄 {len(self.records)} 筆田間專家覆核樣本！")
         else:
-            self.embeddings = None
-            self.records = []
-            print("[INFO] 視覺特徵記憶庫暫無有效標註樣本。")
+            if not self.records and CACHE_FILE.exists():
+                try:
+                    cache_data = torch.load(str(CACHE_FILE), map_location="cpu", weights_only=False)
+                    self.records = cache_data.get("records", [])
+                    self.embeddings = cache_data.get("embeddings", None)
+                    self.last_sync_time = cache_data.get("last_sync_time", datetime.now())
+                except Exception:
+                    pass
+            print(f"[INFO] 視覺特徵記憶庫未產生新特徵，維持現有記憶庫 ({len(self.records)} 筆樣本)。")
+
+        # 視覺記憶庫重構完成，同步清空舊有影像診斷快取，保證重新上傳即時生效
+        try:
+            from app.routers.prediction import clear_image_diagnosis_cache
+            clear_image_diagnosis_cache()
+        except Exception:
+            pass
 
         return len(self.records)
 
     def add_or_update(
         self,
-        feedback_id: int,
-        image_url: str,
-        plant_name: str,
-        disease_name: Optional[str] = None
+        feedback_id: Optional[int] = None,
+        image_url: str = "",
+        plant_name: str = "",
+        disease_name: Optional[str] = None,
+        diary_id: Optional[int] = None,
+        source: str = "feedback"
     ) -> bool:
-        """當管理者在後台即時儲存一筆標註時，動態新增或更新記憶庫，零重啟立即生效！"""
-        from app.services.ai import UNKNOWN_CROP_NAMES
-        if not plant_name or plant_name in UNKNOWN_CROP_NAMES:
+        """
+        當管理者在後台即時儲存一筆標註（回饋審核或病歷校正）時，
+        動態新增或更新記憶庫，內建防污染檢驗，零重啟立即生效！
+        """
+        # 1. 嚴格防污染檢驗：阻擋 123、測試、純數字等髒資料進入記憶庫
+        if not is_valid_crop_name(plant_name):
+            print(f"[SECURITY FILTER] 攔截無效作物名稱【{plant_name}】，拒絕刻錄至 Visual Memory。")
+            return False
+
+        if disease_name and not is_valid_disease_status(disease_name):
+            print(f"[SECURITY FILTER] 攔截無效病害名稱【{disease_name}】，拒絕刻錄至 Visual Memory。")
             return False
 
         clean_rel = str(image_url).replace("\\", "/")
@@ -186,24 +324,37 @@ class VisualMemoryManager:
             return False
 
         emb = self.extract_image_embedding(str(img_path))
-        if emb is None:
-            return False
+
+        # 唯一識別碼區分 feedback 或 diary
+        if diary_id is not None:
+            unique_key = f"diary_{diary_id}"
+            eff_feedback_id = -diary_id
+        else:
+            unique_key = f"feedback_{feedback_id}"
+            eff_feedback_id = feedback_id
 
         # 檢查是否已在 records 內
         existing_idx = None
         for i, r in enumerate(self.records):
-            if r["feedback_id"] == feedback_id:
+            if r.get("unique_key") == unique_key or (source == "feedback" and r.get("feedback_id") == feedback_id):
                 existing_idx = i
                 break
 
         if existing_idx is not None:
+            self.records[existing_idx]["unique_key"] = unique_key
             self.records[existing_idx]["crop_name"] = plant_name
             self.records[existing_idx]["status_name"] = disease_name or "無法判定"
-            if self.embeddings is not None:
+            self.records[existing_idx]["source"] = source
+            if diary_id is not None:
+                self.records[existing_idx]["diary_id"] = diary_id
+            if emb is not None and self.embeddings is not None:
                 self.embeddings[existing_idx] = emb
-        else:
+        elif emb is not None:
             new_record = {
-                "feedback_id": feedback_id,
+                "unique_key": unique_key,
+                "feedback_id": eff_feedback_id,
+                "diary_id": diary_id,
+                "source": source,
                 "image_url": image_url,
                 "crop_name": plant_name,
                 "status_name": disease_name or "無法判定",
@@ -214,18 +365,38 @@ class VisualMemoryManager:
                 self.embeddings = torch.cat([self.embeddings, emb.unsqueeze(0)], dim=0)
             else:
                 self.embeddings = emb.unsqueeze(0)
+        else:
+            return False
 
-        # 刷新磁碟快取
+        self.last_sync_time = datetime.now()
         try:
             torch.save({
                 "records": self.records,
                 "embeddings": self.embeddings,
-                "last_sync_time": datetime.now(),
+                "last_sync_time": self.last_sync_time,
+            }, str(CACHE_FILE))
+        except Exception as e:
+            print(f"[WARN] 即時儲存視覺記憶快取失敗: {e}")
+
+        # 刷新磁碟快取與同步時間
+        self.last_sync_time = datetime.now()
+        try:
+            torch.save({
+                "records": self.records,
+                "embeddings": self.embeddings,
+                "last_sync_time": self.last_sync_time,
             }, str(CACHE_FILE))
         except Exception:
             pass
 
-        print(f"[VisualMemory] 樣本 ID #{feedback_id} 已成功刻錄至特徵記憶庫：【{plant_name} - {disease_name}】")
+        # 刻錄新專家記憶後，立即清除舊診斷快取，保證重新上傳同一張時絕不使用舊錯誤輸出
+        try:
+            from app.routers.prediction import clear_image_diagnosis_cache
+            clear_image_diagnosis_cache()
+        except Exception:
+            pass
+
+        print(f"[VisualMemory] 【{source} #{diary_id or feedback_id}】已成功刻錄至特徵記憶庫：【{plant_name} - {disease_name}】")
         return True
 
     def search(
@@ -254,8 +425,9 @@ class VisualMemoryManager:
 
         if best_score >= min_similarity and best_i < len(self.records):
             matched = self.records[best_i]
+            sample_ref = f"diary #{matched['diary_id']}" if matched.get("diary_id") else f"feedback #{matched.get('feedback_id')}"
             print(
-                f"[VisualMemory 命中] 查詢影像與歷史專家樣本 #{matched['feedback_id']} "
+                f"[VisualMemory 命中] 查詢影像與歷史專家樣本 ({sample_ref}) "
                 f"餘弦相似度達 {best_score:.4f} (>= {min_similarity:.2f})！"
                 f"成功檢索先驗作物：【{matched['crop_name']}】，歷史病徵：【{matched['status_name']}】"
             )
@@ -264,7 +436,9 @@ class VisualMemoryManager:
                 "similarity": round(best_score, 4),
                 "crop_name": matched["crop_name"],
                 "status_name": matched["status_name"],
-                "feedback_id": matched["feedback_id"],
+                "feedback_id": matched.get("feedback_id", 0),
+                "diary_id": matched.get("diary_id"),
+                "source": matched.get("source", "feedback"),
                 "image_url": matched["image_url"],
             }
 

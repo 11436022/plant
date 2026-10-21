@@ -13,6 +13,7 @@ from app.schemas.auth import TokenData
 from app.crud import get_user_by_id, get_user_by_username
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
 
 
 def create_access_token(payload: dict) -> str:
@@ -23,6 +24,26 @@ def create_access_token(payload: dict) -> str:
         minutes=settings.JWT_EXPIRE_MINUTES
     )
     return jwt.encode(token_payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+
+def get_optional_current_user(db: Session = Depends(get_db), token: str | None = Depends(oauth2_scheme_optional)) -> User | None:
+    """
+    非強制認證：若攜帶有效 JWT 則解析出 User；若未攜帶或無效則回傳 None（方便 Web / 訪客模式體驗）。
+    """
+    if not token:
+        return None
+    try:
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        user_id: int | None = payload.get("user_id")
+        username: str | None = payload.get("sub")
+        user = None
+        if user_id:
+            user = get_user_by_id(db, user_id=user_id)
+        if user is None and username:
+            user = get_user_by_username(db, username=username)
+        return user
+    except Exception:
+        return None
 
 
 def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> User:

@@ -1,7 +1,17 @@
+import sys
 from pathlib import Path
-from fastapi import FastAPI
+
+if sys.platform == "win32":
+    try:
+        if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8")
+        if sys.stderr and hasattr(sys.stderr, "reconfigure"):
+            sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -41,12 +51,67 @@ def create_app() -> FastAPI:
         """提供重設密碼的 HTML 中介頁。"""
         return str(STATIC_PATH / "reset_password.html")
 
+    @app.get("/photo", response_class=HTMLResponse)
+    async def get_photo_diagnosis_page(request: Request):
+        """提供跨平台（包含 iPhone / Safari 與 Android）即時拍照快篩與病害診斷網頁。"""
+        template = templates.get_template("photo.html")
+        return HTMLResponse(content=template.render({"request": request}))
+
     @app.on_event("startup")
     async def startup_event() -> None:
         # 啟動時主動補齊驗證信與忘記密碼所需的 schema，避免舊資料庫缺欄位。
-        ensure_auth_schema()
+        try:
+            from app.db.base import Base
+            from app.db.session import engine
+            import app.db.models
+            Base.metadata.create_all(bind=engine)
+            print("[DB] 所有資料表結構驗證/建立成功！")
+        except Exception as e:
+            print(f"[WARN] 自動建立資料表略過: {e}")
+
+        # 若是全新空資料庫或舊版資料庫 (診斷紀錄少於 50 筆)，自動同步最新種子資料
+        try:
+            from sqlalchemy import text
+            from app.db.session import engine, get_db_connection
+            needs_seed = False
+            try:
+                with engine.connect() as conn:
+                    diary_cnt = conn.execute(text("SELECT count(*) FROM plant_diary")).scalar()
+                if not diary_cnt or diary_cnt < 50:
+                    needs_seed = True
+            except Exception:
+                needs_seed = True
+
+            if needs_seed:
+                # 優先使用包含 56 筆與最新資料的 latest_seed.sql
+                sql_path = Path("latest_seed.sql") if Path("latest_seed.sql").exists() else Path("init_db.sql")
+                if sql_path.exists():
+                    print(f"[DB] 自動執行 {sql_path.name} 同步最新資料庫紀錄...")
+                    raw_sql = sql_path.read_text(encoding="utf-8")
+                    db_conn = get_db_connection()
+                    with db_conn.cursor() as cur:
+                        for stmt in raw_sql.split(";\n"):
+                            clean_s = stmt.strip()
+                            if clean_s:
+                                try:
+                                    cur.execute(clean_s)
+                                except Exception:
+                                    pass
+                        db_conn.commit()
+                    db_conn.close()
+                    print("[DB] 資料庫同步完成！")
+        except Exception as seed_err:
+            print(f"[WARN] 檢查/同步資料庫種子略過: {seed_err}")
+
+        try:
+            ensure_auth_schema()
+        except Exception as e:
+            print(f"[WARN] ensure_auth_schema 略過: {e}")
         # 載入 RAG 知識庫
-        rag.load_knowledge_base()
+try:
+            rag.load_knowledge_base()
+        except Exception as e:
+            print(f"[WARN] 載入 RAG 知識庫略過: {e}")
         # 預載本地 ConvNeXt 快篩模型
         try:
             from app.services.convnext import get_convnext_model

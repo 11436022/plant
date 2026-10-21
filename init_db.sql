@@ -50,7 +50,7 @@ CREATE TABLE `disease` (
   `crop_id` int DEFAULT NULL,
   `disease_name` varchar(100) NOT NULL,
   `description` text NOT NULL,
-  `treatment` varchar(100) NOT NULL,
+  `treatment` text NOT NULL,
   PRIMARY KEY (`disease_id`),
   KEY `disease_ibfk_1` (`crop_id`),
   CONSTRAINT `disease_ibfk_1` FOREIGN KEY (`crop_id`) REFERENCES `crop` (`crop_id`)
@@ -77,7 +77,7 @@ CREATE TABLE `pests` (
   `crop_id` int NOT NULL,
   `pest_name` varchar(100) NOT NULL,
   `description` text NOT NULL,
-  `treatment` varchar(100) NOT NULL,
+  `treatment` text NOT NULL,
   PRIMARY KEY (`pest_id`),
   KEY `crop_id` (`crop_id`),
   CONSTRAINT `pests_ibfk_1` FOREIGN KEY (`crop_id`) REFERENCES `crop` (`crop_id`)
