@@ -102,7 +102,16 @@ def ensure_auth_schema() -> None:
                 if not _column_exists(cursor, "webcam_alert", "reference_record_id"):
                     cursor.execute("ALTER TABLE webcam_alert ADD COLUMN reference_record_id VARCHAR(128) NULL DEFAULT NULL")
 
-            # 3. Token 表相關
+            # 3. Disease 與 Pests 參考來源欄位
+            for tbl in ("disease", "pests"):
+                if not _column_exists(cursor, tbl, "source_name"):
+                    cursor.execute(f"ALTER TABLE {tbl} ADD COLUMN source_name VARCHAR(100) NULL DEFAULT NULL")
+                if not _column_exists(cursor, tbl, "source_url"):
+                    cursor.execute(f"ALTER TABLE {tbl} ADD COLUMN source_url VARCHAR(2048) NULL DEFAULT NULL")
+                if not _column_exists(cursor, tbl, "source_record_id"):
+                    cursor.execute(f"ALTER TABLE {tbl} ADD COLUMN source_record_id VARCHAR(128) NULL DEFAULT NULL")
+
+            # 4. Token 表相關
             if not _table_exists(cursor, "user_one_time_tokens"):
                 cursor.execute(
                     """
@@ -123,7 +132,73 @@ def ensure_auth_schema() -> None:
                     """
                 )
 
-            # 4. 確保管理員帳號存在且密碼與權限完整 (預設: admin / admin123)
+            # 5. 回饋與標註資料表 (DiagnosisFeedback)
+            if not _table_exists(cursor, "diagnosis_feedback"):
+                cursor.execute(
+                    """
+                    CREATE TABLE diagnosis_feedback (
+                        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                        prediction_id VARCHAR(64) NULL,
+                        user_id INT NULL,
+                        image_url VARCHAR(255) NOT NULL,
+                        original_plant_name VARCHAR(100) NULL,
+                        original_disease_name VARCHAR(100) NULL,
+                        is_plant_error TINYINT(1) DEFAULT 0,
+                        is_disease_error TINYINT(1) DEFAULT 0,
+                        corrected_plant_name VARCHAR(100) NULL,
+                        corrected_disease_name VARCHAR(100) NULL,
+                        manager_corrected_plant_name VARCHAR(100) NULL,
+                        manager_corrected_disease_name VARCHAR(100) NULL,
+                        admin_reviewed TINYINT(1) DEFAULT 0,
+                        admin_notes TEXT NULL,
+                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        KEY ix_diagnosis_feedback_prediction_id (prediction_id),
+                        KEY ix_diagnosis_feedback_user_id (user_id)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+                    """
+                )
+            else:
+                if not _column_exists(cursor, "diagnosis_feedback", "manager_corrected_plant_name"):
+                    cursor.execute("ALTER TABLE diagnosis_feedback ADD COLUMN manager_corrected_plant_name VARCHAR(100) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "diagnosis_feedback", "manager_corrected_disease_name"):
+                    cursor.execute("ALTER TABLE diagnosis_feedback ADD COLUMN manager_corrected_disease_name VARCHAR(100) NULL DEFAULT NULL")
+
+            # 6. Webcam 告警紀錄資料表 (WebcamAlert)
+            if not _table_exists(cursor, "webcam_alert"):
+                cursor.execute(
+                    """
+                    CREATE TABLE webcam_alert (
+                        id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                        user_id INT NOT NULL,
+                        crop_id INT NULL,
+                        disease_id INT NULL,
+                        status_name VARCHAR(100) NOT NULL,
+                        confidence FLOAT NOT NULL,
+                        category VARCHAR(20) NOT NULL DEFAULT 'unknown',
+                        image_url VARCHAR(2048) NOT NULL,
+                        session_id VARCHAR(64) NOT NULL DEFAULT 'legacy',
+                        region_id VARCHAR(64) NOT NULL DEFAULT 'full-frame',
+                        consecutive_matches INT NOT NULL DEFAULT 3,
+                        requires_review TINYINT(1) NOT NULL DEFAULT 1,
+                        grounding_source VARCHAR(64) NOT NULL DEFAULT 'legacy_unverified',
+                        reference_source VARCHAR(100) NULL,
+                        reference_url VARCHAR(2048) NULL,
+                        reference_record_id VARCHAR(128) NULL,
+                        email_sent TINYINT(1) NOT NULL DEFAULT 0,
+                        is_acknowledged TINYINT(1) NOT NULL DEFAULT 0,
+                        acknowledged_at DATETIME NULL,
+                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        KEY ix_webcam_alert_user_id (user_id)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+                    """
+                )
+            else:
+                if _column_exists(cursor, "webcam_alert", "alert_id") and not _column_exists(cursor, "webcam_alert", "id"):
+                    cursor.execute("ALTER TABLE webcam_alert CHANGE COLUMN alert_id id BIGINT NOT NULL AUTO_INCREMENT")
+                if not _column_exists(cursor, "webcam_alert", "email_sent"):
+                    cursor.execute("ALTER TABLE webcam_alert ADD COLUMN email_sent TINYINT(1) NOT NULL DEFAULT 0")
+
+            # 7. 確保管理員帳號存在且密碼與權限完整 (預設: admin / admin123)
             cursor.execute("SELECT user_id, password_hash, role, is_email_verified FROM user WHERE username = 'admin'")
             admin_row = cursor.fetchone()
             valid_admin_hash = "$2b$12$T45h7KfOl.qAp2sLN0yI3.I/vVzRu5L9Bgs0Mp0Q4DwOkO3fzY87u"  # admin123

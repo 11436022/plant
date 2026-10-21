@@ -16,7 +16,7 @@ def check_form_origin(request: Request):
     """CSRF 來源檢查：保護後台表單提交，同時相容 Railway、反向代理與自訂網域名稱"""
     if request.method in {"GET", "HEAD", "OPTIONS"}:
         return
-    if request.url.path.rstrip("/") in {"/admin/login", "/admin/logout"}:
+    if request.url.path.rstrip("/") in {"/admin/login"}:
         return
 
     origin = request.headers.get("origin") or request.headers.get("referer")
@@ -38,8 +38,9 @@ def check_form_origin(request: Request):
     if origin == str(request.base_url).rstrip("/"):
         return
 
-    allowed_cors_hosts = {o.split("://")[-1].split("/")[0].split(":")[0].lower() for o in settings.CORS_ORIGINS if o}
-    if origin_host in allowed_cors_hosts or "*" in settings.CORS_ORIGINS:
+    cors_list = getattr(settings, "CORS_ORIGINS", [])
+    allowed_cors_hosts = {o.split("://")[-1].split("/")[0].split(":")[0].lower() for o in cors_list if o}
+    if origin_host in allowed_cors_hosts or "*" in cors_list:
         return
 
     raise HTTPException(status_code=403, detail="Cross-origin form submission denied.")

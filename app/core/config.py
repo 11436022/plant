@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
     WIFI_HOST_IP: str = "127.0.0.1"
+    CORS_ORIGINS: list[str] = []
 
     # Webcam monitoring defaults. Values can be overridden from .env.
     WEBCAM_MAX_IMAGE_BYTES: int = 8 * 1024 * 1024
@@ -64,7 +65,11 @@ class Settings(BaseSettings):
     # Google Gemini API 金鑰
     GEMINI_API_KEY: Optional[str] = None
     GEMINI_PRIMARY_MODEL: str = "models/gemini-3.8-flash"
-    GEMINI_FALLBACK_MODELS: list[str] = []
+    GEMINI_FALLBACK_MODELS: list[str] = [
+        "models/gemini-2.5-flash",
+        "models/gemini-3.5-flash",
+        "models/gemini-flash-latest",
+    ]
     GEMINI_MAX_RETRIES: int = 2
     SMTP_USE_TLS: bool = True
     SMTP_USE_SSL: bool = False

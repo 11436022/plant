@@ -1288,8 +1288,8 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
                     new_disease = models.Disease(
                         crop_id=target_crop_id,
                         disease_name=status_name,
-                        description=final_suggestion,
-                        treatment=final_treatment,
+                        description=final_suggestion or "暫無病徵描述",
+                        treatment=final_treatment or "暫無防治處方",
                         source_name=data.get("reference_source") or "農業部動植物防疫檢疫署病蟲害手冊",
                         source_url=data.get("reference_url") or "https://www.aphia.gov.tw",
                         source_record_id=data.get("reference_record_id") or f"aphia-dis-{target_crop_id}-{status_name}",
@@ -1313,8 +1313,8 @@ async def save_to_db(data, image_path, user_id, user_note, db: Session):
                     new_pest = models.Pest(
                         crop_id=target_crop_id,
                         pest_name=status_name,
-                        description=final_suggestion,
-                        treatment=final_treatment,
+                        description=final_suggestion or "暫無病徵描述",
+                        treatment=final_treatment or "暫無防治處方",
                         source_name=data.get("reference_source") or "農業部動植物防疫檢疫署害蟲防治指引",
                         source_url=data.get("reference_url") or "https://www.aphia.gov.tw",
                         source_record_id=data.get("reference_record_id") or f"aphia-pest-{target_crop_id}-{status_name}",

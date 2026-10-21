@@ -142,6 +142,29 @@ def test_prescription_preserves_high_confidence_fallback():
 
 def test_database_authoritative_hit_for_repaired_birch():
     """測試已修復的樺木葉斑病能直接命中資料庫權威記錄，不再回傳無效描述。"""
+    from app.db.session import SessionLocal
+    from app.db.models import Crop, Disease
+    db = SessionLocal()
+    try:
+        crop = db.query(Crop).filter(Crop.crop_name == "樺木").first()
+        if not crop:
+            crop = Crop(crop_name="樺木")
+            db.add(crop)
+            db.commit()
+            db.refresh(crop)
+        dis = db.query(Disease).filter(Disease.crop_id == crop.crop_id, Disease.disease_name == "葉斑病").first()
+        if not dis:
+            dis = Disease(
+                crop_id=crop.crop_id,
+                disease_name="葉斑病",
+                description="葉片出現紅褐色圓形至不規則斑點，嚴重時融合成大斑導致落葉。",
+                treatment="1. 清理病落葉並銷毀。\n2. 噴灑 50% 撲克拉水懸劑 2000 倍液預防。\n3. 增強植株通風與透光度。",
+            )
+            db.add(dis)
+            db.commit()
+    finally:
+        db.close()
+
     sugg, treat, ctx = generate_precise_prescription(
         crop_name="樺木",
         status_name="葉斑病",
