@@ -397,21 +397,12 @@ class WebcamActivity : AppCompatActivity() {
 
         // Keep mutable zones, request bookkeeping and UI on the main thread.
         monitorJob = lifecycleScope.launch {
-            // 🌟 核心優化：點擊開始監控後，立即拍第 1 次進行診斷，不必乾等 30 秒倒數！
-            if (rgMode.checkedRadioButtonId == R.id.rbSingleMode) {
-                delay(500L) // 緩衝 0.5 秒確保預覽鏡頭對焦穩定
-                if (isActive && isMonitoring) {
-                    captureSinglePlant()
-                }
-            }
             while (isActive && isMonitoring) {
                 if (rgMode.checkedRadioButtonId == R.id.rbSingleMode) {
                     val intervalSec = (etSingleInterval.text.toString().toIntOrNull() ?: 120)
                         .coerceIn(30, 600)
                     delay(intervalSec * 1000L)
-                    if (isActive && isMonitoring) {
-                        captureSinglePlant()
-                    }
+                    captureSinglePlant()
                 } else {
                     val currentTime = System.currentTimeMillis()
                     val zones = currentSession?.cropZones?.toList().orEmpty()
@@ -850,8 +841,8 @@ class WebcamActivity : AppCompatActivity() {
     }
 
     private fun getUserSavedToken(): String? {
-        val sharedPref = getSharedPreferences("PlantDoctor", MODE_PRIVATE)
-        return sharedPref.getString("token", null)
+        val sharedPref = getSharedPreferences("PlantDoctorPrefs", MODE_PRIVATE)
+        return sharedPref.getString("access_token", null)
     }
 
     private fun getUserName(): String {
