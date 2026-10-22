@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -33,6 +34,8 @@ class Settings(BaseSettings):
     WEBCAM_ALERT_CONSECUTIVE_MATCHES: int = 3
     WEBCAM_ALERT_COOLDOWN_SECONDS: int = 900
 
+    PUBLIC_BASE_URL_OVERRIDE: Optional[str] = None
+
     # 對外網址設定
     @property
     def FRONTEND_BASE_URL(self) -> str:
@@ -41,7 +44,15 @@ class Settings(BaseSettings):
 
     @property
     def PUBLIC_BASE_URL(self) -> str:
-        """公開可訪問的基礎 URL，通常與前端 URL 相同。"""
+        """公開可訪問的基礎 URL，優先使用環境變數或 Railway 網址，最後回退至前端 URL。"""
+        env_public = os.getenv("PUBLIC_BASE_URL") or self.PUBLIC_BASE_URL_OVERRIDE
+        if env_public:
+            return env_public.rstrip("/")
+        railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN") or os.getenv("RAILWAY_STATIC_URL")
+        if railway_domain:
+            if not railway_domain.startswith("http"):
+                return f"https://{railway_domain}"
+            return railway_domain.rstrip("/")
         return self.FRONTEND_BASE_URL
 
     EMAIL_VERIFY_PATH: str = "/api/v1/auth/user/verify-email"
