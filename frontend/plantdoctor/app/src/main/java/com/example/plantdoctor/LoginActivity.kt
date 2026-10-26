@@ -286,24 +286,27 @@ class LoginActivity : AppCompatActivity() {
 
         apiService.forgotPassword(request).enqueue(object : Callback<GenericResponse> {
             override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
-                val body = response.body()
-                if (response.isSuccessful && body != null) {
-                    val token = body.token
-                    if (!token.isNullOrEmpty()) {
-                        Toast.makeText(this@LoginActivity, "已驗證帳號，請設定新密碼", Toast.LENGTH_SHORT).show()
-                        val intent = android.content.Intent(this@LoginActivity, ResetPasswordActivity::class.java).apply {
-                            putExtra("token", token)
+                if (response.isSuccessful) {
+                    androidx.appcompat.app.AlertDialog.Builder(this@LoginActivity)
+                        .setTitle("信件已寄出")
+                        .setMessage("重設密碼通知已寄送至：\n$email\n\n請至 Gmail 查收並點擊信件內的「點此重設密碼」連結。")
+                        .setPositiveButton("開啟 Gmail") { _, _ ->
+                            try {
+                                val intent = android.content.Intent(android.content.Intent.ACTION_MAIN).apply {
+                                    addCategory(android.content.Intent.CATEGORY_APP_EMAIL)
+                                    flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                }
+                                startActivity(intent)
+                            } catch (e: Exception) {}
                         }
-                        startActivity(intent)
-                    } else {
-                        Toast.makeText(this@LoginActivity, "若 Email 正確，重設信件已寄出！", Toast.LENGTH_LONG).show()
-                    }
+                        .setNegativeButton("我知道了", null)
+                        .show()
                 } else {
-                    Toast.makeText(this@LoginActivity, "發送失敗，請稍後再試", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LoginActivity, "發送失敗，請確認 Email 是否正確", Toast.LENGTH_SHORT).show()
                 }
             }
             override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
-                Toast.makeText(this@LoginActivity, "網路連線失敗", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, "網路連線失敗，請檢查網路", Toast.LENGTH_SHORT).show()
             }
         })
     }

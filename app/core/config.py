@@ -70,6 +70,8 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: Optional[str] = None
     SMTP_FROM_EMAIL: Optional[str] = None
     SMTP_FROM_NAME: str = API_TITLE
+    MAIL_WEBHOOK_URL: Optional[str] = None
+    RESEND_API_KEY: Optional[str] = None
 
     # 中央氣象署開放資料API金鑰
     CWB_API_KEY: Optional[str] = None

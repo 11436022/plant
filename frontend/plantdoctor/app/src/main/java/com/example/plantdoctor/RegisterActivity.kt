@@ -183,8 +183,8 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         val tvMessage = TextView(this).apply {
-            text = "帳號建立成功！\n$email\n\n您的帳號已自動開通完成，現在可以立即登入使用！" 
-            textSize = 16f
+            text = "帳號建立成功！\n\n驗證信已寄送至您的 Gmail：\n$email\n\n請開啟信箱點擊信中的「點此完成信箱驗證」按鈕，完成後即可登入。"
+            textSize = 15f
             setTextColor(textColor)
             setPadding(0, 0, 0, 20)
         }
@@ -195,38 +195,27 @@ class RegisterActivity : AppCompatActivity() {
         val alertDialog = AlertDialog.Builder(this)
             .setView(dialogLayout)
             .setCancelable(false)
-            .setPositiveButton("立即登入") { _, _ ->
+            .setPositiveButton("開啟 Gmail 收信") { _, _ ->
+                SoundManager.playBubblePop()
+                try {
+                    val intent = android.content.Intent(android.content.Intent.ACTION_MAIN).apply {
+                        addCategory(android.content.Intent.CATEGORY_APP_EMAIL)
+                        flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    // 若無預設郵件客戶端則回到登入頁
+                }
+                finish()
+            }
+            .setNeutralButton("我知道了") { _, _ ->
                 SoundManager.playBubblePop()
                 finish()
             }
-            .setNeutralButton("⚡一鍵開通帳號", null)
             .create()
 
         alertDialog.show()
-        val resendButton = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL)
-        resendButton.setOnClickListener {
-            resendButton.isEnabled = false
-            PlantApiService.create(null)
-                .quickVerify(QuickVerifyRequest(email = email))
-                .enqueue(object : Callback<GenericResponse> {
-                    override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
-                        if (isFinishing || isDestroyed) return
-                        resendButton.isEnabled = true
-                        if (response.isSuccessful) {
-                            Toast.makeText(this@RegisterActivity, "帳號已成功開通驗證！請登入", Toast.LENGTH_SHORT).show()
-                            finish()
-                        } else {
-                            tvMessage.text = "開通失敗，請稍後再試。"
-                        }
-                    }
-
-                    override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
-                        if (isFinishing || isDestroyed) return
-                        resendButton.isEnabled = true
-                        tvMessage.text = "連線失敗，請確認網路連線。"
-                    }
-                })
-        }
+        // 使用者點選按鈕後直接關閉對話框並前往收信
 
         alertDialog.window?.let { window ->
             val background = android.graphics.drawable.GradientDrawable().apply {
@@ -235,7 +224,7 @@ class RegisterActivity : AppCompatActivity() {
             }
             window.setBackgroundDrawable(background)
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(textColor)
-            resendButton.setTextColor(textColor)
+            alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.setTextColor(textColor)
         }
     }
 
