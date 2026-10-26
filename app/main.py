@@ -127,7 +127,7 @@ def create_app() -> FastAPI:
             from app.db.session import engine
             from sqlalchemy import text
             with engine.connect() as conn:
-                conn.execute(text("UPDATE users SET is_email_verified = 1 WHERE is_email_verified = 0"))
+                conn.execute(text("UPDATE user SET is_email_verified = 1 WHERE is_email_verified = 0 OR is_email_verified IS NULL"))
                 conn.commit()
                 print("[DB] 所有使用者信箱驗證狀態已自動開通！")
         except Exception as e:
