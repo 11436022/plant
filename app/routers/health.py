@@ -1,4 +1,5 @@
 import os
+import socket
 from fastapi import APIRouter
 from app.db import session as db_session
 from app.core.config import settings
@@ -34,26 +35,20 @@ def health_check():
 @router.get("/health/smtp")
 def check_smtp():
     import smtplib
+    ports_to_test = [587, 465, 25]
+    port_results = {}
+    for p in ports_to_test:
+        try:
+            sock = socket.create_connection(("smtp.gmail.com", p), timeout=2)
+            sock.close()
+            port_results[p] = "connected"
+        except Exception as e:
+            port_results[p] = f"{type(e).__name__}: {e}"
+            
     res = {
         "host": settings.SMTP_HOST,
         "port": settings.SMTP_PORT,
         "user": settings.SMTP_USERNAME,
-        "has_password": bool(settings.SMTP_PASSWORD),
-        "use_tls": settings.SMTP_USE_TLS,
-        "use_ssl": settings.SMTP_USE_SSL,
+        "port_tests": port_results,
     }
-    if not settings.SMTP_HOST:
-        res["error"] = "SMTP_HOST not set"
-        return res
-    try:
-        smtp_cls = smtplib.SMTP_SSL if settings.SMTP_USE_SSL else smtplib.SMTP
-        with smtp_cls(settings.SMTP_HOST, settings.SMTP_PORT, timeout=5) as server:
-            if not settings.SMTP_USE_SSL and settings.SMTP_USE_TLS:
-                server.starttls()
-            if settings.SMTP_USERNAME:
-                server.login(settings.SMTP_USERNAME, settings.SMTP_PASSWORD or "")
-            res["status"] = "ok"
-    except Exception as e:
-        res["status"] = "failed"
-        res["error"] = f"{type(e).__name__}: {e}"
     return res
