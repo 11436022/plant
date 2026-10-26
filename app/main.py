@@ -43,13 +43,24 @@ def create_app() -> FastAPI:
     )
 
     # 掛載上傳檔案的目錄
+    # 確保所有上傳與靜態子目錄存在（防止 Railway 全新掛載空 Volume 時拋出 RuntimeError 導致崩潰）
+    settings.STATIC_DIR.mkdir(parents=True, exist_ok=True)
+    settings.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    settings.FEEDBACK_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    settings.TEMP_DIR.mkdir(parents=True, exist_ok=True)
+
     app.mount("/uploads", StaticFiles(directory=str(settings.UPLOAD_DIR)), name="uploads")
     app.mount("/feedback_uploads", StaticFiles(directory=str(settings.FEEDBACK_UPLOAD_DIR)), name="feedback_uploads")
 
     @app.get("/reset-password-web", response_class=FileResponse)
     async def get_reset_password_web_page():
         """提供重設密碼的 HTML 中介頁。"""
-        return str(STATIC_PATH / "reset_password.html")
+        target = STATIC_PATH / "reset_password.html"
+        if not target.exists():
+            fallback = TEMPLATES_DIR / "reset_password.html"
+            if fallback.exists():
+                return str(fallback)
+        return str(target)
 
     @app.get("/photo", response_class=HTMLResponse)
     async def get_photo_diagnosis_page(request: Request):
