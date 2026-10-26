@@ -11,7 +11,7 @@ if sys.platform == "win32":
         pass
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -84,8 +84,13 @@ def create_app() -> FastAPI:
         template = templates.get_template("photo.html")
         return HTMLResponse(content=template.render({"request": request}))
 
-    @app.get("/download-apk", response_class=FileResponse)
-    @app.get("/plantdoctor.apk", response_class=FileResponse)
+    @app.get("/dashboard")
+    async def redirect_dashboard():
+        """提供 /dashboard 快捷轉址至管理者後台 /admin/。"""
+        return RedirectResponse(url="/admin/", status_code=303)
+
+    @app.api_route("/download-apk", methods=["GET", "HEAD"], response_class=FileResponse)
+    @app.api_route("/plantdoctor.apk", methods=["GET", "HEAD"], response_class=FileResponse)
     async def download_latest_apk():
         """提供最新 Android APK 安裝檔下載，方便手機瀏覽器直接點擊安裝。"""
         candidates = [
