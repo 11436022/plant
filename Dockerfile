@@ -34,8 +34,9 @@ RUN if [ ! -f convnext_plant_best.pth ]; then \
         echo "Downloading convnext_plant_best.pth from GitHub Releases..." && \
         curl -L -o convnext_plant_best.pth https://github.com/11436022/plant/releases/download/v1.0-weights/convnext_plant_best.pth; \
     fi
-# 預先建立靜態資源與上傳檔案目錄
-RUN mkdir -p /app/static/uploads /app/static/feedback_uploads /app/static/tmp
+# 預先建立靜態資源與上傳檔案目錄，並將預載種子與圖片庫備份至 /app/static_seed
+RUN mkdir -p /app/static/uploads /app/static/feedback_uploads /app/static/tmp \
+    && cp -r /app/static /app/static_seed
 
 # 宣告監聽的連接埠
 EXPOSE 8000
@@ -44,5 +45,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
     CMD curl -f http://localhost:${PORT:-8000}/ || exit 1
 
-# 設定容器啟動指令 (啟動前確保 Volume 具備必要之上傳子目錄與寫入權限)
-CMD ["sh", "-c", "mkdir -p /app/static/uploads /app/static/feedback_uploads /app/static/tmp && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]
+# 設定容器啟動指令 (啟動前確保 Volume 具備必要子目錄，並將種子圖片與快取同步還原至 Volume)
+CMD ["sh", "-c", "mkdir -p /app/static/uploads /app/static/feedback_uploads /app/static/tmp && (cp -rn /app/static_seed/* /app/static/ 2>/dev/null || true) && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]

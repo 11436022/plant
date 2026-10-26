@@ -49,6 +49,22 @@ def create_app() -> FastAPI:
     settings.FEEDBACK_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     settings.TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
+    # 🌟 自動將預載種子圖片與快取同步至全新掛載的 Volume (避免空 Volume 遮蔽歷史種子圖片與向量記憶庫)
+    seed_static_dir = BASE_DIR / "static_seed"
+    if seed_static_dir.exists():
+        import shutil, os
+        for root, _, files in os.walk(seed_static_dir):
+            rel_path = Path(root).relative_to(seed_static_dir)
+            target_subdir = settings.STATIC_DIR / rel_path
+            target_subdir.mkdir(parents=True, exist_ok=True)
+            for f in files:
+                dest_file = target_subdir / f
+                if not dest_file.exists():
+                    try:
+                        shutil.copy2(Path(root) / f, dest_file)
+                    except Exception:
+                        pass
+
     app.mount("/uploads", StaticFiles(directory=str(settings.UPLOAD_DIR)), name="uploads")
     app.mount("/feedback_uploads", StaticFiles(directory=str(settings.FEEDBACK_UPLOAD_DIR)), name="feedback_uploads")
 

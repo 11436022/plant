@@ -148,7 +148,7 @@
                             <tr>
                                 <td class="text-center">
                                     <a href="{{ feedback.image_url }}" target="_blank">
-                                        <img src="{{ feedback.image_url }}" alt="Feedback Image" style="width: 70px; height: 70px; object-fit: cover;" class="rounded border shadow-sm">
+                                        <img src="{{ feedback.image_url }}" alt="Feedback Image" style="width: 70px; height: 70px; object-fit: cover;" class="rounded border shadow-sm" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'70\' height=\'70\' viewBox=\'0 0 70 70\'%3E%3Crect width=\'70\' height=\'70\' fill=\'%23f3f4f6\' rx=\'6\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' font-size=\'10\' fill=\'%239ca3af\' text-anchor=\'middle\' dominant-baseline=\'middle\'%3E無影像%3C/text%3E%3C/svg%3E';">
                                     </a>
                                 </td>
                                 <td class="fw-bold">{{ feedback.username or '匿名' }}</td>
