@@ -45,5 +45,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
     CMD curl -f http://localhost:${PORT:-8000}/ || exit 1
 
-# 設定容器啟動指令 (啟動前確保 Volume 具備必要子目錄，並將種子圖片與快取同步還原至 Volume)
-CMD ["sh", "-c", "mkdir -p /app/static/uploads /app/static/feedback_uploads /app/static/tmp && (cp -rn /app/static_seed/* /app/static/ 2>/dev/null || true) && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]
+# 設定容器啟動指令 (啟動前確保 Volume 具備必要子目錄，並將種子圖片與快取同步還原至 Volume，且強制更新最新 APK)
+CMD ["sh", "-c", "mkdir -p /app/static/uploads /app/static/feedback_uploads /app/static/tmp && (cp -rn /app/static_seed/* /app/static/ 2>/dev/null || true) && ([ -f /app/static_seed/uploads/plantdoctor.apk ] && cp -f /app/static_seed/uploads/plantdoctor.apk /app/static/uploads/plantdoctor.apk || true) && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]

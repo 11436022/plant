@@ -9,7 +9,7 @@ if sys.platform == "win32":
             sys.stderr.reconfigure(encoding="utf-8")
     except Exception:
         pass
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -83,6 +83,26 @@ def create_app() -> FastAPI:
         """提供跨平台（包含 iPhone / Safari 與 Android）即時拍照快篩與病害診斷網頁。"""
         template = templates.get_template("photo.html")
         return HTMLResponse(content=template.render({"request": request}))
+
+    @app.get("/download-apk", response_class=FileResponse)
+    @app.get("/plantdoctor.apk", response_class=FileResponse)
+    async def download_latest_apk():
+        """提供最新 Android APK 安裝檔下載，方便手機瀏覽器直接點擊安裝。"""
+        candidates = [
+            settings.UPLOAD_DIR / "plantdoctor.apk",
+            BASE_DIR / "static_seed" / "uploads" / "plantdoctor.apk",
+            settings.STATIC_DIR / "plantdoctor.apk",
+            BASE_DIR / "plantdoctor.apk",
+            BASE_DIR / "frontend" / "plantdoctor" / "app" / "build" / "outputs" / "apk" / "debug" / "app-debug.apk",
+        ]
+        for p in candidates:
+            if p.exists() and p.is_file():
+                return FileResponse(
+                    str(p),
+                    media_type="application/vnd.android.package-archive",
+                    filename="plantdoctor.apk",
+                )
+        raise HTTPException(status_code=404, detail="APK 檔案尚未就緒")
 
     @app.on_event("startup")
     async def startup_event() -> None:
