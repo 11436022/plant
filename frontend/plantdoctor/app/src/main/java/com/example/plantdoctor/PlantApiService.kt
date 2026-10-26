@@ -384,8 +384,8 @@ interface PlantApiService {
         private val WIFI_HOST = BuildConfig.WIFI_HOST
 
         // 🌟 雲端伺服器 (Railway 雲端模式)
-        const val CLOUD_HOST = "plant-production-922a.up.railway.app"
-        const val CLOUD_BASE_URL = "https://plant-production-922a.up.railway.app/api/v1/"
+        const val CLOUD_HOST = "plant-production-462b.up.railway.app"
+        const val CLOUD_BASE_URL = "https://plant-production-462b.up.railway.app/api/v1/"
 
         // 🌟 連線模式開關：true = 直接連雲端 (免開電腦後端，4G/WiFi皆可展示)
         const val FORCE_CLOUD_MODE = true
