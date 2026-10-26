@@ -286,8 +286,18 @@ class LoginActivity : AppCompatActivity() {
 
         apiService.forgotPassword(request).enqueue(object : Callback<GenericResponse> {
             override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(this@LoginActivity, "若 Email 正確，重設信件已寄出！", Toast.LENGTH_LONG).show()
+                val body = response.body()
+                if (response.isSuccessful && body != null) {
+                    val token = body.token
+                    if (!token.isNullOrEmpty()) {
+                        Toast.makeText(this@LoginActivity, "已驗證帳號，請設定新密碼", Toast.LENGTH_SHORT).show()
+                        val intent = android.content.Intent(this@LoginActivity, ResetPasswordActivity::class.java).apply {
+                            putExtra("token", token)
+                        }
+                        startActivity(intent)
+                    } else {
+                        Toast.makeText(this@LoginActivity, "若 Email 正確，重設信件已寄出！", Toast.LENGTH_LONG).show()
+                    }
                 } else {
                     Toast.makeText(this@LoginActivity, "發送失敗，請稍後再試", Toast.LENGTH_SHORT).show()
                 }
@@ -352,7 +362,7 @@ class LoginActivity : AppCompatActivity() {
 
         val builder = AlertDialog.Builder(this)
             .setView(dialogLayout)
-            .setPositiveButton("補寄驗證信") { _, _ ->
+            .setPositiveButton("⚡一鍵開通驗證") { _, _ ->
                 SoundManager.playBubblePop()
 
                 val finalEmail = etEmailInput.text.toString().trim()

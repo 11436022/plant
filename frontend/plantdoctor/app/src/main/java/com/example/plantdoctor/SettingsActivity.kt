@@ -524,10 +524,18 @@ class SettingsActivity : AppCompatActivity() {
 
         apiService.forgotPassword(request).enqueue(object : Callback<GenericResponse> {
             override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
-                Log.d("SettingsActivity", "API Response: ${response.body().toString()}")
-
-                if (response.isSuccessful) {
-                    Toast.makeText(this@SettingsActivity, "重設郵件已發送，請檢查您的信箱", Toast.LENGTH_LONG).show()
+                val body = response.body()
+                if (response.isSuccessful && body != null) {
+                    val token = body.token
+                    if (!token.isNullOrEmpty()) {
+                        Toast.makeText(this@SettingsActivity, "已驗證帳號，請設定新密碼", Toast.LENGTH_SHORT).show()
+                        val intent = android.content.Intent(this@SettingsActivity, ResetPasswordActivity::class.java).apply {
+                            putExtra("token", token)
+                        }
+                        startActivity(intent)
+                    } else {
+                        Toast.makeText(this@SettingsActivity, "重設郵件已發送，請檢查您的信箱", Toast.LENGTH_LONG).show()
+                    }
                 } else {
                     Toast.makeText(this@SettingsActivity, "發送失敗，請確認 Email 是否正確", Toast.LENGTH_SHORT).show()
                 }

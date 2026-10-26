@@ -93,7 +93,18 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="/admin/?search={{ user.username }}">查看紀錄</a>
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <a href="/admin/?search={{ user.username }}" style="color: #1976D2; font-size: 13px;">查看紀錄</a>
+                            <form action="/admin/users/{{ user.user_id }}/toggle-verify" method="post" style="display: inline; margin: 0;">
+                                <button type="submit" style="padding: 4px 8px; font-size: 11px; background: {{ '#757575' if user.is_email_verified else '#2E7D32' }}; color: white; border-radius: 4px;">
+                                    {{ '設為未驗證' if user.is_email_verified else '⚡一鍵開通驗證' }}
+                                </button>
+                            </form>
+                            <form action="/admin/users/{{ user.user_id }}/reset-password" method="post" style="display: inline; margin: 0;" onsubmit="return confirm('確定要將 {{ user.username }} 密碼重設嗎？');">
+                                <input type="text" name="new_password" placeholder="新密碼" required style="width: 80px; padding: 3px 6px; font-size: 11px;">
+                                <button type="submit" style="padding: 4px 8px; font-size: 11px; background: #FFA000; color: white; border-radius: 4px;">改密碼</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}

@@ -29,7 +29,7 @@ class ResetPasswordActivity : AppCompatActivity() {
         btnResetPassword = findViewById<Button>(R.id.btnResetPassword)
 
         // 從 Intent 的 Deep Link 中獲取 token
-        val receivedToken = intent.data?.getQueryParameter("token")
+        val receivedToken = intent.getStringExtra("token") ?: intent.data?.getQueryParameter("token")
         if (!receivedToken.isNullOrEmpty()) {
             token = receivedToken
         } else {

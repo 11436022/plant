@@ -633,3 +633,34 @@ async def admin_users_list(request: Request, search: str = None, page: int = Que
             return HTMLResponse(content=content)
     finally:
         conn.close()
+
+
+@router.post("/users/{user_id}/reset-password")
+async def admin_reset_user_password(
+    user_id: int,
+    new_password: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    """管理者直接強制修改特定使用者的密碼。"""
+    from app.db.models import User
+    user = db.query(User).filter(User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="找不到該使用者")
+    user.password_hash = pwd_context.hash(new_password)
+    db.commit()
+    return RedirectResponse(url="/admin/users/", status_code=303)
+
+
+@router.post("/users/{user_id}/toggle-verify")
+async def admin_toggle_verify_user(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    """管理者切換使用者的信箱驗證狀態。"""
+    from app.db.models import User
+    user = db.query(User).filter(User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="找不到該使用者")
+    user.is_email_verified = not user.is_email_verified
+    db.commit()
+    return RedirectResponse(url="/admin/users/", status_code=303)

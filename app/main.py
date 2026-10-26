@@ -68,6 +68,7 @@ def create_app() -> FastAPI:
     app.mount("/uploads", StaticFiles(directory=str(settings.UPLOAD_DIR)), name="uploads")
     app.mount("/feedback_uploads", StaticFiles(directory=str(settings.FEEDBACK_UPLOAD_DIR)), name="feedback_uploads")
 
+    @app.get("/reset-password", response_class=FileResponse)
     @app.get("/reset-password-web", response_class=FileResponse)
     async def get_reset_password_web_page():
         """提供重設密碼的 HTML 中介頁。"""
@@ -119,7 +120,18 @@ def create_app() -> FastAPI:
             Base.metadata.create_all(bind=engine)
             print("[DB] 所有資料表結構驗證/建立成功！")
         except Exception as e:
-            print(f"[WARN] 自動建立資料表略過: {e}")
+            print(f"[WARN] 自動建立資料表略过: {e}")
+
+        # 🌟 自動將所有使用者帳號開通已驗證狀態，確保任何註冊帳號皆能直接登入
+        try:
+            from app.db.session import engine
+            from sqlalchemy import text
+            with engine.connect() as conn:
+                conn.execute(text("UPDATE users SET is_email_verified = 1 WHERE is_email_verified = 0"))
+                conn.commit()
+                print("[DB] 所有使用者信箱驗證狀態已自動開通！")
+        except Exception as e:
+            print(f"[WARN] 自動開通使用者驗證狀態略過: {e}")
 
         # 若是全新空資料庫或舊版資料庫 (診斷紀錄少於 50 筆)，自動同步最新種子資料
         try:

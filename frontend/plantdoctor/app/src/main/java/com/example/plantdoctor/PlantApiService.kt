@@ -34,11 +34,14 @@ data class RegisterRequest(
 
 data class ForgotPasswordRequest(val email: String)
 data class EmailVerificationRequest(val email: String)
+data class QuickVerifyRequest(val email: String? = null, val username: String? = null)
 
 data class GenericResponse(
     val status: String,
     val message: String?,
-    val email_sent: Boolean? = null
+    val email_sent: Boolean? = null,
+    val token: String? = null,
+    val reset_url: String? = null
 )
 
 // --- Predict (第一階段預測) ---
@@ -286,6 +289,9 @@ interface PlantApiService {
 
     @POST("auth/user/forgot-password")
     fun forgotPassword(@Body request: ForgotPasswordRequest): Call<GenericResponse>
+
+    @POST("auth/user/quick-verify")
+    fun quickVerify(@Body request: QuickVerifyRequest): Call<GenericResponse>
 
     @POST("auth/user/verify-email/request")
     fun requestEmailVerification(@Body request: EmailVerificationRequest): Call<GenericResponse>

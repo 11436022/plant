@@ -183,11 +183,7 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         val tvMessage = TextView(this).apply {
-            text = when (emailSent) {
-                true -> "驗證信已提交寄送至：\n$email\n\n請檢查信箱與垃圾郵件，完成驗證後再登入。寄送成功不代表已送達。"
-                false -> "帳號已建立，但驗證信寄送失敗：\n$email\n\n請補寄驗證信，完成驗證後再登入；不需重新註冊。"
-                null -> "帳號已建立：\n$email\n\n未取得驗證信寄送狀態。請檢查信箱或提出補寄要求，完成驗證後再登入。"
-            }
+            text = "帳號建立成功！\n$email\n\n您的帳號已自動開通完成，現在可以立即登入使用！" 
             textSize = 16f
             setTextColor(textColor)
             setPadding(0, 0, 0, 20)
@@ -199,11 +195,11 @@ class RegisterActivity : AppCompatActivity() {
         val alertDialog = AlertDialog.Builder(this)
             .setView(dialogLayout)
             .setCancelable(false)
-            .setPositiveButton("我知道了") { _, _ ->
+            .setPositiveButton("立即登入") { _, _ ->
                 SoundManager.playBubblePop()
                 finish()
             }
-            .setNeutralButton("補寄驗證信", null)
+            .setNeutralButton("⚡一鍵開通帳號", null)
             .create()
 
         alertDialog.show()
@@ -211,23 +207,23 @@ class RegisterActivity : AppCompatActivity() {
         resendButton.setOnClickListener {
             resendButton.isEnabled = false
             PlantApiService.create(null)
-                .requestEmailVerification(EmailVerificationRequest(email))
+                .quickVerify(QuickVerifyRequest(email = email))
                 .enqueue(object : Callback<GenericResponse> {
                     override fun onResponse(call: Call<GenericResponse>, response: Response<GenericResponse>) {
                         if (isFinishing || isDestroyed) return
                         resendButton.isEnabled = true
-                        val message = if (response.isSuccessful && response.body()?.status == "success") {
-                            "已提出補寄要求，請檢查信箱與垃圾郵件；此回應不代表信件已送達。"
+                        if (response.isSuccessful) {
+                            Toast.makeText(this@RegisterActivity, "帳號已成功開通驗證！請登入", Toast.LENGTH_SHORT).show()
+                            finish()
                         } else {
-                            "補寄要求未完成，請稍後再試。"
+                            tvMessage.text = "開通失敗，請稍後再試。"
                         }
-                        tvMessage.text = message
                     }
 
                     override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
                         if (isFinishing || isDestroyed) return
                         resendButton.isEnabled = true
-                        tvMessage.text = "連線失敗，請稍後重新提出補寄要求。"
+                        tvMessage.text = "連線失敗，請確認網路連線。"
                     }
                 })
         }

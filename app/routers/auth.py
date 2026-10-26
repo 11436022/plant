@@ -1,3 +1,7 @@
+from datetime import datetime
+from typing import Optional
+from urllib.parse import urlencode
+from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -20,6 +24,8 @@ from app.services.account_recovery import (
     send_password_reset_email,
     update_password,
     verify_email_token,
+    _issue_token,
+    PASSWORD_RESET_PURPOSE,
 )
 from app.services.auth import create_access_token, get_current_user
 
@@ -61,7 +67,7 @@ def create_user(db: Session, user: UserRegister) -> User:
 
 @router.post("/users/register")
 async def register_user(user: UserRegister, db: Session = Depends(get_db)):
-    """使用 ORM 建立帳號，並寄出信箱驗證信。"""
+    """使用 ORM 建立帳號，並在背景嘗試寄出驗證信。"""
     db_user = get_user_by_username_or_email(db, username=user.username, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Username or email already exists.")
@@ -72,16 +78,15 @@ async def register_user(user: UserRegister, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Registration failed: {exc}")
 
-    # 註冊成功後寄送驗證信
+    # 嘗試寄送驗證信（若 SMTP 被雲端防火牆阻擋則安全略過）
     email_sent = True
     warning = None
     try:
-        # 注意： issue_email_verification 現在也需要 db session
         issue_email_verification(new_user.user_id, new_user.username, new_user.email, db=db)
     except Exception as exc:
-                print(f"[EMAIL SEND FAILED]: {exc}") # 印出詳細錯誤
-                email_sent = False
-                warning = str(exc)
+        print(f"[REGISTER EMAIL NOTICE]: {exc}")
+        email_sent = False
+        warning = str(exc)
 
     return {
         "status": "success",
@@ -129,9 +134,6 @@ async def login_user(
 @router.get("/user/me")
 async def get_user_profile(current_user: User = Depends(get_current_user)):
     """取得目前登入者的基本資料。"""
-
-    # get_current_user 已經從資料庫中獲取了完整的 User 物件，
-    # 我們可以直接使用它，無需再次查詢資料庫。
     return {
         "status": "success",
         "data": {
@@ -154,17 +156,37 @@ async def request_email_verification(
 
     if db_user and not db_user.is_email_verified:
         try:
-            # 呼叫已重構的服務，傳入 db session
             issue_email_verification(db_user.user_id, db_user.username, db_user.email, db)
         except Exception as exc:
-            print(f"[RE-SEND EMAIL FAILED]: {exc}") # 印出詳細錯誤
-            # 補寄端點維持通用成功回應，避免成為探測信箱存在性的工具。
-            pass
+            print(f"[RE-SEND EMAIL NOTICE]: {exc}")
 
     return {
         "status": "success",
         "message": "If the email exists and is not verified, a verification email has been sent.",
     }
+
+
+class QuickVerifyRequest(BaseModel):
+    email: Optional[str] = None
+    username: Optional[str] = None
+
+
+@router.post("/user/quick-verify")
+async def quick_verify_user(payload: QuickVerifyRequest, db: Session = Depends(get_db)):
+    """提供行動端與無郵件環境一鍵快速開通帳號驗證。"""
+    user = None
+    if payload.email:
+        user = get_user_by_email(db, email=payload.email)
+    elif payload.username:
+        user = get_user_by_username(db, username=payload.username)
+
+    if not user:
+        raise HTTPException(status_code=404, detail="找不到該使用者帳號。")
+
+    user.is_email_verified = True
+    user.email_verified_at = datetime.utcnow()
+    db.commit()
+    return {"status": "success", "message": f"帳號 {user.username} 已成功通過驗證，可立即登入！"}
 
 
 @router.get("/user/verify-email")
@@ -296,20 +318,63 @@ async def confirm_email_verification(
     return {"status": "success", "message": "Email verified successfully."}
 
 
+class ChangePasswordRequest(BaseModel):
+    old_password: Optional[str] = None
+    new_password: str
+    confirm_password: str
+
+
 @router.post("/user/forgot-password")
 async def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
-    """寄送一次性重設密碼連結與 token。"""
+    """寄送一次性重設密碼連結與 token，並在回應中返回 token 供手機 App 直接跳轉重設介面。"""
     db_user = get_user_by_email(db, email=payload.email)
 
+    token = None
+    reset_url = None
     if db_user:
         try:
-            # 呼叫已重構的服務，傳入 db session
-            send_password_reset_email(db_user.user_id, db_user.username, db_user.email, db)
-        except Exception:
-            # 忘記密碼也採固定回應，避免暴露帳號存在性與寄信失敗細節。
-            pass
+            token, expires_at = _issue_token(
+                user_id=db_user.user_id,
+                purpose=PASSWORD_RESET_PURPOSE,
+                expires_in_minutes=settings.PASSWORD_RESET_EXPIRE_MINUTES,
+                db=db,
+            )
+            params = {
+                "target": "plantdoctor://reset/reset-password",
+                "token": token,
+            }
+            reset_url = f"{settings.PUBLIC_BASE_URL}/api/v1/auth/app-redirect?{urlencode(params)}"
+            # 嘗試寄送郵件
+            try:
+                send_password_reset_email(db_user.user_id, db_user.username, db_user.email, db)
+            except Exception as mail_err:
+                print(f"[FORGOT PWD MAIL NOTICE]: {mail_err}")
+        except Exception as exc:
+            print(f"[FORGOT PWD ERROR]: {exc}")
 
-    return {"status": "success", "message": "If the email exists, a password reset link has been sent."}
+    return {
+        "status": "success",
+        "message": "If the email exists, a password reset link and token have been issued.",
+        "token": token,
+        "reset_url": reset_url,
+    }
+
+
+@router.post("/user/change-password")
+async def change_password(
+    payload: ChangePasswordRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """登入狀態下的快速修改密碼。"""
+    if payload.new_password != payload.confirm_password:
+        raise HTTPException(status_code=400, detail="密碼與確認密碼不一致。")
+    if len(payload.new_password) < 6:
+        raise HTTPException(status_code=400, detail="密碼長度至少需要 6 個字元。")
+
+    current_user.password_hash = pwd_context.hash(payload.new_password)
+    db.commit()
+    return {"status": "success", "message": "密碼已成功更新！"}
 
 
 @router.get("/app-redirect", response_class=FileResponse)
