@@ -102,10 +102,13 @@ class Settings(BaseSettings):
 
     def __init__(self, **values):
         super().__init__(**values)
-        # 確保上傳目錄存在
-        self.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-        self.FEEDBACK_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-        self.TEMP_DIR.mkdir(parents=True, exist_ok=True)
+        # 確保上傳目錄存在 (加上例外保護避免特定雲端環境在 import 階段拋錯)
+        try:
+            self.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+            self.FEEDBACK_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+            self.TEMP_DIR.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            print(f"[WARN] 建立上傳目錄警告 (將在容器啟動腳本中補齊): {e}")
 
         # 如果沒有設定 FROM_EMAIL，預設使用 USERNAME
         if self.SMTP_USERNAME and not self.SMTP_FROM_EMAIL:
