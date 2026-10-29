@@ -84,7 +84,7 @@
                     <td>{{ user.username }}</td>
                     <td>{{ user.email }}</td>
                     <td>{{ user.full_name or '-' }}</td>
-                    <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') if user.created_at else '' }}</td>
+                    <td>{{ user.created_at | tw_time }}</td>
                     <td>
                         {% if user.is_email_verified %}
                         <span class="verified-true">是</span>

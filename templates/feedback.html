@@ -185,7 +185,7 @@
                                         -
                                     {% endif %}
                                 </td>
-                                <td class="text-muted small">{{ feedback.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td class="text-muted small">{{ feedback.created_at | tw_time }}</td>
                                 <td class="text-center" id="mem-status-{{ feedback.id }}">
                                     {% if feedback.is_in_visual_memory %}
                                         <span class="badge bg-success-subtle text-success border border-success">

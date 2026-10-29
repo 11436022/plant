@@ -166,7 +166,7 @@
                         {% endif %}
                     </td>
 
-                    <td>{{ diary.created_at.strftime('%Y-%m-%d %H:%M') if diary.created_at else '' }}</td>
+                    <td>{{ diary.created_at | tw_time }}</td>
                     <td>
                         <div class="edit-group">
                             <form action="/admin/update/{{ diary.id }}" method="post" style="display:inline-flex; gap:4px; margin:0;">

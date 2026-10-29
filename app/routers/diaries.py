@@ -1,3 +1,4 @@
+from app.core.timezone import format_taiwan_time
 import shutil
 from pathlib import Path
 
@@ -54,6 +55,8 @@ async def get_all_history(current_user: models.User = Depends(get_current_user))
                 row["requires_review"] = bool(row.get("requires_review", True))
                 if row.get("image_url"):
                     row["image_url"] = build_public_image_url(row["image_url"])
+                if row.get("created_at"):
+                    row["created_at"] = format_taiwan_time(row["created_at"])
             
             return {"status": "success", "count": len(rows), "data": rows}
     except Exception as exc:
@@ -82,6 +85,8 @@ async def get_diary_detail(diary_id: int, current_user: models.User = Depends(ge
             detail["requires_review"] = bool(detail.get("requires_review", True))
             if detail.get("image_url"):
                 detail["image_url"] = build_public_image_url(detail["image_url"])
+            if detail.get("created_at"):
+                detail["created_at"] = format_taiwan_time(detail["created_at"])
             return {"status": "success", "data": detail}
     finally:
         conn.close()

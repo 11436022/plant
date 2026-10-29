@@ -1,3 +1,4 @@
+from app.core.timezone import format_taiwan_time
 import sys
 from pathlib import Path
 
@@ -26,6 +27,7 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_PATH = settings.STATIC_DIR
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 templates.env.auto_reload = True
+templates.env.filters['tw_time'] = format_taiwan_time
 
 
 def create_app() -> FastAPI:
