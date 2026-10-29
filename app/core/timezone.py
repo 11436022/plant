@@ -22,3 +22,4 @@ def format_taiwan_time(dt: Any, fmt: str = "%Y-%m-%d %H:%M") -> str:
             dt = dt.replace(tzinfo=timezone.utc)
         return dt.astimezone(TAIWAN_TZ).strftime(fmt)
     return str(dt)
+
