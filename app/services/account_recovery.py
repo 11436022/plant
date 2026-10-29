@@ -27,6 +27,7 @@ def ensure_auth_schema() -> None:
                 cursor.execute("ALTER TABLE user ADD COLUMN is_email_verified TINYINT(1) NOT NULL DEFAULT 1")
             if not _column_exists(cursor, "user", "email_verified_at"):
                 cursor.execute("ALTER TABLE user ADD COLUMN email_verified_at DATETIME NULL DEFAULT NULL")
+            cursor.execute("UPDATE user SET is_email_verified = 1 WHERE role = 'admin' OR username = 'admin'")
 
             # 2. PlantDiary 表相關 (解決 500 錯誤的關鍵)
             if _table_exists(cursor, "plant_diary"):

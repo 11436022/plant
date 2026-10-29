@@ -47,7 +47,7 @@ def check_form_origin(request: Request):
 
 
 async def require_admin(request: Request, db: Session = Depends(get_db)):
-    if request.url.path.rstrip("/") == "/admin/login":
+    if request.url.path.rstrip("/") in {"/admin/login", "/admin/recover-admin"}:
         return
     check_form_origin(request)
     authorization = request.headers.get("authorization", "")
@@ -63,6 +63,17 @@ async def require_admin(request: Request, db: Session = Depends(get_db)):
 
 
 router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])
+
+
+@router.get("/recover-admin")
+async def recover_admin(db: Session = Depends(get_db)):
+    """緊急解鎖：將所有管理者帳號重設為已驗證，避免誤觸未驗證被反鎖。"""
+    from app.db.models import User
+    users = db.query(User).filter((User.role == "admin") | (User.username == "admin")).all()
+    for u in users:
+        u.is_email_verified = True
+    db.commit()
+    return RedirectResponse(url="/admin/", status_code=303)
 
 
 @router.get("/login", response_class=HTMLResponse)
@@ -661,6 +672,10 @@ async def admin_toggle_verify_user(
     user = db.query(User).filter(User.user_id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="找不到該使用者")
+    if user.username == "admin":
+        user.is_email_verified = True
+        db.commit()
+        return RedirectResponse(url="/admin/users/", status_code=303)
     user.is_email_verified = not user.is_email_verified
     db.commit()
     return RedirectResponse(url="/admin/users/", status_code=303)
