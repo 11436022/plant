@@ -39,10 +39,50 @@ class FallingLeavesView @JvmOverloads constructor(
     )
 
     private val leaves = mutableListOf<Leaf>()
-    // 🌟 保留你修改的總數量 35 片
+    // 🌟 保留總數量 35 片
     private val maxLeaves = 35
-    private val leafBitmaps = mutableListOf<Bitmap>()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val renderMatrix = Matrix()
+
+    companion object {
+        private val sharedBitmaps = mutableListOf<Bitmap>()
+        @Volatile
+        private var isBitmapLoaded = false
+
+        @Synchronized
+        fun getSharedBitmaps(resources: android.content.res.Resources): List<Bitmap> {
+            if (!isBitmapLoaded) {
+                val leafResIds = intArrayOf(
+                    R.drawable.ic_leaf_1,
+                    R.drawable.ic_leaf_2,
+                    R.drawable.ic_leaf_3,
+                    R.drawable.ic_leaf_4,
+                    R.drawable.ic_leaf_5,
+                    R.drawable.ic_leaf_6
+                )
+                val options = BitmapFactory.Options().apply {
+                    inSampleSize = 2 // 降低記憶體佔用與縮放耗時 75%
+                }
+                for (resId in leafResIds) {
+                    try {
+                        val b = BitmapFactory.decodeResource(resources, resId, options)
+                        if (b != null) {
+                            val scaled = Bitmap.createScaledBitmap(b, 80, 80, true)
+                            if (scaled != b) b.recycle()
+                            sharedBitmaps.add(scaled)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                isBitmapLoaded = true
+            }
+            return sharedBitmaps
+        }
+    }
+
+    private val leafBitmaps: List<Bitmap>
+        get() = getSharedBitmaps(resources)
 
     // 🌟 控制目前繪製模式：前景、背景或全繪製
     var drawLayerMode: LayerMode = LayerMode.ALL
@@ -60,29 +100,7 @@ class FallingLeavesView @JvmOverloads constructor(
     init {
         // 🌟 確保背景透明，不遮擋底層 gradient_background
         setBackgroundColor(android.graphics.Color.TRANSPARENT)
-
-        // 載入 6 張葉子圖檔（檔名請確保對應 res/drawable）
-        val leafResIds = intArrayOf(
-            R.drawable.ic_leaf_1,
-            R.drawable.ic_leaf_2,
-            R.drawable.ic_leaf_3,
-            R.drawable.ic_leaf_4,
-            R.drawable.ic_leaf_5,
-            R.drawable.ic_leaf_6
-        )
-
-        for (resId in leafResIds) {
-            try {
-                val b = BitmapFactory.decodeResource(resources, resId)
-                if (b != null) {
-                    // 縮放到適當的大小（以 80px 為基準）
-                    val scaled = Bitmap.createScaledBitmap(b, 80, 80, true)
-                    leafBitmaps.add(scaled)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+        getSharedBitmaps(resources)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -131,8 +149,6 @@ class FallingLeavesView @JvmOverloads constructor(
         super.onDraw(canvas)
         if (width == 0 || height == 0 || leafBitmaps.isEmpty()) return
 
-        val matrix = Matrix()
-
         for (leaf in leaves) {
             // 🌟 根據指定模式進行圖層過濾繪製
             if (drawLayerMode == LayerMode.BACKGROUND_ONLY && leaf.isForeground) continue
@@ -163,17 +179,17 @@ class FallingLeavesView @JvmOverloads constructor(
             }
 
             // 3. 繪製葉子
-            matrix.reset()
-            matrix.postScale(leaf.scale, leaf.scale)
-            matrix.postRotate(leaf.rotation, (leaf.bitmap.width * leaf.scale) / 2f, (leaf.bitmap.height * leaf.scale) / 2f)
-            matrix.postTranslate(leaf.x, leaf.y)
+            renderMatrix.reset()
+            renderMatrix.postScale(leaf.scale, leaf.scale)
+            renderMatrix.postRotate(leaf.rotation, (leaf.bitmap.width * leaf.scale) / 2f, (leaf.bitmap.height * leaf.scale) / 2f)
+            renderMatrix.postTranslate(leaf.x, leaf.y)
 
             paint.alpha = leaf.alpha
-            canvas.drawBitmap(leaf.bitmap, matrix, paint)
+            canvas.drawBitmap(leaf.bitmap, renderMatrix, paint)
         }
 
-        // 持續刷新動畫（60FPS）
-        invalidate()
+        // 持續刷新動畫（硬體垂直同步對齊）
+        postInvalidateOnAnimation()
     }
 
     /**

@@ -63,61 +63,67 @@ object SoundManager : DefaultLifecycleObserver {
                 }
             }
         }
+        Thread {
+            try {
+                val afd1 = appContext.assets.openFd("pop1.mp3")
+                val afd2 = appContext.assets.openFd("pop2.mp3")
+                val afd3 = appContext.assets.openFd("pop3.mp3")
+                val afd4 = appContext.assets.openFd("pop4.mp3")
 
-        try {
-            val afd1 = appContext.assets.openFd("pop1.mp3")
-            val afd2 = appContext.assets.openFd("pop2.mp3")
-            val afd3 = appContext.assets.openFd("pop3.mp3")
-            val afd4 = appContext.assets.openFd("pop4.mp3")
+                popSoundIds[0] = soundPool?.load(afd1, 1) ?: 0
+                popSoundIds[1] = soundPool?.load(afd2, 1) ?: 0
+                popSoundIds[2] = soundPool?.load(afd3, 1) ?: 0
+                popSoundIds[3] = soundPool?.load(afd4, 1) ?: 0
 
-            popSoundIds[0] = soundPool?.load(afd1, 1) ?: 0
-            popSoundIds[1] = soundPool?.load(afd2, 1) ?: 0
-            popSoundIds[2] = soundPool?.load(afd3, 1) ?: 0
-            popSoundIds[3] = soundPool?.load(afd4, 1) ?: 0
+                afd1.close()
+                afd2.close()
+                afd3.close()
+                afd4.close()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
 
-            afd1.close()
-            afd2.close()
-            afd3.close()
-            afd4.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+            // === [B] 風聲 ===
+            try {
+                val assetFileDescriptor = appContext.assets.openFd("wind.mp3")
+                val wp = MediaPlayer()
+                wp.setAudioStreamType(AudioManager.STREAM_MUSIC)
+                wp.setDataSource(
+                    assetFileDescriptor.fileDescriptor,
+                    assetFileDescriptor.startOffset,
+                    assetFileDescriptor.length
+                )
+                assetFileDescriptor.close()
+                wp.isLooping = true
+                wp.prepare()
+                wp.setVolume(volWind, volWind)
+                windPlayer = wp
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
 
-        // === [B] 風聲 ===
-        try {
-            val assetFileDescriptor = appContext.assets.openFd("wind.mp3")
-            windPlayer = MediaPlayer()
-            windPlayer?.setAudioStreamType(AudioManager.STREAM_MUSIC)
-            windPlayer?.setDataSource(
-                assetFileDescriptor.fileDescriptor,
-                assetFileDescriptor.startOffset,
-                assetFileDescriptor.length
-            )
-            assetFileDescriptor.close()
-            windPlayer?.isLooping = true
-            windPlayer?.prepare()
-            windPlayer?.setVolume(volWind, volWind)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        // === [C] 背景音樂 ===
-        try {
-            val assetFileDescriptor = appContext.assets.openFd("forest.mp3")
-            bgmPlayer = MediaPlayer()
-            bgmPlayer?.setAudioStreamType(AudioManager.STREAM_MUSIC)
-            bgmPlayer?.setDataSource(
-                assetFileDescriptor.fileDescriptor,
-                assetFileDescriptor.startOffset,
-                assetFileDescriptor.length
-            )
-            assetFileDescriptor.close()
-            bgmPlayer?.isLooping = true
-            bgmPlayer?.prepare()
-            bgmPlayer?.setVolume(volBgm, volBgm)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+            // === [C] 森林背景音樂 ===
+            try {
+                val assetFileDescriptor = appContext.assets.openFd("forest.mp3")
+                val bp = MediaPlayer()
+                bp.setAudioStreamType(AudioManager.STREAM_MUSIC)
+                bp.setDataSource(
+                    assetFileDescriptor.fileDescriptor,
+                    assetFileDescriptor.startOffset,
+                    assetFileDescriptor.length
+                )
+                assetFileDescriptor.close()
+                bp.isLooping = true
+                bp.prepare()
+                bp.setVolume(volBgm, volBgm)
+                bgmPlayer = bp
+                if (!isFirstLaunch) {
+                    bp.start()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }.start()
     }
 
     // 🌟 核心新增：讓外界播放開 APP 音效（如木魚）的地方可以獲取目前設定的音量（回傳 0.0f ~ 1.0f）

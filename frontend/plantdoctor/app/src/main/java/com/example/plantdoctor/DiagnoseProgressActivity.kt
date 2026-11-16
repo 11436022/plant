@@ -14,6 +14,10 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -52,14 +56,29 @@ class DiagnoseProgressActivity : AppCompatActivity() {
 
     private val progressRunnable = object : Runnable {
         override fun run() {
-            if (!isApiFinished && currentProgress < 90) {
-                currentProgress += (1..3).random()
-                if (currentProgress > 90) currentProgress = 90
+            if (!isApiFinished) {
+                if (currentProgress < 90) {
+                    currentProgress += (1..3).random()
+                    if (currentProgress > 90) currentProgress = 90
+                } else if (currentProgress < 98) {
+                    currentProgress += 1
+                }
 
                 progressBar.progress = currentProgress
                 tvPercent.text = "$currentProgress%"
 
-                val nextDelay = (320..580).random().toLong()
+                when (currentProgress) {
+                    in 0..30 -> tvStatus.text = "植物特徵分析中..."
+                    in 31..65 -> tvStatus.text = "本地專家模型比對中..."
+                    in 66..89 -> tvStatus.text = "雲端 AI 專家深層診斷中..."
+                    in 90..98 -> tvStatus.text = "檢索農業專書處方中..."
+                }
+
+                val nextDelay = if (currentProgress < 90) {
+                    (320..580).random().toLong()
+                } else {
+                    (1200..2000).random().toLong()
+                }
                 progressHandler.postDelayed(this, nextDelay)
             }
         }
@@ -141,58 +160,70 @@ class DiagnoseProgressActivity : AppCompatActivity() {
             return
         }
 
-        val file = uriToFile(uri)
-        val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
-        val imagePart = MultipartBody.Part.createFormData("file", file.name, requestFile)
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val file = uriToFile(uri)
+                val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                val imagePart = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
-        val cropPart = if (selectedCropName.isNotEmpty() && selectedCropName != "未知") {
-            MultipartBody.Part.createFormData("crop_name", selectedCropName)
-        } else {
-            null
-        }
+                val cropPart = if (selectedCropName.isNotEmpty() && selectedCropName != "未知") {
+                    MultipartBody.Part.createFormData("crop_name", selectedCropName)
+                } else {
+                    null
+                }
 
-        val apiService = PlantApiService.create(token)
+                val apiService = PlantApiService.create(token)
 
-        apiService.predictImage(imagePart, cropPart).enqueue(object : Callback<PredictionResponse> {
-            override fun onResponse(call: Call<PredictionResponse>, response: Response<PredictionResponse>) {
-                isApiFinished = true
-                progressHandler.removeCallbacks(progressRunnable)
+                apiService.predictImage(imagePart, cropPart).enqueue(object : Callback<PredictionResponse> {
+                    override fun onResponse(call: Call<PredictionResponse>, response: Response<PredictionResponse>) {
+                        isApiFinished = true
+                        progressHandler.removeCallbacks(progressRunnable)
 
-                if (response.isSuccessful) {
-                    progressBar.progress = 100
-                    tvPercent.text = "100%"
+                        if (response.isSuccessful) {
+                            progressBar.progress = 100
+                            tvPercent.text = "100%"
+                            tvStatus.text = "分析完成！"
 
-                    val predictionResult = response.body()
-                    if (predictionResult != null) {
-                        Toast.makeText(this@DiagnoseProgressActivity, "分析完成！", Toast.LENGTH_SHORT).show()
+                            val predictionResult = response.body()
+                            if (predictionResult != null) {
+                                Toast.makeText(this@DiagnoseProgressActivity, "分析完成！", Toast.LENGTH_SHORT).show()
 
-                        val predictionId = predictionResult.prediction_id
-                        val analysisResult = predictionResult.analysis_result
-                        val resultJson = Gson().toJson(analysisResult)
+                                val predictionId = predictionResult.prediction_id
+                                val analysisResult = predictionResult.analysis_result
+                                val resultJson = Gson().toJson(analysisResult)
 
-                        val intent = Intent(this@DiagnoseProgressActivity, ResultActivity::class.java)
-                        intent.putExtra("IMAGE_URI", imageUriString)
-                        intent.putExtra("PREDICTION_ID", predictionId)
-                        intent.putExtra("ANALYSIS_RESULT_JSON", resultJson)
-                        startActivity(intent)
-                        finish()
-                    } else {
-                        Toast.makeText(this@DiagnoseProgressActivity, "分析失敗：伺服器回傳資料為空", Toast.LENGTH_LONG).show()
+                                val intent = Intent(this@DiagnoseProgressActivity, ResultActivity::class.java)
+                                intent.putExtra("IMAGE_URI", imageUriString)
+                                intent.putExtra("PREDICTION_ID", predictionId)
+                                intent.putExtra("ANALYSIS_RESULT_JSON", resultJson)
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                Toast.makeText(this@DiagnoseProgressActivity, "分析失敗：伺服器回傳資料為空", Toast.LENGTH_LONG).show()
+                                finish()
+                            }
+                        } else {
+                            Toast.makeText(this@DiagnoseProgressActivity, "分析失敗: ${response.code()}", Toast.LENGTH_LONG).show()
+                            finish()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<PredictionResponse>, t: Throwable) {
+                        isApiFinished = true
+                        progressHandler.removeCallbacks(progressRunnable)
+                        Toast.makeText(this@DiagnoseProgressActivity, "網路連線超時，請檢查伺服器", Toast.LENGTH_SHORT).show()
                         finish()
                     }
-                } else {
-                    Toast.makeText(this@DiagnoseProgressActivity, "分析失敗: ${response.code()}", Toast.LENGTH_LONG).show()
+                })
+            } catch (e: Exception) {
+                isApiFinished = true
+                progressHandler.removeCallbacks(progressRunnable)
+                launch(Dispatchers.Main) {
+                    Toast.makeText(this@DiagnoseProgressActivity, "讀取圖片失敗: ${e.message}", Toast.LENGTH_SHORT).show()
                     finish()
                 }
             }
-
-            override fun onFailure(call: Call<PredictionResponse>, t: Throwable) {
-                isApiFinished = true
-                progressHandler.removeCallbacks(progressRunnable)
-                Toast.makeText(this@DiagnoseProgressActivity, "網路連線超時，請檢查伺服器", Toast.LENGTH_SHORT).show()
-                finish()
-            }
-        })
+        }
     }
 
     private fun uriToFile(uri: Uri): File {
