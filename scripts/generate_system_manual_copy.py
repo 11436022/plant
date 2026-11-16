@@ -1,0 +1,604 @@
+"""
+腳本名稱：generate_system_manual_copy.py
+功能：建立《系統手冊》副本（documents/系統手冊_副本.docx 與 documents/系統手冊_副本.md），
+完整融入「Web 管理後台（Admin Web）」之架構、操作指引、使用功能表與狀態轉換說明。
+"""
+
+import os
+import sys
+from pathlib import Path
+from lxml import etree
+import docx
+from docx.shared import Inches, Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_TABLE_ALIGNMENT
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+DOCUMENTS_DIR = ROOT_DIR / "documents"
+SRC_DOCX = DOCUMENTS_DIR / "系統手冊.docx"
+DST_DOCX = DOCUMENTS_DIR / "系統手冊_副本.docx"
+DST_MD = DOCUMENTS_DIR / "系統手冊_副本.md"
+
+print(f"📖 讀取原始手冊: {SRC_DOCX}")
+doc = docx.Document(str(SRC_DOCX))
+
+# -------------------------------------------------------------
+# 輔助函式：設定表格儲存格樣式與背景色
+# -------------------------------------------------------------
+def set_cell_shading(cell, color_hex="DDEAD7"):
+    tcPr = cell._tc.get_or_add_tcPr()
+    # 移除既有 shd
+    for s in tcPr.xpath("w:shd"):
+        tcPr.remove(s)
+    shd = etree.Element("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}shd")
+    shd.set("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val", "clear")
+    shd.set("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}color", "auto")
+    shd.set("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}fill", color_hex)
+    tcPr.append(shd)
+
+def set_cell_margins_and_width(cell, width_dxa=5071):
+    tcPr = cell._tc.get_or_add_tcPr()
+    tcW = tcPr.xpath("w:tcW")
+    if tcW:
+        tcW[0].set("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}w", str(width_dxa))
+        tcW[0].set("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}type", "dxa")
+    else:
+        new_w = etree.Element("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}tcW")
+        new_w.set("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}w", str(width_dxa))
+        new_w.set("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}type", "dxa")
+        tcPr.append(new_w)
+
+def format_cell_text(cell, text, bold=False, font_size_pt=10, align=WD_ALIGN_PARAGRAPH.LEFT, color_rgb=(0,0,0)):
+    cell.text = ""
+    p = cell.paragraphs[0]
+    p.alignment = align
+    p.paragraph_format.space_before = Pt(3)
+    p.paragraph_format.space_after = Pt(3)
+    p.paragraph_format.line_spacing = 1.15
+    run = p.add_run(text)
+    run.bold = bold
+    run.font.name = "Times New Roman"
+    run.font.size = Pt(font_size_pt)
+    run.font.color.rgb = RGBColor(*color_rgb)
+    # 中文字型支援
+    rPr = run._r.get_or_add_rPr()
+    rFonts = rPr.xpath("w:rFonts")
+    if rFonts:
+        rFonts[0].set("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}eastAsia", "微軟正黑體")
+    else:
+        new_rf = etree.Element("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}rFonts")
+        new_rf.set("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}eastAsia", "微軟正黑體")
+        new_rf.set("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}ascii", "Times New Roman")
+        rPr.append(new_rf)
+
+def create_admin_table(title, steps_data):
+    """
+    建立符合系統手冊標準風格之 2 欄功能操作表
+    Row 0: 標題（跨 2 欄，填滿 DDEAD7）
+    Row 1, 3, 5...: 步驟列（填滿 DDEAD7，綠底粗體）
+    Row 2, 4, 6...: 說明與實施內容列（白底）
+    """
+    table = doc.add_table(rows=1 + len(steps_data) * 2, cols=2)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.style = "Table Grid"
+
+    tblPr = table._element.xpath("w:tblPr")[0]
+    tblW = tblPr.xpath("w:tblW")
+    if tblW:
+        tblW[0].set("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}w", "10142")
+        tblW[0].set("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}type", "dxa")
+
+    # Header Row (Row 0)
+    row0 = table.rows[0]
+    # 合併兩格
+    row0.cells[0].merge(row0.cells[1])
+    format_cell_text(row0.cells[0], title, bold=True, font_size_pt=11, align=WD_ALIGN_PARAGRAPH.CENTER)
+    set_cell_shading(row0.cells[0], "DDEAD7")
+    set_cell_margins_and_width(row0.cells[0], 10142)
+
+    # 填入各步驟
+    for idx, (step_left, desc_left, step_right, desc_right) in enumerate(steps_data):
+        step_row_idx = 1 + idx * 2
+        content_row_idx = 2 + idx * 2
+
+        # 步驟標題列 (綠底)
+        step_row = table.rows[step_row_idx]
+        format_cell_text(step_row.cells[0], step_left, bold=True, font_size_pt=10, align=WD_ALIGN_PARAGRAPH.LEFT)
+        set_cell_shading(step_row.cells[0], "DDEAD7")
+        set_cell_margins_and_width(step_row.cells[0], 5071)
+
+        format_cell_text(step_row.cells[1], step_right, bold=True, font_size_pt=10, align=WD_ALIGN_PARAGRAPH.LEFT)
+        set_cell_shading(step_row.cells[1], "DDEAD7")
+        set_cell_margins_and_width(step_row.cells[1], 5071)
+
+        # 內容說明列 (白底)
+        content_row = table.rows[content_row_idx]
+        format_cell_text(content_row.cells[0], desc_left, bold=False, font_size_pt=9.5, align=WD_ALIGN_PARAGRAPH.LEFT)
+        set_cell_shading(content_row.cells[0], "FFFFFF")
+        set_cell_margins_and_width(content_row.cells[0], 5071)
+
+        format_cell_text(content_row.cells[1], desc_right, bold=False, font_size_pt=9.5, align=WD_ALIGN_PARAGRAPH.LEFT)
+        set_cell_shading(content_row.cells[1], "FFFFFF")
+        set_cell_margins_and_width(content_row.cells[1], 5071)
+
+    return table
+
+# -------------------------------------------------------------
+# 定位關鍵段落
+# -------------------------------------------------------------
+p_op_idx = None
+p_user_idx = None
+p_reflect_idx = None
+
+for i, p in enumerate(doc.paragraphs):
+    t = p.text.strip()
+    if t == "操作手冊":
+        p_op_idx = i
+    elif t == "使用手冊":
+        p_user_idx = i
+    elif t == "感想":
+        p_reflect_idx = i
+
+print(f"📍 找到章節錨點: 操作手冊={p_op_idx}, 使用手冊={p_user_idx}, 感想={p_reflect_idx}")
+
+# -------------------------------------------------------------
+# 1. 更新第十一章 操作手冊
+# -------------------------------------------------------------
+# 更新 11-1 核心元件為七大元件
+doc.paragraphs[p_op_idx + 2].text = (
+    "本系統採用前後端完全分離之現代化微服務設計架構，各元件間職責分明且具備高度解耦性，主要由以下七大核心元件協同運作："
+)
+# 確保 6 與 7 描述加入
+# 檢查原 496-500 是否包含 6 與 7
+comp_texts = [p.text for p in doc.paragraphs[p_op_idx+3:p_op_idx+8]]
+has_comp6 = any("視覺特徵檢索記憶庫" in t for t in comp_texts)
+if not has_comp6:
+    p_comp5 = doc.paragraphs[p_op_idx + 7] # 第 5 元件
+    p6 = p_comp5.insert_paragraph_before(
+        "6. 專家視覺特徵檢索記憶庫 (Visual Memory Flywheel)：基於 ConvNeXt 卷積骨幹提取之 768 維密集視覺嵌入向量索引（visual_memory_cache.pt）。專門針對田間低置信度複雜病斑進行局部特徵比對，將田間經專家確認之高品質罕見病斑即時動態入庫，提供毫秒級特徵檢索，實現持續滾動的自適應視覺飛輪。",
+        style="Normal"
+    )
+    p7 = p_comp5.insert_paragraph_before(
+        "7. 主動學習閉環與專家審核微調管線 (Active Learning Pipeline & Admin Dashboard)：整合農民端誤判回饋提報機制，由農業專家與系統管理員於後台（/admin/feedback/）對回饋樣本進行獨立審核標註。支援一鍵匯出驗證數據集、觸發本地 ConvNeXt 增量微調訓練（trainer.py）與特徵庫同步重構，構建模型持續進化的閉環機制。",
+        style="Normal"
+    )
+
+# 重新定位使用手冊
+for i, p in enumerate(doc.paragraphs):
+    if p.text.strip() == "使用手冊":
+        p_user_heading = p
+        break
+
+# 在「使用手冊」之前插入 11-2 至 11-7 完整實作指引
+sections_11 = [
+    ("Heading 2", "系統安裝與環境設定"),
+    ("Heading 3", "前置軟硬體環境需求"),
+    ("Normal", "• 作業系統：Windows 10/11、Ubuntu 22.04 LTS 或 macOS Monterey 以上。\n"
+               "• 後端環境：Python 3.10 或 3.11、MySQL 8.0 資料庫伺服器、Git 版本控制工具。\n"
+               "• 前端環境：Android Studio Ladybug (2024.2+) 或更高版本、JDK 17、Android SDK Platform 34。\n"
+               "• 容器環境（可選）：Docker Desktop 或 Docker Engine 24+ 及 Docker Compose v2+。\n"
+               "• 金鑰與憑證：Google Gemini API Key、Gmail 應用程式密碼（用於 SMTP 寄發驗證信與警報通知）。"),
+
+    ("Heading 3", "步驟 1：取得專案原始碼與虛擬環境建置"),
+    ("Normal", "使用 Git 指令將專案儲存庫複製至本地端，建立獨立虛擬環境並安裝相依套件：\n\n"
+               "  git clone https://github.com/11436022/plant.git\n"
+               "  cd plant\n"
+               "  python -m venv venv\n"
+               "  .\\venv\\Scripts\\activate  # Linux / macOS 採 source venv/bin/activate\n"
+               "  python -m pip install --upgrade pip\n"
+               "  pip install -r requirements.txt"),
+
+    ("Heading 3", "步驟 2：配置環境變數檔案 (.env) 與 AI 權重"),
+    ("Normal", "複製隨附之 .env.example 為 .env，填入 GEMINI_API_KEY、MySQL 連線帳密（DB_HOST=127.0.0.1, DB_PORT=3306, DB_USER=plant, DB_NAME=plant_db）、JWT_SECRET_KEY 及 Gmail SMTP 帳密。\n"
+               "將本地自訓 ConvNeXt 權重檔 convnext_plant_best.pth 與類別雙向映射字典 idx_to_class.json 置於專案根目錄。若未放置權重，系統將自動啟動安全降級機制，改由雲端 Gemini 進行全權診斷。"),
+
+    ("Heading 2", "資料庫遷移與知識庫建置"),
+    ("Normal", "依序建立 MySQL plant_db 資料庫，並執行資料庫結構版本遷移與農業部官方知識庫建構：\n\n"
+               "  # 1. 執行 Alembic 資料庫版本遷移至最新結構\n"
+               "  python -m alembic upgrade head\n\n"
+               "  # 2. 匯入農業部官方作物病蟲害基本種子資料（具冪等性，不覆蓋既有日誌）\n"
+               "  python seed.py\n\n"
+               "  # 3. 建立 FAISS 語意向量知識庫索引 (生成 knowledge_base.faiss 與 knowledge_content.json)\n"
+               "  python build_knowledge_base.py"),
+
+    ("Heading 2", "系統啟動與服務驗證"),
+    ("Normal", "於專案根目錄執行啟動入口：\n\n"
+               "  python main.py\n\n"
+               "伺服器成功運行於 http://0.0.0.0:8000。可透過瀏覽器存取 OpenAPI 互動式文件（http://127.0.0.1:8000/docs）與健康檢查端點（/api/v1/health）。管理員帳號初次建立方式：於系統註冊通過信箱驗證後，於 MySQL 將該會員角色設定為 admin：\n\n"
+               "  UPDATE user SET role = 'admin' WHERE email = 'your_admin_email@domain.com';"),
+
+    ("Heading 2", "Docker 容器化快速部署"),
+    ("Normal", "本系統提供相容現代 Compose Specification 規範之部署配置，採用非 root 安全容器並內建 host-gateway 支援跨平台主機資料庫互通：\n\n"
+               "  docker compose up -d --build\n\n"
+               "容器啟動後自動掛載 ./static/uploads 與 ./static/feedback_uploads 確保持久化資料不遺失。"),
+
+    ("Heading 2", "Android 行動客戶端建置與連線"),
+    ("Normal", "使用 Android Studio 開啟 frontend/plantdoctor 目錄，確認 JDK 為版本 17。至 network/RetrofitClient.kt 配置 BASE_URL（模擬器使用 10.0.2.2:8000；實機測試使用區網 IPv4）。執行單元測試 ./gradlew testDebugUnitTest 確保前後端契約完全通過後，點選 Run 'app' 部署至手機。"),
+
+    ("Heading 2", "Web 管理後台存取與日常維護"),
+    ("Heading 3", "管理後台架構與路由導覽"),
+    ("Normal", "本系統 Web 管理後台採用嚴密之安全鑑權設計，所有管理端點統一由 /admin 前綴管理，並全面實作 HttpOnly、SameSite=Strict 安全 Session Cookie（plant_admin_session），徹底杜絕跨站偽造請求 (CSRF) 與 XSS 憑證外洩威脅。\n\n"
+               "管理者具備 admin 角色且信箱通過驗證後，可存取以下五大核心後台服務：\n"
+               "1. 管理員安全登入與會話管理頁面 (/admin/login, /admin/logout)\n"
+               "2. 管理者數據總覽儀表板與診斷紀錄管理 (/admin/)\n"
+               "3. 使用者誤判回饋審核與持續學習標註微調 (/admin/feedback/)\n"
+               "4. 使用者帳號管理清單與審核 (/admin/users/)\n"
+               "5. Webcam 瀏覽器視訊即時監控控制台 (/webcam)"),
+
+    ("Heading 3", "日常資料庫備份與知識庫更新維護作業"),
+    ("Normal", "1. 資料庫排程備份：建議透過排程指令定期傾印匯出 plant_db 資料庫：\n"
+               "   mysqldump -u plant -p plant_db > backup_plant_db_$(date +%Y%m%d).sql\n\n"
+               "2. 農業部最新病蟲害開放資料熱更新流程：當農業部釋出新文獻時，執行 update_reference_data.py 更新 data.json，再依序執行 build_knowledge_base.py 重建向量庫，最後執行 seed.py 增量更新關聯資料庫。\n\n"
+               "3. Git 版本原子化提交：團隊進行維護時，應採單一模組獨立提交規範，維護清晰的審計紀錄。"),
+]
+
+for style, text in sections_11:
+    p_user_heading.insert_paragraph_before(text, style=style)
+
+print("✅ 已成功擴充第十一章 操作手冊（含 11-2 至 11-7 完整章節）")
+
+# -------------------------------------------------------------
+# 2. 更新第十二章 使用手冊 (加入 Web 管理後台功能表)
+# -------------------------------------------------------------
+# 找到「感想」標題，在此之前插入 12-2 Web 管理後台使用功能表
+for i, p in enumerate(doc.paragraphs):
+    if p.text.strip() == "感想":
+        p_reflect_heading = p
+        break
+
+p_reflect_heading.insert_paragraph_before("Web 管理後台使用功能表", style="Heading 2")
+p_reflect_heading.insert_paragraph_before(
+    "為滿足農業專家、系統維護者與田間管理員對全站診斷日誌複核、誤判糾錯主動學習與使用者權限審查之專業管理需求，本系統提供完整之 Web 管理後台控制介面。以下詳細定義 Web 管理後台五大核心模組之操作步驟與說明：",
+    style="Normal"
+)
+
+# --- 表 12-2-1 管理員安全登入與會話管理操作表 ---
+cap_12_2_1 = p_reflect_heading.insert_paragraph_before("表 12-2-1 管理員安全登入與會話管理操作表", style="Caption")
+table_12_2_1_data = [
+    (
+        "1. 開啟管理員登入網頁",
+        "以現代瀏覽器造訪 http://localhost:8000/admin/login。頁面載入安全管理員登入介面，表單強制要求輸入帳號與密碼，並內建 Cross-origin 來源檢查防禦。",
+        "2. 驗證身分並提交登入",
+        "輸入具備 admin 角色且已通過 Gmail 信箱啟用驗證之管理者帳號密碼，點擊「登入」。系統驗證密碼雜湊，若非 admin 或未通過信箱驗證則自動拒絕通行。"
+    ),
+    (
+        "3. 安全 Session Cookie 寫入與導航",
+        "驗證通過後，伺服器核發 JWT 存取憑證並寫入 HttpOnly、SameSite=Strict 之加密安全 Cookie（plant_admin_session），自動以 HTTP 303 跳轉至管理儀表板首頁。",
+        "4. 管理者安全登出作業",
+        "於後台任意頁面點擊右上角「登出」按鈕，前端發送 POST /admin/logout 請求，後端立即刪除安全 Cookie 並以 303 重定向返回管理員登入頁面，防範會話劫持。"
+    )
+]
+tbl_1 = create_admin_table("管理員安全登入與會話管理", table_12_2_1_data)
+p_reflect_heading._element.addprevious(tbl_1._element)
+p_reflect_heading.insert_paragraph_before("", style="Normal")
+
+# --- 表 12-2-2 管理者數據儀表板與診斷紀錄審查校正操作表 ---
+cap_12_2_2 = p_reflect_heading.insert_paragraph_before("表 12-2-2 管理者數據儀表板與診斷紀錄審查校正操作表", style="Caption")
+table_12_2_2_data = [
+    (
+        "1. 檢視全站數據總覽儀表板",
+        "登入後進入 /admin/ 儀表板，頂部即時展示核心 KPI 指標卡：系統總會員數、累積植物診斷數、涵蓋病害種類數、今日診斷活躍數、待審查案件數（requires_review=1）及已校正數。",
+        "2. 關鍵字模糊檢索與狀態篩選",
+        "支援多維度即時過濾：於搜尋框輸入作物名稱、病害名稱或會員帳號進行模糊查詢；或點擊上方「待審查」/「已校正」按鈕，快速鎖定需要專家介入之疑難病例。"
+    ),
+    (
+        "3. 專家診斷校正與處方標註",
+        "針對低信心或判定存疑之紀錄，點擊該筆紀錄之校正輸入框，輸入專家複審之正確病害名稱並提交更新。系統自動寫入 user_corrected_status 並將 requires_review 解除為 0。",
+        "4. 專家覆核橫幅自動生成",
+        "校正完成後，系統不抹除原始 AI 判定作為審計對照，並於處方建議頂部自動加註「🌟【專家覆核校正】：原診斷為【...】，經專家複審校正為【...】」專屬橫幅，同步更新至農友 App。"
+    )
+]
+tbl_2 = create_admin_table("管理者數據儀表板與診斷紀錄審查校正", table_12_2_2_data)
+p_reflect_heading._element.addprevious(tbl_2._element)
+p_reflect_heading.insert_paragraph_before("", style="Normal")
+
+# --- 表 12-2-3 使用者誤判回饋審核、視覺記憶刻錄與模型微調操作表 ---
+cap_12_2_3 = p_reflect_heading.insert_paragraph_before("表 12-2-3 使用者誤判回饋審核、視覺記憶刻錄與模型微調操作表", style="Caption")
+table_12_2_3_data = [
+    (
+        "1. 審核農友回報之誤判個案",
+        "點擊頂部導航「使用者回饋」進入 /admin/feedback/。清單展示農友於 App 診斷結果頁點擊「結果有誤」所提報之田間原始影像、原 AI 預測標籤與錯誤勾選項（植物種類錯誤/疾病判斷錯誤）。",
+        "2. 專家精確標註與提交",
+        "農業專家檢視病斑影像，於標註欄位分別填寫正確的「正確植物名」與「正確疾病名」（如「南瓜」、「白粉病」），點擊儲存寫入 MySQL diagnosis_feedback 實體資料表。"
+    ),
+    (
+        "3. 視覺特徵檢索飛輪即時刻錄 (Visual RAG)",
+        "專家一按下儲存，系統在背景立即調用 ConvNeXt 骨幹網路提取 768 維 L2 正規化特徵向量，即時刻錄至 visual_memory_cache.pt 特徵庫。後續新用戶上傳相似影像秒速注入專家先驗，免重啟立即生效！",
+        "4. 匯出訓練集與觸發 ConvNeXt 模型微調",
+        "累積一定標註量後，點擊「📦 導出重訓資料集」自動整理為 PyTorch ImageFolder 階層目錄；點擊「🚀 啟動模型微調」自動執行持續增量微調管線，動態擴增類別輸出並熱更新權重。"
+    )
+]
+tbl_3 = create_admin_table("使用者誤判回饋審核、視覺記憶刻錄與模型微調", table_12_2_3_data)
+p_reflect_heading._element.addprevious(tbl_3._element)
+p_reflect_heading.insert_paragraph_before("", style="Normal")
+
+# --- 表 12-2-4 使用者帳號管理清單與權限查核操作表 ---
+cap_12_2_4 = p_reflect_heading.insert_paragraph_before("表 12-2-4 使用者帳號管理清單與權限查核操作表", style="Caption")
+table_12_2_4_data = [
+    (
+        "1. 全站註冊會員名冊檢視",
+        "點擊頂部導航「使用者管理」進入 /admin/users/。系統以分頁表格完整呈現所有註冊會員之 ID、使用者名稱（帳號）、電子信箱（Email）、全名、註冊時間及信箱驗證狀態。",
+        "2. 關鍵字即時檢索過濾",
+        "於搜尋框輸入欲查詢之帳號或 Email 關鍵字，點擊「搜尋」即可即時縮小名冊範圍，支援每頁 20 筆標準分頁瀏覽，方便管理員快速定位異常或特定農友帳號。"
+    ),
+    (
+        "3. 信箱驗證啟用狀態查核",
+        "表格中顯著標記會員是否已通過 Gmail 驗證信啟用（綠色「是」或灰色「否」）。管理員可直接查核各帳號之註冊真實性，防止機器人濫建虛假帳號。",
+        "4. 會員歷史病害紀錄關聯跳轉",
+        "點擊任一會員列最右側之「查看紀錄」超連結，系統自動跳轉回管理儀表板，並自動帶入該使用者篩選條件，完整展示該農友名下所有過往植物診斷日誌。"
+    )
+]
+tbl_4 = create_admin_table("使用者帳號管理清單與權限查核", table_12_2_4_data)
+p_reflect_heading._element.addprevious(tbl_4._element)
+p_reflect_heading.insert_paragraph_before("", style="Normal")
+
+# --- 表 12-2-5 Webcam 瀏覽器視訊即時監控控制台操作表 ---
+cap_12_2_5 = p_reflect_heading.insert_paragraph_before("表 12-2-5 Webcam 瀏覽器視訊即時監控控制台操作表", style="Caption")
+table_12_2_5_data = [
+    (
+        "1. 瀏覽器存取監控控制台",
+        "管理員以瀏覽器存取 http://localhost:8000/webcam。系統呼叫 HTML5 getUserMedia 取得本機或外接攝影機之視訊存取權限，介面展示即時預覽畫面與設定面板。",
+        "2. 設定取樣頻率與劃定檢驗區域",
+        "自訂影格擷取頻率（預設 30 秒採樣一次）及目標作物名稱；支援劃定檢驗區域（ROI）進行局部對焦辨識，排除背景走道、反光與無關雜草干擾。"
+    ),
+    (
+        "3. 啟動背景多影格連續共識分析",
+        "點擊「啟動監控」，前端定時截圖傳輸至 /api/v1/webcam/analyze。後端調用雙層 AI 推論，嚴格執行連續 3 幀相同病斑共識防抖判定，徹底杜絕單張偶發性誤報。",
+        "4. 多通道即時警報與郵件推播",
+        "當連續 3 幀異常且置信度 ≥ 80% 時，控制台立即觸發音效警示與瀏覽器桌面推播；後端同步透過 SMTP 非同步寄發高危病害 Email 警報信，並自動留存異常快照至資料庫。"
+    )
+]
+tbl_5 = create_admin_table("Webcam 瀏覽器視訊即時監控控制台", table_12_2_5_data)
+p_reflect_heading._element.addprevious(tbl_5._element)
+p_reflect_heading.insert_paragraph_before("", style="Normal")
+
+# --- 12-3 Web 管理後台狀態轉換與操作流程說明 ---
+p_reflect_heading.insert_paragraph_before("Web 管理後台狀態轉換與操作流程說明", style="Heading 2")
+p_reflect_heading.insert_paragraph_before(
+    "Web 管理後台之操作流程遵循嚴謹之狀態機（State Machine）轉換契約，確保只有通過驗證之管理員可在各項高權限管理功能間切換：\n\n"
+    "1. 未認證狀態 (Unauthenticated Admin State)：使用者存取任意 /admin/* 路徑，中介層 require_admin 自動攔截。若未附帶有效之 plant_admin_session 安全 Cookie，系統強制 303 重定向至 /admin/login 登入頁。\n"
+    "2. 登入鑑權狀態 (Admin Authentication State)：管理員提交帳號密碼。系統執行 Argon2id 密碼驗證、信箱驗證檢查（is_email_verified=True）與 admin 角色授權。三者皆合格後核發 JWT 憑證寫入 HttpOnly Cookie，轉換為已認證狀態。\n"
+    "3. 數據儀表板與日誌審核狀態 (Dashboard & Diary Audit State)：進入 /admin/。管理者可檢視 6 項核心 KPI 指標、進行多條件檢索、對待審查日誌執行專家病名校正，並觸發「🌟【專家覆核校正】」橫幅自動注入。\n"
+    "4. 誤判回饋審查與持續學習狀態 (Feedback & Continual Learning State)：進入 /admin/feedback/。審查田間回報影像並執行專家標註。標註提交後動態觸發「視覺特徵檢索飛輪（Visual RAG）」向量刻錄，並支援一鍵導出標準訓練集與啟動 ConvNeXt 增量微調。\n"
+    "5. 會員名冊檢索狀態 (User Management State)：進入 /admin/users/。分頁查詢全站註冊會員、核驗 Gmail 啟用狀態，並支援歷史診斷紀錄雙向關聯檢視。\n"
+    "6. 視訊串流連續監控狀態 (Webcam Monitoring State)：進入 /webcam。控制台啟動定時影像採樣與連續 3 幀共識判定，異常時自動觸發音效、瀏覽器推播與 SMTP 郵件告警。\n"
+    "7. 安全登出狀態 (Admin Logout State)：點擊「登出」呼叫 POST /admin/logout，伺服器立即作廢安全 Cookie，完全切斷會話並重定向至登入頁面，確保無憑證殘留風險。\n\n"
+    "上述動態轉換流程嚴格對應系統架構圖：圖 5-3-12 (檢視儀表板活動圖)、圖 5-3-13 (查詢使用者活動圖)、圖 5-3-14 (審核回饋活動圖)、圖 7-4-5 (檢視儀表板狀態圖)、圖 7-4-6 (Webcam 監控狀態圖) 及圖 9-3-10 (管理後台權限檢查圖)，達成分析、設計與操作文件之高度一致性。",
+    style="Normal"
+)
+
+print("✅ 已成功擴充第十二章 使用手冊（新增 12-2 節 5 大功能表與 12-3 節狀態流程）")
+
+# -------------------------------------------------------------
+# 3. 更新首頁「表目錄」
+# -------------------------------------------------------------
+# 尋找表 12-1-7更改主題顏色功能表 的段落
+p_table_toc_idx = None
+for i, p in enumerate(doc.paragraphs):
+    if "表 12-1-7更改主題顏色功能表" in p.text:
+        p_table_toc_idx = i
+        break
+
+if p_table_toc_idx is not None:
+    p_ref = doc.paragraphs[p_table_toc_idx]
+    new_tables_toc = [
+        "表 12-2-1 管理員安全登入與會話管理操作表\t108",
+        "表 12-2-2 管理者數據儀表板與診斷紀錄審查校正操作表\t109",
+        "表 12-2-3 使用者誤判回饋審核、視覺記憶刻錄與模型微調操作表\t110",
+        "表 12-2-4 使用者帳號管理清單與權限查核操作表\t111",
+        "表 12-2-5 Webcam 瀏覽器視訊即時監控控制台操作表\t112",
+    ]
+    # 在 p_ref 後面依序插入
+    for t_text in reversed(new_tables_toc):
+        new_p = p_ref._element.getparent().makeelement("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}p")
+        # 複製 table of figures 樣式
+        p_ref._element.addnext(new_p)
+        # 用 python-docx 封裝
+        docx_p = docx.text.paragraph.Paragraph(new_p, doc)
+        docx_p.style = "table of figures"
+        run = docx_p.add_run(t_text)
+        run.font.name = "Times New Roman"
+    print("✅ 已成功於首頁「表目錄」補齊 5 張新表格索引")
+
+# -------------------------------------------------------------
+# 4. 儲存副本檔案
+# -------------------------------------------------------------
+doc.save(str(DST_DOCX))
+print(f"💾 成功儲存 DOCX 副本: {DST_DOCX} (大小: {os.path.getsize(DST_DOCX):,} 位元組)")
+
+# -------------------------------------------------------------
+# 5. 同步產出 Markdown 副本 documents/系統手冊_副本.md
+# -------------------------------------------------------------
+md_content = f"""# 《植葉神醫 - 智慧植物病蟲害診斷與健康管理系統》系統手冊（副本 - 含 Web 管理後台增補版）
+
+> 本手冊為原版《系統手冊》之完整增補副本，特別針對 **Web 管理後台（Admin Web）** 進行深度擴充，完整涵蓋操作手冊安裝部署與管理維護指引（第十一章 11-1～11-7）、Web 後台五大功能操作表（第十二章 12-2 表 12-2-1 至 12-2-5）以及後台狀態機轉換契約（第十二章 12-3）。
+
+---
+
+## 目錄增補概覽
+- **第十一章 操作手冊**
+  - 11-1 系統架構與元件需求（升級為七大核心元件，納入視覺特徵記憶庫與主動學習管線）
+  - 表 11-1-1 系統軟硬體需求與套件清單
+  - 11-2 系統安裝與環境設定（前置需求、Git 原始碼、虛擬環境、.env 組態、ConvNeXt 權重）
+  - 11-3 資料庫遷移與知識庫建置（MySQL 授權、Alembic 升級、seed.py 種子資料、FAISS 向量建庫）
+  - 11-4 系統啟動與服務驗證（FastAPI 啟動、Swagger UI、/api/v1/health、管理員帳號初次建立）
+  - 11-5 Docker 容器化快速部署（Docker Compose 規範、跨主機連線、持久化儲存保證）
+  - 11-6 Android 行動客戶端建置與連線（Android Studio Ladybug、Retrofit IP 配置、契約測試）
+  - 11-7 Web 管理後台存取與日常維護（五大管理路由導覽、HttpOnly 安全 Cookie 鑑權、排程備份與熱更新）
+- **第十二章 使用手冊**
+  - 12-1 使用功能表（Android App 行動端 7 大操作表，表 12-1-1 至 12-1-7）
+  - 圖 12-1-1 應用程式畫面狀態轉換圖
+  - **12-2 Web 管理後台使用功能表（本次核心新增）**
+    - **表 12-2-1 管理員安全登入與會話管理操作表 (`/admin/login`, `/admin/logout`)**
+    - **表 12-2-2 管理者數據儀表板與診斷紀錄審查校正操作表 (`/admin/`, UC-07)**
+    - **表 12-2-3 使用者誤判回饋審核、視覺記憶刻錄與模型微調操作表 (`/admin/feedback/`, UC-14)**
+    - **表 12-2-4 使用者帳號管理清單與權限查核操作表 (`/admin/users/`, UC-12)**
+    - **表 12-2-5 Webcam 瀏覽器視訊即時監控控制台操作表 (`/webcam`, UC-10, UC-11)**
+  - **12-3 Web 管理後台狀態轉換與操作流程說明（本次核心新增）**
+
+---
+
+# 第十一章 操作手冊（副本增補版）
+
+## 11-1 系統架構與元件需求
+本系統採用前後端完全分離之現代化微服務設計架構，各元件間職責分明且具備高度解耦性，主要由以下七大核心元件協同運作：
+1. **前端行動應用 (Android Mobile App)**：基於 Kotlin 語言開發，整合 ViewBinding、CameraX 與 Retrofit2。提供農友直覺操作介面，支援相機對焦拍攝、相簿選圖、即時鏡頭連續監控（單/多植物模式與連續幀防抖警報）、診斷視覺化呈現、個人日誌管理、備忘記事編輯（UC-08）、主題色彩切換與誤判回饋提報。
+2. **後端服務引擎 (FastAPI Backend)**：採用 Python 3.11 與高效能 FastAPI 框架，擔任全系統業務調度中樞。負責 RESTful API 路由分發、JWT 權限鑑權、SMTP 信箱驗證與警報寄發、影像檢驗、端雲級聯 AI 診斷排程、跨雲容災備援調度及 FAISS 向量檢索。
+3. **資料庫持久化系統 (MySQL 8.0)**：採用 MySQL 8.0 InnoDB 引擎搭配 SQLAlchemy ORM 與 Alembic 版本控制庫。持久化儲存會員帳號、BCrypt 密碼雜湊、一次性權杖、官方作物病蟲害基礎資料庫、植物日誌快照與 Webcam 連續幀異常快照暨郵件警報事件；實體圖片保存於靜態目錄。
+4. **雙層級聯 AI 協同診斷引擎 (Local ConvNeXt + Cloud Gemini)**：提供階層式端雲協同推論架構。第一層由本地自訓 ConvNeXt 模型進行毫秒級（<500ms）常見 38 類病斑快篩，當模型置信度 ≥ 75% 且 Grad-CAM 葉片特徵面積占比 ≥ 35% 時直接採納本地診斷；若未達標或屬於低置信度未知擾動，則無縫升級至第二層 Gemini 3.8 Flash 多模態雲端大模型進行深層辨析，並內建 OpenAI GPT-4o-mini 跨雲容災機制以杜絕服務中斷與大模型幻覺。
+5. **檢索增強向量知識庫 (FAISS RAG Knowledge Base)**：以 FAISS 密集向量索引庫整合農業部官方病蟲害專書文本庫（data.json）。當本地資料庫無現成處方或走雲端兜底診斷時，自動檢索語意最相近之農業部權威文獻並結合 MySQL 專家資料庫，將防護處置建議與官方出處精準注入診斷報告，提供具可追溯來源依據之農業防護指南。
+6. **專家視覺特徵檢索記憶庫 (Visual Memory Flywheel)**：基於 ConvNeXt 卷積骨幹提取之 768 維密集視覺嵌入向量索引（visual_memory_cache.pt）。專門針對田間低置信度複雜病斑進行局部特徵比對，將田間經專家確認之高品質罕見病斑即時動態入庫，提供毫秒級特徵檢索，實現持續滾動的自適應視覺飛輪。
+7. **主動學習閉環與專家審核微調管線 (Active Learning Pipeline & Admin Dashboard)**：整合農民端誤判回饋提報機制，由農業專家與系統管理員於後台（/admin/feedback/）對回饋樣本進行獨立審核標註。支援一鍵匯出驗證數據集、觸發本地 ConvNeXt 增量微調訓練（trainer.py）與特徵庫同步重構，構建模型持續進化的閉環機制。
+
+### 表 11-1-1 系統軟硬體需求與套件清單
+*(請參照 Word 副本對應表格)*
+
+## 11-2 系統安裝與環境設定
+### 11-2-1 前置軟硬體環境需求
+- 作業系統：Windows 10/11、Ubuntu 22.04 LTS 或 macOS Monterey 以上。
+- 後端環境：Python 3.10 或 3.11、MySQL 8.0 資料庫伺服器、Git 版本控制工具。
+- 前端環境：Android Studio Ladybug (2024.2+) 或更高版本、JDK 17、Android SDK Platform 34。
+- 容器環境（可選）：Docker Desktop 或 Docker Engine 24+ 及 Docker Compose v2+。
+- 金鑰與憑證：Google Gemini API Key、Gmail 應用程式密碼。
+
+### 11-2-2 步驟 1：取得專案原始碼與虛擬環境建置
+```bash
+git clone https://github.com/11436022/plant.git
+cd plant
+python -m venv venv
+.\\venv\\Scripts\\activate  # Linux / macOS 採 source venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### 11-2-3 步驟 2：配置環境變數組態檔案 (.env)
+複製 `.env.example` 為 `.env`，確認資料庫連線、JWT 金鑰、SMTP 郵件與 AI 金鑰：
+```dotenv
+GEMINI_API_KEY=your_actual_gemini_api_key
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USER=plant
+DB_PASSWORD=your_secure_password
+DB_NAME=plant_db
+JWT_SECRET_KEY=generate_a_long_random_secret_key_at_least_32_chars
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_gmail_account@gmail.com
+SMTP_PASSWORD=your_gmail_app_password
+SMTP_FROM_EMAIL=your_gmail_account@gmail.com
+WIFI_HOST_IP=127.0.0.1
+```
+
+### 11-2-4 步驟 3：本地 AI 模型權重配置
+確認專案根目錄下具備 `convnext_plant_best.pth` 與 `idx_to_class.json`。若未放置，系統自動啟用安全降級至雲端 Gemini 進行全權診斷。
+
+## 11-3 資料庫遷移與知識庫建置
+```bash
+# 1. 建立 MySQL 資料庫實例並授權
+mysql -u root -p -e "CREATE DATABASE plant_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# 2. 執行 Alembic 資料庫版本遷移至最新結構
+python -m alembic upgrade head
+
+# 3. 匯入官方農業基礎種子資料 (具冪等性)
+python seed.py
+
+# 4. 建立 FAISS 向量知識庫 (生成 knowledge_base.faiss 與 knowledge_content.json)
+python build_knowledge_base.py
+```
+
+## 11-4 系統啟動與服務驗證
+```bash
+# 啟動後端 FastAPI 伺服器
+python main.py
+```
+- Swagger API 文件：`http://127.0.0.1:8000/docs`
+- 服務健康檢查：`http://127.0.0.1:8000/api/v1/health`
+- 初次建立管理員帳號：註冊並完成信箱驗證後，於 MySQL 將角色設為 admin：
+  ```sql
+  UPDATE user SET role = 'admin' WHERE email = 'your_admin_email@domain.com';
+  ```
+
+## 11-5 Docker 容器化快速部署
+```bash
+docker compose up -d --build
+docker compose ps
+docker compose logs -f
+```
+
+## 11-6 Android 行動客戶端建置與連線
+使用 Android Studio Ladybug 開啟 `frontend/plantdoctor`，配置 `RetrofitClient.kt` 之 `BASE_URL`，執行 `./gradlew testDebugUnitTest` 確保單元契約測試通過後，點選 Run 部署至實機。
+
+## 11-7 Web 管理後台存取與日常維護
+### 11-7-1 管理後台路由導覽與安全防護機制
+本系統 Web 管理後台所有端點均統一實作 HttpOnly、SameSite=Strict 安全 Session Cookie（`plant_admin_session`），防範 CSRF 與 XSS 憑證竊取：
+1. **管理員安全登入頁面** (`/admin/login`, `/admin/logout`)：嚴格限定 `role = 'admin'` 且信箱已驗證之帳號登入。
+2. **管理者數據總覽儀表板** (`/admin/`)：全站統計總覽、待審查案件篩選、專家診斷校正橫幅。
+3. **使用者誤判回饋審核與持續學習** (`/admin/feedback/`)：審核田間誤判影像、768 維特徵記憶刻錄（Visual RAG）、資料集導出與 ConvNeXt 微調重訓。
+4. **使用者帳號管理清單** (`/admin/users/`)：全站會員名冊檢視、Email 驗證狀態查核與歷史紀錄關聯查詢。
+5. **Webcam 瀏覽器視訊即時監控控制台** (`/webcam`)：即時串流監控、連續 3 幀防抖判定、聲音與郵件警報。
+
+### 11-7-2 日常維護作業
+- 資料庫排程備份：`mysqldump -u plant -p plant_db > backup_plant_db_$(date +%Y%m%d).sql`
+- 農業部開放資料熱更新：`python update_reference_data.py` ➔ `python build_knowledge_base.py` ➔ `python seed.py`
+- Git 版本控制採獨立模組原子化提交規範。
+
+---
+
+# 第十二章 使用手冊（副本增補版）
+
+## 12-1 使用功能表（Android 行動端）
+*(表 12-1-1 至 表 12-1-7 保留原手冊內容，涵蓋註冊/登入、忘記密碼、相機拍攝診斷、相簿照片診斷、即時監控、歷史日誌及主題顏色切換)*
+
+---
+
+## 12-2 Web 管理後台使用功能表（副本新增）
+
+### 表 12-2-1 管理員安全登入與會話管理操作表
+| 步驟項目 | 步驟說明 (左側) | 步驟項目 | 步驟說明 (右側) |
+| :--- | :--- | :--- | :--- |
+| **1. 開啟管理員登入網頁** | 以現代瀏覽器造訪 `http://localhost:8000/admin/login`。頁面載入安全管理員登入介面，表單強制要求輸入帳號與密碼，並內建 Cross-origin 來源檢查防禦。 | **2. 驗證身分並提交登入** | 輸入具備 admin 角色且已通過 Gmail 信箱啟用驗證之管理者帳號密碼，點擊「登入」。系統驗證密碼雜湊，若非 admin 或未通過信箱驗證則自動拒絕通行。 |
+| **3. 安全 Session Cookie 寫入與導航** | 驗證通過後，伺服器核發 JWT 存取憑證並寫入 HttpOnly、SameSite=Strict 之加密安全 Cookie（plant_admin_session），自動以 HTTP 303 跳轉至管理儀表板首頁。 | **4. 管理者安全登出作業** | 於後台任意頁面點擊右上角「登出」按鈕，前端發送 POST /admin/logout 請求，後端立即刪除安全 Cookie 並以 303 重定向返回管理員登入頁面，防範會話劫持。 |
+
+### 表 12-2-2 管理者數據儀表板與診斷紀錄審查校正操作表
+| 步驟項目 | 步驟說明 (左側) | 步驟項目 | 步驟說明 (右側) |
+| :--- | :--- | :--- | :--- |
+| **1. 檢視全站數據總覽儀表板** | 登入後進入 `/admin/` 儀表板，頂部即時展示核心 KPI 指標卡：系統總會員數、累積植物診斷數、涵蓋病害種類數、今日診斷活躍數、待審查案件數（requires_review=1）及已校正數。 | **2. 關鍵字模糊檢索與狀態篩選** | 支援多維度即時過濾：於搜尋框輸入作物名稱、病害名稱或會員帳號進行模糊查詢；或點擊上方「待審查」/「已校正」按鈕，快速鎖定需要專家介入之疑難病例。 |
+| **3. 專家診斷校正與處方標註** | 針對低信心或判定存疑之紀錄，點擊該筆紀錄之校正輸入框，輸入專家複審之正確病害名稱並提交更新。系統自動寫入 user_corrected_status 並將 requires_review 解除為 0。 | **4. 專家覆核橫幅自動生成** | 校正完成後，系統不抹除原始 AI 判定作為審計對照，並於處方建議頂部自動加註「🌟【專家覆核校正】：原診斷為【...】，經專家複審校正為【...】」專屬橫幅，同步更新至農友 App。 |
+
+### 表 12-2-3 使用者誤判回饋審核、視覺記憶刻錄與模型微調操作表
+| 步驟項目 | 步驟說明 (左側) | 步驟項目 | 步驟說明 (右側) |
+| :--- | :--- | :--- | :--- |
+| **1. 審核農友回報之誤判個案** | 點擊頂部導航「使用者回饋」進入 `/admin/feedback/`。清單展示農友於 App 診斷結果頁點擊「結果有誤」所提報之田間原始影像、原 AI 預測標籤與錯誤勾選項（植物種類錯誤/疾病判斷錯誤）。 | **2. 專家精確標註與提交** | 農業專家檢視病斑影像，於標註欄位分別填寫正確的「正確植物名」與「正確疾病名」（如「南瓜」、「白粉病」），點擊儲存寫入 MySQL diagnosis_feedback 實體資料表。 |
+| **3. 視覺特徵檢索飛輪即時刻錄 (Visual RAG)** | 專家一按下儲存，系統在背景立即調用 ConvNeXt 骨幹網路提取 768 維 L2 正規化特徵向量，即時刻錄至 visual_memory_cache.pt 特徵庫。後續新用戶上傳相似影像秒速注入專家先驗，免重啟立即生效！ | **4. 匯出訓練集與觸發 ConvNeXt 模型微調** | 累積一定標註量後，點擊「📦 導出重訓資料集」自動整理為 PyTorch ImageFolder 階層目錄；點擊「🚀 啟動模型微調」自動執行持續增量微調管線，動態擴增類別輸出並熱更新權重。 |
+
+### 表 12-2-4 使用者帳號管理清單與權限查核操作表
+| 步驟項目 | 步驟說明 (左側) | 步驟項目 | 步驟說明 (右側) |
+| :--- | :--- | :--- | :--- |
+| **1. 全站註冊會員名冊檢視** | 點擊頂部導航「使用者管理」進入 `/admin/users/`。系統以分頁表格完整呈現所有註冊會員之 ID、使用者名稱（帳號）、電子信箱（Email）、全名、註冊時間及信箱驗證狀態。 | **2. 關鍵字即時檢索過濾** | 於搜尋框輸入欲查詢之帳號或 Email 關鍵字，點擊「搜尋」即可即時縮小名冊範圍，支援每頁 20 筆標準分頁瀏覽，方便管理員快速定位異常或特定農友帳號。 |
+| **3. 信箱驗證啟用狀態查核** | 表格中顯著標記會員是否已通過 Gmail 驗證信啟用（綠色「是」或灰色「否」）。管理員可直接查核各帳號之註冊真實性，防止機器人濫建虛假帳號。 | **4. 會員歷史病害紀錄關聯跳轉** | 點擊任一會員列最右側之「查看紀錄」超連結，系統自動跳轉回管理儀表板，並自動帶入該使用者篩選條件，完整展示該農友名下所有過往植物診斷日誌。 |
+
+### 表 12-2-5 Webcam 瀏覽器視訊即時監控控制台操作表
+| 步驟項目 | 步驟說明 (左側) | 步驟項目 | 步驟說明 (右側) |
+| :--- | :--- | :--- | :--- |
+| **1. 瀏覽器存取監控控制台** | 管理員以瀏覽器存取 `http://localhost:8000/webcam`。系統呼叫 HTML5 getUserMedia 取得本機或外接攝影機之視訊存取權限，介面展示即時預覽畫面與設定面板。 | **2. 設定取樣頻率與劃定檢驗區域** | 自訂影格擷取頻率（預設 30 秒採樣一次）及目標作物名稱；支援劃定檢驗區域（ROI）進行局部對焦辨識，排除背景走道、反光與無關雜草干擾。 |
+| **3. 啟動背景多影格連續共識分析** | 點擊「啟動監控」，前端定時截圖傳輸至 `/api/v1/webcam/analyze`。後端調用雙層 AI 推論，嚴格執行連續 3 幀相同病斑共識防抖判定，徹底杜絕單張偶發性誤報。 | **4. 多通道即時警報與郵件推播** | 當連續 3 幀異常且置信度 ≥ 80% 時，控制台立即觸發音效警示與瀏覽器桌面推播；後端同步透過 SMTP 非同步寄發高危病害 Email 警報信，並自動留存異常快照至資料庫。 |
+
+---
+
+## 12-3 Web 管理後台狀態轉換與操作流程說明（副本新增）
+Web 管理後台之操作流程遵循嚴謹之狀態機（State Machine）轉換契約，確保只有通過驗證之管理員可在各項高權限管理功能間切換：
+1. **未認證狀態 (Unauthenticated Admin State)**：使用者存取任意 `/admin/*` 路徑，中介層 `require_admin` 自動攔截。若未附帶有效之 `plant_admin_session` 安全 Cookie，系統強制 303 重定向至 `/admin/login` 登入頁。
+2. **登入鑑權狀態 (Admin Authentication State)**：管理員提交帳號密碼。系統執行 Argon2id 密碼驗證、信箱驗證檢查（`is_email_verified=True`）與 admin 角色授權。三者皆合格後核發 JWT 憑證寫入 HttpOnly Cookie，轉換為已認證狀態。
+3. **數據儀表板與日誌審核狀態 (Dashboard & Diary Audit State)**：進入 `/admin/`。管理者可檢視 6 項核心 KPI 指標、進行多條件檢索、對待審查日誌執行專家病名校正，並觸發「🌟【專家覆核校正】」橫幅自動注入。
+4. **誤判回饋審查與持續學習狀態 (Feedback & Continual Learning State)**：進入 `/admin/feedback/`。審查田間回報影像並執行專家標註。標註提交後動態觸發「視覺特徵檢索飛輪（Visual RAG）」向量刻錄，並支援一鍵導出標準訓練集與啟動 ConvNeXt 增量微調。
+5. **會員名冊檢索狀態 (User Management State)**：進入 `/admin/users/`。分頁查詢全站註冊會員、核驗 Gmail 啟用狀態，並支援歷史診斷紀錄雙向關聯檢視。
+6. **視訊串流連續監控狀態 (Webcam Monitoring State)**：進入 `/webcam`。控制台啟動定時影像採樣與連續 3 幀共識判定，異常時自動觸發音效、瀏覽器推播與 SMTP 郵件告警。
+7. **安全登出狀態 (Admin Logout State)**：點擊「登出」呼叫 `POST /admin/logout`，伺服器立即作廢安全 Cookie，完全切斷會話並重定向至登入頁面，確保無憑證殘留風險。
+
+上述動態轉換流程嚴格對應系統架構圖：圖 5-3-12 (檢視儀表板活動圖)、圖 5-3-13 (查詢使用者活動圖)、圖 5-3-14 (審核回饋活動圖)、圖 7-4-5 (檢視儀表板狀態圖)、圖 7-4-6 (Webcam 監控狀態圖) 及圖 9-3-10 (管理後台權限檢查圖)，達成分析、設計與操作文件之高度一致性。
+"""
+
+DST_MD.write_text(md_content, encoding="utf-8")
+print(f"💾 成功儲存 Markdown 副本: {DST_MD} (大小: {os.path.getsize(DST_MD):,} 位元組)")
+print("🎉 所有操作順利完成！")
