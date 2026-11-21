@@ -31,6 +31,7 @@ SYMPTOM_EXPANSIONS = {
 
 
 @router.get("/")
+@router.get("/search")
 def get_remedies(
     q: Optional[str] = Query(None, description="關鍵字搜尋（品名、主成分、廠商、病蟲害適應症）"),
     category: str = Query("all", description="分類篩選：all, disease (病害), pest (蟲害), growth (活力營養), pet_safe (寵物友善), indoor_safe (室內安全)"),

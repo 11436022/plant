@@ -42,8 +42,15 @@ def validate_image_content(content: bytes, content_type: str | None) -> FrameMet
                 raise HTTPException(status_code=400, detail="Image resolution is too large.")
             if normalized_type in mime_formats and image_format != mime_formats[normalized_type]:
                 raise HTTPException(status_code=400, detail="Image format does not match its content type.")
-            if width < settings.WEBCAM_MIN_IMAGE_WIDTH or height < settings.WEBCAM_MIN_IMAGE_HEIGHT:
-                raise HTTPException(status_code=400, detail=f"Minimum image size is {settings.WEBCAM_MIN_IMAGE_WIDTH}x{settings.WEBCAM_MIN_IMAGE_HEIGHT}.")
+            # 支援手機直拍 (Portrait) 與橫拍 (Landscape)：長邊需達標、短邊不低於 160px
+            longer_side = max(width, height)
+            shorter_side = min(width, height)
+            min_longer = max(settings.WEBCAM_MIN_IMAGE_WIDTH, settings.WEBCAM_MIN_IMAGE_HEIGHT)
+            if longer_side < min_longer or shorter_side < 160:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"圖片解析度過低（至少需 {settings.WEBCAM_MIN_IMAGE_WIDTH}×{settings.WEBCAM_MIN_IMAGE_HEIGHT}），請上傳清晰的葉片照片以利 AI 辨識。"
+                )
             grayscale = image.convert("L")
             grayscale.thumbnail((320, 320))
             if float(ImageStat.Stat(grayscale).stddev[0]) < 5.0:

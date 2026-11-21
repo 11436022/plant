@@ -319,8 +319,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-xs text-slate-600 font-bold block mb-1">盆栽專屬標籤 (同種多盆隔離)</label>
-                        <input type="text" id="input-plant-tag" placeholder="如: 陽台1號、客廳2號" value="陽台1號" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-medium focus:ring-2 focus:ring-brand-500" />
+                        <label class="text-xs text-slate-600 font-bold block mb-1">盆栽專屬標籤 (選填，同種多盆隔離)</label>
+                        <input type="text" id="input-plant-tag" placeholder="如: 陽台1號、客廳盆栽 (未填則為未分類)" value="" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-medium focus:ring-2 focus:ring-brand-500" />
                     </div>
                 </div>
 
@@ -1361,7 +1361,7 @@
             animateProgressBar();
 
             const crop = document.getElementById('input-crop-name').value;
-            const tag = document.getElementById('input-plant-tag').value.trim() || '陽台1號';
+            const tag = document.getElementById('input-plant-tag').value.trim() || '未分類';
             const indoorPet = document.getElementById('check-indoor-pet').checked;
 
             try {
@@ -2002,14 +2002,16 @@
                 const params = new URLSearchParams();
                 if (query) params.append('q', query);
                 if (currentRemedyCategory && currentRemedyCategory !== 'all') params.append('category', currentRemedyCategory);
-                params.append('limit', '30');
+                params.append('limit', '50');
 
-                const res = await fetch(getFullApiUrl(`/api/v1/remedies/search?${params.toString()}`));
+                // 支援 /api/v1/remedies/ 或 /api/v1/remedies
+                const res = await fetch(getFullApiUrl(`/api/v1/remedies/?${params.toString()}`));
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
-                const list = data.data || [];
+                const list = data.items || data.data || [];
 
                 grid.innerHTML = '';
-                if (list.length === 0) {
+                if (!list || list.length === 0) {
                     empty.classList.remove('hidden');
                     return;
                 }
@@ -2018,14 +2020,31 @@
                     const card = document.createElement('div');
                     card.className = 'bg-white rounded-3xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between group';
                     
-                    const isPetSafe = item.is_pet_safe;
-                    const catBadge = item.category === 'disease' ? '🛡️ 防病剋星' : (item.category === 'pest' ? '🐛 驅蟲除蟎' : '🌱 活力營養');
+                    const isPetSafe = item.pet_friendly_status === 'SAFE';
+                    let catBadge = '🌱 活力營養';
+                    if (item.use_disease && item.use_pest) {
+                        catBadge = '🛡️🐛 雙效防護';
+                    } else if (item.use_disease) {
+                        catBadge = '🛡️ 防病剋星';
+                    } else if (item.use_pest) {
+                        catBadge = '🐛 驅蟲除蟎';
+                    } else if (item.category_name) {
+                        catBadge = item.category_name;
+                    }
+
+                    const safeBadge = isPetSafe 
+                        ? '<span class="text-[11px] font-bold bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full">🐱 寵物安全</span>' 
+                        : '<span class="text-[11px] font-bold bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">⚠️ 避開犬貓</span>';
+
+                    const ingredient = item.active_ingredient || item.common_name || item.ingredient || '天然植保成分';
+                    const targetStr = item.efficacy_summary || (item.matched_targets && item.matched_targets.slice(0, 3).join('、')) || '白粉病、缺鐵黃化、葉蟎';
+                    const vendor = item.company_name || item.vendor_name || '合規原廠';
 
                     card.innerHTML = `
                         <div>
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">${catBadge}</span>
-                                ${isPetSafe ? '<span class="text-[11px] font-bold bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full">🐱 寵物安全</span>' : '<span class="text-[11px] font-bold bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">⚠️ 避開犬貓</span>'}
+                                ${safeBadge}
                             </div>
                             <h4 class="text-base font-black text-slate-800 group-hover:text-brand-700 transition truncate">${item.product_name || '無毒保護資材'}</h4>
                             <p class="text-xs text-slate-500 font-mono mt-0.5">${item.registration_no || '官方審定編號'}</p>
@@ -2033,40 +2052,45 @@
                             <div class="mt-3 bg-slate-50 rounded-2xl p-3 text-xs space-y-1.5 border border-slate-100">
                                 <div class="flex items-center justify-between">
                                     <span class="text-slate-500">主成分：</span>
-                                    <span class="font-bold text-slate-700">${item.common_name || item.ingredient || '天然植保成分'}</span>
+                                    <span class="font-bold text-slate-700">${ingredient}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-slate-500">專克適用：</span>
-                                    <span class="font-bold text-brand-700">${item.target_disease || '白粉病、缺鐵黃化、葉蟎'}</span>
+                                    <span class="font-bold text-brand-700 truncate max-w-[180px]">${targetStr}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs text-slate-400 font-mono truncate max-w-[120px]">${item.vendor_name || '合規原廠'}</span>
-                            <button onclick='openRemedyModal(${JSON.stringify(item)})' class="text-xs bg-brand-700 hover:bg-brand-800 text-white font-bold px-3 py-1.5 rounded-xl shadow-sm transition">
+                            <span class="text-xs text-slate-400 font-mono truncate max-w-[120px]">${vendor}</span>
+                            <button class="btn-open-remedy text-xs bg-brand-700 hover:bg-brand-800 text-white font-bold px-3 py-1.5 rounded-xl shadow-sm transition">
                                 查看稀釋指南
                             </button>
                         </div>
                     `;
+                    card.querySelector('.btn-open-remedy').onclick = () => openRemedyModal(item);
                     grid.appendChild(card);
                 });
                 lucide.createIcons();
             } catch (e) {
                 console.error(e);
-                grid.innerHTML = '<div class="col-span-full py-12 text-center text-rose-500 font-medium">無法連接資材庫端點</div>';
+                grid.innerHTML = '<div class="col-span-full py-12 text-center text-rose-500 font-medium">無法連接資材庫端點：' + (e.message || '') + '</div>';
             }
         }
 
         function openRemedyModal(item) {
-            document.getElementById('modal-remedy-title').textContent = item.product_name;
-            document.getElementById('modal-remedy-regno').textContent = `官方字號：${item.registration_no}`;
-            document.getElementById('modal-remedy-ingredient').textContent = item.common_name || item.ingredient || '天然成分';
-            document.getElementById('modal-remedy-targets').textContent = item.target_disease || '一般真菌與生理病害';
-            document.getElementById('modal-remedy-vendor').textContent = item.vendor_name || '核准廠商';
+            document.getElementById('modal-remedy-title').textContent = item.product_name || '無毒保護資材';
+            document.getElementById('modal-remedy-regno').textContent = `官方字號：${item.registration_no || '--'}`;
+            document.getElementById('modal-remedy-ingredient').textContent = item.active_ingredient || item.common_name || item.ingredient || '天然植保成分';
+            document.getElementById('modal-remedy-targets').textContent = item.efficacy_summary || (item.matched_targets && item.matched_targets.join('、')) || '一般真菌與生理病害';
+            document.getElementById('modal-remedy-vendor').textContent = item.company_name || item.vendor_name || '核准廠商';
 
-            document.getElementById('modal-remedy-dilution').textContent = item.dilution_tip || '600ml 礦泉水寶特瓶約裝入 1/2 瓶蓋（約 3ml），均勻搖晃後噴灑於葉面與葉背。';
-            document.getElementById('modal-remedy-notice').textContent = item.precautions || '存放陰涼避光處，避免幼童接觸，施用時請保持環境通風。';
+            const defaultDilution = (item.active_ingredient && item.active_ingredient.includes('油'))
+                ? '以 600ml 寶特瓶裝水，滴入約 0.6ml~1.2ml（約半瓶蓋以內），劇烈搖晃乳化後均勻噴灑葉片正反面，清晨或傍晚施用效果最佳。'
+                : '標準 600ml 礦泉水寶特瓶約裝入 1 瓶蓋（約 3~5ml），均勻搖晃後噴灑於葉面與葉背。';
+
+            document.getElementById('modal-remedy-dilution').textContent = item.dilution_tip || defaultDilution;
+            document.getElementById('modal-remedy-notice').textContent = item.pet_friendly_desc || item.indoor_reason || item.precautions || '存放陰涼避光處，避免幼童直接接觸，施用時請保持環境通風。';
 
             document.getElementById('modal-remedy-detail').classList.remove('hidden');
         }
