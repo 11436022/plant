@@ -971,7 +971,7 @@
                 </div>
                 <div>
                     <label class="text-xs font-bold text-slate-700 block mb-1">密碼</label>
-                    <input type="password" id="auth-password" value="123456" placeholder="請輸入密碼" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-brand-500" />
+                    <input type="password" id="auth-password" value="12345678" placeholder="請輸入密碼" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-brand-500" />
                 </div>
                 <div class="pt-2 flex items-center gap-3">
                     <button onclick="handleLogin()" class="flex-1 bg-brand-700 hover:bg-brand-800 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">立即登入</button>
@@ -1219,7 +1219,7 @@
                 formData.append('username', u);
                 formData.append('password', p);
 
-                const res = await fetch(getFullApiUrl('/api/v1/auth/token'), {
+                const res = await fetch(getFullApiUrl('/api/v1/auth/login'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: formData
@@ -1230,6 +1230,7 @@
                     localStorage.setItem('plant_username', u);
                     closeAuthModal();
                     checkUserSession();
+                    if (currentView === 'history') fetchHistoryFromServer();
                     Swal.fire({ icon: 'success', title: '登入成功！', timer: 1200, showConfirmButton: false });
                 } else {
                     throw new Error(data.detail || '帳號或密碼錯誤');
@@ -1241,7 +1242,7 @@
 
         async function handleQuickDemoLogin() {
             document.getElementById('auth-username').value = '123';
-            document.getElementById('auth-password').value = '123456';
+            document.getElementById('auth-password').value = '12345678';
             await handleLogin();
         }
 
@@ -1309,15 +1310,15 @@
             let tag = '陽台1號';
 
             if (type === 'iron') {
-                sampleUrl = 'https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80';
+                sampleUrl = '/uploads/5be47fb03c4a48cea32436669fa48f44.jpg';
                 crop = '檸檬';
                 tag = '陽台1號';
             } else if (type === 'powdery') {
-                sampleUrl = 'https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80';
+                sampleUrl = '/uploads/a1fedd2b0db8462e92112d124cc30cb4.jpg';
                 crop = '柑橘';
                 tag = '客廳2號';
             } else {
-                sampleUrl = 'https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80';
+                sampleUrl = '/uploads/c7acdf30186e4acab8472a3a45902d4f.jpg';
                 crop = '檸檬';
                 tag = '陽台1號';
             }
@@ -1327,7 +1328,9 @@
 
             try {
                 const res = await fetch(sampleUrl);
+                if (!res.ok) throw new Error('無法載入範例圖片');
                 const blob = await res.blob();
+                if (blob.size === 0) throw new Error('範例圖片為空');
                 currentSelectedFile = new File([blob], `${crop}_sample.jpg`, { type: 'image/jpeg' });
                 document.getElementById('preview-image').src = sampleUrl;
                 document.getElementById('preview-container').classList.remove('hidden');
@@ -1342,12 +1345,13 @@
                 });
             } catch (err) {
                 console.error(err);
+                Swal.fire({ icon: 'error', title: '範例圖載入失敗', text: err.message });
             }
         }
 
         // 執行診斷流程（含進度條動畫 對齊 DiagnoseProgressActivity）
         async function executeDiagnosisFlow() {
-            if (!currentSelectedFile) {
+            if (!currentSelectedFile || currentSelectedFile.size === 0) {
                 Swal.fire({ icon: 'warning', title: '請先選擇葉片照片', text: '請上傳照片或點擊上方「展覽示範葉片」！' });
                 return;
             }
