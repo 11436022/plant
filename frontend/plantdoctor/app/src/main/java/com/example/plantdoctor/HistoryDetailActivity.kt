@@ -26,6 +26,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.Date
+import java.util.Locale
 
 class HistoryDetailActivity : AppCompatActivity() {
 
@@ -53,6 +55,28 @@ class HistoryDetailActivity : AppCompatActivity() {
     private lateinit var etUserNoteEdit: EditText
     private lateinit var ivEditNote: ImageView
     private lateinit var btnSaveNote: Button
+
+    // 🌟 時間軸與康復追蹤相關 UI 元件
+    private lateinit var tvTimelineHeaderTitle: TextView
+    private lateinit var tvTrendTitle: TextView
+    private lateinit var tvTrendDesc: TextView
+    private lateinit var tvCompareTitle: TextView
+    private lateinit var layoutBeforeAfter: LinearLayout
+    private lateinit var imgBefore: ImageView
+    private lateinit var tvBeforeLabel: TextView
+    private lateinit var tvBeforeDate: TextView
+    private lateinit var imgAfter: ImageView
+    private lateinit var tvAfterLabel: TextView
+    private lateinit var tvAfterDate: TextView
+    private lateinit var cvBeforeImg: CardView
+    private lateinit var cvAfterImg: CardView
+    private lateinit var containerTimelineNodes: LinearLayout
+
+    // 🌟 專家處方箋區塊化與一鍵打卡元件
+    private lateinit var tvDetailSymptom: TextView
+    private lateinit var tvDetailTreatment: TextView
+    private lateinit var btnOpenRemedyCatalog: TextView
+    private lateinit var btnCareCheckin: TextView
 
     private var dX = 0f
     private var dY = 0f
@@ -101,6 +125,28 @@ class HistoryDetailActivity : AppCompatActivity() {
         etUserNoteEdit = findViewById(R.id.et_user_note_edit)
         ivEditNote = findViewById(R.id.iv_edit_note)
         btnSaveNote = findViewById(R.id.btn_save_note)
+
+        // 🌟 綁定生長與康復時間軸元件
+        tvTimelineHeaderTitle = findViewById(R.id.tv_timeline_header_title)
+        tvTrendTitle = findViewById(R.id.tv_trend_title)
+        tvTrendDesc = findViewById(R.id.tv_trend_desc)
+        tvCompareTitle = findViewById(R.id.tv_compare_title)
+        layoutBeforeAfter = findViewById(R.id.layout_before_after)
+        imgBefore = findViewById(R.id.img_before)
+        tvBeforeLabel = findViewById(R.id.tv_before_label)
+        tvBeforeDate = findViewById(R.id.tv_before_date)
+        imgAfter = findViewById(R.id.img_after)
+        tvAfterLabel = findViewById(R.id.tv_after_label)
+        tvAfterDate = findViewById(R.id.tv_after_date)
+        cvBeforeImg = findViewById(R.id.cv_before_img)
+        cvAfterImg = findViewById(R.id.cv_after_img)
+        containerTimelineNodes = findViewById(R.id.container_timeline_nodes)
+
+        // 🌟 綁定處方箋區塊化與打卡按鈕
+        tvDetailSymptom = findViewById(R.id.tv_detail_symptom)
+        tvDetailTreatment = findViewById(R.id.tv_detail_treatment)
+        btnOpenRemedyCatalog = findViewById(R.id.btn_open_remedy_catalog)
+        btnCareCheckin = findViewById(R.id.btn_care_checkin)
 
         // 限制卡片最高只能滑到「病例詳情」標題的下方
         val behavior = BottomSheetBehavior.from(cardAdvice)
@@ -245,6 +291,38 @@ class HistoryDetailActivity : AppCompatActivity() {
 
     private fun handleSaveNote() {
         val updatedNote = etUserNoteEdit.text.toString()
+        saveNoteToServer(updatedNote)
+    }
+
+    private fun handleCareCheckin(isHealthy: Boolean) {
+        val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
+        val checkinText = if (isHealthy) {
+            "【💧 照護打卡】$todayStr 已完成日常澆水與生長環境通風巡檢。"
+        } else {
+            "【🌿 照護打卡】$todayStr 已依處方指南完成藥劑噴灑與通風照護。"
+        }
+
+        val existingNote = tvUserNoteDisplay.text.toString().trim()
+        val finalNote = if (existingNote.isBlank() || existingNote.contains("點選右側鉛筆")) {
+            checkinText
+        } else {
+            "$existingNote\n$checkinText"
+        }
+
+        val successMsg = if (isHealthy) {
+            "打卡成功！已為此植物累積一次日常生長澆水紀錄 🌱"
+        } else {
+            "打卡成功！已為此植物累積一次康復照護紀錄 🎉"
+        }
+
+        saveNoteToServer(finalNote) {
+            Toast.makeText(this, successMsg, Toast.LENGTH_LONG).show()
+            // 重新刷新時間軸
+            fetchTimelineData()
+        }
+    }
+
+    private fun saveNoteToServer(updatedNote: String, onSuccess: (() -> Unit)? = null) {
         btnSaveNote.isEnabled = false
 
         val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
@@ -258,6 +336,7 @@ class HistoryDetailActivity : AppCompatActivity() {
                     Toast.makeText(this@HistoryDetailActivity, "筆記已儲存", Toast.LENGTH_SHORT).show()
                     tvUserNoteDisplay.text = updatedNote
                     switchToDisplayMode()
+                    onSuccess?.invoke()
                 } else {
                     Toast.makeText(this@HistoryDetailActivity, "儲存失敗: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
@@ -387,7 +466,8 @@ class HistoryDetailActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val data = response.body()?.data ?: return
 
-                    tvPlantName.text = "植物：${data.crop_name ?: "無法辨識"}"
+                    val tagSuffix = if (!data.plant_tag.isNullOrBlank()) " [${data.plant_tag}]" else ""
+                    tvPlantName.text = "植物：${data.crop_name ?: "無法辨識"}$tagSuffix"
 
                     if (!data.user_corrected_status.isNullOrBlank()) {
                         tvDiseaseName.text = "原診斷：${data.status_name ?: "未知"}\n專家覆核定案：${data.user_corrected_status}"
@@ -402,7 +482,40 @@ class HistoryDetailActivity : AppCompatActivity() {
                         append("【過往筆記】")
                     }.toString()
                     tvAdvice.text = fullAdvice
-                    tvAdvice.setTextIsSelectable(true)
+
+                    // 🌟 核心升級：將處方箋優雅拆解為獨立的卡片區塊
+                    tvDetailSymptom.text = data.suggestion ?: "目前植株狀態穩定，無異常嚴重病徵。"
+                    tvDetailTreatment.text = data.treatment ?: "請維持良好光照與通風，適度澆水即可。"
+
+                    // 判斷此植株當前是否為健康狀態
+                    val isHealthyPlant = (data.user_corrected_status ?: data.status_name ?: "").contains("健康")
+
+                    // 點擊「官方用藥寶典 ➜」直接攜帶作物與病名快速開啟寶典
+                    if (isHealthyPlant) {
+                        btnOpenRemedyCatalog.visibility = View.GONE
+                        btnCareCheckin.text = "💧 記錄今日已澆水"
+                    } else {
+                        btnOpenRemedyCatalog.visibility = View.VISIBLE
+                        btnCareCheckin.text = "🌿 記錄今日已噴藥"
+                        btnOpenRemedyCatalog.setOnClickListener {
+                            SoundManager.playBubblePop()
+                            val intent = Intent(this@HistoryDetailActivity, RemedyCatalogActivity::class.java).apply {
+                                val targetQuery = data.user_corrected_status ?: data.status_name ?: ""
+                                if (targetQuery.isNotBlank() && targetQuery != "健康") {
+                                    putExtra("EXTRA_SEARCH_QUERY", targetQuery)
+                                    putExtra("AUTO_QUERY", targetQuery)
+                                }
+                            }
+                            startActivity(intent)
+                        }
+                    }
+
+                    // 點擊一鍵照護打卡（健康時打卡澆水，生病時打卡噴藥）
+                    btnCareCheckin.setOnClickListener {
+                        SoundManager.playBubblePop()
+                        handleCareCheckin(isHealthyPlant)
+                    }
+
                     currentImageUrl = fixImageUrl(data.image_url ?: "")
 
                     Glide.with(this@HistoryDetailActivity).load(currentImageUrl).placeholder(android.R.drawable.ic_menu_gallery).into(imgPlant)
@@ -412,12 +525,155 @@ class HistoryDetailActivity : AppCompatActivity() {
                     switchToDisplayMode()
 
                     setupHistoryDetailGuide()
+                    // 🌟 同步載入本株植物專屬的康復時間軸與 Before/After 比對
+                    fetchTimelineData()
                 }
             }
             override fun onFailure(call: Call<DetailDetailResponse>, t: Throwable) {
                 Toast.makeText(this@HistoryDetailActivity, "載入失敗", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun fetchTimelineData() {
+        val sharedPref = getSharedPreferences("PlantDoctor", Context.MODE_PRIVATE)
+        val token = sharedPref.getString("token", "") ?: ""
+
+        PlantApiService.create(token).getDiaryTimeline(diaryId).enqueue(object : Callback<TimelineResponse> {
+            override fun onResponse(call: Call<TimelineResponse>, response: Response<TimelineResponse>) {
+                if (response.isSuccessful && response.body() != null) {
+                    val body = response.body()!!
+                    renderTimeline(body)
+                }
+            }
+
+            override fun onFailure(call: Call<TimelineResponse>, t: Throwable) {
+                // 靜默降級，不影響原本處方箋的閱覽
+            }
+        })
+    }
+
+    private fun renderTimeline(data: TimelineResponse) {
+        if (!data.plantTag.isNullOrBlank()) {
+            tvTimelineHeaderTitle.text = "🌱 【${data.plantTag}】專屬康復時間軸與生長監控"
+        } else {
+            tvTimelineHeaderTitle.text = "🌱 單株專屬康復時間軸與生長監控"
+        }
+        tvTrendTitle.text = data.trendTitle
+        tvTrendDesc.text = data.trendDesc
+
+        // 依趨勢顏色高亮卡片標題
+        when (data.trendStatus) {
+            "RECOVERED" -> tvTrendTitle.setTextColor(Color.parseColor("#2E7D32"))
+            "ALERT" -> tvTrendTitle.setTextColor(Color.parseColor("#C62828"))
+            "TRANSITION", "TREATING" -> tvTrendTitle.setTextColor(Color.parseColor("#E65100"))
+            else -> tvTrendTitle.setTextColor(Color.parseColor("#1B5E20"))
+        }
+
+        // 處理 Before vs After 對比
+        if (data.hasBeforeAfter && data.beforeRecord != null && data.afterRecord != null) {
+            layoutBeforeAfter.visibility = View.VISIBLE
+
+            // 🌟 動態切換標題：健康轉健康叫「成長發育寫真」，生病轉健康才叫「康復成效對照」
+            tvCompareTitle.text = data.compareTitle ?: "🔍 歷程影像對比 (Before vs After)"
+
+            val before = data.beforeRecord
+            val after = data.afterRecord
+
+            tvBeforeLabel.text = data.beforeLabel ?: (if (before.isHealthy) "初期：健康" else "初期：${before.statusName}")
+            tvBeforeDate.text = before.createdAt.take(10)
+            val beforeUrl = fixImageUrl(before.imageUrl)
+            Glide.with(this).load(beforeUrl).placeholder(android.R.drawable.ic_menu_gallery).into(imgBefore)
+            cvBeforeImg.setOnClickListener {
+                SoundManager.playBubblePop()
+                startActivity(Intent(this, ImagePreviewActivity::class.java).apply {
+                    putExtra("IMAGE_PATH", beforeUrl)
+                })
+            }
+
+            tvAfterLabel.text = data.afterLabel ?: (if (after.isHealthy) "現況：健康" else "現況：${after.statusName}")
+            tvAfterDate.text = after.createdAt.take(10)
+            val afterUrl = fixImageUrl(after.imageUrl)
+            Glide.with(this).load(afterUrl).placeholder(android.R.drawable.ic_menu_gallery).into(imgAfter)
+            cvAfterImg.setOnClickListener {
+                SoundManager.playBubblePop()
+                startActivity(Intent(this, ImagePreviewActivity::class.java).apply {
+                    putExtra("IMAGE_PATH", afterUrl)
+                })
+            }
+        } else {
+            layoutBeforeAfter.visibility = View.GONE
+        }
+
+        // 渲染垂直節點列表
+        containerTimelineNodes.removeAllViews()
+        val inflater = layoutInflater
+
+        data.timeline.forEachIndexed { index, node ->
+            val nodeView = inflater.inflate(R.layout.item_timeline_node, containerTimelineNodes, false)
+
+            val viewDot = nodeView.findViewById<View>(R.id.view_dot)
+            val viewLine = nodeView.findViewById<View>(R.id.view_line)
+            val imgThumb = nodeView.findViewById<ImageView>(R.id.img_node_thumb)
+            val tvStatus = nodeView.findViewById<TextView>(R.id.tv_node_status)
+            val tvTag = nodeView.findViewById<TextView>(R.id.tv_node_tag)
+            val tvDate = nodeView.findViewById<TextView>(R.id.tv_node_date)
+            val tvNote = nodeView.findViewById<TextView>(R.id.tv_node_note)
+            val cardNode = nodeView.findViewById<CardView>(R.id.card_timeline_node)
+
+            // 如果是最後一個節點，隱藏連接下方的線條
+            if (index == data.timeline.size - 1) {
+                viewLine.visibility = View.INVISIBLE
+            }
+
+            // 狀態與樣式
+            if (node.isHealthy) {
+                tvStatus.text = "🌿 健康狀態"
+                tvStatus.setTextColor(Color.parseColor("#2E7D32"))
+                viewDot.backgroundTintList = getColorStateList(android.R.color.holo_green_dark)
+            } else {
+                tvStatus.text = "🦠 ${node.statusName}"
+                tvStatus.setTextColor(Color.parseColor("#C62828"))
+                viewDot.backgroundTintList = getColorStateList(android.R.color.holo_red_light)
+            }
+
+            tvDate.text = node.createdAt
+
+            // 當前檢視標籤
+            if (node.isCurrent) {
+                tvTag.visibility = View.VISIBLE
+                cardNode.setCardBackgroundColor(Color.parseColor("#E8F5E9"))
+            } else {
+                tvTag.visibility = View.GONE
+                cardNode.setCardBackgroundColor(Color.parseColor("#FFFFFF"))
+            }
+
+            // 筆記
+            if (node.userNote.isNotBlank()) {
+                tvNote.visibility = View.VISIBLE
+                tvNote.text = "📝 ${node.userNote}"
+            } else {
+                tvNote.visibility = View.GONE
+            }
+
+            // 縮圖
+            val nodeImgUrl = fixImageUrl(node.imageUrl)
+            Glide.with(this).load(nodeImgUrl).placeholder(android.R.drawable.ic_menu_gallery).into(imgThumb)
+
+            // 點擊節點卡片切換至該病例（若不是當前頁）
+            cardNode.setOnClickListener {
+                if (node.id != diaryId) {
+                    SoundManager.playBubblePop()
+                    val intent = Intent(this, HistoryDetailActivity::class.java).apply {
+                        putExtra("DIARY_ID", node.id)
+                    }
+                    startActivity(intent)
+                    finish()
+                }
+            }
+
+            containerTimelineNodes.addView(nodeView)
+        }
     }
 
     private fun fixImageUrl(rawUrl: String): String {

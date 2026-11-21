@@ -14,6 +14,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.app.ActivityCompat
 import com.example.plantdoctor.PlantApiService
 import com.example.plantdoctor.PlantCareAdvice
@@ -41,6 +43,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var cardDiagnose: CardView
     private lateinit var cardWebcam: CardView
     private lateinit var cardHistory: CardView
+    private lateinit var cardRemedies: CardView
     private lateinit var cardSettings: CardView
     private lateinit var cardWeather: CardView
     private lateinit var tvhomeTitle: TextView
@@ -69,9 +72,30 @@ class HomeActivity : AppCompatActivity() {
 
         // 1. 綁定元件
         homeRoot = findViewById(R.id.home_root_layout)
+
+        // 🌟 核心防護：依系統狀態列高度自動調整頂部間距，完美適配挖孔螢幕、水滴屏、任何手機螢幕大小！
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.home_scroll_view)) { _, insets ->
+            val statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+            val navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            // 頂部至少保留 statusBars.top + 8dp，底部保留 navBars.bottom
+            val density = resources.displayMetrics.density
+            val extraTopPadding = (8 * density).toInt()
+            val safeTop = if (statusBars.top > 0) statusBars.top + extraTopPadding else (28 * density).toInt()
+            val safeBottom = if (navBars.bottom > 0) navBars.bottom + (16 * density).toInt() else (24 * density).toInt()
+
+            homeRoot.setPadding(
+                homeRoot.paddingLeft,
+                safeTop,
+                homeRoot.paddingRight,
+                safeBottom
+            )
+            insets
+        }
+
         cardDiagnose = findViewById(R.id.card_diagnose)
         cardWebcam = findViewById(R.id.card_webcam)
         cardHistory = findViewById(R.id.card_history)
+        cardRemedies = findViewById(R.id.card_remedies)
         cardSettings = findViewById(R.id.card_settings)
         tvhomeTitle = findViewById(R.id.tv_home_title)
         cardWeather = findViewById(R.id.weather_card)
@@ -133,6 +157,11 @@ class HomeActivity : AppCompatActivity() {
         cardHistory.setOnClickListener {
             SoundManager.playBubblePop()
             startActivity(Intent(this, HistoryListActivity::class.java))
+        }
+
+        cardRemedies.setOnClickListener {
+            SoundManager.playBubblePop()
+            startActivity(Intent(this, RemedyCatalogActivity::class.java))
         }
 
         cardSettings.setOnClickListener {

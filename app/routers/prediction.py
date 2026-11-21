@@ -79,18 +79,15 @@ def get_owned_prediction(prediction_id: str, user_id: int, *, consume: bool = Fa
 async def predict_plant_status(
     file: UploadFile = File(...),
     crop_name: Optional[str] = Form(None),
+    is_indoor: bool = Form(True),
+    has_pet: bool = Form(False),
+    user_city: Optional[str] = Form(None),
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_optional_current_user),
 ):
     """
     接收圖片，執行 AI 分析，並將結果暫存。
-
-    這個端點會：
-    1. 儲存上傳的圖片到一個臨時資料夾。
-    2. 呼叫 AI 模型進行分析。
-    3. 產生一個唯一的 prediction_id。
-    4. 將分析結果和圖片路徑暫存起來。
-    5. 回傳 prediction_id 和分析結果給客戶端。
+    支援室內安全、寵物友善與全台官方 1,616 筆資材自動匹配推薦。
     """
     start_time = time.time()
     temp_file_path = None
@@ -163,6 +160,24 @@ async def predict_plant_status(
 
         # 步驟 2: 處理原始結果，與資料庫同步並取得最終可信的診斷
         final_diagnosis = process_and_update_diagnosis(raw_ai_result, db)
+        if user_city:
+            from app.services.remedies import search_official_remedies
+            local_remedies = search_official_remedies(
+                final_diagnosis.get("status_name", ""),
+                is_indoor=is_indoor,
+                has_pet=has_pet,
+                city_filter=user_city,
+                limit=3
+            )
+            if local_remedies:
+                final_diagnosis["commercial_remedies"] = local_remedies
+                from app.services.ai import format_remedies_into_treatment
+                final_diagnosis["treatment"] = format_remedies_into_treatment(
+                    final_diagnosis.get("treatment", ""),
+                    local_remedies,
+                    is_indoor=is_indoor,
+                    has_pet=has_pet,
+                )
 
         # 3. 產生唯一的 ID
         prediction_id = str(uuid.uuid4())

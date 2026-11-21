@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- 頂部圖片容器 (115dp) + 類別徽章疊加 -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="115dp"
+            android:background="#F1F8E9">
+
+            <ImageView
+                android:id="@+id/img_remedy_license"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@android:drawable/ic_menu_gallery"
+                tools:ignore="ContentDescription" />
+
+            <!-- 類別徽章 (左上角) -->
+            <TextView
+                android:id="@+id/tv_category_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:layout_margin="5dp"
+                android:background="@drawable/bg_badge_safe"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="3dp"
+                android:text="🛡️ 殺菌防病"
+                android:textColor="#2E7D32"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <!-- 寵物安全徽章 (右上角) -->
+            <TextView
+                android:id="@+id/tv_remedy_pet_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="5dp"
+                android:background="@drawable/bg_badge_safe"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="3dp"
+                android:text="🐾 寵物安全"
+                android:textColor="#2E7D32"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+        <!-- 卡片資訊區域 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <!-- 商品名稱 -->
+            <TextView
+                android:id="@+id/tv_remedy_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="自然靈(免稀釋)"
+                android:textColor="#1B5E20"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <!-- 適應症/核心功效摘要 (使用者最關心的：到底治什麼病蟲害！) -->
+            <TextView
+                android:id="@+id/tv_remedy_efficacy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_badge_efficacy"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingHorizontal="5dp"
+                android:paddingVertical="3dp"
+                android:text="🎯 專治：白粉病、紅蜘蛛"
+                android:textColor="#37474F"
+                android:textSize="10.5sp"
+                android:textStyle="bold" />
+
+            <!-- 主成分 -->
+            <TextView
+                android:id="@+id/tv_remedy_ingredients"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="🌿 肉桂精油"
+                android:textColor="#757575"
+                android:textSize="10sp" />
+
+            <!-- 前往採購按鈕 (電商導流) -->
+            <TextView
+                android:id="@+id/btn_buy_shopee"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_chip_selected"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingVertical="5dp"
+                android:text="🛒 前往採購"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

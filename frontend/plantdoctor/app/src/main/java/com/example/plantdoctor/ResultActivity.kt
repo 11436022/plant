@@ -1,5 +1,8 @@
 package com.example.plantdoctor
 
+import android.view.LayoutInflater
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
@@ -130,6 +133,7 @@ class ResultActivity : AppCompatActivity() {
                 params.marginEnd = 0
                 binding.btnDiscard.layoutParams = params
                 binding.btnDiscard.text = "結果有誤？（回饋）"
+                binding.btnViewRemedyCatalog.visibility = View.GONE
             } else {
                 binding.btnSave.visibility = View.VISIBLE
                 val marginPx = (8 * resources.displayMetrics.density).toInt()
@@ -137,6 +141,20 @@ class ResultActivity : AppCompatActivity() {
                 params.marginEnd = marginPx
                 binding.btnDiscard.layoutParams = params
                 binding.btnDiscard.text = "結果有誤"
+
+                // 若有病蟲害且非健康狀態，開放查看官方資材型錄快捷鍵
+                if (data.category?.lowercase() !in listOf("healthy", "健康")) {
+                    binding.btnViewRemedyCatalog.visibility = View.VISIBLE
+                    binding.btnViewRemedyCatalog.setOnClickListener {
+                        SoundManager.playBubblePop()
+                        val intent = Intent(this, RemedyCatalogActivity::class.java).apply {
+                            putExtra("EXTRA_SEARCH_QUERY", diseaseName ?: plantName ?: "")
+                        }
+                        startActivity(intent)
+                    }
+                } else {
+                    binding.btnViewRemedyCatalog.visibility = View.GONE
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -174,7 +192,7 @@ class ResultActivity : AppCompatActivity() {
         // 補上 "儲存至日記" 按鈕的監聽器
         binding.btnSave.setOnClickListener {
             SoundManager.playBubblePop()
-            confirmAndSaveDiary(predictionId)
+            showPlantTagDialogAndSave(predictionId)
         }
 
         // 註冊系統返回鍵監聽，確保 Android 13+ 預測性返回與實體返回鍵皆能正確觸發退出確認/關閉彈窗
@@ -309,7 +327,7 @@ class ResultActivity : AppCompatActivity() {
         }
         btnSave?.setOnClickListener {
             overlay.visibility = View.GONE
-            confirmAndSaveDiary(predictionId)
+            showPlantTagDialogAndSave(predictionId)
         }
         btnDontSave?.setOnClickListener {
             overlay.visibility = View.GONE
@@ -325,7 +343,83 @@ class ResultActivity : AppCompatActivity() {
         }
     }
 
-    private fun confirmAndSaveDiary(predictionId: String?) {
+    private fun showPlantTagDialogAndSave(predictionId: String?) {
+        if (isUnknownResult) {
+            Toast.makeText(this, "未知作物或無法判定之結果，無法儲存至日記", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (predictionId.isNullOrEmpty()) {
+            Toast.makeText(this, "缺少預測ID，無法儲存", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_plant_tag_select, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val tvTitle = dialogView.findViewById<TextView>(R.id.dialog_tag_title)
+        val tvSubtitle = dialogView.findViewById<TextView>(R.id.dialog_tag_subtitle)
+        val btnClose = dialogView.findViewById<ImageButton>(R.id.dialog_tag_btn_close)
+        val etPlantTag = dialogView.findViewById<EditText>(R.id.et_plant_tag)
+        val chipTag1 = dialogView.findViewById<TextView>(R.id.chip_tag_default_1)
+        val chipTag2 = dialogView.findViewById<TextView>(R.id.chip_tag_default_2)
+        val chipTag3 = dialogView.findViewById<TextView>(R.id.chip_tag_default_3)
+        val btnCancel = dialogView.findViewById<TextView>(R.id.dialog_tag_btn_cancel)
+        val btnConfirm = dialogView.findViewById<TextView>(R.id.dialog_tag_btn_confirm)
+
+        val cropName = plantName ?: "植物"
+        tvTitle.text = "🌿 歸檔至【$cropName】專屬病歷"
+        tvSubtitle.text = "若種植了多盆同品種植物，指定盆栽暱稱可完美隔離時間軸！"
+
+        // 預設填入第一組常用標籤
+        val defaultTag = "$cropName 1號"
+        etPlantTag.setText(defaultTag)
+        etPlantTag.setSelection(etPlantTag.text.length)
+
+        chipTag1.text = "$cropName 1號"
+        chipTag2.text = "$cropName 2號"
+        chipTag3.text = "陽台盆栽"
+
+        val quickChips: List<TextView> = listOf(chipTag1, chipTag2, chipTag3)
+        quickChips.forEach { chip: TextView ->
+            chip.setOnClickListener {
+                SoundManager.playBubblePop()
+                quickChips.forEach { c: TextView ->
+                    c.setBackgroundResource(R.drawable.bg_chip_unselected)
+                    c.setTextColor(Color.parseColor("#2E7D32"))
+                }
+                chip.setBackgroundResource(R.drawable.bg_chip_selected)
+                chip.setTextColor(Color.WHITE)
+                etPlantTag.setText(chip.text.toString())
+                etPlantTag.setSelection(etPlantTag.text.length)
+            }
+        }
+
+        btnClose.setOnClickListener {
+            SoundManager.playBubblePop()
+            dialog.dismiss()
+        }
+
+        btnCancel.setOnClickListener {
+            SoundManager.playBubblePop()
+            dialog.dismiss()
+        }
+
+        btnConfirm.setOnClickListener {
+            SoundManager.playBubblePop()
+            val chosenTag = etPlantTag.text.toString().trim().ifBlank { defaultTag }
+            dialog.dismiss()
+            confirmAndSaveDiary(predictionId, chosenTag)
+        }
+
+        dialog.show()
+    }
+
+    private fun confirmAndSaveDiary(predictionId: String?, plantTag: String? = null) {
         if (isUnknownResult) {
             Toast.makeText(this, "未知作物或無法判定之結果，無法儲存至日記", Toast.LENGTH_SHORT).show()
             return
@@ -350,8 +444,11 @@ class ResultActivity : AppCompatActivity() {
         binding.btnSave.isEnabled = false
         binding.btnSave.text = "儲存中..."
 
-        // The server saves the diagnosis snapshot; display labels are not input.
-        val request = DiaryConfirmRequest(user_note = userNote)
+        // 🌟 攜帶專屬盆栽標籤 plant_tag 寫入資料庫
+        val request = DiaryConfirmRequest(
+            user_note = userNote,
+            plant_tag = plantTag
+        )
 
         val apiService = PlantApiService.create(token)
         apiService.confirmDiary(predictionId, request).enqueue(object : Callback<DiaryConfirmResponse> {
@@ -511,4 +608,5 @@ class ResultActivity : AppCompatActivity() {
             }
         })
     }
-}
+}
+

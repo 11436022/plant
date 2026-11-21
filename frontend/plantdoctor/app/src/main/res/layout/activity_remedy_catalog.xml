@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/remedy_catalog_root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background">
+
+    <!-- 🌟 自適應頂部 Guideline (6%) -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.06" />
+
+    <!-- 1. 返回主頁按鈕 -->
+    <ImageButton
+        android:id="@+id/btn_back_home"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="14dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="返回"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideline_top"
+        app:tint="#2E7D32" />
+
+    <!-- 2. 標題 -->
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="14dp"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="官方安全用藥寶典"
+        android:textColor="#1B5E20"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:autoSizeMaxTextSize="28sp"
+        app:autoSizeMinTextSize="18sp"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintBottom_toBottomOf="@id/btn_back_home"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btn_back_home" />
+
+    <!-- 3. 搜尋欄 -->
+    <LinearLayout
+        android:id="@+id/layout_search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="14dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edittext_background"
+        android:elevation="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="7dp"
+        app:layout_constraintTop_toBottomOf="@id/btn_back_home">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@android:drawable/ic_menu_search"
+            app:tint="#4CAF50"
+            tools:ignore="ContentDescription" />
+
+        <EditText
+            android:id="@+id/et_search_remedy"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="搜尋品名、症狀（如：紅蜘蛛、長白粉）..."
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textColor="#2E7D32"
+            android:textColorHint="#81C784"
+            android:textSize="13.5sp" />
+
+        <ImageView
+            android:id="@+id/btn_clear_search"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:visibility="gone"
+            app:tint="#9E9E9E"
+            tools:ignore="ContentDescription" />
+    </LinearLayout>
+
+    <!-- 4. 主題分類專區 Chips (殺菌防病 / 害蟲除蟎 / 活力生根 / 貓狗無毒) -->
+    <HorizontalScrollView
+        android:id="@+id/scroll_chips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:overScrollMode="never"
+        android:paddingHorizontal="14dp"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/layout_search_bar">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/chip_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_chip_selected"
+                android:clickable="true"
+                android:elevation="1dp"
+                android:focusable="true"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="5dp"
+                android:text="全量圖鑑 (1,616)"
+                android:textColor="#FFFFFF"
+                android:textSize="11.5sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/chip_disease"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_chip_unselected"
+                android:clickable="true"
+                android:elevation="1dp"
+                android:focusable="true"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="5dp"
+                android:text="🛡️ 真菌發霉剋星"
+                android:textColor="#37474F"
+                android:textSize="11.5sp" />
+
+            <TextView
+                android:id="@+id/chip_pest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_chip_unselected"
+                android:clickable="true"
+                android:elevation="1dp"
+                android:focusable="true"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="5dp"
+                android:text="🐛 害蟲除蟎專區"
+                android:textColor="#37474F"
+                android:textSize="11.5sp" />
+
+            <TextView
+                android:id="@+id/chip_growth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_chip_unselected"
+                android:clickable="true"
+                android:elevation="1dp"
+                android:focusable="true"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="5dp"
+                android:text="🌱 活力生根強健"
+                android:textColor="#37474F"
+                android:textSize="11.5sp" />
+
+            <TextView
+                android:id="@+id/chip_pet_safe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_chip_unselected"
+                android:clickable="true"
+                android:elevation="1dp"
+                android:focusable="true"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="5dp"
+                android:text="🐾 貓狗安全無毒"
+                android:textColor="#37474F"
+                android:textSize="11.5sp" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- 6. 統計提示列 -->
+    <TextView
+        android:id="@+id/tv_count_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="6dp"
+        android:text="載入官方審定資材中..."
+        android:textColor="#558B2F"
+        android:textSize="11.5sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scroll_chips" />
+
+    <!-- 7. 載入中動畫 -->
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:indeterminateTint="#2E7D32"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_count_label" />
+
+    <!-- 8. 空狀態無結果 -->
+    <LinearLayout
+        android:id="@+id/layout_empty_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_count_label">
+
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:alpha="0.6"
+            android:src="@drawable/doctor_find"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="查無相符之官方審定保護資材"
+            android:textColor="#558B2F"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="點選上方快捷標籤或搜尋「紅蜘蛛」、「白粉病」"
+            android:textColor="#757575"
+            android:textSize="12.5sp" />
+    </LinearLayout>
+
+    <!-- 9. 雙欄現代商品網格 (2-Column Grid) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_remedies"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="9dp"
+        android:paddingBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_count_label" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

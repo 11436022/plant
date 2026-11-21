@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
 
-    <!-- 🌟 百分比 Guideline：依據螢幕高度 5% 自適應定位頂部列 -->
+    <!-- 🌟 百分比 Guideline：依據螢幕高度 8% 自適應定位頂部列 -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_top"
         android:layout_width="wrap_content"
@@ -41,9 +41,9 @@
         android:maxLines="1"
         android:text="歷史診斷紀錄"
         android:textColor="#1B5E20"
-        android:textSize="38sp"
+        android:textSize="36sp"
         android:textStyle="bold"
-        app:autoSizeMaxTextSize="38sp"
+        app:autoSizeMaxTextSize="36sp"
         app:autoSizeMinTextSize="18sp"
         app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="@id/btn_back_home"
@@ -51,39 +51,167 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/btn_back_home" />
 
-    <!-- 3. 搜尋輸入框 -->
-    <EditText
-        android:id="@+id/et_search"
-        android:layout_width="0dp"
+    <!-- 3. 搜尋與日曆按鈕水平列 -->
+    <LinearLayout
+        android:id="@+id/layout_search_bar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/search_bg"
-        android:drawableStart="@android:drawable/ic_menu_search"
-        android:drawablePadding="10dp"
-        android:hint="輸入植物名稱搜尋..."
-        android:inputType="text"
-        android:maxLines="1"
-        android:padding="12dp"
-        android:textColor="#333333"
-        android:textColorHint="#757575"
-        android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_back_home" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/btn_back_home">
 
-    <!-- 4. 歷史紀錄列表 -->
+        <!-- 關鍵字 / 日期搜尋框 -->
+        <EditText
+            android:id="@+id/et_search"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:background="@drawable/search_bg"
+            android:drawableStart="@android:drawable/ic_menu_search"
+            android:drawablePadding="10dp"
+            android:hint="搜尋植物、病害或日期 (如 10-30)..."
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingHorizontal="14dp"
+            android:textColor="#333333"
+            android:textColorHint="#757575"
+            android:textSize="14sp" />
+
+        <!-- 📅 日曆挑選器快捷按鈕 -->
+        <ImageButton
+            android:id="@+id/btn_pick_date"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/search_bg"
+            android:contentDescription="挑選特定日期"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@android:drawable/ic_menu_my_calendar"
+            app:tint="#2E7D32" />
+    </LinearLayout>
+
+    <!-- 4. 快捷植物分類與過濾橫條 (HorizontalScrollView) -->
+    <HorizontalScrollView
+        android:id="@+id/scroll_date_chips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/layout_search_bar">
+
+        <LinearLayout
+            android:id="@+id/layout_chips_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- 全部標籤 -->
+            <TextView
+                android:id="@+id/chip_filter_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_chip_selected"
+                android:text="🌱 全部紀錄"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <!-- 本月標籤 -->
+            <TextView
+                android:id="@+id/chip_filter_this_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_chip_unselected"
+                android:text="🗓️ 本月"
+                android:textColor="#2E7D32"
+                android:textSize="13sp" />
+
+            <!-- 上月標籤 -->
+            <TextView
+                android:id="@+id/chip_filter_last_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_chip_unselected"
+                android:text="🗓️ 上月"
+                android:textColor="#2E7D32"
+                android:textSize="13sp" />
+
+            <!-- 選中特定日期動態膠囊 (可點擊 ✕ 清除) -->
+            <TextView
+                android:id="@+id/chip_filter_custom_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_chip_selected"
+                android:text="📅 2026-10-30 ✕"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <!-- 動態加入的植物品類膠囊容器 (如：🍋 檸檬 (5)、🍉 西瓜 (3)) -->
+            <LinearLayout
+                android:id="@+id/layout_crop_chips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- 5. 歷史紀錄列表 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_history_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
         android:clipToPadding="false"
         android:paddingBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/et_search"
+        app:layout_constraintTop_toBottomOf="@id/scroll_date_chips"
         tools:listitem="@layout/item_history" />
+
+    <!-- 6. 無資料空狀態提示 -->
+    <LinearLayout
+        android:id="@+id/layout_empty_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scroll_date_chips">
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:alpha="0.5"
+            android:src="@android:drawable/ic_menu_today"
+            app:tint="#81C784" />
+
+        <TextView
+            android:id="@+id/tv_empty_history"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text="此篩選條件下尚無診斷紀錄\n點擊「全部紀錄」查看完整日誌"
+            android:textColor="#757575"
+            android:textSize="14sp" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

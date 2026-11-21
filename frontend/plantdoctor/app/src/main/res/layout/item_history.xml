@@ -1,110 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="15dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="#FFFFFF">
+    android:layout_margin="6dp"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="3dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:orientation="vertical">
 
-        <LinearLayout
+        <!-- 頂部拍立得滿版照片容器 (135dp) + 浮動半透明膠囊標籤 -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_height="135dp"
+            android:background="#E8F5E9">
 
             <ImageView
                 android:id="@+id/img_history_plant"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@android:drawable/ic_menu_gallery" />
+                android:src="@android:drawable/ic_menu_gallery"
+                tools:ignore="ContentDescription" />
 
-            <LinearLayout
-                android:layout_width="0dp"
+            <!-- 右上角：動態病害 / 健康狀態浮動膠囊 -->
+            <TextView
+                android:id="@+id/tv_status_badge"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:orientation="vertical">
+                android:layout_gravity="top|end"
+                android:layout_margin="8dp"
+                android:background="@drawable/bg_badge_healthy"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:text="🌿 健康"
+                android:textColor="#2E7D32"
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/tv_history_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="植物名稱"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#2E7D32" />
+            <!-- 左上角：室內/寵物安全小徽章 -->
+            <TextView
+                android:id="@+id/tv_safety_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:layout_margin="8dp"
+                android:background="@drawable/bg_badge_safe"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="3dp"
+                android:text="🐾 寵物安全"
+                android:textColor="#0277BD"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </FrameLayout>
 
-                <TextView
-                    android:id="@+id/tv_history_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="2026-04-12"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <ImageView
-                android:id="@+id/img_arrow"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/arrow_down_float" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tv_history_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="14sp"
-            android:textColor="#444444" />
-
+        <!-- 下半部：個人植物手記摘要 -->
         <LinearLayout
-            android:id="@+id/layout_detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="12dp"
-            android:visibility="gone">
+            android:paddingHorizontal="12dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="12dp">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"
-                android:layout_marginBottom="8dp" />
-
+            <!-- 植物名稱 (大字清新) -->
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="診斷詳情："
-                android:textStyle="bold"
-                android:textColor="#2E7D32" />
-
-            <TextView
-                android:id="@+id/tv_history_advice"
+                android:id="@+id/tv_history_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"
-                android:textColor="#444444"
-                android:text="這裡會顯示完整的防治建議..." />
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="檸檬"
+                android:textColor="#1B5E20"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btn_go_detail"
-                android:layout_width="wrap_content"
+            <!-- 病徵診斷摘要 -->
+            <TextView
+                android:id="@+id/tv_history_status"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:text="查看完整報告"
-                android:textSize="12sp"
-                style="@style/Widget.MaterialComponents.Button.TextButton" />
+                android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="病徵：柑橘葉蟎"
+                android:textColor="#455A64"
+                android:textSize="12sp" />
+
+            <!-- 底部日期與時間 -->
+            <TextView
+                android:id="@+id/tv_history_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="📅 2026-10-13"
+                android:textColor="#90A4AE"
+                android:textSize="11sp" />
         </LinearLayout>
 
     </LinearLayout>

@@ -98,6 +98,7 @@ fun formatDiagnosisMetadata(
 // 相容你原本 ResultActivity 傳入的 disease_name 與 gemini_advice，後端忽略即可
 data class DiaryConfirmRequest(
     val user_note: String? = null,
+    val plant_tag: String? = null, // 🌟 專屬盆栽標籤 (如: 陽台1號、客廳2號)
     val disease_name: String? = null,
     val gemini_advice: String? = null
 )
@@ -142,6 +143,36 @@ data class HistoryResponse(
 data class DetailDetailResponse(
     val status: String,
     val data: HistoryItem
+)
+
+// --- 🌱 植物時間軸與康復追蹤 (超越通用 GPT 的連續時間軸) ---
+data class TimelineNode(
+    val id: Int,
+    @SerializedName("status_name") val statusName: String,
+    @SerializedName("is_healthy") val isHealthy: Boolean,
+    val category: String,
+    val confidence: Double?,
+    @SerializedName("image_url") val imageUrl: String,
+    @SerializedName("user_note") val userNote: String,
+    @SerializedName("created_at") val createdAt: String,
+    @SerializedName("is_current") val isCurrent: Boolean
+)
+
+data class TimelineResponse(
+    val status: String,
+    @SerializedName("crop_name") val cropName: String?,
+    @SerializedName("plant_tag") val plantTag: String? = null,
+    @SerializedName("total_records") val totalRecords: Int,
+    @SerializedName("trend_status") val trendStatus: String,
+    @SerializedName("trend_title") val trendTitle: String,
+    @SerializedName("trend_desc") val trendDesc: String,
+    @SerializedName("compare_title") val compareTitle: String? = null,
+    @SerializedName("before_label") val beforeLabel: String? = null,
+    @SerializedName("after_label") val afterLabel: String? = null,
+    @SerializedName("has_before_after") val hasBeforeAfter: Boolean,
+    @SerializedName("before_record") val beforeRecord: TimelineNode?,
+    @SerializedName("after_record") val afterRecord: TimelineNode?,
+    val timeline: List<TimelineNode>
 )
 
 // --- Knowledge (知識庫) ---
@@ -196,6 +227,34 @@ data class DiagnosisFeedbackRequest(
 data class DiagnosisFeedbackResponse(
     val id: Int,
     val message: String
+)
+
+// --- 🌿 臺灣官方免登記植物保護資材 (1,616 筆產品型錄) ---
+data class RemedyItem(
+    @SerializedName("registration_no") val registrationNo: String,
+    @SerializedName("product_name") val productName: String,
+    @SerializedName("active_ingredient") val activeIngredient: String,
+    @SerializedName("company_name") val companyName: String,
+    @SerializedName("city") val city: String,
+    @SerializedName("use_pest") val usePest: Boolean,
+    @SerializedName("use_disease") val useDisease: Boolean,
+    @SerializedName("use_growth") val useGrowth: Boolean? = false,
+    @SerializedName("primary_category") val primaryCategory: String? = null,
+    @SerializedName("category_name") val categoryName: String? = null,
+    @SerializedName("efficacy_summary") val efficacySummary: String? = null,
+    @SerializedName("indoor_safe") val indoorSafe: Boolean,
+    @SerializedName("indoor_reason") val indoorReason: String?,
+    @SerializedName("pet_friendly_status") val petFriendlyStatus: String,
+    @SerializedName("pet_friendly_desc") val petFriendlyDesc: String?,
+    @SerializedName("license_image_url") val licenseImageUrl: String?,
+    @SerializedName("purchase_search_url") val purchaseSearchUrl: String?
+)
+
+data class RemediesResponse(
+    val total: Int,
+    val skip: Int,
+    val limit: Int,
+    val items: List<RemedyItem>
 )
 
 // --- 天氣相關 Data Models ---
@@ -321,6 +380,9 @@ interface PlantApiService {
     @GET("diaries/{diary_id}")
     fun getDiaryDetail(@Path("diary_id") diaryId: Int): Call<DetailDetailResponse>
 
+    @GET("diaries/{diary_id}/timeline")
+    fun getDiaryTimeline(@Path("diary_id") diaryId: Int): Call<TimelineResponse>
+
     @DELETE("diaries/{diary_id}")
     fun deleteDiary(@Path("diary_id") diaryId: Int): Call<GenericResponse>
 
@@ -384,6 +446,21 @@ interface PlantApiService {
     @GET("weather/plant-care-advice")
     fun getPlantCareAdvice(@Query("city") city: String): Call<PlantCareAdvice>
 
+    // --- 🌿 全台官方免登記資材型錄檢索 ---
+    @GET("remedies/")
+    fun getRemedies(
+        @Query("q") query: String? = null,
+        @Query("category") category: String? = null,
+        @Query("city") city: String? = null,
+        @Query("skip") skip: Int = 0,
+        @Query("limit") limit: Int = 50
+    ): Call<RemediesResponse>
+
+    @GET("remedies/{reg_no_num}")
+    fun getRemedyDetail(
+        @Path("reg_no_num") regNoNum: String
+    ): Call<RemedyItem?>
+
 
     // --- 3. Retrofit 實例產生器 ---
     companion object {
@@ -393,11 +470,11 @@ interface PlantApiService {
         const val CLOUD_HOST = "plant-production-462b.up.railway.app"
         const val CLOUD_BASE_URL = "https://plant-production-462b.up.railway.app/api/v1/"
 
-        // 🌟 連線模式開關：true = 直接連雲端 (免開電腦後端，4G/WiFi皆可展示)
-        const val FORCE_CLOUD_MODE = true
+        // 🌟 連線模式開關：false = 本機後端測試 (電腦 run.py)；true = Railway 雲端伺服器
+        const val FORCE_CLOUD_MODE = false
 
         // 🌟 全域變數，用來即時同步目前能通的 IP 門牌
-        var currentRunningIp: String = if (FORCE_CLOUD_MODE) CLOUD_HOST else WIFI_HOST
+        var currentRunningIp: String = if (FORCE_CLOUD_MODE) CLOUD_HOST else (if (!WIFI_HOST.isNullOrBlank()) WIFI_HOST else "127.0.0.1")
 
         private fun getSmartBaseUrl(): String {
             if (FORCE_CLOUD_MODE) {
@@ -432,6 +509,9 @@ interface PlantApiService {
                 if (isUsbConnected) {
                     currentRunningIp = "127.0.0.1" // 🔌 有線插線
                     "http://127.0.0.1:8000/api/v1/"
+                } else if (!WIFI_HOST.isNullOrBlank()) {
+                    currentRunningIp = WIFI_HOST // 📶 區域網路
+                    "http://$WIFI_HOST:8000/api/v1/"
                 } else {
                     currentRunningIp = CLOUD_HOST // ☁️ 無線走雲端
                     CLOUD_BASE_URL

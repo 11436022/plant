@@ -112,6 +112,7 @@ class PlantDiary(Base):
     gemini_treatment = Column("treatment", Text)    # 重新命名 treatment -> gemini_treatment
     user_note = Column(Text)
     user_corrected_status = Column(String(100), nullable=True)
+    plant_tag = Column(String(50), nullable=True)  # 🌟 專屬盆栽身分標籤 (如: 陽台1號、客廳2號)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="plant_diary")

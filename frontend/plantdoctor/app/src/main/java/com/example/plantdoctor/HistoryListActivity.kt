@@ -1,15 +1,17 @@
 package com.example.plantdoctor
 
+import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.MotionEvent
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -21,20 +23,25 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout // 🌟 新增
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 // 歷史紀錄資料模型
 data class HistoryItem(
     @SerializedName("id") val id: Int,
     @SerializedName("crop_name") val crop_name: String?,
+    @SerializedName("plant_tag") val plant_tag: String? = null,
     @SerializedName("created_at") val created_at: String,
     @SerializedName("status_name") val status_name: String?,
     @SerializedName("user_corrected_status") val user_corrected_status: String?,
@@ -58,10 +65,16 @@ class HistoryListActivity : AppCompatActivity() {
     private val fullHistoryList = mutableListOf<HistoryItem>()
     private var lastQuery: String = ""
 
-    // 🌟 1. 建立風聲延遲計時器與任務（放在 onCreate 外面）
+    // 🗓️ 日期與月份篩選變數
+    private var selectedDateFilter: String? = null
+    private var selectedMonthFilter: String? = null
+    private var selectedCropFilter: String? = null // 🌟 植物品類篩選變數 (null 代表全部)
+    private lateinit var layoutCropChips: LinearLayout
+
+    // 🌟 建立風聲延遲計時器與任務
     private val windHandler = Handler(Looper.getMainLooper())
     private val windRunnable = Runnable {
-        SoundManager.startWind() // 當按住滿 0.5 秒，正式吹起風聲
+        SoundManager.startWind()
     }
 
     private val detailActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -74,15 +87,11 @@ class HistoryListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history_list)
 
-        // 🌟 核心新增：綁定最外層佈局、返回鍵與頂部大字標題
         val historyListRoot = findViewById<ConstraintLayout>(R.id.history_list_root_layout)
         val btnBack = findViewById<ImageButton>(R.id.btn_back_home)
-
-        // 🌟 核心新增：綁定你的頂部大字標題（請依據你 XML 的真實 ID 做修改，例如 tv_history_main_title）
         val tvHistoryMainTitle = findViewById<TextView>(R.id.tv_history_title)
 
-        // 🌟 核心新增：召喚大總管！
-        // 依照需求，我們只丟入大背景、大標題文字與返回按鈕，搜尋框 etSearch 則完全不傳入，維持原色！
+        // 套用全局主題
         ThemeManager.applyTheme(
             context = this,
             rootLayout = historyListRoot,
@@ -90,13 +99,13 @@ class HistoryListActivity : AppCompatActivity() {
             imageButtons = listOf(btnBack)
         )
 
-        // 1. 返回按鈕點擊事件
+        // 1. 返回按鈕
         btnBack.setOnClickListener {
             SoundManager.playBubblePop()
             finish()
         }
 
-        // 2. 搜尋框邏輯
+        // 2. 關鍵字與日期直接搜尋輸入框
         val etSearch = findViewById<EditText>(R.id.et_search)
         etSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -107,9 +116,20 @@ class HistoryListActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        // 3. 初始化 RecyclerView
+        // 3. 📅 日曆挑選器按鈕 (解決特定日期需要一直滑動的痛點)
+        val btnPickDate = findViewById<ImageButton>(R.id.btn_pick_date)
+        btnPickDate.setOnClickListener {
+            SoundManager.playBubblePop()
+            showDatePickerDialog()
+        }
+
+        // 4. 快捷月份標籤綁定
+        layoutCropChips = findViewById(R.id.layout_crop_chips)
+        setupFilterChips()
+
+        // 5. 初始化 RecyclerView：升級為現代「雙欄美型拍立得相簿網格 (2-Column Grid)」
         val rvHistory = findViewById<RecyclerView>(R.id.rv_history_list)
-        rvHistory.layoutManager = LinearLayoutManager(this)
+        rvHistory.layoutManager = GridLayoutManager(this, 2)
         adapter = HistoryAdapter(displayList, detailActivityLauncher)
         rvHistory.adapter = adapter
     }
@@ -119,25 +139,246 @@ class HistoryListActivity : AppCompatActivity() {
         fetchHistoryFromServer()
     }
 
-    private fun filterList(query: String) {
-        val filtered = if (query.isEmpty()) {
-            fullHistoryList
-        } else {
-            fullHistoryList.filter {
-                (it.crop_name ?: "").contains(query, ignoreCase = true) ||
-                        (it.status_name ?: "").contains(query, ignoreCase = true) ||
-                        (it.user_corrected_status?.contains(query, ignoreCase = true) == true)
-            }
+    /**
+     * 彈出日曆對話框，供使用者點選特定年月日
+     */
+    private fun showDatePickerDialog() {
+        val calendar = Calendar.getInstance()
+        val datePicker = DatePickerDialog(
+            this,
+            { _, year, month, dayOfMonth ->
+                val chosenDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth)
+                applyCustomDateFilter(chosenDate)
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+        datePicker.show()
+    }
+
+    /**
+     * 設定快捷導覽膠囊標籤點擊邏輯 (全部 / 本月 / 上月 / 特定日期)
+     */
+    private fun setupFilterChips() {
+        val chipAll = findViewById<TextView>(R.id.chip_filter_all)
+        val chipThisMonth = findViewById<TextView>(R.id.chip_filter_this_month)
+        val chipLastMonth = findViewById<TextView>(R.id.chip_filter_last_month)
+        val chipCustomDate = findViewById<TextView>(R.id.chip_filter_custom_date)
+
+        val resetChipStyles = {
+            chipAll.setBackgroundResource(R.drawable.bg_chip_unselected)
+            chipAll.setTextColor(Color.parseColor("#2E7D32"))
+            chipThisMonth.setBackgroundResource(R.drawable.bg_chip_unselected)
+            chipThisMonth.setTextColor(Color.parseColor("#2E7D32"))
+            chipLastMonth.setBackgroundResource(R.drawable.bg_chip_unselected)
+            chipLastMonth.setTextColor(Color.parseColor("#2E7D32"))
         }
+
+        // 點擊【全部紀錄】
+        chipAll.setOnClickListener {
+            SoundManager.playBubblePop()
+            resetChipStyles()
+            chipAll.setBackgroundResource(R.drawable.bg_chip_selected)
+            chipAll.setTextColor(Color.WHITE)
+            chipCustomDate.visibility = View.GONE
+            selectedDateFilter = null
+            selectedMonthFilter = null
+            selectedCropFilter = null
+            refreshCropChipStyles()
+            filterList(lastQuery)
+        }
+
+        // 點擊【本月】
+        chipThisMonth.setOnClickListener {
+            SoundManager.playBubblePop()
+            resetChipStyles()
+            chipThisMonth.setBackgroundResource(R.drawable.bg_chip_selected)
+            chipThisMonth.setTextColor(Color.WHITE)
+            chipCustomDate.visibility = View.GONE
+            selectedDateFilter = null
+            selectedMonthFilter = SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(Date())
+            filterList(lastQuery)
+        }
+
+        // 點擊【上月】
+        chipLastMonth.setOnClickListener {
+            SoundManager.playBubblePop()
+            resetChipStyles()
+            chipLastMonth.setBackgroundResource(R.drawable.bg_chip_selected)
+            chipLastMonth.setTextColor(Color.WHITE)
+            chipCustomDate.visibility = View.GONE
+            val cal = Calendar.getInstance().apply { add(Calendar.MONTH, -1) }
+            selectedDateFilter = null
+            selectedMonthFilter = SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(cal.time)
+            filterList(lastQuery)
+        }
+
+        // 點擊【已選特定日期膠囊】清除篩選
+        chipCustomDate.setOnClickListener {
+            SoundManager.playBubblePop()
+            chipCustomDate.visibility = View.GONE
+            chipAll.performClick()
+        }
+    }
+
+    /**
+     * 套用特定日期篩選並更新頂部標籤狀態
+     */
+    private fun applyCustomDateFilter(formattedDate: String) {
+        selectedDateFilter = formattedDate
+        selectedMonthFilter = null
+
+        val chipAll = findViewById<TextView>(R.id.chip_filter_all)
+        val chipThisMonth = findViewById<TextView>(R.id.chip_filter_this_month)
+        val chipLastMonth = findViewById<TextView>(R.id.chip_filter_last_month)
+        val chipCustomDate = findViewById<TextView>(R.id.chip_filter_custom_date)
+
+        chipAll.setBackgroundResource(R.drawable.bg_chip_unselected)
+        chipAll.setTextColor(Color.parseColor("#2E7D32"))
+        chipThisMonth.setBackgroundResource(R.drawable.bg_chip_unselected)
+        chipThisMonth.setTextColor(Color.parseColor("#2E7D32"))
+        chipLastMonth.setBackgroundResource(R.drawable.bg_chip_unselected)
+        chipLastMonth.setTextColor(Color.parseColor("#2E7D32"))
+
+        chipCustomDate.text = "📅 $formattedDate ✕"
+        chipCustomDate.visibility = View.VISIBLE
+
+        filterList(lastQuery)
+    }
+
+    /**
+     * 核心多維度過濾演算法：同時支援植物名稱、病害、輸入日期、點選日期、月份過濾
+     */
+    private fun filterList(query: String) {
+        val trimmedQuery = query.trim()
+
+        val filtered = fullHistoryList.filter { item ->
+            // 1. 關鍵字搜尋 (同時支援作物名、病害名、覆核名與日期字串)
+            val matchesKeyword = if (trimmedQuery.isEmpty()) {
+                true
+            } else {
+                (item.crop_name ?: "").contains(trimmedQuery, ignoreCase = true) ||
+                (item.plant_tag ?: "").contains(trimmedQuery, ignoreCase = true) ||
+                (item.status_name ?: "").contains(trimmedQuery, ignoreCase = true) ||
+                (item.user_corrected_status?.contains(trimmedQuery, ignoreCase = true) == true) ||
+                item.created_at.contains(trimmedQuery, ignoreCase = true)
+            }
+
+            // 2. 精準特定日期過濾 (YYYY-MM-DD)
+            val matchesDate = if (selectedDateFilter.isNullOrBlank()) {
+                true
+            } else {
+                item.created_at.contains(selectedDateFilter!!)
+            }
+
+            // 3. 月份快捷過濾 (YYYY-MM)
+            val matchesMonth = if (selectedMonthFilter.isNullOrBlank()) {
+                true
+            } else {
+                item.created_at.contains(selectedMonthFilter!!)
+            }
+
+            // 4. 🌟 植物品類過濾 (Crop Filter)
+            val matchesCrop = if (selectedCropFilter.isNullOrBlank()) {
+                true
+            } else {
+                (item.crop_name ?: "未知植物") == selectedCropFilter
+            }
+
+            matchesKeyword && matchesDate && matchesMonth && matchesCrop
+        }
+
         displayList.clear()
         displayList.addAll(filtered)
         adapter.notifyDataSetChanged()
+
+        // 空狀態提示視圖
+        val layoutEmpty = findViewById<View>(R.id.layout_empty_state)
+        layoutEmpty.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
     }
 
     private fun updateLists(newData: List<HistoryItem>) {
         fullHistoryList.clear()
         fullHistoryList.addAll(newData)
+        buildDynamicCropChips()
         filterList(lastQuery)
+    }
+
+    /**
+     * 🌟 動態建置目前使用者所擁有的植物膠囊標籤 (例如：🍋 檸檬 (5)、🍉 西瓜 (3))
+     */
+    private fun buildDynamicCropChips() {
+        layoutCropChips.removeAllViews()
+
+        // 統計每種植物的紀錄數量
+        val cropCounts = mutableMapOf<String, Int>()
+        fullHistoryList.forEach { item ->
+            val name = item.crop_name?.takeIf { it.isNotBlank() } ?: "未知植物"
+            cropCounts[name] = (cropCounts[name] ?: 0) + 1
+        }
+
+        val density = resources.displayMetrics.density
+        val marginEndPx = (8 * density).toInt()
+        val padHPx = (14 * density).toInt()
+        val padVPx = (7 * density).toInt()
+
+        cropCounts.forEach { (cropName, count) ->
+            val chip = TextView(this).apply {
+                val params = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 0, marginEndPx, 0)
+                }
+                layoutParams = params
+                setPadding(padHPx, padVPx, padHPx, padVPx)
+                textSize = 13f
+                text = "$cropName ($count)"
+                tag = cropName
+
+                if (selectedCropFilter == cropName) {
+                    setBackgroundResource(R.drawable.bg_chip_selected)
+                    setTextColor(Color.WHITE)
+                } else {
+                    setBackgroundResource(R.drawable.bg_chip_unselected)
+                    setTextColor(Color.parseColor("#2E7D32"))
+                }
+
+                setOnClickListener {
+                    SoundManager.playBubblePop()
+                    if (selectedCropFilter == cropName) {
+                        // 再次點擊取消篩選
+                        selectedCropFilter = null
+                    } else {
+                        selectedCropFilter = cropName
+                    }
+                    refreshCropChipStyles()
+                    filterList(lastQuery)
+                }
+            }
+            layoutCropChips.addView(chip)
+        }
+    }
+
+    private fun refreshCropChipStyles() {
+        val chipAll = findViewById<TextView>(R.id.chip_filter_all)
+        for (i in 0 until layoutCropChips.childCount) {
+            val child = layoutCropChips.getChildAt(i) as? TextView ?: continue
+            val cropTag = child.tag as? String
+            if (cropTag == selectedCropFilter) {
+                child.setBackgroundResource(R.drawable.bg_chip_selected)
+                child.setTextColor(Color.WHITE)
+            } else {
+                child.setBackgroundResource(R.drawable.bg_chip_unselected)
+                child.setTextColor(Color.parseColor("#2E7D32"))
+            }
+        }
+
+        if (selectedCropFilter != null) {
+            chipAll.setBackgroundResource(R.drawable.bg_chip_unselected)
+            chipAll.setTextColor(Color.parseColor("#2E7D32"))
+        }
     }
 
     private fun fetchHistoryFromServer() {
@@ -157,7 +398,6 @@ class HistoryListActivity : AppCompatActivity() {
         })
     }
 
-    // 🌟 全螢幕長按雷達，判定長按 0.5 秒才吹風
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event != null) {
             when (event.action) {
@@ -185,7 +425,7 @@ class HistoryListActivity : AppCompatActivity() {
     }
 }
 
-// --- Adapter 實作 ---
+// --- 現代化 Material 3 Adapter 實作 ---
 
 class HistoryAdapter(
     private val historyList: List<HistoryItem>,
@@ -196,11 +436,9 @@ class HistoryAdapter(
         val tvName: TextView = view.findViewById(R.id.tv_history_name)
         val tvDate: TextView = view.findViewById(R.id.tv_history_date)
         val tvStatus: TextView = view.findViewById(R.id.tv_history_status)
-        val tvAdvice: TextView = view.findViewById(R.id.tv_history_advice)
-        val layoutDetail: LinearLayout = view.findViewById(R.id.layout_detail)
-        val imgArrow: ImageView = view.findViewById(R.id.img_arrow)
+        val tvStatusBadge: TextView = view.findViewById(R.id.tv_status_badge)
+        val tvSafetyBadge: TextView = view.findViewById(R.id.tv_safety_badge)
         val imgHistory: ImageView = view.findViewById(R.id.img_history_plant)
-        val btnGoDetail: Button = view.findViewById(R.id.btn_go_detail)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
@@ -210,37 +448,54 @@ class HistoryAdapter(
 
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
         val item = historyList[position]
-        holder.tvName.text = item.crop_name ?: "未知作物"
-        holder.tvDate.text = item.created_at
-        holder.tvStatus.text = buildString {
-            if (!item.user_corrected_status.isNullOrBlank()) {
-                append("原診斷：${item.status_name ?: "無法判定"}")
-                append("\n專家覆核定案：${item.user_corrected_status}")
-            } else {
-                append("診斷：${item.status_name ?: "無法判定"}")
-            }
-            if (item.requires_review == true) append("\n需要人工複核")
+        val tagSuffix = if (!item.plant_tag.isNullOrBlank()) " [${item.plant_tag}]" else ""
+        holder.tvName.text = "${item.crop_name ?: "未知植物"}$tagSuffix"
+        holder.tvDate.text = "📅 ${item.created_at}"
+
+        val effectiveStatus = if (!item.user_corrected_status.isNullOrBlank()) {
+            item.user_corrected_status
+        } else {
+            item.status_name ?: "無法判定"
         }
 
-        val finalUrl = fixImageUrl(item.image_url)
+        // 1. 狀態膠囊徽章 (健康=綠色，病害=紅色)
+        val isHealthy = effectiveStatus.contains("健康")
+        if (isHealthy) {
+            val confText = item.confidence?.let { String.format(Locale.getDefault(), " %.0f%%", it * 100) } ?: ""
+            holder.tvStatusBadge.text = "🌿 健康$confText"
+            holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_healthy)
+            holder.tvStatusBadge.setTextColor(Color.parseColor("#2E7D32"))
+        } else {
+            val confText = item.confidence?.let { String.format(Locale.getDefault(), " %.0f%%", it * 100) } ?: ""
+            holder.tvStatusBadge.text = "⚠️ $effectiveStatus$confText"
+            holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_disease)
+            holder.tvStatusBadge.setTextColor(Color.parseColor("#C62828"))
+        }
 
+        // 2. 室內與寵物友善標章
+        holder.tvSafetyBadge.text = "🐾 寵物安全"
+        holder.tvSafetyBadge.setBackgroundResource(R.drawable.bg_badge_safe)
+
+        // 3. 診斷摘要說明 (拍立得卡片精簡排版)
+        holder.tvStatus.text = buildString {
+            if (!item.user_corrected_status.isNullOrBlank()) {
+                append(item.user_corrected_status)
+            } else {
+                append(item.status_name ?: "無法判定")
+            }
+        }
+
+        // 4. 圓角縮圖載入
+        val finalUrl = fixImageUrl(item.image_url)
         Glide.with(holder.itemView.context)
             .load(finalUrl)
             .placeholder(android.R.drawable.ic_menu_gallery)
             .error(android.R.drawable.ic_dialog_alert)
             .into(holder.imgHistory)
 
-        holder.tvAdvice.text = "點擊查看完整報告"
-
-        holder.layoutDetail.visibility = View.GONE
-        holder.imgArrow.visibility = View.GONE
-        holder.btnGoDetail.visibility = View.GONE
-
-        // 【新邏輯】點擊整個項目，直接跳轉到詳情頁
+        // 5. 點擊整張質感卡片跳轉詳情頁
         holder.itemView.setOnClickListener {
-            // 🌟 點擊歷史紀錄卡片項目時，播放清脆的泡泡聲！
             SoundManager.playBubblePop()
-
             val intent = Intent(holder.itemView.context, HistoryDetailActivity::class.java).apply {
                 putExtra("DIARY_ID", item.id)
             }
@@ -251,12 +506,10 @@ class HistoryAdapter(
     override fun getItemCount() = historyList.size
 
     private fun fixImageUrl(rawUrl: String): String {
-        // 1. 安全防禦：如果是測試環境儲存的本地 Uri 路徑，直接回傳
         if (rawUrl.startsWith("content://") || rawUrl.startsWith("file://")) {
             return rawUrl
         }
 
-        // 2. 🌟 核心進化：直接跟 API 拿目前已經探路成功的正確主機或 IP
         val resolvedIp = com.example.plantdoctor.PlantApiService.currentRunningIp
         val isCloud = resolvedIp.contains("railway.app")
         val schemeAndHost = when {
@@ -265,34 +518,29 @@ class HistoryAdapter(
             else -> "http://$resolvedIp:8000"
         }
 
-        // 3. 把後端傳來的 127.0.0.1 或 localhost 置換為正確主機
         var url = rawUrl
             .replace("http://127.0.0.1:8000", schemeAndHost)
             .replace("http://localhost:8000", schemeAndHost)
             .replace("127.0.0.1", resolvedIp)
             .replace("localhost", resolvedIp)
 
-        // 4. 基本相對路徑防禦
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             val safePath = if (url.startsWith("/")) url else "/$url"
             url = "$schemeAndHost$safePath"
         }
 
-        // 5. static/ 路由防禦
         val keywordStatic = "static/"
         if (url.contains(keywordStatic)) {
             val startIndex = url.indexOf(keywordStatic)
             url = "$schemeAndHost/$keywordStatic" + url.substring(startIndex + keywordStatic.length)
         }
 
-        // 6. uploads/ 路由防禦
         val keywordUploads = "uploads/"
         if (url.contains(keywordUploads)) {
             val startIndex = url.indexOf(keywordUploads)
             url = "$schemeAndHost/$keywordUploads" + url.substring(startIndex + keywordUploads.length)
         }
 
-        android.util.Log.d("FixImageUrl", "🖼️ 圖片網址最終修復為: $url")
         return url
     }
 }

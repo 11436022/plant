@@ -40,6 +40,9 @@
             android:name=".HistoryListActivity"
             android:exported="false" />
         <activity
+            android:name=".RemedyCatalogActivity"
+            android:exported="false" />
+        <activity
             android:name=".HistoryProgressActivity"
             android:exported="false" />
         <activity

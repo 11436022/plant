@@ -38,6 +38,7 @@ async def get_all_history(current_user: models.User = Depends(get_current_user))
             SELECT
                 d.id,
                 COALESCE(c.crop_name, '未知作物') AS crop_name,
+                d.plant_tag,
                 d.status_name,
                 d.user_corrected_status,
                 d.category, d.confidence, d.requires_review, d.grounding_source,
@@ -65,6 +66,183 @@ async def get_all_history(current_user: models.User = Depends(get_current_user))
         conn.close()
 
 
+@router.get("/{diary_id}/timeline")
+async def get_diary_timeline(diary_id: int, current_user: models.User = Depends(get_current_user)):
+    """
+    取得該病例所屬植物的連續歷史時間軸與生長康復趨勢 (Before vs After)。
+    超越通用 GPT：透過時序數據自動比對病斑收斂與健康變化趨勢。
+    """
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            # 1. 取得當前病例所屬的 crop_id、plant_tag 與作物名稱
+            cursor.execute(
+                """
+                SELECT d.crop_id, d.plant_tag, COALESCE(c.crop_name, '未知作物') AS crop_name, d.status_name
+                FROM plant_diary d
+                LEFT JOIN crop c ON d.crop_id = c.crop_id
+                WHERE d.id = %s AND d.user_id = %s
+                """,
+                (diary_id, current_user.user_id),
+            )
+            target = cursor.fetchone()
+            if not target:
+                raise HTTPException(status_code=404, detail="Diary not found.")
+
+            crop_id = target.get("crop_id")
+            crop_name = target.get("crop_name", "該植株")
+            plant_tag = target.get("plant_tag")
+
+            # 2. 撈取該使用者針對此株專屬盆栽 (若有 plant_tag 則按標籤隔離，否則按 crop_id)
+            if plant_tag and plant_tag.strip():
+                cursor.execute(
+                    """
+                    SELECT d.id, d.crop_id, d.plant_tag, COALESCE(c.crop_name, '未知作物') AS crop_name,
+                           d.status_name, d.user_corrected_status, d.category, d.confidence,
+                           d.image_url, d.user_note, d.created_at
+                    FROM plant_diary d
+                    LEFT JOIN crop c ON d.crop_id = c.crop_id
+                    WHERE d.user_id = %s AND d.crop_id = %s AND d.plant_tag = %s
+                    ORDER BY d.created_at ASC
+                    """,
+                    (current_user.user_id, crop_id, plant_tag),
+                )
+            elif crop_id is not None:
+                cursor.execute(
+                    """
+                    SELECT d.id, d.crop_id, d.plant_tag, COALESCE(c.crop_name, '未知作物') AS crop_name,
+                           d.status_name, d.user_corrected_status, d.category, d.confidence,
+                           d.image_url, d.user_note, d.created_at
+                    FROM plant_diary d
+                    LEFT JOIN crop c ON d.crop_id = c.crop_id
+                    WHERE d.user_id = %s AND d.crop_id = %s
+                    ORDER BY d.created_at ASC
+                    """,
+                    (current_user.user_id, crop_id),
+                )
+            else:
+                cursor.execute(
+                    """
+                    SELECT d.id, d.crop_id, d.plant_tag, COALESCE(c.crop_name, '未知作物') AS crop_name,
+                           d.status_name, d.user_corrected_status, d.category, d.confidence,
+                           d.image_url, d.user_note, d.created_at
+                    FROM plant_diary d
+                    LEFT JOIN crop c ON d.crop_id = c.crop_id
+                    WHERE d.user_id = %s AND d.id = %s
+                    ORDER BY d.created_at ASC
+                    """,
+                    (current_user.user_id, diary_id),
+                )
+
+            records = cursor.fetchall()
+            if not records:
+                return {
+                    "status": "success",
+                    "crop_name": crop_name,
+                    "trend_status": "MONITORING",
+                    "trend_title": "🌱 專屬時序建立中",
+                    "trend_desc": "此植株目前有 1 筆診斷病歷，持續拍照追蹤即可自動繪製康復時間軸。",
+                    "timeline": [],
+                    "has_before_after": False,
+                }
+
+            # 格式化紀錄
+            formatted_timeline = []
+            for r in records:
+                st = r.get("user_corrected_status") or r.get("status_name") or "未知"
+                is_healthy = st == "健康"
+                img = build_public_image_url(r.get("image_url", "")) if r.get("image_url") else ""
+                t_str = format_taiwan_time(r["created_at"]) if r.get("created_at") else ""
+                formatted_timeline.append({
+                    "id": r["id"],
+                    "status_name": st,
+                    "is_healthy": is_healthy,
+                    "category": r.get("category", "unknown"),
+                    "confidence": r.get("confidence"),
+                    "image_url": img,
+                    "user_note": r.get("user_note") or "",
+                    "created_at": t_str,
+                    "is_current": (r["id"] == diary_id),
+                })
+
+            total_count = len(formatted_timeline)
+            first_record = formatted_timeline[0]
+            latest_record = formatted_timeline[-1]
+
+            # 3. 智慧趨勢判定與臨床情境動態匹配 (Clinical Context Matching)
+            compare_title = "🔍 治療前後病斑對比 (Before vs After)"
+            before_label_default = "初期發病"
+            after_label_default = "最新現況"
+
+            if total_count >= 2:
+                has_before_after = True
+                first_st = first_record["status_name"]
+                latest_st = latest_record["status_name"]
+
+                if first_st != "健康" and latest_st == "健康":
+                    trend_status = "RECOVERED"
+                    trend_title = "🎉 顯著康復（已回復健康）"
+                    trend_desc = f"從最初診斷【{first_st}】經對症用藥與照護，最新紀錄已無明顯病徵，重拾旺盛生機！"
+                    compare_title = "🎉 康復成效對照 (發病期 vs 康復現況)"
+                    before_label_default = f"發病：{first_st}"
+                    after_label_default = "現況：健康康復"
+                elif first_st != "健康" and latest_st != "健康":
+                    if first_st != latest_st:
+                        trend_status = "TRANSITION"
+                        trend_title = "🔄 病況演變監控中"
+                        trend_desc = f"原先【{first_st}】已轉為【{latest_st}】，建議持續依處方箋進行環境通風與藥劑微調。"
+                        compare_title = "🔄 病況演變對照 (初次確診 vs 當前轉變)"
+                        before_label_default = f"初診：{first_st}"
+                        after_label_default = f"轉變：{latest_st}"
+                    else:
+                        trend_status = "TREATING"
+                        trend_title = "💊 處方療程進行中"
+                        trend_desc = f"持續監測【{latest_st}】防治成效，請維持官方資材定期噴灑並避免過度澆水。"
+                        compare_title = "💊 療程進度對照 (初次確診 vs 治療現況)"
+                        before_label_default = f"初診：{first_st}"
+                        after_label_default = f"現況：{latest_st}"
+                elif first_st == "健康" and latest_st != "健康":
+                    trend_status = "ALERT"
+                    trend_title = "⚠️ 突發新病徵警告"
+                    trend_desc = f"植株近期出現【{latest_st}】跡象，請儘速依生活化處方箋進行初期抑病處置！"
+                    compare_title = "⚠️ 突發病徵對照 (健康原貌 vs 發病現況)"
+                    before_label_default = "前期：健康正常"
+                    after_label_default = f"現況：{latest_st}"
+                else:
+                    # 兩者皆為健康：動態切換為「成長發育寫真」，避開荒謬的「治療/發病」字眼！
+                    trend_status = "HEALTHY"
+                    trend_title = "✨ 連續健康生長"
+                    trend_desc = "連續多期保持健康旺盛狀態，日常照護與光照水分管理極佳！"
+                    compare_title = "🌱 成長發育寫真對照 (前期長勢 vs 近期現況)"
+                    before_label_default = "前期長勢"
+                    after_label_default = "最新枝葉"
+            else:
+                has_before_after = False
+                cur_st = first_record["status_name"]
+                trend_status = "MONITORING"
+                trend_title = "📋 單株專屬病歷已建檔"
+                trend_desc = f"已為【{crop_name}】建立健康追蹤檔案，未來再度拍照時將自動生成比對圖與趨勢線！"
+
+            return {
+                "status": "success",
+                "crop_name": crop_name,
+                "plant_tag": plant_tag,
+                "total_records": total_count,
+                "trend_status": trend_status,
+                "trend_title": trend_title,
+                "trend_desc": trend_desc,
+                "compare_title": compare_title,
+                "before_label": before_label_default,
+                "after_label": after_label_default,
+                "has_before_after": has_before_after,
+                "before_record": first_record if has_before_after else None,
+                "after_record": latest_record if has_before_after else None,
+                "timeline": formatted_timeline,
+            }
+    finally:
+        conn.close()
+
+
 @router.get("/{diary_id}")
 async def get_diary_detail(diary_id: int, current_user: models.User = Depends(get_current_user)):
     """取得單筆日誌詳情。"""
@@ -87,6 +265,12 @@ async def get_diary_detail(diary_id: int, current_user: models.User = Depends(ge
                 detail["image_url"] = build_public_image_url(detail["image_url"])
             if detail.get("created_at"):
                 detail["created_at"] = format_taiwan_time(detail["created_at"])
+            try:
+                from app.services.remedies import search_official_remedies
+                status = detail.get("user_corrected_status") or detail.get("status_name") or ""
+                detail["commercial_remedies"] = search_official_remedies(status, is_indoor=True, has_pet=False, limit=3)
+            except Exception:
+                detail["commercial_remedies"] = []
             return {"status": "success", "data": detail}
     finally:
         conn.close()
@@ -237,6 +421,13 @@ async def confirm_and_create_diary(
             user_note=payload.user_note, # <-- 使用 payload 中的 user_note
             db=db,
         )
+
+        # 5.1 🌟 若有指定專屬盆栽標籤 (如: 陽台1號、客廳2號)，寫入 plant_tag 欄位
+        if payload.plant_tag and payload.plant_tag.strip():
+            db.query(models.PlantDiary).filter(models.PlantDiary.id == diary_id).update(
+                {"plant_tag": payload.plant_tag.strip()}
+            )
+            db.commit()
 
         # 6. 從資料庫重新讀取，以回傳完整的資料給 App
         new_diary_entry = (

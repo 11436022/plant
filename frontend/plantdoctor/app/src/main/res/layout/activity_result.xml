@@ -166,6 +166,23 @@
                         android:textSize="16sp" />
 
                     <TextView
+                        android:id="@+id/btn_view_remedy_catalog"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_chip_selected"
+                        android:clickable="true"
+                        android:elevation="1dp"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:paddingVertical="10dp"
+                        android:text="🌿 查閱官方用藥圖鑑與原廠證件"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="觀察筆記"

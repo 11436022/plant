@@ -2,6 +2,7 @@ import base64
 import json
 import math
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -399,6 +400,87 @@ def arbitrate_diagnosis(
     return _uncertain_diagnosis()
 
 
+INDOOR_FORBIDDEN_CHEMICALS = [
+    "波爾多液", "波爾多劑", "大生", "多菌靈", "百滅寧", "丁基加保扶",
+    "億力", "普拔克", "陶斯松", "賽滅寧", "加保扶", "除蟲菊酯",
+]
+
+def apply_indoor_safety_filter(treatment_text: str, is_indoor: bool = True) -> str:
+    """若為室內/辦公室環境，強制過濾高毒性化學農藥，替換為家庭安全物理/天然保護資材"""
+    if not is_indoor or not treatment_text:
+        return treatment_text
+    filtered = treatment_text
+    found_chemicals = [c for c in INDOOR_FORBIDDEN_CHEMICALS if c in filtered]
+    if found_chemicals:
+        for c in found_chemicals:
+            filtered = filtered.replace(c, "家庭天然安全資材（如稀釋苦楝油、小蘇打或甲殼素）")
+        filtered += "\n⚠️【安全規則引擎過濾】：室內與寵物環境已自動置換為農業部核准之免登記安全防護資材。"
+    return filtered
+
+
+def format_remedies_into_treatment(
+    treatment_text: str,
+    remedies_list: list[dict],
+    is_indoor: bool = True,
+    has_pet: bool = False,
+) -> str:
+    """將官方審定之免登記安全資材與用藥推薦轉換為居家直覺、極簡超低閱讀負擔、日常容器（寶特瓶/瓶蓋）換算之生活化處方"""
+    if not treatment_text and not remedies_list:
+        return "1. 請將盆栽置於通風採光良好處。\n2. 避免過度澆水積水。"
+
+    # 避免重複附加
+    if "居家安心推薦用藥" in treatment_text or "怎麼調配" in treatment_text:
+        return treatment_text
+
+    # 1. 簡化一般急救步驟，剔除果園冷藏/倉儲等非居家盆栽指引
+    lines = [line.strip() for line in treatment_text.split("\n") if line.strip()]
+    clean_steps = []
+    skip_keywords = ["貯藏", "採收後", "冷藏", "0-2℃", "倉儲", "外銷", "運銷", "貯存"]
+
+    for l in lines:
+        if any(sk in l for sk in skip_keywords):
+            continue
+        # 去除編號前綴如 1. 2. 3. 或 • -
+        clean_line = re.sub(r"^[0-9]+[\.、]\s*", "", l)
+        clean_line = re.sub(r"^[-•]\s*", "", clean_line)
+        if clean_line and len(clean_steps) < 2:
+            clean_steps.append(clean_line)
+
+    if not clean_steps:
+        clean_steps = [
+            "剪除嚴重感染之病葉或病果並丟棄，防止病菌擴散感染相鄰部位。",
+            "移至室內明亮通風處，暫停朝葉面噴水，保持盆土表面微乾。"
+        ]
+
+    output = "【即時照護】\n"
+    icons = ["✂️ 處置：", "💨 環境："]
+    for i, step in enumerate(clean_steps[:2]):
+        icon = icons[i] if i < len(icons) else "• "
+        output += f"{icon}{step}\n"
+
+    # 2. 官方審定資材推薦（精選 1 款首選 + 最多 1 款備選，超直覺生活化調配說明）
+    if remedies_list:
+        output += "\n🌿【居家安心推薦用藥】（🐾 寵物友善／室內安全）：\n"
+        primary = remedies_list[0]
+        p_name = primary.get("product_name", "")
+        ingr = primary.get("active_ingredient", "")
+        # 精簡主成分顯示
+        ingr_short = "、".join([x for x in ingr.split("、") if x][:2]) or ingr
+        pet_badge = "🐾 犬貓安全" if primary.get("pet_friendly_status") == "SAFE" else "⚠️ 噴灑時避開寵物"
+
+        output += f"👉 首選推薦：【{p_name}】\n"
+        output += f"   • 成分特性：{ingr_short}配方（{pet_badge}）\n"
+        output += f"   • 怎麼調配：拿 1 瓶 600ml 寶特瓶裝水，倒入「半瓶蓋」藥劑搖勻（生活化比例，免用量杯）\n"
+        output += f"   • 怎麼噴灑：每週傍晚均勻噴在葉背與生病處 1 次\n"
+
+        if len(remedies_list) > 1:
+            alt = remedies_list[1]
+            alt_name = alt.get("product_name", "")
+            output += f"\n💡 替代備選：【{alt_name}】（亦為農業部審定居家安全資材）\n"
+
+    return output.strip()
+
+
 def generate_precise_prescription(
     crop_name: str,
     status_name: str,
@@ -409,6 +491,8 @@ def generate_precise_prescription(
     is_local_convnext_hit: bool = False,
     image_path: str | None = None,
     active_learning_banner: str | None = None,
+    is_indoor: bool = True,
+    has_pet: bool = False,
 ) -> tuple[str, str, str]:
     """
     精準處方箋生成：以 Gemini 親眼看圖的動態處置為核心！
@@ -504,23 +588,32 @@ def generate_precise_prescription(
             print(f"[MySQL]  命中 MySQL 專家資料庫標準指引 -> {crop_name} - {status_name}")
             return base_desc, base_treat_db, "mysql_fallback_database"
 
-    # --- 步驟 2：MySQL 資料庫無該病害處方 -> 檢索 FAISS 農業部官方專書並結合 Gemini 動態生成處方 ---
+    # --- 步驟 2：MySQL 資料庫無該病害處方 -> 檢索 FAISS 農業部官方專書、官方資材庫並結合 Gemini 動態生成處方 ---
     rag_snippet = ""
     try:
         rag_snippet = rag.search_knowledge_base(f"{crop_name} {status_name}", k=3)
     except Exception:
         rag_snippet = ""
 
+    remedy_context = ""
+    try:
+        from app.services.remedies import build_remedy_bidirectional_context
+        remedy_context = build_remedy_bidirectional_context(crop_name, status_name, is_indoor=is_indoor, has_pet=has_pet)
+    except Exception as rem_err:
+        remedy_context = ""
+
     if image_path and Path(image_path).exists():
         try:
             img = prepare_optimized_image_for_ai(image_path)
             rag_ref = f"\n參考農業部官方文獻片段：\n{rag_snippet}\n" if rag_snippet else ""
+            rem_ref = f"\n{remedy_context}\n" if remedy_context else ""
             rx_prompt = (
-                f"你是一位專業植物病理專家。目前已辨識此照片為【{crop_name} - {status_name}】。\n"
+                f"你是一位專業植物病理與家庭園藝資材專家。目前已辨識此照片為【{crop_name} - {status_name}】。\n"
                 f"{rag_ref}"
-                "請根據照片中植株實際病徵嚴重度與官方防治規範，以繁體中文回傳單層 JSON：\n"
-                '{"suggestion": "2點具體病徵與風險分析（每點以 - 開頭並以 \\n 換行，每點精簡控制在 30 至 50 字以內）", '
-                '"treatment": "3點行動導向防治步驟（以 1. 2. 3. 開頭並以 \\n 換行）。【排版規範】：每點格式為『1. 步驟名稱：具體處置作為與稀釋倍率』，去除冗長理論贅述，每點字數精簡控制在 40 至 60 字以內。"}'
+                f"{rem_ref}"
+                "請根據照片中植株實際病徵嚴重度、室內與寵物安全規範及上述官方審定資材，以繁體中文回傳單層 JSON：\n"
+                '{"suggestion": "2點具體病徵與風險分析（每點以 - 開頭並以 \\n 換行，每點精簡在 25 至 40 字以內）", '
+                '"treatment": "2點行動導向居家盆栽急救步驟（以 1. 2. 開頭並以 \\n 換行）。注意：專門針對居家與辦公室盆栽，第一點修剪隔離受害組織，第二點通風控水，嚴禁給予大田耕作或採收後冷藏指引！每點控制在 25 至 40 字以內。"}'
             )
             resp = call_gemini_with_fallback(contents=[rx_prompt, img])
             clean_rx = (resp.text or "").replace("```json", "").replace("```", "").strip()
@@ -528,10 +621,10 @@ def generate_precise_prescription(
             gen_sugg = str(rx_data.get("suggestion", "")).strip()
             gen_treat = str(rx_data.get("treatment", "")).strip()
             if not _is_invalid_text(gen_sugg) and not _is_invalid_text(gen_treat):
-                print(f"[Gemini]  資料庫無現成處方 -> 已結合 FAISS 農業部專書與 Gemini 動態生成處方：{crop_name} - {status_name}")
+                print(f"[Gemini]  資料庫無現成處方 -> 已結合 FAISS 農業部專書、官方資材雙向驗證與 Gemini 動態生成處方：{crop_name} - {status_name}")
                 if active_learning_banner:
                     gen_sugg = f"{active_learning_banner}\n{gen_sugg}"
-                return gen_sugg, gen_treat, "gemini_multimodal_dynamic_prescription"
+                return gen_sugg, apply_indoor_safety_filter(gen_treat, is_indoor=is_indoor), "gemini_multimodal_dynamic_prescription"
         except Exception as rx_err:
             print(f"[WARN]  結合 FAISS 與 Gemini 生成處方失敗: {rx_err}")
 
@@ -606,8 +699,8 @@ def _call_gemini_fallback(
       "status_name": "string (標準化的病害/害蟲名稱，健康填 '健康'，非植物請填 '無法判定')",
       "category": "string (One of 'disease', 'pest', 'healthy', 'unknown')",
       "confidence": "float (A value between 0.0 and 1.0)",
-      "suggestion": "string (2 點核心病徵與風險分析，每點以 '-' 開頭，每點約 30-50 字，'\\n' 換行)",
-      "treatment": "string (3 點行動導向防治步驟，以 '1.' '2.' '3.' 開頭，格式為『步驟名稱：具體作法與稀釋倍率』，去除冗長理論贅述，每點精簡控制在 40-60 字以內，'\\n' 換行)"
+      "suggestion": "string (2 點核心病徵與風險分析，每點以 '-' 開頭，每點約 25-40 字，'\\n' 換行)",
+      "treatment": "string (2 點居家盆栽急救步驟，以 '1.' '2.' 開頭。第 1 點為剪除隔離受害組織，第 2 點為通風控水環境管理。嚴禁給予大農田或採收後倉儲/冷藏指引，每點精簡在 25-40 字以內，'\\n' 換行)"
     }}
     """
     try:
@@ -1111,13 +1204,16 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
     if category == "healthy":
         if confidence < MIN_HEALTHY_CONFIDENCE or crop_name in UNKNOWN_CROP_NAMES or status_name in UNKNOWN_STATUS_NAMES:
             return _uncertain_diagnosis(crop_name=UNKNOWN_CROP_NAME, confidence=confidence)
+        healthy_treatment = ai_treatment
+        if "健康植株提醒" not in healthy_treatment:
+            healthy_treatment = healthy_treatment.strip() + "\n\n🌱【植株健康提醒】：目前植株無病害或蟲害徵候，植物生長健康！請維持日常正常通風與適度澆水即可，無需施用任何殺菌劑或化學防治藥劑，避免造成反效果與藥害。"
         return {
             "crop_name": crop_name,
             "category": "healthy",
             "status_name": HEALTHY_STATUS_NAME,
             "confidence": confidence,
             "suggestion": ai_suggestion,
-            "treatment": ai_treatment,
+            "treatment": healthy_treatment,
             "grounding_source": raw_ai_data.get("grounding_source") or "crop_database",
             "reference_source": raw_ai_data.get("reference_source") or "農業部農業試驗所作物生長健康常規指引",
             "reference_url": raw_ai_data.get("reference_url") or "https://www.tari.gov.tw",
@@ -1148,6 +1244,12 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
         .first()
     )
 
+    from app.services.remedies import search_official_remedies
+    remedies_list = search_official_remedies(status_name, is_indoor=True, has_pet=False, limit=3)
+    pet_status = "SAFE"
+    if remedies_list and any(r.get("pet_friendly_status") == "CAUTION" for r in remedies_list):
+        pet_status = "CAUTION"
+
     if record:
         print(f"[Override]  比對到資料庫記錄: {crop_name} - {status_name}")
         desc = record.description or ai_suggestion
@@ -1160,18 +1262,25 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
         ref_url = source_url or raw_ai_data.get("reference_url") or "https://www.aphia.gov.tw"
         ref_id = source_record_id or raw_ai_data.get("reference_record_id") or f"aphia-db-{crop.crop_id}-{category}-{getattr(record, 'disease_id' if category == 'disease' else 'pest_id')}"
 
+        final_treat = apply_indoor_safety_filter(ai_treatment or treat, is_indoor=True)
+        final_treat = format_remedies_into_treatment(final_treat, remedies_list, is_indoor=True, has_pet=False)
+
         return {
             "crop_name": crop_name,
             "category": category,
             "status_name": status_name,
             "confidence": confidence,
             "suggestion": ai_suggestion or desc,
-            "treatment": ai_treatment or treat,
+            "treatment": final_treat,
             "grounding_source": raw_ai_data.get("grounding_source") or ("disease_database" if category == "disease" else "pest_database"),
             "reference_source": ref_source,
             "reference_url": ref_url,
             "reference_record_id": ref_id,
             "requires_review": raw_ai_data.get("requires_review", False),
+            "commercial_remedies": remedies_list,
+            "indoor_safe": True,
+            "pet_friendly_rating": pet_status,
+            "safety_protocol": "臺灣農業部 (EIR841 全量登錄資材雙向驗證防護)",
         }
     else:
         print(f"[OK]  新增資料庫紀錄: {crop_name} - {status_name}")
@@ -1191,18 +1300,25 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
         db.add(new_record)
         db.commit()
 
+        final_treat = apply_indoor_safety_filter(ai_treatment, is_indoor=True)
+        final_treat = format_remedies_into_treatment(final_treat, remedies_list, is_indoor=True, has_pet=False)
+
         return {
             "crop_name": crop_name,
             "category": category,
             "status_name": status_name,
             "confidence": confidence,
             "suggestion": ai_suggestion,
-            "treatment": ai_treatment,
+            "treatment": final_treat,
             "grounding_source": raw_ai_data.get("grounding_source") or "ai_created_database",
             "reference_source": ref_source,
             "reference_url": ref_url,
             "reference_record_id": ref_id,
             "requires_review": raw_ai_data.get("requires_review", False),
+            "commercial_remedies": remedies_list,
+            "indoor_safe": True,
+            "pet_friendly_rating": pet_status,
+            "safety_protocol": "臺灣農業部 (EIR841 全量登錄資材雙向驗證防護)",
         }
 
 
