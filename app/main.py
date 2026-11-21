@@ -81,10 +81,12 @@ def create_app() -> FastAPI:
                 return str(fallback)
         return str(target)
 
+    @app.get("/", response_class=HTMLResponse)
+    @app.get("/web", response_class=HTMLResponse)
     @app.get("/photo", response_class=HTMLResponse)
-    async def get_photo_diagnosis_page(request: Request):
-        """提供跨平台（包含 iPhone / Safari 與 Android）即時拍照快篩與病害診斷網頁。"""
-        template = templates.get_template("photo.html")
+    async def get_web_app_page(request: Request):
+        """提供跨平台（包含 iPhone / Safari / 電腦展覽大屏）即時拍照快篩、單株時間軸與官方資材圖鑑網頁。"""
+        template = templates.get_template("index.html")
         return HTMLResponse(content=template.render({"request": request}))
 
     @app.get("/dashboard")
