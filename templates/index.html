@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#1B5E20">
     <link rel="icon" type="image/png" href="https://img.icons8.com/color/180/potted-plant.png">
     
-    <!-- Tailwind CSS & Lucide Icons & SweetAlert2 -->
+    <!-- Tailwind CSS, Lucide Icons & SweetAlert2 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -20,6 +20,7 @@
                         brand: {
                             50: '#F1F8E9',
                             100: '#DCEDC8',
+                            200: '#C5E1A5',
                             500: '#4CAF50',
                             600: '#388E3C',
                             700: '#2E7D32',
@@ -38,8 +39,8 @@
             background-color: #F8FAF9;
         }
         .glass-header {
-            background: rgba(27, 94, 32, 0.95);
-            backdrop-filter: blur(12px);
+            background: rgba(27, 94, 32, 0.96);
+            backdrop-filter: blur(14px);
         }
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
@@ -61,48 +62,62 @@
             left: 19px;
             z-index: 0;
         }
+        /* 飄落樹葉動畫 */
+        @keyframes fallingLeaf {
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+            30% { opacity: 0.8; }
+            100% { transform: translateY(180px) rotate(360deg); opacity: 0; }
+        }
+        .falling-leaf {
+            position: absolute;
+            animation: fallingLeaf 3s infinite linear;
+        }
     </style>
 </head>
 <body class="text-slate-800 flex flex-col min-h-screen">
 
-    <!-- 頂部導航列 (Top Navigation) -->
+    <!-- 頂部全局導航列 (Top App Bar) -->
     <header class="glass-header sticky top-0 z-50 text-white shadow-md border-b border-green-700/60">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <!-- 品牌與展示標籤 -->
-                <div class="flex items-center gap-3">
+                
+                <!-- 品牌與首頁按鈕 -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('home')">
                     <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center p-2 border border-white/20 shadow-inner">
                         <i data-lucide="sprout" class="w-6 h-6 text-green-300"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="text-lg font-bold tracking-tight text-white">Plant Doctor</span>
-                            <span class="text-xs bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 px-2 py-0.5 rounded-full font-medium">展覽互動大屏</span>
+                            <span class="text-[11px] bg-emerald-500/25 text-emerald-200 border border-emerald-400/30 px-2 py-0.5 rounded-full font-medium">展覽大屏系統</span>
                         </div>
-                        <p class="text-xs text-green-200/80 hidden sm:block">二技專案 #114202 | 植物病蟲害智慧診斷與連續監測系統</p>
+                        <p class="text-xs text-green-200/80 hidden sm:block">二技畢業專案 #114202 | 植物病蟲害連續監控</p>
                     </div>
                 </div>
 
-                <!-- 導覽頁籤 (Tabs) -->
+                <!-- 導覽頁籤 (Desktop Nav) -->
                 <nav class="hidden md:flex items-center space-x-1">
-                    <button onclick="switchTab('diagnosis')" id="tab-btn-diagnosis" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-white/20 text-white shadow-sm">
-                        <i data-lucide="camera" class="w-4 h-4"></i> 智慧診斷處方
+                    <button onclick="navigateTo('home')" id="nav-btn-home" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 bg-white/20 text-white shadow-sm">
+                        <i data-lucide="home" class="w-4 h-4"></i> 首頁
                     </button>
-                    <button onclick="switchTab('timeline')" id="tab-btn-timeline" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 text-green-100 hover:bg-white/10">
-                        <i data-lucide="calendar" class="w-4 h-4"></i> 單株康復時間軸
+                    <button onclick="navigateTo('upload')" id="nav-btn-upload" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-green-100 hover:bg-white/10">
+                        <i data-lucide="camera" class="w-4 h-4"></i> 拍照診斷
                     </button>
-                    <button onclick="switchTab('remedies')" id="tab-btn-remedies" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 text-green-100 hover:bg-white/10">
-                        <i data-lucide="shield-check" class="w-4 h-4"></i> 官方資材寶典 <span class="text-xs bg-amber-400 text-amber-950 font-bold px-1.5 py-0.2 rounded-full">1,616</span>
+                    <button onclick="navigateTo('history')" id="nav-btn-history" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-green-100 hover:bg-white/10">
+                        <i data-lucide="book-open" class="w-4 h-4"></i> 病歷日記
                     </button>
-                    <button onclick="switchTab('webcam')" id="tab-btn-webcam" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 text-green-100 hover:bg-white/10">
-                        <i data-lucide="video" class="w-4 h-4"></i> 溫室定點巡檢
+                    <button onclick="navigateTo('remedies')" id="nav-btn-remedies" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-green-100 hover:bg-white/10">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i> 官方資材寶典 <span class="text-[11px] bg-amber-400 text-amber-950 font-bold px-1.5 py-0.2 rounded-full">1,616</span>
+                    </button>
+                    <button onclick="navigateTo('webcam')" id="nav-btn-webcam" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-green-100 hover:bg-white/10">
+                        <i data-lucide="video" class="w-4 h-4"></i> 溫室巡檢
                     </button>
                 </nav>
 
                 <!-- 右側狀態控制區 -->
                 <div class="flex items-center gap-2 sm:gap-3">
                     <!-- 連線狀態徽章 (可點擊設定 Railway URL) -->
-                    <button onclick="openApiConfigModal()" class="flex items-center gap-2 text-xs bg-black/20 hover:bg-black/30 text-white px-3 py-1.5 rounded-full border border-white/15 transition" title="點擊設定 API 伺服器端點">
+                    <button onclick="openApiConfigModal()" class="flex items-center gap-2 text-xs bg-black/20 hover:bg-black/30 text-white px-3 py-1.5 rounded-full border border-white/15 transition" title="點擊設定 Railway 雲端 API 端點">
                         <span id="conn-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                         <span id="conn-text" class="hidden sm:inline font-mono">Railway 雲端</span>
                         <i data-lucide="settings" class="w-3.5 h-3.5 text-green-300"></i>
@@ -119,345 +134,585 @@
             </div>
         </div>
 
-        <!-- 行動端底部快捷導覽條 -->
-        <div class="md:hidden flex items-center justify-around bg-green-900/90 border-t border-green-700 py-2 px-2 text-xs">
-            <button onclick="switchTab('diagnosis')" class="flex flex-col items-center gap-1 text-white font-medium">
+        <!-- 手機端底部導航條 (Mobile Bottom Nav) -->
+        <div class="md:hidden flex items-center justify-around bg-green-900/95 border-t border-green-700 py-2 px-2 text-xs">
+            <button onclick="navigateTo('home')" class="flex flex-col items-center gap-1 text-white font-medium">
+                <i data-lucide="home" class="w-4 h-4"></i> 首頁
+            </button>
+            <button onclick="navigateTo('upload')" class="flex flex-col items-center gap-1 text-green-200 hover:text-white">
                 <i data-lucide="camera" class="w-4 h-4"></i> 診斷
             </button>
-            <button onclick="switchTab('timeline')" class="flex flex-col items-center gap-1 text-green-200 hover:text-white">
-                <i data-lucide="calendar" class="w-4 h-4"></i> 時間軸
+            <button onclick="navigateTo('history')" class="flex flex-col items-center gap-1 text-green-200 hover:text-white">
+                <i data-lucide="book-open" class="w-4 h-4"></i> 日記
             </button>
-            <button onclick="switchTab('remedies')" class="flex flex-col items-center gap-1 text-green-200 hover:text-white">
-                <i data-lucide="shield-check" class="w-4 h-4"></i> 資材寶典
+            <button onclick="navigateTo('remedies')" class="flex flex-col items-center gap-1 text-green-200 hover:text-white">
+                <i data-lucide="shield-check" class="w-4 h-4"></i> 資材
             </button>
-            <button onclick="switchTab('webcam')" class="flex flex-col items-center gap-1 text-green-200 hover:text-white">
-                <i data-lucide="video" class="w-4 h-4"></i> 溫室巡檢
+            <button onclick="navigateTo('webcam')" class="flex flex-col items-center gap-1 text-green-200 hover:text-white">
+                <i data-lucide="video" class="w-4 h-4"></i> 巡檢
             </button>
         </div>
     </header>
 
-    <!-- 主內容容器 -->
+    <!-- 主內容區 (Main Content Area) -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
         <!-- ========================================== -->
-        <!-- TAB 1: 智慧診斷與生活處方 (DIAGNOSIS) -->
+        <!-- 1. 首頁視圖 (VIEW: HOME) 對齊 HomeActivity -->
         <!-- ========================================== -->
-        <section id="pane-diagnosis" class="tab-pane block">
-            <!-- 標題橫幅 -->
-            <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold text-brand-900 flex items-center gap-2">
-                        <span>葉片即時快篩與生活化處方</span>
-                        <span class="text-xs bg-green-100 text-brand-700 font-bold px-2.5 py-1 rounded-full border border-green-300">雙引擎仲裁架構</span>
-                    </h1>
-                    <p class="text-sm text-slate-600 mt-1">融合邊緣 ConvNeXt 4ms 超低延遲快篩與農業部 1,616 筆官方審定免登記資材</p>
-                </div>
-
-                <!-- 展覽快捷按鈕 -->
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-semibold text-slate-500 flex items-center gap-1">
-                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-500"></i> 展覽示範葉片：
-                    </span>
-                    <button onclick="loadDemoSample('iron')" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-semibold px-2.5 py-1.5 rounded-lg transition shadow-sm">
-                        🍋 檸檬缺鐵黃化
-                    </button>
-                    <button onclick="loadDemoSample('powdery')" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 font-semibold px-2.5 py-1.5 rounded-lg transition shadow-sm">
-                        🍊 柑橘白粉病
-                    </button>
-                    <button onclick="loadDemoSample('healthy')" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold px-2.5 py-1.5 rounded-lg transition shadow-sm">
-                        🌿 健康健康長勢
-                    </button>
-                </div>
-            </div>
-
-            <!-- 主網格：左側上傳控制 vs 右側即時診斷與處方 -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
-                <!-- 左側：圖片上傳與設定 (5 Cols) -->
-                <div class="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-5">
-                    
-                    <!-- 步驟 1: 選擇作物與環境 -->
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">1. 選擇植物品種與環境條件</label>
-                        <div class="grid grid-cols-2 gap-3 mb-3">
-                            <div>
-                                <label class="text-xs text-slate-600 font-medium block mb-1">目標作物</label>
-                                <select id="input-crop-name" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium">
-                                    <option value="檸檬">🍋 檸檬 (Lemon)</option>
-                                    <option value="柑橘">🍊 柑橘 (Citrus)</option>
-                                    <option value="番茄">🍅 番茄 (Tomato)</option>
-                                    <option value="草莓">🍓 草莓 (Strawberry)</option>
-                                    <option value="葡萄">🍇 葡萄 (Grape)</option>
-                                    <option value="蘋果">🍎 蘋果 (Apple)</option>
-                                    <option value="玫瑰">🌹 玫瑰/景觀花卉</option>
-                                    <option value="室內綠植">🪴 室內盆栽/觀葉植物</option>
-                                    <option value="未知作物">❓ 自動全品項辨識</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-xs text-slate-600 font-medium block mb-1">盆栽專屬標籤</label>
-                                <input type="text" id="input-plant-tag" placeholder="如: 陽台1號、客廳2號" value="陽台1號" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium" />
-                            </div>
-                        </div>
-
-                        <!-- 都市與家庭安全選項 -->
-                        <div class="bg-emerald-50/70 border border-emerald-200/60 rounded-xl p-3 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-700"></i>
-                                <span class="text-xs font-semibold text-emerald-900">室內安全與毛孩寵物友善</span>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="check-indoor-pet" checked class="sr-only peer">
-                                <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- 步驟 2: 圖片預覽與上傳區 -->
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">2. 採集患部或葉片特寫照片</label>
-                        
-                        <!-- 拖曳上傳容器 -->
-                        <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="border-2 border-dashed border-slate-300 hover:border-brand-500 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/30 p-6 text-center cursor-pointer transition relative overflow-hidden group">
-                            <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)" />
-                            
-                            <!-- 預覽圖 (預設隱藏) -->
-                            <div id="preview-container" class="hidden relative rounded-xl overflow-hidden shadow-inner max-h-64 mx-auto">
-                                <img id="preview-image" src="" alt="葉片預覽" class="w-full h-auto object-cover max-h-64 rounded-xl" />
-                                <button type="button" onclick="event.stopPropagation(); clearSelectedImage();" class="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5 transition" title="清除圖片">
-                                    <i data-lucide="x" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-
-                            <!-- 空狀態提示 -->
-                            <div id="empty-prompt" class="space-y-3 py-4">
-                                <div class="w-14 h-14 rounded-full bg-emerald-100 text-brand-700 flex items-center justify-center mx-auto group-hover:scale-110 transition">
-                                    <i data-lucide="upload-cloud" class="w-7 h-7"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-slate-700">點擊上傳 或 將植物照片拖曳至此</p>
-                                    <p class="text-xs text-slate-500 mt-0.5">支援 JPG、PNG、WebP（支援手機與筆電直接拍攝）</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 拍照輔助快捷鈕 -->
-                        <div class="flex items-center justify-center gap-3 mt-3">
-                            <button type="button" onclick="openCameraCapture()" class="text-xs text-slate-700 hover:text-brand-700 font-semibold flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition">
-                                <i data-lucide="camera" class="w-4 h-4"></i> 開啟筆電/手機鏡頭拍攝
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 診斷送出按鈕 -->
-                    <button id="btn-submit-predict" onclick="executeDiagnosis()" class="w-full bg-brand-700 hover:bg-brand-800 active:scale-[0.99] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-brand-700/20 transition flex items-center justify-center gap-2">
-                        <i data-lucide="search" class="w-5 h-5"></i>
-                        <span id="btn-submit-text">開始 AI 智能快篩與處方診斷</span>
-                    </button>
-                </div>
-
-                <!-- 右側：診斷結果與生活化處方箋 (7 Cols) -->
-                <div class="lg:col-span-7 space-y-6">
-
-                    <!-- 初始未分析提示 (Empty State) -->
-                    <div id="diagnosis-empty-view" class="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-sm">
-                        <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4">
-                            <i data-lucide="leaf" class="w-8 h-8"></i>
-                        </div>
-                        <h3 class="text-base font-bold text-slate-700">尚未執行診斷分析</h3>
-                        <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">請在左側上傳葉片患部特寫，或點擊頂部「展覽示範葉片」立即體驗雙引擎快篩分析！</p>
-                    </div>
-
-                    <!-- 診斷結果面板 (分析完成後呈現) -->
-                    <div id="diagnosis-result-view" class="hidden space-y-5">
-                        
-                        <!-- 核心判斷卡片 -->
-                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                            <!-- 卡片頂部彩條 -->
-                            <div id="result-status-header" class="bg-emerald-600 px-6 py-4 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full font-bold" id="res-crop-badge">作物：檸檬</span>
-                                        <span class="text-xs uppercase tracking-wider bg-black/20 px-2.5 py-0.5 rounded-full font-bold" id="res-tag-badge">盆栽：陽台1號</span>
-                                    </div>
-                                    <h2 class="text-2xl font-black mt-1" id="res-diagnosis-name">健康狀態</h2>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-xs text-white/80 font-medium">判斷置信度</div>
-                                    <div class="text-2xl font-black font-mono text-white" id="res-confidence">98.5%</div>
-                                </div>
-                            </div>
-
-                            <!-- 引擎與合規性護城河橫條 -->
-                            <div class="bg-slate-50 px-6 py-2.5 border-b border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2">
-                                <div class="flex items-center gap-2" id="res-engine-tag">
-                                    <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-md">
-                                        <i data-lucide="zap" class="w-3.5 h-3.5 text-emerald-600"></i> 本地 ConvNeXt 快篩 (&lt;4ms)
-                                    </span>
-                                    <span class="text-slate-400">|</span>
-                                    <span class="text-slate-600 font-medium">台灣農業部防檢署審定資材連動</span>
-                                </div>
-                                <div class="text-slate-500 font-mono text-[11px]" id="res-time-tag">剛剛分析</div>
-                            </div>
-
-                            <!-- 診斷卡片主體 -->
-                            <div class="p-6 space-y-5">
-                                
-                                <!-- 區塊 1: 病況特徵分析 -->
-                                <div class="bg-blue-50/60 border border-blue-200/70 rounded-xl p-4">
-                                    <h4 class="text-xs font-bold text-blue-900 flex items-center gap-1.5 uppercase tracking-wide mb-2">
-                                        <i data-lucide="microscope" class="w-4 h-4 text-blue-700"></i> 病徵特徵深度剖析
-                                    </h4>
-                                    <p class="text-sm text-blue-950 leading-relaxed" id="res-suggestion">
-                                        葉片組織厚實健康，葉脈清晰無阻，葉面無明顯黃化、粉黴或穿孔病徵。
-                                    </p>
-                                </div>
-
-                                <!-- 區塊 2: 居家生活化處方箋 (超越 GPT 的微量計量法) -->
-                                <div class="bg-emerald-50/70 border border-emerald-200/80 rounded-xl p-4">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <h4 class="text-xs font-bold text-emerald-950 flex items-center gap-1.5 uppercase tracking-wide">
-                                            <i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-700"></i> 居家生活化免登記資材處方箋
-                                        </h4>
-                                        <span class="text-[11px] bg-emerald-200/60 text-emerald-800 font-semibold px-2 py-0.5 rounded-full">礦泉水寶特瓶計量</span>
-                                    </div>
-                                    <div class="text-sm text-emerald-950 leading-relaxed whitespace-pre-line" id="res-treatment">
-                                        1. 礦泉水寶特瓶（約600ml）裝滿清水。
-                                        2. 倒入約 1/2 瓶蓋之無毒保護資材，均勻搖晃稀釋。
-                                        3. 傍晚時分均勻噴灑於葉面與葉背，避免正午烈日灼傷。
-                                    </div>
-                                </div>
-
-                                <!-- 操作與存檔按鈕組 -->
-                                <div class="pt-2 flex flex-col sm:flex-row items-center gap-3">
-                                    <button onclick="saveCurrentDiagnosisToDiary()" id="btn-save-diary" class="w-full sm:flex-1 bg-brand-700 hover:bg-brand-800 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
-                                        <i data-lucide="bookmark-plus" class="w-4 h-4"></i> 儲存並加入【<span id="label-save-tag">陽台1號</span>】生長時間軸
-                                    </button>
-                                    <button onclick="jumpToRemedySearch()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-5 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
-                                        <i data-lucide="shield-alert" class="w-4 h-4"></i> 查閱對應官方資材
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ========================================== -->
-        <!-- TAB 2: 單株專屬康復時間軸 (TIMELINE) -->
-        <!-- ========================================== -->
-        <section id="pane-timeline" class="tab-pane hidden space-y-6">
+        <section id="view-home" class="app-view block space-y-6">
             
-            <!-- 頂部控制列 -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-xl sm:text-2xl font-extrabold text-brand-900 flex items-center gap-2">
-                        <i data-lucide="git-commit" class="w-6 h-6 text-brand-700"></i>
-                        <span>單株專屬康復時間軸與生長監控</span>
-                    </h2>
-                    <p class="text-xs text-slate-500 mt-1">杜絕不同盆栽相互污染，以時間序列自動比對病斑收斂與健康變化趨勢</p>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <label class="text-xs font-bold text-slate-600">切換盆栽標籤：</label>
-                    <select id="select-timeline-tag" onchange="loadTimelineBySelectedDiary()" class="text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-semibold text-brand-900 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                        <option value="">載入中...</option>
-                    </select>
+            <!-- 天氣小組件橫幅 (對齊 HomeActivity 天氣卡片) -->
+            <div class="bg-gradient-to-r from-emerald-800 to-teal-800 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute -right-8 -bottom-8 w-48 h-48 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center p-3 border border-white/20">
+                            <i data-lucide="sun-medium" class="w-10 h-10 text-amber-300 animate-spin-slow"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-medium" id="weather-city">臺北市</span>
+                                <span class="text-xs text-green-200" id="weather-update">即時農事天氣更新</span>
+                            </div>
+                            <div class="flex items-baseline gap-2 mt-1">
+                                <span class="text-3xl font-black font-mono" id="weather-temp">24°C</span>
+                                <span class="text-sm font-medium text-green-100" id="weather-desc">晴時多雲 · 降雨機率 10%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-black/20 rounded-2xl px-4 py-3 border border-white/10 max-w-md text-xs space-y-1">
+                        <div class="flex items-center gap-1.5 font-bold text-amber-300">
+                            <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                            <span>今日溫室病蟲害防範提醒</span>
+                        </div>
+                        <p class="text-white/80 leading-relaxed" id="weather-tip">濕度偏高，傍晚請加強溫室對流通風，注意紅蜘蛛與白粉病滋生風險。</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- 趨勢狀態橫幅 -->
-            <div id="timeline-trend-banner" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="flex items-center gap-3.5">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
-                        <i data-lucide="activity" class="w-6 h-6"></i>
+            <!-- 大按鈕：拍照診斷主入口 (Hero Action) -->
+            <div onclick="navigateTo('upload')" class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-emerald-400 hover:border-brand-700 shadow-md hover:shadow-xl transition cursor-pointer flex flex-col sm:flex-row items-center justify-between gap-6 group">
+                <div class="flex items-center gap-5">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-700 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition">
+                        <i data-lucide="camera" class="w-8 h-8"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-black text-emerald-900" id="timeline-trend-title">✨ 連續健康生長</h3>
-                        <p class="text-xs text-emerald-800/90 mt-0.5" id="timeline-trend-desc">連續多期保持健康旺盛狀態，日常照護與光照水分管理極佳！</p>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-xl sm:text-2xl font-black text-slate-800 group-hover:text-brand-800 transition">植物病蟲害拍照診斷</h2>
+                            <span class="text-xs bg-emerald-100 text-brand-800 font-bold px-2 py-0.5 rounded-full">雙引擎仲裁</span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">上傳或拍攝患部葉片，本地 ConvNeXt (&lt;4ms) 結合 Gemini 多模態秒級給出生活處方</p>
                     </div>
                 </div>
-
-                <!-- 每日照護簽到打卡 -->
-                <button id="btn-timeline-checkin" onclick="handleCareCheckin()" class="w-full sm:w-auto bg-brand-700 hover:bg-brand-800 text-white font-bold px-5 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2 text-xs shrink-0">
-                    <i data-lucide="droplet" class="w-4 h-4"></i>
-                    <span id="btn-checkin-text">💧 記錄今日已澆水</span>
+                <button class="bg-brand-700 group-hover:bg-brand-800 text-white font-bold text-sm px-6 py-3 rounded-2xl shadow-md transition flex items-center gap-2 shrink-0">
+                    <span>立即診斷</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
 
-            <!-- Before vs After 對照寫真卡片 -->
-            <div id="timeline-compare-card" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-600 mb-4 flex items-center gap-2" id="timeline-compare-title">
-                    <i data-lucide="split" class="w-4 h-4 text-brand-700"></i>
-                    <span>🌱 成長發育寫真對照 (前期長勢 vs 近期現況)</span>
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- 左：前期照片 -->
-                    <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50 flex flex-col">
-                        <div class="aspect-video bg-slate-200 relative overflow-hidden">
-                            <img id="img-compare-before" src="https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80" alt="前期長勢" class="w-full h-full object-cover" />
-                            <span class="absolute top-2 left-2 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded font-mono" id="label-compare-before-date">2026-11-15</span>
+            <!-- 功能捷徑卡片網格 (對齊 HomeActivity 四大入口) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                
+                <!-- 1. 病歷相簿 -->
+                <div onclick="navigateTo('history')" class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-500 transition cursor-pointer flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-brand-700 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                            <i data-lucide="book-open" class="w-6 h-6"></i>
                         </div>
-                        <div class="p-3 bg-white text-center border-t border-slate-100">
-                            <span class="text-xs font-bold text-slate-700" id="label-compare-before">前期長勢 (健康狀態)</span>
-                        </div>
+                        <h3 class="text-base font-black text-slate-800 group-hover:text-brand-700 transition">植物生長日記</h3>
+                        <p class="text-xs text-slate-500 mt-1">雙欄拍立得網格、日期快查、單株專屬時間軸追蹤</p>
                     </div>
-
-                    <!-- 右：最新照片 -->
-                    <div class="border border-emerald-300 rounded-xl overflow-hidden bg-emerald-50/30 flex flex-col shadow-sm">
-                        <div class="aspect-video bg-slate-200 relative overflow-hidden">
-                            <img id="img-compare-after" src="https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80" alt="最新現況" class="w-full h-full object-cover" />
-                            <span class="absolute top-2 left-2 bg-emerald-700 text-white text-[11px] px-2 py-0.5 rounded font-mono" id="label-compare-after-date">2026-11-22</span>
-                        </div>
-                        <div class="p-3 bg-white text-center border-t border-slate-100">
-                            <span class="text-xs font-bold text-emerald-800" id="label-compare-after">最新枝葉 (健康狀態)</span>
-                        </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-brand-700">
+                        <span>開啟相簿</span>
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
                     </div>
                 </div>
-            </div>
 
-            <!-- 連續時序節點列表 (Timeline Nodes) -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-600 mb-6 flex items-center gap-2">
-                    <i data-lucide="history" class="w-4 h-4 text-brand-700"></i>
-                    <span>歷次巡檢與用藥詳細時間軌跡</span>
-                </h3>
-
-                <div class="relative pl-6 space-y-6" id="timeline-nodes-container">
-                    <!-- 時間軸節點由 JS 動態渲染 -->
+                <!-- 2. 官方資材寶典 -->
+                <div onclick="navigateTo('remedies')" class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-500 transition cursor-pointer flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-base font-black text-slate-800 group-hover:text-brand-700 transition">官方安全用藥寶典</h3>
+                        <p class="text-xs text-slate-500 mt-1">收錄 1,616 筆防檢署免登記資材、生活化寶特瓶稀釋指南</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-brand-700">
+                        <span>查閱圖鑑</span>
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </div>
                 </div>
-            </div>
 
+                <!-- 3. 溫室定點巡檢 -->
+                <div onclick="navigateTo('webcam')" class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-500 transition cursor-pointer flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                            <i data-lucide="video" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-base font-black text-slate-800 group-hover:text-brand-700 transition">溫室定點巡檢</h3>
+                        <p class="text-xs text-slate-500 mt-1">特定育苗床/隔離區定點視訊連續監控與異常警報</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-brand-700">
+                        <span>進入巡檢</span>
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+
+                <!-- 4. 系統設定 -->
+                <div onclick="openSettingsModal()" class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-500 transition cursor-pointer flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                            <i data-lucide="sliders" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-base font-black text-slate-800 group-hover:text-brand-700 transition">系統設定與帳號</h3>
+                        <p class="text-xs text-slate-500 mt-1">Railway 雲端 API 端點切換、Ping 測速、帳號安全管理</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-brand-700">
+                        <span>管理設定</span>
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+
+            </div>
         </section>
 
         <!-- ========================================== -->
-        <!-- TAB 3: 官方安全用藥寶典 (REMEDIES) -->
+        <!-- 2. 拍照與診斷視圖 (VIEW: UPLOAD) 對齊 UploadActivity -->
         <!-- ========================================== -->
-        <section id="pane-remedies" class="tab-pane hidden space-y-6">
+        <section id="view-upload" class="app-view hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <button onclick="navigateTo('home')" class="text-xs font-bold text-slate-600 hover:text-brand-700 flex items-center gap-1">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回主頁
+                </button>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-500 font-semibold">🌟 展覽示範樣本：</span>
+                    <button onclick="loadDemoSample('iron')" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold px-2.5 py-1 rounded-lg">🍋 檸檬缺鐵</button>
+                    <button onclick="loadDemoSample('powdery')" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 font-bold px-2.5 py-1 rounded-lg">🍊 柑橘白粉病</button>
+                    <button onclick="loadDemoSample('healthy')" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold px-2.5 py-1 rounded-lg">🌿 健康生長</button>
+                </div>
+            </div>
+
+            <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+                        <i data-lucide="camera" class="w-6 h-6 text-brand-700"></i>
+                        <span>植物病蟲害拍照快篩</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">上傳清晰葉片特寫照片，AI 將自動辨識病徵並產出對應生活化安全處方</p>
+                </div>
+
+                <!-- 作物與盆栽設定 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs text-slate-600 font-bold block mb-1">目標植物種類</label>
+                        <select id="input-crop-name" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-medium focus:ring-2 focus:ring-brand-500">
+                            <option value="檸檬">🍋 檸檬 (Lemon)</option>
+                            <option value="柑橘">🍊 柑橘 (Citrus)</option>
+                            <option value="番茄">🍅 番茄 (Tomato)</option>
+                            <option value="草莓">🍓 草莓 (Strawberry)</option>
+                            <option value="葡萄">🍇 葡萄 (Grape)</option>
+                            <option value="蘋果">🍎 蘋果 (Apple)</option>
+                            <option value="玫瑰">🌹 玫瑰/景觀花卉</option>
+                            <option value="室內綠植">🪴 室內盆栽/觀葉植物</option>
+                            <option value="未知作物">❓ 自動全品項辨識</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-600 font-bold block mb-1">盆栽專屬標籤 (同種多盆隔離)</label>
+                        <input type="text" id="input-plant-tag" placeholder="如: 陽台1號、客廳2號" value="陽台1號" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-medium focus:ring-2 focus:ring-brand-500" />
+                    </div>
+                </div>
+
+                <!-- 寵物與室內友善開關 (都市模式) -->
+                <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <i data-lucide="shield-check" class="w-5 h-5 text-brand-700"></i>
+                        <div>
+                            <span class="text-xs font-bold text-emerald-950 block">室內安全與毛孩寵物友善過濾</span>
+                            <span class="text-[11px] text-emerald-800">處方自動排除對貓狗有害成分，優先推廣無毒居家資材</span>
+                        </div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="check-indoor-pet" checked class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                    </label>
+                </div>
+
+                <!-- 圖片上傳/拖曳區 -->
+                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="border-2 border-dashed border-slate-300 hover:border-brand-500 rounded-2xl bg-slate-50 p-8 text-center cursor-pointer transition relative overflow-hidden group">
+                    <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)" />
+                    
+                    <div id="preview-container" class="hidden relative rounded-xl overflow-hidden shadow-inner max-h-72 mx-auto">
+                        <img id="preview-image" src="" alt="預覽" class="w-full h-auto object-cover max-h-72 rounded-xl" />
+                        <button type="button" onclick="event.stopPropagation(); clearSelectedImage();" class="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <div id="empty-prompt" class="space-y-3 py-6">
+                        <div class="w-16 h-16 rounded-full bg-emerald-100 text-brand-700 flex items-center justify-center mx-auto group-hover:scale-110 transition">
+                            <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-slate-700">點擊上傳 或 將葉片患部特寫拖曳至此</p>
+                            <p class="text-xs text-slate-500 mt-1">支援手機拍照、筆電鏡頭或 JPG、PNG、WebP 圖檔</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 鏡頭拍照輔助按鈕 -->
+                <div class="flex items-center justify-center gap-3">
+                    <button type="button" onclick="openCameraCapture()" class="text-xs text-slate-700 hover:text-brand-700 font-bold flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl transition">
+                        <i data-lucide="camera" class="w-4 h-4"></i> 開啟筆電 / 手機相機現場拍照
+                    </button>
+                </div>
+
+                <!-- 開始診斷送出鈕 -->
+                <button onclick="executeDiagnosisFlow()" class="w-full bg-brand-700 hover:bg-brand-800 text-white font-bold py-4 rounded-2xl shadow-lg transition flex items-center justify-center gap-2 text-base">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    <span>開始 AI 雙引擎快篩分析</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 3. 診斷載入中視圖 (VIEW: DIAGNOSE PROGRESS) 對齊 DiagnoseProgressActivity -->
+        <!-- ========================================== -->
+        <section id="view-diagnose-progress" class="app-view hidden py-16">
+            <div class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-8 text-center space-y-6 relative overflow-hidden">
+                <!-- 飄落葉片動效裝飾 -->
+                <div class="falling-leaf left-10 text-emerald-400" style="animation-delay: 0s;"><i data-lucide="leaf" class="w-5 h-5"></i></div>
+                <div class="falling-leaf right-12 text-green-500" style="animation-delay: 1.2s;"><i data-lucide="leaf" class="w-4 h-4"></i></div>
+                
+                <div class="w-20 h-20 rounded-full bg-emerald-100 text-brand-700 flex items-center justify-center mx-auto shadow-inner">
+                    <i data-lucide="cpu" class="w-10 h-10 animate-pulse"></i>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-black text-slate-800" id="progress-status-text">邊緣模型特徵萃取中...</h3>
+                    <p class="text-xs text-slate-500 mt-1" id="progress-sub-text">本地 ConvNeXt (&lt;4ms) 進行初篩，並由雲端進行特徵仲裁</p>
+                </div>
+
+                <!-- 平滑進度條 -->
+                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200">
+                    <div id="progress-bar-fill" class="bg-brand-700 h-full w-0 transition-all duration-300 rounded-full"></div>
+                </div>
+
+                <div class="text-xs text-slate-400 font-mono" id="progress-pct">0%</div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 4. 診斷結果頁 (VIEW: RESULT) 對齊 ResultActivity -->
+        <!-- ========================================== -->
+        <section id="view-result" class="app-view hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <button onclick="navigateTo('upload')" class="text-xs font-bold text-slate-600 hover:text-brand-700 flex items-center gap-1">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> 重新診斷
+                </button>
+                <div class="flex items-center gap-2">
+                    <button onclick="openFeedbackModal()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+                        <i data-lucide="message-square-warning" class="w-3.5 h-3.5"></i> 提交診斷糾錯反饋
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <!-- 狀態大彩條 -->
+                <div id="res-status-banner" class="bg-emerald-600 px-6 sm:px-8 py-5 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full font-bold" id="res-crop-pill">作物：檸檬</span>
+                            <span class="text-xs uppercase tracking-wider bg-black/20 px-2.5 py-0.5 rounded-full font-bold" id="res-tag-pill">盆栽：陽台1號</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-black mt-1" id="res-status-name">健康狀態</h2>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs text-white/80 font-medium">判斷信心度</div>
+                        <div class="text-3xl font-black font-mono text-white" id="res-confidence-val">98.5%</div>
+                    </div>
+                </div>
+
+                <!-- 來源與合規條 -->
+                <div class="bg-slate-50 px-6 sm:px-8 py-2.5 border-b border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2">
+                    <div id="res-engine-badge" class="flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-md">
+                            <i data-lucide="zap" class="w-3.5 h-3.5 text-emerald-600"></i> 本地 ConvNeXt 快篩 (&lt;4ms)
+                        </span>
+                        <span class="text-slate-400">|</span>
+                        <span class="text-slate-600 font-medium">農業部動植物防檢署安全約束</span>
+                    </div>
+                </div>
+
+                <!-- 處方箋主體三區塊 -->
+                <div class="p-6 sm:p-8 space-y-5">
+                    
+                    <!-- 卡片 1: 病徵分析 -->
+                    <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-5 space-y-2">
+                        <h4 class="text-xs font-bold text-blue-900 flex items-center gap-2 uppercase tracking-wide">
+                            <i data-lucide="microscope" class="w-4 h-4 text-blue-700"></i> 病況特徵特寫分析
+                        </h4>
+                        <p class="text-sm text-blue-950 leading-relaxed" id="res-symptom-text">
+                            葉脈組織健康飽滿，無異常斑點、黃化或穿孔痕跡。
+                        </p>
+                    </div>
+
+                    <!-- 卡片 2: 居家生活化處方箋 -->
+                    <div class="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-5 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-xs font-bold text-emerald-950 flex items-center gap-2 uppercase tracking-wide">
+                                <i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-700"></i> 居家生活化免登記處方箋
+                            </h4>
+                            <span class="text-[11px] bg-emerald-200/70 text-emerald-900 font-bold px-2 py-0.5 rounded-full">礦泉水寶特瓶計量</span>
+                        </div>
+                        <div class="text-sm text-emerald-950 leading-relaxed whitespace-pre-line" id="res-treatment-text">
+                            1. 準備約 600ml 礦泉水寶特瓶裝滿清水。
+                            2. 倒入約 1/2 瓶蓋之天然無毒資材（如柑橘精油或甲殼素）。
+                            3. 均勻搖晃後於傍晚向葉片正反面噴灑。
+                        </div>
+                    </div>
+
+                    <!-- 卡片 3: 注意事項 -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs text-slate-600 space-y-1">
+                        <span class="font-bold text-slate-700 flex items-center gap-1.5">
+                            <i data-lucide="info" class="w-3.5 h-3.5 text-slate-500"></i> 照護注意事項
+                        </span>
+                        <p>避開正午高溫陽光直射，避免肥傷灼傷；連續雨天後應加強盆栽基底排水透氣。</p>
+                    </div>
+
+                    <!-- 動作按鈕 -->
+                    <div class="pt-3 flex flex-col sm:flex-row items-center gap-3">
+                        <button onclick="promptPlantTagAndSave()" class="w-full sm:flex-1 bg-brand-700 hover:bg-brand-800 text-white font-bold py-3.5 px-5 rounded-2xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                            <i data-lucide="bookmark-plus" class="w-4 h-4"></i>
+                            <span>儲存至日記並建立專屬時間軸</span>
+                        </button>
+                        <button onclick="jumpToRemediesFromDiagnosis()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 px-6 rounded-2xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i>
+                            <span>查閱官方對應資材</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 5. 歷史病歷相簿視圖 (VIEW: HISTORY) 對齊 HistoryListActivity (2-Column Grid) -->
+        <!-- ========================================== -->
+        <section id="view-history" class="app-view hidden space-y-6">
             
-            <!-- 搜尋與過濾頂部 -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <!-- 搜尋與過濾頂部控制列 (對齊 activity_history_list.xml) -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-4">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h2 class="text-2xl font-extrabold text-brand-900 flex items-center gap-2">
-                            <i data-lucide="shield-check" class="w-6 h-6 text-brand-700"></i>
-                            <span>台灣官方免登記保護資材全量寶典</span>
+                        <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+                            <i data-lucide="book-open" class="w-6 h-6 text-brand-700"></i>
+                            <span>植物生長與病歷日記</span>
                         </h2>
-                        <p class="text-xs text-slate-500 mt-1">資料介接自農業部動植物防檢署審定清冊，共收錄 1,616 筆合法合規無毒資材</p>
+                        <p class="text-xs text-slate-500 mt-1">雙欄拍立得網格、單株專屬時間序列追蹤</p>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full md:w-auto">
+                        <div class="relative flex-1 md:w-72">
+                            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="history-search-input" oninput="filterHistoryList()" placeholder="搜尋作物、病害、盆栽標籤..." class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2.5 focus:ring-2 focus:ring-brand-500 font-medium" />
+                        </div>
+                        <input type="date" id="history-date-picker" onchange="filterHistoryByDate()" class="text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-medium text-slate-700" title="選擇特定日期" />
+                    </div>
+                </div>
+
+                <!-- 月份快捷晶片 -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
+                    <button onclick="setHistoryMonthFilter('all')" id="btn-month-all" class="month-chip px-3.5 py-1.5 rounded-full bg-brand-800 text-white shrink-0 shadow-sm transition">
+                        🌱 全部紀錄
+                    </button>
+                    <button onclick="setHistoryMonthFilter('current')" id="btn-month-current" class="month-chip px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0 transition">
+                        🗓️ 本月最新
+                    </button>
+                    <button onclick="setHistoryMonthFilter('prev')" id="btn-month-prev" class="month-chip px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0 transition">
+                        🗓️ 上月歷史
+                    </button>
+                </div>
+            </div>
+
+            <!-- 雙欄拍立得網格 (2-Column Grid 對齊 item_history.xml) -->
+            <div id="history-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- 由 JS 動態注入卡片 -->
+            </div>
+
+            <!-- 空狀態 -->
+            <div id="history-empty" class="hidden bg-white rounded-3xl border border-slate-200 p-12 text-center">
+                <i data-lucide="folder-search" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+                <h4 class="text-base font-bold text-slate-700">查無病歷紀錄</h4>
+                <p class="text-xs text-slate-500 mt-1">尚未儲存診斷紀錄，或篩選條件查無資料。</p>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 6. 病歷詳細與時間軸視圖 (VIEW: HISTORY DETAIL) 對齊 HistoryDetailActivity -->
+        <!-- ========================================== -->
+        <section id="view-history-detail" class="app-view hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <button onclick="navigateTo('history')" class="text-xs font-bold text-slate-600 hover:text-brand-700 flex items-center gap-1">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回病歷相簿
+                </button>
+                <button onclick="deleteCurrentDetailRecord()" class="text-xs text-red-600 hover:text-red-800 font-bold border border-red-200 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 刪除此筆病歷
+                </button>
+            </div>
+
+            <!-- 頂部植株大卡片 -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-0">
+                    <!-- 左側患部照片 -->
+                    <div class="md:col-span-5 aspect-square sm:aspect-video md:aspect-auto bg-slate-100 relative group cursor-pointer" onclick="openLightbox(document.getElementById('detail-main-img').src)">
+                        <img id="detail-main-img" src="" alt="病歷照片" class="w-full h-full object-cover max-h-96" />
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1.5">
+                            <i data-lucide="maximize-2" class="w-4 h-4"></i> 點擊放大檢視
+                        </div>
+                    </div>
+
+                    <!-- 右側核心資訊 -->
+                    <div class="md:col-span-7 p-6 sm:p-8 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xs font-bold bg-brand-100 text-brand-800 px-2.5 py-0.5 rounded-full" id="detail-tag-pill">盆栽：陽台1號</span>
+                                <span class="text-xs text-slate-400 font-mono" id="detail-date-text">2026-11-22 00:00</span>
+                            </div>
+                            <h2 class="text-2xl sm:text-3xl font-black text-slate-800" id="detail-plant-name">植物：檸檬 [陽台1號]</h2>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="text-sm font-bold px-3 py-1 rounded-full" id="detail-status-pill">健康狀態</span>
+                            </div>
+                        </div>
+
+                        <!-- 照護筆記區塊 (User Note - 支援即時編輯) -->
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                    <i data-lucide="edit-3" class="w-3.5 h-3.5 text-brand-700"></i> 使用者專屬照護筆記
+                                </span>
+                                <button onclick="toggleNoteEditMode()" id="btn-edit-note" class="text-xs text-brand-700 hover:underline font-bold">
+                                    編輯筆記
+                                </button>
+                            </div>
+                            <div id="note-display-view">
+                                <p class="text-xs text-slate-600 leading-relaxed" id="detail-note-text">尚未記錄筆記。</p>
+                            </div>
+                            <div id="note-edit-view" class="hidden space-y-2">
+                                <textarea id="input-edit-note" rows="2" class="w-full text-xs bg-white border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-brand-500"></textarea>
+                                <div class="flex justify-end gap-2">
+                                    <button onclick="toggleNoteEditMode()" class="text-xs text-slate-500 font-bold px-3 py-1">取消</button>
+                                    <button onclick="saveNoteToServer()" class="text-xs bg-brand-700 hover:bg-brand-800 text-white font-bold px-4 py-1.5 rounded-lg shadow">儲存筆記</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 單株專屬康復時間軸與生長監控 (對齊 HistoryDetailActivity 時間軸模組) -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+                <div>
+                    <h3 class="text-xl font-black text-slate-800 flex items-center gap-2" id="detail-timeline-header-title">
+                        <i data-lucide="activity" class="w-5 h-5 text-brand-700"></i>
+                        <span>🌱 單株專屬康復時間軸與生長監控</span>
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-0.5">自動串聯同一株盆栽之連續追蹤紀錄，破除通用 GPT 無狀態對話缺陷</p>
+                </div>
+
+                <!-- 趨勢狀態橫幅 -->
+                <div id="detail-trend-banner" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h4 class="text-base font-black text-emerald-900" id="detail-trend-title">✨ 連續健康生長</h4>
+                        <p class="text-xs text-emerald-800 mt-0.5" id="detail-trend-desc">連續多期保持健康旺盛狀態，日常照護與光照水分管理極佳！</p>
+                    </div>
+
+                    <!-- 每日照護簽到打卡 -->
+                    <button onclick="executeCareCheckinOnDetail()" class="w-full sm:w-auto bg-brand-700 hover:bg-brand-800 text-white font-bold px-5 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2 text-xs shrink-0">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        <span id="detail-btn-checkin-text">💧 記錄今日已澆水</span>
+                    </button>
+                </div>
+
+                <!-- Before vs After 歷程寫真對照卡片 -->
+                <div id="detail-compare-container" class="border border-slate-200 rounded-2xl p-5 space-y-4">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-2" id="detail-compare-title">
+                        <i data-lucide="split" class="w-4 h-4 text-brand-700"></i>
+                        <span>🌱 成長發育寫真對照 (前期長勢 vs 近期現況)</span>
+                    </h4>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
+                            <div class="aspect-video bg-slate-200 relative overflow-hidden">
+                                <img id="detail-compare-before-img" src="" alt="前期" class="w-full h-full object-cover" />
+                                <span class="absolute top-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded font-mono" id="detail-before-date">--</span>
+                            </div>
+                            <div class="p-2.5 bg-white text-center border-t border-slate-100 text-xs font-bold text-slate-700" id="detail-before-label">
+                                前期長勢
+                            </div>
+                        </div>
+
+                        <div class="border border-emerald-300 rounded-xl overflow-hidden bg-emerald-50/40">
+                            <div class="aspect-video bg-slate-200 relative overflow-hidden">
+                                <img id="detail-compare-after-img" src="" alt="現況" class="w-full h-full object-cover" />
+                                <span class="absolute top-2 left-2 bg-emerald-700 text-white text-[10px] px-2 py-0.5 rounded font-mono" id="detail-after-date">--</span>
+                            </div>
+                            <div class="p-2.5 bg-white text-center border-t border-slate-100 text-xs font-bold text-emerald-800" id="detail-after-label">
+                                最新現況
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 時序 Stepper 節點列表 -->
+                <div class="relative pl-6 space-y-5" id="detail-timeline-stepper">
+                    <!-- JS 動態渲染節點 -->
+                </div>
+            </div>
+
+            <!-- 處方箋詳細三大區塊 -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-5">
+                <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                    <i data-lucide="clipboard-list" class="w-5 h-5 text-brand-700"></i>
+                    <span>專家處方箋與官方用藥</span>
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-5 space-y-2">
+                        <span class="text-xs font-bold text-blue-900 uppercase">病徵特徵深度剖析</span>
+                        <p class="text-xs text-blue-950 leading-relaxed" id="detail-symptom-text">--</p>
+                    </div>
+
+                    <div class="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-5 space-y-2">
+                        <span class="text-xs font-bold text-emerald-950 uppercase">居家生活化安全處方箋</span>
+                        <p class="text-xs text-emerald-950 leading-relaxed whitespace-pre-line" id="detail-treatment-text">--</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 7. 官方資材寶典視圖 (VIEW: REMEDIES) 對齊 RemedyCatalogActivity -->
+        <!-- ========================================== -->
+        <section id="view-remedies" class="app-view hidden space-y-6">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+                            <i data-lucide="shield-check" class="w-6 h-6 text-brand-700"></i>
+                            <span>官方安全用藥寶典</span>
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">介接農業部動植物防檢署審定清冊，共收錄 1,616 筆合法免登記資材</p>
                     </div>
 
                     <div class="relative w-full md:w-80">
                         <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="input-remedy-search" oninput="debounceRemedySearch()" placeholder="搜尋品名、成分（如: 苦楝油、白粉病）..." class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium" />
+                        <input type="text" id="remedies-search-input" oninput="debounceRemedySearch()" placeholder="搜尋品名、成分（如: 苦楝油、白粉病）..." class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-brand-500 font-medium" />
                     </div>
                 </div>
 
-                <!-- 分類晶片過濾 (Filter Chips) -->
-                <div class="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar text-xs font-semibold">
+                <!-- 分類晶片過濾 -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
                     <button onclick="setRemedyCategory('all')" id="chip-cat-all" class="remedy-chip px-3.5 py-1.5 rounded-full bg-brand-800 text-white shrink-0 shadow-sm transition">
                         全部資材 (1,616)
                     </button>
@@ -468,7 +723,7 @@
                         🐛 害蟲除蟎專區
                     </button>
                     <button onclick="setRemedyCategory('growth')" id="chip-cat-growth" class="remedy-chip px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0 transition">
-                        🌱 活力生長營養 (缺鐵/黃化)
+                        🌱 活力營養 (缺鐵黃化)
                     </button>
                     <button onclick="setRemedyCategory('pet_safe')" id="chip-cat-pet_safe" class="remedy-chip px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0 transition">
                         🐱 寵物貓狗安全
@@ -479,65 +734,63 @@
                 </div>
             </div>
 
-            <!-- 資材卡片網格 -->
-            <div id="remedies-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- 由 JS 動態注入卡片 -->
+            <!-- 卡片網格 -->
+            <div id="remedies-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- JS 動態注入 -->
             </div>
 
-            <!-- 空狀態 / 載入狀態 -->
-            <div id="remedies-empty" class="hidden bg-white rounded-2xl border border-slate-200 p-12 text-center">
+            <!-- 空狀態 -->
+            <div id="remedies-empty" class="hidden bg-white rounded-3xl border border-slate-200 p-12 text-center">
                 <i data-lucide="package-open" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
-                <h4 class="text-sm font-bold text-slate-700">查無相符之官方審定保護資材</h4>
-                <p class="text-xs text-slate-500 mt-1">請嘗試縮減關鍵字或點選上方「全部資材」重置篩選</p>
+                <h4 class="text-base font-bold text-slate-700">查無相符之官方審定保護資材</h4>
+                <p class="text-xs text-slate-500 mt-1">請嘗試縮減關鍵字或點選「全部資材」重置條件</p>
             </div>
         </section>
 
         <!-- ========================================== -->
-        <!-- TAB 4: 溫室定點即時巡檢 (WEBCAM) -->
+        <!-- 8. 溫室巡檢視圖 (VIEW: WEBCAM) 對齊 WebcamActivity -->
         <!-- ========================================== -->
-        <section id="pane-webcam" class="tab-pane hidden space-y-6">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <section id="view-webcam" class="app-view hidden space-y-6">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-2xl font-extrabold text-brand-900 flex items-center gap-2">
+                    <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
                         <i data-lucide="video" class="w-6 h-6 text-brand-700"></i>
                         <span>智慧溫室定點 Webcam 巡檢監控</span>
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">針對特定育苗床或重症隔離區進行定點連續防抖採集與異常自動警報</p>
+                    <p class="text-xs text-slate-500 mt-1">定點連續監控、多幀防抖仲裁與自動告警推播</p>
                 </div>
-                <a href="/webcam" target="_blank" class="bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2">
-                    <i data-lucide="external-link" class="w-4 h-4"></i> 開啟全螢幕定點監控大屏
+                <a href="/webcam" target="_blank" class="bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition flex items-center gap-2">
+                    <i data-lucide="external-link" class="w-4 h-4"></i> 開啟原生全螢幕監控大屏
                 </a>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- 視訊畫面 -->
-                <div class="lg:col-span-2 bg-black rounded-2xl overflow-hidden aspect-video relative flex items-center justify-center border border-slate-800">
-                    <img id="webcam-stream" src="/static/tmp/webcam_preview.jpg" onerror="this.src='https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=1200&q=80'" alt="溫室畫面" class="w-full h-full object-cover" />
-                    <div class="absolute top-3 left-3 bg-black/70 text-white text-xs px-2.5 py-1 rounded-md flex items-center gap-2 font-mono">
+                <div class="lg:col-span-2 bg-black rounded-3xl overflow-hidden aspect-video relative flex items-center justify-center border border-slate-800">
+                    <img id="webcam-stream" src="/static/tmp/webcam_preview.jpg" onerror="this.src='https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=1200&q=80'" alt="畫面" class="w-full h-full object-cover" />
+                    <div class="absolute top-4 left-4 bg-black/70 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-2 font-mono">
                         <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
                         LIVE | 育苗床定點機位 A-01
                     </div>
                 </div>
 
-                <!-- 警報與防護機制說明 -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 space-y-4">
                     <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                        <i data-lucide="bell-ring" class="w-4 h-4 text-amber-600"></i> 最近巡檢自動警報
+                        <i data-lucide="bell-ring" class="w-4 h-4 text-amber-600"></i> 最近巡檢連續警報
                     </h4>
                     <div class="space-y-3" id="webcam-alert-list">
-                        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 text-xs space-y-1">
+                        <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50 text-xs space-y-1.5">
                             <div class="flex items-center justify-between font-bold text-slate-700">
                                 <span>柑橘 - 白粉病疑似病斑</span>
-                                <span class="text-red-600">連續命中 5 幀</span>
+                                <span class="text-rose-600 bg-rose-50 px-2 py-0.5 rounded font-mono">連續命中 5 幀</span>
                             </div>
-                            <p class="text-slate-500 text-[11px]">2026-11-22 00:15:30</p>
+                            <p class="text-slate-400 text-[11px]">2026-11-22 00:15:30</p>
                         </div>
-                        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 text-xs space-y-1">
+                        <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50 text-xs space-y-1.5">
                             <div class="flex items-center justify-between font-bold text-slate-700">
-                                <span>番茄 - 早疫病同心輪紋</span>
-                                <span class="text-amber-600">連續命中 3 幀</span>
+                                <span>番茄 - 早疫病輪紋</span>
+                                <span class="text-amber-600 bg-amber-50 px-2 py-0.5 rounded font-mono">連續命中 3 幀</span>
                             </div>
-                            <p class="text-slate-500 text-[11px]">2026-11-21 16:40:12</p>
+                            <p class="text-slate-400 text-[11px]">2026-11-21 16:40:12</p>
                         </div>
                     </div>
                 </div>
@@ -550,10 +803,10 @@
     <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p>© 2026 國立臺北商業大學 專題組別 #114202 | Plant Doctor 植物病蟲害連續監控系統</p>
-            <div class="flex items-center gap-4">
-                <a href="/admin/" class="hover:text-brand-700 transition font-semibold">Web 管理者後台</a>
+            <div class="flex items-center gap-4 font-semibold">
+                <a href="/admin/" class="hover:text-brand-700 transition">Web 管理者後台</a>
                 <a href="/docs" target="_blank" class="hover:text-brand-700 transition">Swagger API</a>
-                <a href="/download-apk" class="hover:text-brand-700 transition flex items-center gap-1 font-semibold text-brand-700">
+                <a href="/download-apk" class="text-brand-700 hover:underline flex items-center gap-1">
                     <i data-lucide="download" class="w-3.5 h-3.5"></i> 下載 Android APK
                 </a>
             </div>
@@ -561,87 +814,93 @@
     </footer>
 
     <!-- ========================================== -->
-    <!-- 彈窗 1: API 端點設定 (Railway Config Modal) -->
+    <!-- 彈窗組 (MODALS) 對齊各對話框 -->
     <!-- ========================================== -->
-    <div id="modal-api-config" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between">
-                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                    <i data-lucide="server" class="w-5 h-5 text-brand-700"></i> API 雲端伺服器端點設定
-                </h3>
-                <button onclick="closeApiConfigModal()" class="text-slate-400 hover:text-slate-600 p-1">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+
+    <!-- 1. 盆栽標籤選取彈窗 (對齊 dialog_plant_tag_select.xml) -->
+    <div id="modal-plant-tag" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-5">
+            <div class="text-center">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-brand-700 flex items-center justify-center mx-auto mb-3">
+                    <i data-lucide="tag" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-black text-slate-800">指定此盆栽專屬標籤</h3>
+                <p class="text-xs text-slate-500 mt-1">方便日後獨立追蹤康復歷程，不與其他盆栽混淆</p>
             </div>
-            <p class="text-xs text-slate-500">若部署於 Railway 或從本地靜態網頁開啟，請指定後端 API 基礎路徑：</p>
+
+            <!-- 快捷標籤晶片 -->
             <div>
-                <label class="text-xs font-bold text-slate-700 block mb-1">API Base URL</label>
-                <input type="text" id="config-api-base" placeholder="例如: https://xxx.up.railway.app 或保留空白走相對路徑" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-mono focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">快速選擇標籤</label>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="selectQuickTag('陽台1號')" class="tag-quick-chip text-xs bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-3 py-1.5 rounded-xl transition">🌿 陽台1號</button>
+                    <button type="button" onclick="selectQuickTag('客廳2號')" class="tag-quick-chip text-xs bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-3 py-1.5 rounded-xl transition">🪴 客廳2號</button>
+                    <button type="button" onclick="selectQuickTag('頂樓花園')" class="tag-quick-chip text-xs bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-3 py-1.5 rounded-xl transition">🌸 頂樓花園</button>
+                    <button type="button" onclick="selectQuickTag('辦公室3號')" class="tag-quick-chip text-xs bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-3 py-1.5 rounded-xl transition">🏢 辦公室3號</button>
+                </div>
             </div>
-            <div class="flex items-center justify-between text-xs text-slate-500">
-                <span>目前延遲 (Ping)：<span id="ping-result" class="font-bold text-slate-700">測量中...</span></span>
-                <button onclick="testApiPing()" class="text-brand-700 hover:underline font-semibold">重新測速</button>
+
+            <div>
+                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">或自訂盆栽編號/名稱</label>
+                <input type="text" id="modal-tag-input" value="陽台1號" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-bold text-brand-900 focus:ring-2 focus:ring-brand-500" />
             </div>
-            <div class="flex items-center justify-end gap-3 pt-2">
-                <button onclick="closeApiConfigModal()" class="text-xs text-slate-600 px-4 py-2 rounded-lg font-semibold hover:bg-slate-100">取消</button>
-                <button onclick="saveApiConfig()" class="text-xs bg-brand-700 hover:bg-brand-800 text-white px-5 py-2 rounded-lg font-bold shadow transition">儲存並套用</button>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button onclick="closePlantTagModal()" class="flex-1 text-xs text-slate-600 font-bold py-2.5 rounded-xl hover:bg-slate-100">取消</button>
+                <button onclick="confirmSaveWithTag()" class="flex-1 bg-brand-700 hover:bg-brand-800 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">確認存檔</button>
             </div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 彈窗 2: 帳號登入 (Auth Modal) -->
-    <!-- ========================================== -->
-    <div id="modal-auth" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+    <!-- 2. 診斷糾錯反饋彈窗 (對齊反饋提交) -->
+    <div id="modal-feedback" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between">
-                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                    <i data-lucide="lock" class="w-5 h-5 text-brand-700"></i> 使用者登入 / 展覽示範
+                <h3 class="text-base font-black text-slate-800 flex items-center gap-2">
+                    <i data-lucide="message-square-warning" class="w-5 h-5 text-rose-600"></i> 提交診斷糾錯反饋
                 </h3>
-                <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                <button onclick="closeFeedbackModal()" class="text-slate-400 hover:text-slate-600 p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
+            <p class="text-xs text-slate-500">若 AI 診斷有誤，您的反饋將送交管理者後台審核，持續優化專家知識庫！</p>
             
             <div class="space-y-3">
                 <div>
-                    <label class="text-xs font-bold text-slate-700 block mb-1">帳號 / Email</label>
-                    <input type="text" id="auth-username" value="123" placeholder="請輸入帳號" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-brand-500" />
+                    <label class="text-xs font-bold text-slate-700 block mb-1">更正之植物名稱</label>
+                    <input type="text" id="fb-crop-name" placeholder="例如: 檸檬" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-brand-500" />
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-700 block mb-1">密碼</label>
-                    <input type="password" id="auth-password" value="123456" placeholder="請輸入密碼" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-brand-500" />
+                    <label class="text-xs font-bold text-slate-700 block mb-1">更正之正確病害名稱</label>
+                    <input type="text" id="fb-disease-name" placeholder="例如: 白粉病" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-brand-500" />
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-700 block mb-1">補充說明/徵狀特徵</label>
+                    <textarea id="fb-comment" rows="2" placeholder="葉片背面有明顯白色粉狀斑塊..." class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-brand-500"></textarea>
                 </div>
             </div>
 
-            <div class="pt-2 flex items-center gap-3">
-                <button onclick="handleLogin()" class="flex-1 bg-brand-700 hover:bg-brand-800 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
-                    立即登入
-                </button>
-                <button onclick="handleQuickDemoLogin()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
-                    ⚡ 展覽示範一鍵登入
-                </button>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeFeedbackModal()" class="text-xs text-slate-500 font-bold px-4 py-2">取消</button>
+                <button onclick="submitDiagnosisFeedback()" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold px-5 py-2 rounded-xl shadow transition">提交反饋</button>
             </div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 彈窗 3: 資材詳細內容 (Remedy Detail Modal) -->
-    <!-- ========================================== -->
+    <!-- 3. 資材詳細彈窗 (對齊 dialog_remedy_detail.xml) -->
     <div id="modal-remedy-detail" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex items-start justify-between">
                 <div>
-                    <span id="modal-remedy-badge" class="text-xs font-bold text-brand-800 bg-brand-100 px-2.5 py-0.5 rounded-full">防檢署官方審定</span>
+                    <span id="modal-remedy-badge" class="text-xs font-bold text-brand-800 bg-brand-100 px-2.5 py-0.5 rounded-full">防檢署審定資材</span>
                     <h3 class="text-xl font-black text-slate-800 mt-1" id="modal-remedy-title">資材名稱</h3>
-                    <p class="text-xs text-slate-500 font-mono" id="modal-remedy-regno">字號：--</p>
+                    <p class="text-xs text-slate-500 font-mono" id="modal-remedy-regno">官方證號：--</p>
                 </div>
                 <button onclick="closeRemedyModal()" class="text-slate-400 hover:text-slate-600 p-1">
                     <i data-lucide="x" class="w-6 h-6"></i>
                 </button>
             </div>
 
-            <!-- 核心成分與標籤 -->
+            <!-- 成分與標籤 -->
             <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-2 text-xs">
                 <div class="flex items-center justify-between">
                     <span class="text-slate-500">主要天然成分：</span>
@@ -659,7 +918,7 @@
 
             <!-- 生活化微量稀釋指引 -->
             <div class="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-4 space-y-2">
-                <h4 class="text-xs font-bold text-emerald-900 flex items-center gap-1.5 uppercase">
+                <h4 class="text-xs font-bold text-emerald-950 flex items-center gap-1.5 uppercase">
                     <i data-lucide="droplets" class="w-4 h-4 text-emerald-600"></i> 生活化寶特瓶稀釋指引
                 </h4>
                 <p class="text-xs text-emerald-950 leading-relaxed" id="modal-remedy-dilution">
@@ -673,7 +932,7 @@
                     <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600"></i> 使用與防護注意事項
                 </h4>
                 <p class="text-xs text-amber-950 leading-relaxed" id="modal-remedy-notice">
-                    請儲存於陰涼通風處，避免孩童接觸。清晨或傍晚施用最佳，避開開花授粉期。
+                    請儲存於陰涼通風處，避免孩童接觸。清晨或傍晚施用最佳，避開正午酷熱。
                 </p>
             </div>
 
@@ -683,21 +942,106 @@
         </div>
     </div>
 
+    <!-- 4. 大圖燈箱預覽 (Image Lightbox) -->
+    <div id="modal-lightbox" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 cursor-pointer" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="放大檢視" class="max-w-full max-h-[90vh] rounded-2xl object-contain shadow-2xl" />
+    </div>
+
+    <!-- 5. 帳號登入/註冊彈窗 (Auth Modal) -->
+    <div id="modal-auth" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-black text-slate-800 flex items-center gap-2">
+                    <i data-lucide="lock" class="w-5 h-5 text-brand-700"></i> 使用者登入 / 註冊
+                </h3>
+                <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="flex border-b border-slate-200 text-xs font-bold">
+                <button onclick="setAuthTab('login')" id="auth-tab-login" class="flex-1 py-2 text-brand-700 border-b-2 border-brand-700">登入</button>
+                <button onclick="setAuthTab('register')" id="auth-tab-register" class="flex-1 py-2 text-slate-400">註冊新帳號</button>
+            </div>
+
+            <div id="auth-form-login" class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold text-slate-700 block mb-1">帳號</label>
+                    <input type="text" id="auth-username" value="123" placeholder="請輸入帳號" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-brand-500" />
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-700 block mb-1">密碼</label>
+                    <input type="password" id="auth-password" value="123456" placeholder="請輸入密碼" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-brand-500" />
+                </div>
+                <div class="pt-2 flex items-center gap-3">
+                    <button onclick="handleLogin()" class="flex-1 bg-brand-700 hover:bg-brand-800 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">立即登入</button>
+                    <button onclick="handleQuickDemoLogin()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">⚡ 示範一鍵登入</button>
+                </div>
+            </div>
+
+            <div id="auth-form-register" class="hidden space-y-3">
+                <div>
+                    <label class="text-xs font-bold text-slate-700 block mb-1">帳號名稱</label>
+                    <input type="text" id="reg-username" placeholder="英數字帳號" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-brand-500" />
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-700 block mb-1">電子信箱 (Email)</label>
+                    <input type="email" id="reg-email" placeholder="example@ntub.edu.tw" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-brand-500" />
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-700 block mb-1">密碼</label>
+                    <input type="password" id="reg-password" placeholder="請設定 6 位以上密碼" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-brand-500" />
+                </div>
+                <button onclick="handleRegister()" class="w-full bg-brand-700 hover:bg-brand-800 text-white font-bold py-2.5 rounded-xl text-xs shadow transition mt-2">
+                    立即註冊
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. API 端點設定 (Railway Config Modal) -->
+    <div id="modal-api-config" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="server" class="w-5 h-5 text-brand-700"></i> Railway 雲端 API 端點設定
+                </h3>
+                <button onclick="closeApiConfigModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500">部署於 Railway 或從本地展示時，可指定雲端後端網址：</p>
+            <div>
+                <label class="text-xs font-bold text-slate-700 block mb-1">API Base URL</label>
+                <input type="text" id="config-api-base" placeholder="例如: https://xxx.up.railway.app 或保留空白走相對路徑" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-mono focus:ring-2 focus:ring-brand-500" />
+            </div>
+            <div class="flex items-center justify-between text-xs text-slate-500">
+                <span>目前延遲 (Ping)：<span id="ping-result" class="font-bold text-slate-700">測量中...</span></span>
+                <button onclick="testApiPing()" class="text-brand-700 hover:underline font-bold">重新測速</button>
+            </div>
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <button onclick="closeApiConfigModal()" class="text-xs text-slate-600 font-bold px-4 py-2">取消</button>
+                <button onclick="saveApiConfig()" class="text-xs bg-brand-700 hover:bg-brand-800 text-white px-5 py-2 rounded-xl font-bold shadow transition">儲存並套用</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ========================================== -->
-    <!-- 前端核心 JavaScript 邏輯 (APP CONTROLLER) -->
+    <!-- 核心 JAVASCRIPT 控制器 (CONTROLLER) -->
     <!-- ========================================== -->
     <script>
         // 全域狀態
-        let currentTab = 'diagnosis';
+        let currentView = 'home';
         let currentSelectedFile = null;
         let lastAnalysisResult = null;
         let lastPredictionId = null;
+        let allHistoryItems = [];
+        let currentDetailItem = null;
+        let currentTimelineData = null;
         let currentRemedyCategory = 'all';
         let remedyDebounceTimer = null;
-        let userDiariesCache = [];
-        let currentViewingDiaryId = null;
+        let historyMonthFilter = 'all';
 
-        // API 端點 (支援本機相對路徑或自訂 Railway 網址)
         let API_BASE = localStorage.getItem('plant_api_base') || '';
 
         function getFullApiUrl(endpoint) {
@@ -711,58 +1055,66 @@
             lucide.createIcons();
             initApiStatus();
             checkUserSession();
+            loadWeatherWidget();
             loadRemediesList();
-            fetchUserDiariesForTimeline();
         });
 
-        // 頁籤切換
-        function switchTab(tabName) {
-            currentTab = tabName;
-            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(btn => {
+        // 頁面路由切換 (SPA Navigation)
+        function navigateTo(viewName) {
+            currentView = viewName;
+            document.querySelectorAll('.app-view').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('bg-white/20', 'text-white', 'shadow-sm');
                 btn.classList.add('text-green-100');
             });
 
-            const activePane = document.getElementById(`pane-${tabName}`);
-            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
-            if (activePane) activePane.classList.remove('hidden');
-            if (activeBtn) {
-                activeBtn.classList.add('bg-white/20', 'text-white', 'shadow-sm');
-                activeBtn.classList.remove('text-green-100');
+            const targetView = document.getElementById(`view-${viewName}`);
+            const targetNavBtn = document.getElementById(`nav-btn-${viewName}`);
+            if (targetView) targetView.classList.remove('hidden');
+            if (targetNavBtn) {
+                targetNavBtn.classList.add('bg-white/20', 'text-white', 'shadow-sm');
+                targetNavBtn.classList.remove('text-green-100');
             }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             lucide.createIcons();
 
-            if (tabName === 'timeline') {
-                fetchUserDiariesForTimeline();
-            } else if (tabName === 'remedies') {
+            if (viewName === 'history') {
+                fetchHistoryFromServer();
+            } else if (viewName === 'remedies') {
                 loadRemediesList();
             }
         }
 
-        // API 連線檢測
-        async function initApiStatus() {
-            const connDot = document.getElementById('conn-dot');
-            const connText = document.getElementById('conn-text');
-            const pingRes = document.getElementById('ping-result');
-
+        // 即時天氣加載 (對齊 HomeActivity 天氣)
+        async function loadWeatherWidget() {
             try {
-                const start = performance.now();
-                const res = await fetch(getFullApiUrl('/api/v1/health/live'), { method: 'GET' });
-                const dur = Math.round(performance.now() - start);
+                const res = await fetch(getFullApiUrl('/api/v1/weather/current?city=臺北市'));
                 if (res.ok) {
-                    connDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
-                    connText.textContent = `Railway 雲端 (${dur}ms)`;
-                    pingRes.textContent = `${dur} ms (正常)`;
-                    pingRes.className = 'font-bold text-emerald-600';
-                } else {
-                    throw new Error('Status not ok');
+                    const data = await res.json();
+                    document.getElementById('weather-city').textContent = data.location || '臺北市';
+                    document.getElementById('weather-temp').textContent = data.temperature || '24°C';
+                    document.getElementById('weather-desc').textContent = `${data.weather || '晴時多雲'} · 降雨機率 ${data.rain_probability || '10%'}`;
                 }
             } catch (e) {
-                connDot.className = 'w-2 h-2 rounded-full bg-amber-400';
-                connText.textContent = '本機/弱網模式';
-                pingRes.textContent = '離線或端點不可達';
-                pingRes.className = 'font-bold text-amber-600';
+                console.warn('Weather fetch error', e);
+            }
+        }
+
+        // API 連線狀態檢測
+        async function initApiStatus() {
+            const dot = document.getElementById('conn-dot');
+            const txt = document.getElementById('conn-text');
+            try {
+                const start = performance.now();
+                const res = await fetch(getFullApiUrl('/api/v1/health'));
+                const dur = Math.round(performance.now() - start);
+                if (res.ok) {
+                    dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+                    txt.textContent = `Railway 雲端 (${dur}ms)`;
+                }
+            } catch (e) {
+                dot.className = 'w-2 h-2 rounded-full bg-amber-400';
+                txt.textContent = '本地離線/弱網';
             }
         }
 
@@ -781,41 +1133,39 @@
             localStorage.setItem('plant_api_base', API_BASE);
             closeApiConfigModal();
             initApiStatus();
-            Swal.fire({
-                icon: 'success',
-                title: '端點已套用',
-                text: API_BASE ? `已設定為: ${API_BASE}` : '已還原為相對路徑',
-                timer: 1500,
-                showConfirmButton: false
-            });
+            Swal.fire({ icon: 'success', title: 'API 端點已儲存', timer: 1200, showConfirmButton: false });
         }
 
         async function testApiPing() {
             const pingRes = document.getElementById('ping-result');
-            pingRes.textContent = '測速中...';
+            pingRes.textContent = '測量中...';
             try {
                 const start = performance.now();
                 const tempBase = document.getElementById('config-api-base').value.trim().replace(/\/+$/, '');
-                const url = tempBase ? `${tempBase}/api/v1/health/live` : '/api/v1/health/live';
+                const url = tempBase ? `${tempBase}/api/v1/health` : '/api/v1/health';
                 const res = await fetch(url);
                 const dur = Math.round(performance.now() - start);
-                pingRes.textContent = `${dur} ms (連線順暢)`;
+                pingRes.textContent = `${dur} ms (正常)`;
                 pingRes.className = 'font-bold text-emerald-600';
-            } catch (err) {
+            } catch (e) {
                 pingRes.textContent = '無法連線 (請檢查網址或 CORS)';
                 pingRes.className = 'font-bold text-red-600';
             }
         }
 
+        function openSettingsModal() {
+            openApiConfigModal();
+        }
+
         // 登入狀態檢測
         function checkUserSession() {
             const token = localStorage.getItem('plant_token');
-            const username = localStorage.getItem('plant_username');
-            const userPill = document.getElementById('user-display-name');
-            if (token && username) {
-                userPill.textContent = `👤 ${username} (點擊登出)`;
+            const user = localStorage.getItem('plant_username');
+            const pill = document.getElementById('user-display-name');
+            if (token && user) {
+                pill.textContent = `👤 ${user} (點擊登出)`;
             } else {
-                userPill.textContent = '示範訪客 (點擊登入)';
+                pill.textContent = '示範訪客 (點擊登入)';
             }
         }
 
@@ -828,8 +1178,8 @@
                     showCancelButton: true,
                     confirmButtonText: '登出',
                     cancelButtonText: '取消'
-                }).then(res => {
-                    if (res.isConfirmed) {
+                }).then(r => {
+                    if (r.isConfirmed) {
                         localStorage.removeItem('plant_token');
                         localStorage.removeItem('plant_username');
                         checkUserSession();
@@ -843,6 +1193,20 @@
 
         function closeAuthModal() {
             document.getElementById('modal-auth').classList.add('hidden');
+        }
+
+        function setAuthTab(tab) {
+            if (tab === 'login') {
+                document.getElementById('auth-form-login').classList.remove('hidden');
+                document.getElementById('auth-form-register').classList.add('hidden');
+                document.getElementById('auth-tab-login').className = 'flex-1 py-2 text-brand-700 border-b-2 border-brand-700';
+                document.getElementById('auth-tab-register').className = 'flex-1 py-2 text-slate-400';
+            } else {
+                document.getElementById('auth-form-login').classList.add('hidden');
+                document.getElementById('auth-form-register').classList.remove('hidden');
+                document.getElementById('auth-tab-login').className = 'flex-1 py-2 text-slate-400';
+                document.getElementById('auth-tab-register').className = 'flex-1 py-2 text-brand-700 border-b-2 border-brand-700';
+            }
         }
 
         async function handleLogin() {
@@ -866,7 +1230,6 @@
                     localStorage.setItem('plant_username', u);
                     closeAuthModal();
                     checkUserSession();
-                    fetchUserDiariesForTimeline();
                     Swal.fire({ icon: 'success', title: '登入成功！', timer: 1200, showConfirmButton: false });
                 } else {
                     throw new Error(data.detail || '帳號或密碼錯誤');
@@ -882,8 +1245,36 @@
             await handleLogin();
         }
 
+        async function handleRegister() {
+            const u = document.getElementById('reg-username').value.trim();
+            const em = document.getElementById('reg-email').value.trim();
+            const p = document.getElementById('reg-password').value.trim();
+            if (!u || !em || !p) {
+                Swal.fire({ icon: 'warning', title: '請填寫完整註冊資料' });
+                return;
+            }
+
+            try {
+                const res = await fetch(getFullApiUrl('/api/v1/auth/register'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, email: em, password: p })
+                });
+                if (res.ok) {
+                    Swal.fire({ icon: 'success', title: '註冊成功！請直接登入' });
+                    setAuthTab('login');
+                    document.getElementById('auth-username').value = u;
+                } else {
+                    const err = await res.json();
+                    throw new Error(err.detail || '註冊失敗');
+                }
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: '註冊失敗', text: e.message });
+            }
+        }
+
         // ==========================================
-        // 診斷業務邏輯 (DIAGNOSIS LOGIC)
+        // 拍照診斷與進度條 (DIAGNOSIS FLOW)
         // ==========================================
         function handleFileSelect(e) {
             const file = e.target.files[0];
@@ -912,7 +1303,6 @@
             input.click();
         }
 
-        // 載入展覽示範葉片
         async function loadDemoSample(type) {
             let sampleUrl = '';
             let crop = '檸檬';
@@ -935,12 +1325,10 @@
             document.getElementById('input-crop-name').value = crop;
             document.getElementById('input-plant-tag').value = tag;
 
-            // 取得圖片 blob
             try {
                 const res = await fetch(sampleUrl);
                 const blob = await res.blob();
-                currentSelectedFile = new File([blob], `${crop}_${type}.jpg`, { type: 'image/jpeg' });
-                
+                currentSelectedFile = new File([blob], `${crop}_sample.jpg`, { type: 'image/jpeg' });
                 document.getElementById('preview-image').src = sampleUrl;
                 document.getElementById('preview-container').classList.remove('hidden');
                 document.getElementById('empty-prompt').classList.add('hidden');
@@ -948,8 +1336,8 @@
                 Swal.fire({
                     icon: 'info',
                     title: `已加載【${crop}】示範葉片`,
-                    text: '點擊下方「開始 AI 智能快篩」即可立即展示！',
-                    timer: 1500,
+                    text: '請點擊「開始 AI 雙引擎快篩分析」！',
+                    timer: 1400,
                     showConfirmButton: false
                 });
             } catch (err) {
@@ -957,20 +1345,19 @@
             }
         }
 
-        // 執行 AI 診斷
-        async function executeDiagnosis() {
+        // 執行診斷流程（含進度條動畫 對齊 DiagnoseProgressActivity）
+        async function executeDiagnosisFlow() {
             if (!currentSelectedFile) {
                 Swal.fire({ icon: 'warning', title: '請先選擇葉片照片', text: '請上傳照片或點擊上方「展覽示範葉片」！' });
                 return;
             }
 
-            const btn = document.getElementById('btn-submit-predict');
-            const btnText = document.getElementById('btn-submit-text');
-            btn.disabled = true;
-            btnText.innerHTML = '<span class="animate-spin inline-block mr-2">⚙️</span> AI 多模態推論仲裁中...';
+            // 切換至進度條動畫頁面
+            navigateTo('diagnose-progress');
+            animateProgressBar();
 
             const crop = document.getElementById('input-crop-name').value;
-            const tag = document.getElementById('input-plant-tag').value.trim() || '專屬植株';
+            const tag = document.getElementById('input-plant-tag').value.trim() || '陽台1號';
             const indoorPet = document.getElementById('check-indoor-pet').checked;
 
             try {
@@ -992,64 +1379,90 @@
 
                 if (!res.ok) {
                     const err = await res.json().catch(() => ({}));
-                    throw new Error(err.detail || `伺服器回應異常 (${res.status})`);
+                    throw new Error(err.detail || `診斷失敗 (${res.status})`);
                 }
 
                 const data = await res.json();
                 lastAnalysisResult = data.analysis_result || {};
                 lastPredictionId = data.prediction_id;
 
-                renderDiagnosisResult(lastAnalysisResult, tag);
+                setTimeout(() => {
+                    renderResultScreen(lastAnalysisResult, tag);
+                }, 1200);
             } catch (err) {
-                Swal.fire({ icon: 'error', title: '診斷過程發生錯誤', text: err.message });
-            } finally {
-                btn.disabled = false;
-                btnText.textContent = '重新執行 AI 快篩與處方診斷';
+                Swal.fire({ icon: 'error', title: '診斷異常', text: err.message }).then(() => {
+                    navigateTo('upload');
+                });
             }
         }
 
-        function renderDiagnosisResult(result, tag) {
-            document.getElementById('diagnosis-empty-view').classList.add('hidden');
-            const resultView = document.getElementById('diagnosis-result-view');
-            resultView.classList.remove('hidden');
+        function animateProgressBar() {
+            const fill = document.getElementById('progress-bar-fill');
+            const pct = document.getElementById('progress-pct');
+            const stText = document.getElementById('progress-status-text');
+            const subText = document.getElementById('progress-sub-text');
+            
+            fill.style.width = '0%';
+            pct.textContent = '0%';
+            stText.textContent = '邊緣 ConvNeXt 模型快速快篩中...';
+            subText.textContent = '超低延遲推論 (<4ms)，擷取葉脈微特徵';
+
+            setTimeout(() => {
+                fill.style.width = '45%';
+                pct.textContent = '45%';
+                stText.textContent = '進行 OOD 域外作物與 85% 信心門檻仲裁...';
+            }, 400);
+
+            setTimeout(() => {
+                fill.style.width = '85%';
+                pct.textContent = '85%';
+                stText.textContent = '連動台灣農業部防檢署 1,616 筆官方審定資材...';
+                subText.textContent = '依室內寵物條件生成生活化寶特瓶計量處方';
+            }, 850);
+
+            setTimeout(() => {
+                fill.style.width = '100%';
+                pct.textContent = '100%';
+            }, 1200);
+        }
+
+        function renderResultScreen(result, tag) {
+            navigateTo('result');
 
             const crop = result.crop_name || '植株';
             const status = result.status_name || '無法判定';
             const conf = ((result.confidence || 0.95) * 100).toFixed(1);
             const isHealthy = status.includes('健康');
 
-            // 頂部橫幅
-            const header = document.getElementById('result-status-header');
-            if (isHealthy) {
-                header.className = 'bg-emerald-600 px-6 py-4 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2';
-            } else {
-                header.className = 'bg-rose-600 px-6 py-4 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2';
-            }
+            // 頂部大彩條
+            const banner = document.getElementById('res-status-banner');
+            banner.className = isHealthy 
+                ? 'bg-emerald-600 px-6 sm:px-8 py-5 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3'
+                : 'bg-rose-600 px-6 sm:px-8 py-5 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3';
 
-            document.getElementById('res-crop-badge').textContent = `作物：${crop}`;
-            document.getElementById('res-tag-badge').textContent = `盆栽：${tag}`;
-            document.getElementById('label-save-tag').textContent = tag;
-            document.getElementById('res-diagnosis-name').textContent = isHealthy ? '🌿 健康旺盛狀態' : `⚠️ ${status}`;
-            document.getElementById('res-confidence').textContent = `${conf}%`;
+            document.getElementById('res-crop-pill').textContent = `作物：${crop}`;
+            document.getElementById('res-tag-pill').textContent = `盆栽：${tag}`;
+            document.getElementById('res-status-name').textContent = isHealthy ? '🌿 健康旺盛狀態' : `⚠️ ${status}`;
+            document.getElementById('res-confidence-val').textContent = `${conf}%`;
 
-            // 特徵剖析與處方箋
-            document.getElementById('res-suggestion').textContent = result.suggestion || '病況特徵特寫收斂良好，無擴大跡象。';
-            document.getElementById('res-treatment').textContent = result.treatment || '維持良好通風，定期巡檢，傍晚時分微量補充水分。';
+            // 處方內容
+            document.getElementById('res-symptom-text').textContent = result.suggestion || '病況特徵特寫收斂良好，無擴大跡象。';
+            document.getElementById('res-treatment-text').textContent = result.treatment || '維持良好通風，定期巡檢，傍晚時分微量補充水分。';
 
-            // 來源標籤
-            const engineTag = document.getElementById('res-engine-tag');
+            // 來源標章
+            const badge = document.getElementById('res-engine-badge');
             const src = result.grounding_source || '';
             if (src.includes('convnext')) {
-                engineTag.innerHTML = `
-                    <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-md">
-                        <i data-lucide="zap" class="w-3.5 h-3.5 text-emerald-600"></i> 本地 ConvNeXt 輕量快篩 (&lt;4ms)
+                badge.innerHTML = `
+                    <span class="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-md">
+                        <i data-lucide="zap" class="w-3.5 h-3.5 text-emerald-600"></i> 本地 ConvNeXt 快篩 (&lt;4ms)
                     </span>
                     <span class="text-slate-400">|</span>
                     <span class="text-slate-600 font-medium">台灣農業部防檢署資材庫合規約束</span>
                 `;
             } else {
-                engineTag.innerHTML = `
-                    <span class="inline-flex items-center gap-1 font-semibold text-purple-800 bg-purple-100 px-2.5 py-1 rounded-md">
+                badge.innerHTML = `
+                    <span class="inline-flex items-center gap-1 font-bold text-purple-800 bg-purple-100 px-2.5 py-1 rounded-md">
                         <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-600"></i> Gemini 多模態語義特徵審核
                     </span>
                     <span class="text-slate-400">|</span>
@@ -1057,35 +1470,42 @@
                 `;
             }
             lucide.createIcons();
-
-            resultView.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // 儲存至日記並生成時間軸
-        async function saveCurrentDiagnosisToDiary() {
+        // 存檔與標籤彈窗 (對齊 dialog_plant_tag_select.xml)
+        function promptPlantTagAndSave() {
             const token = localStorage.getItem('plant_token');
             if (!token) {
                 Swal.fire({
                     title: '請先登入後儲存',
-                    text: '您可以點擊「展覽示範一鍵登入」立即綁定專屬生長日記！',
+                    text: '您可以點選「示範一鍵登入」立即綁定專屬生長日記！',
                     icon: 'info',
-                    confirmButtonText: '開啟登入',
+                    confirmButtonText: '立即登入',
                     showCancelButton: true
-                }).then(res => {
-                    if (res.isConfirmed) openAuthModal();
+                }).then(r => {
+                    if (r.isConfirmed) openAuthModal();
                 });
                 return;
             }
 
-            if (!lastPredictionId) {
-                Swal.fire({ icon: 'warning', title: '尚未有待存檔的診斷結果' });
-                return;
-            }
+            const currentTag = document.getElementById('input-plant-tag').value.trim() || '陽台1號';
+            document.getElementById('modal-tag-input').value = currentTag;
+            document.getElementById('modal-plant-tag').classList.remove('hidden');
+        }
 
-            const tag = document.getElementById('input-plant-tag').value.trim() || '專屬植株';
-            const btn = document.getElementById('btn-save-diary');
-            btn.disabled = true;
+        function closePlantTagModal() {
+            document.getElementById('modal-plant-tag').classList.add('hidden');
+        }
 
+        function selectQuickTag(tag) {
+            document.getElementById('modal-tag-input').value = tag;
+        }
+
+        async function confirmSaveWithTag() {
+            const tag = document.getElementById('modal-tag-input').value.trim() || '專屬盆栽';
+            closePlantTagModal();
+
+            const token = localStorage.getItem('plant_token');
             try {
                 const res = await fetch(getFullApiUrl(`/api/v1/diaries/confirm/${lastPredictionId}`), {
                     method: 'POST',
@@ -1097,217 +1517,461 @@
                 });
 
                 if (res.ok) {
+                    const data = await res.json();
+                    const newDiaryId = data.diary_id || (data.data && data.data.id);
                     Swal.fire({
                         icon: 'success',
-                        title: '已存入專屬生長日記！',
-                        text: `已建立【${tag}】之康復時間軸，隨時追蹤健康趨勢！`,
+                        title: '已存入生長日記！',
+                        text: `已為【${tag}】建立專屬康復時間軸！`,
                         showCancelButton: true,
                         confirmButtonText: '立即查看時間軸',
-                        cancelButtonText: '留在診斷頁'
+                        cancelButtonText: '開啟病歷相簿'
                     }).then(r => {
-                        if (r.isConfirmed) {
-                            switchTab('timeline');
+                        if (r.isConfirmed && newDiaryId) {
+                            openDiaryDetail(newDiaryId);
+                        } else {
+                            navigateTo('history');
                         }
                     });
                 } else {
                     const err = await res.json().catch(() => ({}));
-                    throw new Error(err.detail || '儲存失敗');
+                    throw new Error(err.detail || '存檔失敗');
                 }
             } catch (err) {
-                Swal.fire({ icon: 'error', title: '儲存失敗', text: err.message });
-            } finally {
-                btn.disabled = false;
+                Swal.fire({ icon: 'error', title: '存檔失敗', text: err.message });
             }
         }
 
-        function jumpToRemedySearch() {
-            const status = (lastAnalysisResult && lastAnalysisResult.status_name) || '';
-            switchTab('remedies');
-            const cleanQuery = status.replace(/健康|正常/g, '').trim();
-            document.getElementById('input-remedy-search').value = cleanQuery;
-            loadRemediesList(cleanQuery);
+        function jumpToRemediesFromDiagnosis() {
+            const st = (lastAnalysisResult && lastAnalysisResult.status_name) || '';
+            const q = st.replace(/健康|正常/g, '').trim();
+            navigateTo('remedies');
+            document.getElementById('remedies-search-input').value = q;
+            loadRemediesList(q);
         }
 
-        // ==========================================
-        // 時間軸業務邏輯 (TIMELINE LOGIC)
-        // ==========================================
-        async function fetchUserDiariesForTimeline() {
-            const token = localStorage.getItem('plant_token');
-            const sel = document.getElementById('select-timeline-tag');
-            sel.innerHTML = '';
-
-            if (!token) {
-                sel.innerHTML = '<option value="">未登入 (請先在右上角登入)</option>';
-                renderDemoTimelineFallback();
+        // 糾錯反饋
+        function openFeedbackModal() {
+            if (!lastPredictionId) {
+                Swal.fire({ icon: 'info', title: '尚未執行診斷' });
                 return;
             }
+            document.getElementById('fb-crop-name').value = lastAnalysisResult?.crop_name || '';
+            document.getElementById('fb-disease-name').value = lastAnalysisResult?.status_name || '';
+            document.getElementById('modal-feedback').classList.remove('hidden');
+        }
+
+        function closeFeedbackModal() {
+            document.getElementById('modal-feedback').classList.add('hidden');
+        }
+
+        async function submitDiagnosisFeedback() {
+            const c = document.getElementById('fb-crop-name').value.trim();
+            const d = document.getElementById('fb-disease-name').value.trim();
+            const com = document.getElementById('fb-comment').value.trim();
+            const token = localStorage.getItem('plant_token');
+
+            if (!token) {
+                Swal.fire({ icon: 'info', title: '請先登入後提交反饋' });
+                return;
+            }
+
+            try {
+                const res = await fetch(getFullApiUrl('/api/v1/feedback/diagnosis'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        prediction_id: lastPredictionId,
+                        corrected_plant_name: c,
+                        corrected_disease_name: d,
+                        comment: com,
+                        is_plant_error: Boolean(c && c !== lastAnalysisResult?.crop_name),
+                        is_disease_error: Boolean(d && d !== lastAnalysisResult?.status_name)
+                    })
+                });
+
+                if (res.ok) {
+                    closeFeedbackModal();
+                    Swal.fire({ icon: 'success', title: '糾錯反饋已提交至管理員後台審核！' });
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.detail || '提交失敗');
+                }
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: '提交反饋失敗', text: e.message });
+            }
+        }
+
+        // ==========================================
+        // 歷史日記列表 (HISTORY LIST - 2-Column Grid)
+        // ==========================================
+        async function fetchHistoryFromServer() {
+            const token = localStorage.getItem('plant_token');
+            const grid = document.getElementById('history-grid');
+            const empty = document.getElementById('history-empty');
+
+            if (!token) {
+                renderDemoHistoryList();
+                return;
+            }
+
+            grid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-400 font-medium">載入病歷相簿中...</div>';
+            empty.classList.add('hidden');
 
             try {
                 const res = await fetch(getFullApiUrl('/api/v1/diaries'), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();
-                userDiariesCache = data.data || [];
-
-                if (userDiariesCache.length === 0) {
-                    sel.innerHTML = '<option value="">尚無紀錄 (請先至診斷頁儲存)</option>';
-                    renderDemoTimelineFallback();
-                    return;
-                }
-
-                // 依 plant_tag / crop_name 去重或列出項目
-                userDiariesCache.forEach(item => {
-                    const opt = document.createElement('option');
-                    opt.value = item.id;
-                    const tag = item.plant_tag ? ` [${item.plant_tag}]` : '';
-                    opt.textContent = `${item.crop_name || '植株'}${tag} (${item.created_at.split(' ')[0]})`;
-                    sel.appendChild(opt);
-                });
-
-                currentViewingDiaryId = userDiariesCache[0].id;
-                loadTimelineBySelectedDiary();
+                allHistoryItems = data.data || [];
+                renderHistoryGrid(allHistoryItems);
             } catch (err) {
                 console.error(err);
-                renderDemoTimelineFallback();
+                renderDemoHistoryList();
             }
         }
 
-        async function loadTimelineBySelectedDiary() {
-            const sel = document.getElementById('select-timeline-tag');
-            const diaryId = sel.value || currentViewingDiaryId;
-            if (!diaryId) return;
+        function renderHistoryGrid(items) {
+            const grid = document.getElementById('history-grid');
+            const empty = document.getElementById('history-empty');
+            grid.innerHTML = '';
 
-            const token = localStorage.getItem('plant_token');
-            try {
-                const res = await fetch(getFullApiUrl(`/api/v1/diaries/${diaryId}/timeline`), {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                renderTimelineData(data);
-            } catch (err) {
-                console.error(err);
+            if (!items || items.length === 0) {
+                empty.classList.remove('hidden');
+                return;
             }
-        }
+            empty.classList.add('hidden');
 
-        function renderTimelineData(data) {
-            document.getElementById('timeline-trend-title').textContent = data.trend_title || '✨ 成長監控進行中';
-            document.getElementById('timeline-trend-desc').textContent = data.trend_desc || '持續依生活化處方箋記錄與照護。';
-            document.getElementById('timeline-compare-title').textContent = data.compare_title || '🌱 歷程影像對比';
+            items.forEach(item => {
+                const isHealthy = (item.user_corrected_status || item.status_name || '').includes('健康');
+                const tag = item.plant_tag ? ` [${item.plant_tag}]` : '';
+                const title = `${item.crop_name || '植株'}${tag}`;
+                const status = item.user_corrected_status || item.status_name || '無法判定';
+                const date = (item.created_at || '').split(' ')[0] || '--';
 
-            // 簽到按鈕文字切換
-            const checkinText = document.getElementById('btn-checkin-text');
-            if (data.trend_status === 'HEALTHY') {
-                checkinText.textContent = '💧 記錄今日已澆水';
-            } else {
-                checkinText.textContent = '🌿 記錄今日已噴藥';
-            }
+                const card = document.createElement('div');
+                card.onclick = () => openDiaryDetail(item.id);
+                card.className = 'bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer group flex flex-col justify-between';
 
-            // Before vs After
-            if (data.has_before_after && data.before_record && data.after_record) {
-                document.getElementById('timeline-compare-card').classList.remove('hidden');
-                document.getElementById('img-compare-before').src = data.before_record.image_url;
-                document.getElementById('label-compare-before-date').textContent = data.before_record.created_at;
-                document.getElementById('label-compare-before').textContent = `${data.before_label} (${data.before_record.status_name})`;
-
-                document.getElementById('img-compare-after').src = data.after_record.image_url;
-                document.getElementById('label-compare-after-date').textContent = data.after_record.created_at;
-                document.getElementById('label-compare-after').textContent = `${data.after_label} (${data.after_record.status_name})`;
-            }
-
-            // 渲染時間節點
-            const nodesContainer = document.getElementById('timeline-nodes-container');
-            nodesContainer.innerHTML = '<div class="stepper-line"></div>';
-
-            const list = data.timeline || [];
-            list.forEach((node, idx) => {
-                const div = document.createElement('div');
-                div.className = 'relative z-10 flex items-start gap-4';
-                
-                const dotColor = node.is_healthy ? 'bg-emerald-500' : 'bg-rose-500';
-                const badgeColor = node.is_healthy ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800';
-
-                div.innerHTML = `
-                    <div class="w-8 h-8 rounded-full ${dotColor} text-white flex items-center justify-center shrink-0 shadow-md">
-                        <i data-lucide="${node.is_healthy ? 'check' : 'alert-circle'}" class="w-4 h-4"></i>
-                    </div>
-                    <div class="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold ${badgeColor} px-2.5 py-0.5 rounded-full">
-                                ${node.status_name}
+                card.innerHTML = `
+                    <div>
+                        <!-- 135dp 拍立得縮圖與浮動標籤 -->
+                        <div class="h-36 bg-slate-100 relative overflow-hidden">
+                            <img src="${item.image_url || 'https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80'}" alt="${title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80'" />
+                            
+                            <!-- 狀態膠囊 -->
+                            <span class="absolute top-2.5 right-2.5 text-[11px] font-bold px-2 py-0.5 rounded-full shadow ${isHealthy ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
+                                ${isHealthy ? '🌿 健康' : '⚠️ ' + status}
                             </span>
-                            <span class="text-xs text-slate-500 font-mono">${node.created_at}</span>
+                            
+                            <!-- 寵物安全 -->
+                            <span class="absolute top-2.5 left-2.5 text-[10px] font-bold bg-blue-600 text-white px-2 py-0.5 rounded-full shadow">
+                                🐱 寵物安全
+                            </span>
                         </div>
-                        <p class="text-xs text-slate-600">${node.user_note || '定期巡檢監控，生長狀態穩定。'}</p>
+
+                        <!-- 標題與日期 -->
+                        <div class="p-4 space-y-1">
+                            <h4 class="text-base font-black text-slate-800 group-hover:text-brand-700 transition truncate">${title}</h4>
+                            <p class="text-xs text-slate-500 truncate">診斷結果：<span class="font-bold text-slate-700">${status}</span></p>
+                        </div>
+                    </div>
+
+                    <div class="px-4 pb-3 pt-0 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                        <span>📅 ${date}</span>
+                        <span class="text-brand-700 font-bold group-hover:underline">詳情 &gt;</span>
                     </div>
                 `;
-                nodesContainer.appendChild(div);
+                grid.appendChild(card);
             });
             lucide.createIcons();
         }
 
-        function renderDemoTimelineFallback() {
-            renderTimelineData({
-                trend_title: '✨ 連續健康生長 (示範模式)',
-                trend_desc: '陽台1號植株連續維持健康生長狀態，日常照護與光照水分管理極佳！',
-                compare_title: '🌱 成長發育寫真對照 (前期長勢 vs 最新現況)',
-                trend_status: 'HEALTHY',
-                has_before_after: true,
-                before_label: '前期長勢',
-                after_label: '最新現況',
-                before_record: {
-                    created_at: '2026-11-15 08:30',
-                    status_name: '健康狀態',
+        function renderDemoHistoryList() {
+            const demoItems = [
+                {
+                    id: 111,
+                    crop_name: '檸檬',
+                    plant_tag: '陽台1號',
+                    status_name: '缺鐵症',
+                    created_at: '2026-11-21 23:46',
                     image_url: 'https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80'
                 },
-                after_record: {
-                    created_at: '2026-11-22 09:10',
+                {
+                    id: 109,
+                    crop_name: '柑橘',
+                    plant_tag: '客廳2號',
                     status_name: '健康狀態',
+                    created_at: '2026-10-20 21:52',
                     image_url: 'https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80'
-                },
-                timeline: [
-                    { id: 1, status_name: '健康正常', is_healthy: true, created_at: '2026-11-15 08:30', user_note: '初次建立陽台1號檸檬生長檔案' },
-                    { id: 2, status_name: '💧 今日已澆水 (簽到)', is_healthy: true, created_at: '2026-11-18 07:45', user_note: '清晨澆水約500ml，葉面飽滿。' },
-                    { id: 3, status_name: '健康正常', is_healthy: true, created_at: '2026-11-22 09:10', user_note: '巡檢正常，無病斑與害蟲' }
-                ]
-            });
+                }
+            ];
+            allHistoryItems = demoItems;
+            renderHistoryGrid(demoItems);
         }
 
-        async function handleCareCheckin() {
-            const token = localStorage.getItem('plant_token');
-            if (!token) {
-                Swal.fire({ icon: 'info', title: '請先登入', text: '登入後即可將今日照護簽到記錄至專屬時間軸！' });
+        function filterHistoryList() {
+            const q = document.getElementById('history-search-input').value.trim().toLowerCase();
+            const filtered = allHistoryItems.filter(item => {
+                const matchCrop = (item.crop_name || '').toLowerCase().includes(q);
+                const matchTag = (item.plant_tag || '').toLowerCase().includes(q);
+                const matchStatus = (item.user_corrected_status || item.status_name || '').toLowerCase().includes(q);
+                const matchDate = (item.created_at || '').includes(q);
+                return matchCrop || matchTag || matchStatus || matchDate;
+            });
+            renderHistoryGrid(filtered);
+        }
+
+        function filterHistoryByDate() {
+            const d = document.getElementById('history-date-picker').value;
+            if (!d) {
+                renderHistoryGrid(allHistoryItems);
                 return;
             }
-            const sel = document.getElementById('select-timeline-tag');
-            const diaryId = sel.value;
-            if (!diaryId) return;
+            const filtered = allHistoryItems.filter(item => (item.created_at || '').includes(d));
+            renderHistoryGrid(filtered);
+        }
 
-            const checkinText = document.getElementById('btn-checkin-text').textContent;
+        function setHistoryMonthFilter(filter) {
+            historyMonthFilter = filter;
+            document.querySelectorAll('.month-chip').forEach(btn => {
+                btn.className = 'month-chip px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0 transition';
+            });
+            const activeBtn = document.getElementById(`btn-month-${filter}`);
+            if (activeBtn) activeBtn.className = 'month-chip px-3.5 py-1.5 rounded-full bg-brand-800 text-white shrink-0 shadow-sm transition';
+
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const prevM = String(now.getMonth() === 0 ? 12 : now.getMonth()).padStart(2, '0');
+            const prevY = now.getMonth() === 0 ? y - 1 : y;
+
+            if (filter === 'current') {
+                const prefix = `${y}-${m}`;
+                renderHistoryGrid(allHistoryItems.filter(i => (i.created_at || '').includes(prefix)));
+            } else if (filter === 'prev') {
+                const prefix = `${prevY}-${prevM}`;
+                renderHistoryGrid(allHistoryItems.filter(i => (i.created_at || '').includes(prefix)));
+            } else {
+                renderHistoryGrid(allHistoryItems);
+            }
+        }
+
+        // ==========================================
+        // 病歷詳細與時間軸 (HISTORY DETAIL LOGIC)
+        // ==========================================
+        async function openDiaryDetail(diaryId) {
+            navigateTo('history-detail');
+            const token = localStorage.getItem('plant_token');
+            const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
             try {
-                const res = await fetch(getFullApiUrl(`/api/v1/diaries/${diaryId}`), {
+                // 1. 抓取基本詳情
+                const resDetail = await fetch(getFullApiUrl(`/api/v1/diaries/${diaryId}`), { headers });
+                if (!resDetail.ok) throw new Error('無法取得病歷詳情');
+                const dataDetail = await resDetail.json();
+                currentDetailItem = dataDetail.data || {};
+
+                renderDiaryDetail(currentDetailItem);
+
+                // 2. 抓取專屬生長時間軸
+                const resTimeline = await fetch(getFullApiUrl(`/api/v1/diaries/${diaryId}/timeline`), { headers });
+                if (resTimeline.ok) {
+                    const dataTimeline = await resTimeline.json();
+                    currentTimelineData = dataTimeline;
+                    renderDetailTimeline(dataTimeline);
+                }
+            } catch (err) {
+                console.error(err);
+                Swal.fire({ icon: 'error', title: '無法讀取病歷', text: err.message });
+            }
+        }
+
+        function renderDiaryDetail(item) {
+            document.getElementById('detail-main-img').src = item.image_url || 'https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80';
+            const tag = item.plant_tag ? ` [${item.plant_tag}]` : '';
+            document.getElementById('detail-plant-name').textContent = `植物：${item.crop_name || '植株'}${tag}`;
+            document.getElementById('detail-tag-pill').textContent = `盆栽：${item.plant_tag || '未分類'}`;
+            document.getElementById('detail-date-text').textContent = item.created_at || '--';
+
+            const status = item.user_corrected_status || item.status_name || '無法判定';
+            const isHealthy = status.includes('健康');
+            const statusPill = document.getElementById('detail-status-pill');
+            statusPill.textContent = status;
+            statusPill.className = isHealthy ? 'text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800' : 'text-xs font-bold px-3 py-1 rounded-full bg-rose-100 text-rose-800';
+
+            document.getElementById('detail-note-text').textContent = item.user_note || '尚無備註，點擊上方編輯新增。';
+            document.getElementById('detail-symptom-text').textContent = item.suggestion || '病況特徵特寫良好，定期追蹤維護。';
+            document.getElementById('detail-treatment-text').textContent = item.treatment || '保持良好通風與排水，適時補充植物保護資材。';
+        }
+
+        function renderDetailTimeline(tl) {
+            const headerTitle = document.getElementById('detail-timeline-header-title');
+            if (tl.plant_tag) {
+                headerTitle.innerHTML = `<i data-lucide="activity" class="w-5 h-5 text-brand-700"></i><span>🌱 【${tl.plant_tag}】專屬康復時間軸與生長監控</span>`;
+            } else {
+                headerTitle.innerHTML = `<i data-lucide="activity" class="w-5 h-5 text-brand-700"></i><span>🌱 單株專屬康復時間軸與生長監控</span>`;
+            }
+
+            document.getElementById('detail-trend-title').textContent = tl.trend_title || '✨ 成長監控中';
+            document.getElementById('detail-trend-desc').textContent = tl.trend_desc || '持續依照生活化處方箋記錄照護。';
+            document.getElementById('detail-compare-title').innerHTML = `<i data-lucide="split" class="w-4 h-4 text-brand-700"></i><span>${tl.compare_title || '🌱 歷程影像對比'}</span>`;
+
+            // 簽到按鈕文字
+            const btnCheckin = document.getElementById('detail-btn-checkin-text');
+            if (tl.trend_status === 'HEALTHY') {
+                btnCheckin.textContent = '💧 記錄今日已澆水';
+            } else {
+                btnCheckin.textContent = '🌿 記錄今日已噴藥';
+            }
+
+            // Before vs After
+            if (tl.has_before_after && tl.before_record && tl.after_record) {
+                document.getElementById('detail-compare-container').classList.remove('hidden');
+                document.getElementById('detail-compare-before-img').src = tl.before_record.image_url;
+                document.getElementById('detail-before-date').textContent = tl.before_record.created_at;
+                document.getElementById('detail-before-label').textContent = `${tl.before_label} (${tl.before_record.status_name})`;
+
+                document.getElementById('detail-compare-after-img').src = tl.after_record.image_url;
+                document.getElementById('detail-after-date').textContent = tl.after_record.created_at;
+                document.getElementById('detail-after-label').textContent = `${tl.after_label} (${tl.after_record.status_name})`;
+            } else {
+                document.getElementById('detail-compare-container').classList.add('hidden');
+            }
+
+            // 渲染 Stepper 節點
+            const stepper = document.getElementById('detail-timeline-stepper');
+            stepper.innerHTML = '<div class="stepper-line"></div>';
+
+            (tl.timeline || []).forEach(node => {
+                const row = document.createElement('div');
+                row.className = 'relative z-10 flex items-start gap-4';
+                const dotBg = node.is_healthy ? 'bg-emerald-600' : 'bg-rose-600';
+                const badgeBg = node.is_healthy ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800';
+
+                row.innerHTML = `
+                    <div class="w-8 h-8 rounded-full ${dotBg} text-white flex items-center justify-center shrink-0 shadow">
+                        <i data-lucide="${node.is_healthy ? 'check' : 'alert-circle'}" class="w-4 h-4"></i>
+                    </div>
+                    <div class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-1.5 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold ${badgeBg} px-2.5 py-0.5 rounded-full">${node.status_name}</span>
+                            <span class="text-xs text-slate-400 font-mono">${node.created_at}</span>
+                        </div>
+                        <p class="text-xs text-slate-600">${node.user_note || '巡檢狀態穩定。'}</p>
+                    </div>
+                `;
+                stepper.appendChild(row);
+            });
+            lucide.createIcons();
+        }
+
+        function toggleNoteEditMode() {
+            const dView = document.getElementById('note-display-view');
+            const eView = document.getElementById('note-edit-view');
+            const isEditing = !eView.classList.contains('hidden');
+
+            if (isEditing) {
+                eView.classList.add('hidden');
+                dView.classList.remove('hidden');
+            } else {
+                document.getElementById('input-edit-note').value = currentDetailItem?.user_note || '';
+                eView.classList.remove('hidden');
+                dView.classList.add('hidden');
+            }
+        }
+
+        async function saveNoteToServer() {
+            const updated = document.getElementById('input-edit-note').value.trim();
+            const token = localStorage.getItem('plant_token');
+            if (!token || !currentDetailItem) return;
+
+            try {
+                const res = await fetch(getFullApiUrl(`/api/v1/diaries/${currentDetailItem.id}`), {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ user_note: `【${checkinText}】紀錄完成` })
+                    body: JSON.stringify({ user_note: updated })
+                });
+
+                if (res.ok) {
+                    currentDetailItem.user_note = updated;
+                    document.getElementById('detail-note-text').textContent = updated || '尚無備註。';
+                    toggleNoteEditMode();
+                    Swal.fire({ icon: 'success', title: '筆記已儲存', timer: 1200, showConfirmButton: false });
+                }
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: '儲存失敗', text: e.message });
+            }
+        }
+
+        async function executeCareCheckinOnDetail() {
+            const token = localStorage.getItem('plant_token');
+            if (!token || !currentDetailItem) {
+                Swal.fire({ icon: 'info', title: '請先登入' });
+                return;
+            }
+            const txt = document.getElementById('detail-btn-checkin-text').textContent;
+            try {
+                const res = await fetch(getFullApiUrl(`/api/v1/diaries/${currentDetailItem.id}`), {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ user_note: `【${txt}】紀錄完成` })
                 });
                 if (res.ok) {
                     Swal.fire({ icon: 'success', title: '今日照護打卡成功！', timer: 1200, showConfirmButton: false });
-                    loadTimelineBySelectedDiary();
+                    openDiaryDetail(currentDetailItem.id);
                 }
             } catch (e) {
                 Swal.fire({ icon: 'error', title: '打卡失敗', text: e.message });
             }
         }
 
+        async function deleteCurrentDetailRecord() {
+            if (!currentDetailItem) return;
+            const token = localStorage.getItem('plant_token');
+
+            Swal.fire({
+                title: '確定要刪除這筆病歷嗎？',
+                text: '刪除後將無法還原此紀錄！',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: '確定刪除',
+                cancelButtonText: '取消'
+            }).then(async r => {
+                if (r.isConfirmed) {
+                    try {
+                        const res = await fetch(getFullApiUrl(`/api/v1/diaries/${currentDetailItem.id}`), {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        if (res.ok) {
+                            Swal.fire({ icon: 'success', title: '病歷已刪除', timer: 1200, showConfirmButton: false });
+                            navigateTo('history');
+                        }
+                    } catch (e) {
+                        Swal.fire({ icon: 'error', title: '刪除失敗', text: e.message });
+                    }
+                }
+            });
+        }
+
         // ==========================================
-        // 資材圖鑑業務邏輯 (REMEDIES LOGIC)
+        // 官方安全用藥寶典 (REMEDY CATALOG LOGIC)
         // ==========================================
         function debounceRemedySearch() {
             clearTimeout(remedyDebounceTimer);
             remedyDebounceTimer = setTimeout(() => {
-                const q = document.getElementById('input-remedy-search').value.trim();
+                const q = document.getElementById('remedies-search-input').value.trim();
                 loadRemediesList(q);
             }, 300);
         }
@@ -1318,17 +1982,16 @@
                 btn.className = 'remedy-chip px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0 transition';
             });
             const activeBtn = document.getElementById(`chip-cat-${cat}`);
-            if (activeBtn) {
-                activeBtn.className = 'remedy-chip px-3.5 py-1.5 rounded-full bg-brand-800 text-white shrink-0 shadow-sm transition';
-            }
-            const q = document.getElementById('input-remedy-search').value.trim();
+            if (activeBtn) activeBtn.className = 'remedy-chip px-3.5 py-1.5 rounded-full bg-brand-800 text-white shrink-0 shadow-sm transition';
+
+            const q = document.getElementById('remedies-search-input').value.trim();
             loadRemediesList(q);
         }
 
         async function loadRemediesList(query = '') {
             const grid = document.getElementById('remedies-grid');
             const empty = document.getElementById('remedies-empty');
-            grid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-400 font-medium">載入農業部官方審定資材中...</div>';
+            grid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-400 font-medium">檢索農業部官方審定資材庫中...</div>';
             empty.classList.add('hidden');
 
             try {
@@ -1349,7 +2012,7 @@
 
                 list.forEach(item => {
                     const card = document.createElement('div');
-                    card.className = 'bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between group';
+                    card.className = 'bg-white rounded-3xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between group';
                     
                     const isPetSafe = item.is_pet_safe;
                     const catBadge = item.category === 'disease' ? '🛡️ 防病剋星' : (item.category === 'pest' ? '🐛 驅蟲除蟎' : '🌱 活力營養');
@@ -1357,27 +2020,27 @@
                     card.innerHTML = `
                         <div>
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">${catBadge}</span>
-                                ${isPetSafe ? '<span class="text-[11px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">🐱 寵物友善</span>' : '<span class="text-[11px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">⚠️ 避開犬貓</span>'}
+                                <span class="text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">${catBadge}</span>
+                                ${isPetSafe ? '<span class="text-[11px] font-bold bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full">🐱 寵物安全</span>' : '<span class="text-[11px] font-bold bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">⚠️ 避開犬貓</span>'}
                             </div>
-                            <h4 class="text-base font-extrabold text-slate-800 group-hover:text-brand-700 transition">${item.product_name || '無毒保護資材'}</h4>
+                            <h4 class="text-base font-black text-slate-800 group-hover:text-brand-700 transition truncate">${item.product_name || '無毒保護資材'}</h4>
                             <p class="text-xs text-slate-500 font-mono mt-0.5">${item.registration_no || '官方審定編號'}</p>
                             
-                            <div class="mt-3 bg-slate-50 rounded-xl p-3 text-xs space-y-1.5 border border-slate-100">
+                            <div class="mt-3 bg-slate-50 rounded-2xl p-3 text-xs space-y-1.5 border border-slate-100">
                                 <div class="flex items-center justify-between">
                                     <span class="text-slate-500">主成分：</span>
-                                    <span class="font-semibold text-slate-700">${item.common_name || item.ingredient || '天然植物油/甲殼素'}</span>
+                                    <span class="font-bold text-slate-700">${item.common_name || item.ingredient || '天然植保成分'}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-slate-500">專克病害：</span>
-                                    <span class="font-bold text-brand-700">${item.target_disease || '白粉病、缺鐵黃化、紅蜘蛛'}</span>
+                                    <span class="text-slate-500">專克適用：</span>
+                                    <span class="font-bold text-brand-700">${item.target_disease || '白粉病、缺鐵黃化、葉蟎'}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs text-slate-400 font-mono">${item.vendor_name || '合規原廠'}</span>
-                            <button onclick='openRemedyModal(${JSON.stringify(item)})' class="text-xs bg-brand-700 hover:bg-brand-800 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm transition">
+                            <span class="text-xs text-slate-400 font-mono truncate max-w-[120px]">${item.vendor_name || '合規原廠'}</span>
+                            <button onclick='openRemedyModal(${JSON.stringify(item)})' class="text-xs bg-brand-700 hover:bg-brand-800 text-white font-bold px-3 py-1.5 rounded-xl shadow-sm transition">
                                 查看稀釋指南
                             </button>
                         </div>
@@ -1385,18 +2048,18 @@
                     grid.appendChild(card);
                 });
                 lucide.createIcons();
-            } catch (err) {
-                console.error(err);
-                grid.innerHTML = '<div class="col-span-full py-12 text-center text-red-500 font-medium">無法連接資材庫端點</div>';
+            } catch (e) {
+                console.error(e);
+                grid.innerHTML = '<div class="col-span-full py-12 text-center text-rose-500 font-medium">無法連接資材庫端點</div>';
             }
         }
 
         function openRemedyModal(item) {
             document.getElementById('modal-remedy-title').textContent = item.product_name;
             document.getElementById('modal-remedy-regno').textContent = `官方字號：${item.registration_no}`;
-            document.getElementById('modal-remedy-ingredient').textContent = item.common_name || item.ingredient || '天然植保資材';
-            document.getElementById('modal-remedy-targets').textContent = item.target_disease || '一般真菌與微量營養管理';
-            document.getElementById('modal-remedy-vendor').textContent = item.vendor_name || '官方核准製造廠';
+            document.getElementById('modal-remedy-ingredient').textContent = item.common_name || item.ingredient || '天然成分';
+            document.getElementById('modal-remedy-targets').textContent = item.target_disease || '一般真菌與生理病害';
+            document.getElementById('modal-remedy-vendor').textContent = item.vendor_name || '核准廠商';
 
             document.getElementById('modal-remedy-dilution').textContent = item.dilution_tip || '600ml 礦泉水寶特瓶約裝入 1/2 瓶蓋（約 3ml），均勻搖晃後噴灑於葉面與葉背。';
             document.getElementById('modal-remedy-notice').textContent = item.precautions || '存放陰涼避光處，避免幼童接觸，施用時請保持環境通風。';
@@ -1406,6 +2069,17 @@
 
         function closeRemedyModal() {
             document.getElementById('modal-remedy-detail').classList.add('hidden');
+        }
+
+        // 大圖燈箱
+        function openLightbox(src) {
+            if (!src) return;
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('modal-lightbox').classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('modal-lightbox').classList.add('hidden');
         }
     </script>
 </body>

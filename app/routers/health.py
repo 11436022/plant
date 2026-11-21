@@ -8,6 +8,8 @@ router = APIRouter(tags=["health"])
 
 
 @router.get("/")
+@router.get("/live")
+@router.get("/health/live")
 def read_root():
     """基本健康檢查。"""
     return {"message": "Plant API is running. Open /docs for the API docs."}
