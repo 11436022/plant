@@ -688,12 +688,18 @@
                 </div>
             </div>
 
-            <!-- 處方箋詳細三大區塊 -->
+            <!-- 處方箋詳細三大區塊 (對齊 activity_history_detail.xml) -->
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-5">
-                <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
-                    <i data-lucide="clipboard-list" class="w-5 h-5 text-brand-700"></i>
-                    <span>專家處方箋與官方用藥</span>
-                </h3>
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                        <i data-lucide="clipboard-list" class="w-5 h-5 text-brand-700"></i>
+                        <span>專家處方箋與官方用藥</span>
+                    </h3>
+                    <button id="btn-detail-open-remedy" onclick="jumpToRemediesFromDiary()" class="hidden text-xs font-bold text-brand-700 hover:text-white hover:bg-brand-700 bg-brand-50 border border-brand-200 px-4 py-2 rounded-full transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-brand-600"></i>
+                        <span>官方用藥寶典 ➜</span>
+                    </button>
+                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-5 space-y-2">
@@ -702,7 +708,12 @@
                     </div>
 
                     <div class="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-5 space-y-2">
-                        <span class="text-xs font-bold text-emerald-950 uppercase">居家生活化安全處方箋</span>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-emerald-950 uppercase">🌿 居家生活化安全處方箋</span>
+                            <button id="btn-detail-open-remedy-inline" onclick="jumpToRemediesFromDiary()" class="hidden text-xs font-bold text-emerald-700 hover:text-emerald-950 hover:underline flex items-center gap-1 cursor-pointer">
+                                <span>官方用藥寶典 ➜</span>
+                            </button>
+                        </div>
                         <p class="text-xs text-emerald-950 leading-relaxed whitespace-pre-line" id="detail-treatment-text">--</p>
                     </div>
                 </div>
@@ -1173,6 +1184,21 @@
             checkUserSession();
             loadWeatherWidget();
             loadRemediesList();
+
+            // 鍵盤快捷鍵支援 (Alt+R 或非輸入框時按 R 快速前往官方用藥寶典)
+            window.addEventListener('keydown', (e) => {
+                const targetTag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
+                const isInput = targetTag === 'INPUT' || targetTag === 'TEXTAREA' || e.target.isContentEditable;
+                if ((e.altKey && (e.key === 'r' || e.key === 'R')) || (!isInput && !e.ctrlKey && !e.metaKey && (e.key === 'r' || e.key === 'R'))) {
+                    if (currentView === 'history-detail') {
+                        jumpToRemediesFromDiary();
+                    } else if (currentView === 'result') {
+                        jumpToRemediesFromDiagnosis();
+                    } else {
+                        navigateTo('remedies');
+                    }
+                }
+            });
         });
 
         // 頁面路由切換 (SPA Navigation)
@@ -2112,6 +2138,28 @@
             document.getElementById('detail-note-text').textContent = item.user_note || '尚無備註，點擊上方編輯新增。';
             document.getElementById('detail-symptom-text').textContent = item.suggestion || '病況特徵特寫良好，定期追蹤維護。';
             document.getElementById('detail-treatment-text').textContent = item.treatment || '保持良好通風與排水，適時補充植物保護資材。';
+
+            // 官方用藥寶典快捷入口 (對齊 HistoryDetailActivity.kt:490-505)
+            const btnRemedy = document.getElementById('btn-detail-open-remedy');
+            const btnRemedyInline = document.getElementById('btn-detail-open-remedy-inline');
+            if (isHealthy) {
+                if (btnRemedy) btnRemedy.classList.add('hidden');
+                if (btnRemedyInline) btnRemedyInline.classList.add('hidden');
+            } else {
+                if (btnRemedy) btnRemedy.classList.remove('hidden');
+                if (btnRemedyInline) btnRemedyInline.classList.remove('hidden');
+            }
+            lucide.createIcons();
+        }
+
+        // 點擊「官方用藥寶典 ➜」直接攜帶病名快速開啟寶典 (對齊 HistoryDetailActivity.kt:502)
+        function jumpToRemediesFromDiary() {
+            const rawStatus = currentDetailItem?.user_corrected_status || currentDetailItem?.status_name || '';
+            const q = rawStatus.replace(/健康|正常/g, '').trim();
+            navigateTo('remedies');
+            const searchInput = document.getElementById('remedies-search-input');
+            if (searchInput) searchInput.value = q;
+            loadRemediesList(q);
         }
 
         function renderDetailTimeline(tl) {
