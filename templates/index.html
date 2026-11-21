@@ -302,26 +302,20 @@
                     <p class="text-xs text-slate-500 mt-1">上傳清晰葉片特寫照片，AI 將自動辨識病徵並產出對應生活化安全處方</p>
                 </div>
 
-                <!-- 作物與盆栽設定 -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs text-slate-600 font-bold block mb-1">目標植物種類</label>
-                        <select id="input-crop-name" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-medium focus:ring-2 focus:ring-brand-500">
-                            <option value="檸檬">🍋 檸檬 (Lemon)</option>
-                            <option value="柑橘">🍊 柑橘 (Citrus)</option>
-                            <option value="番茄">🍅 番茄 (Tomato)</option>
-                            <option value="草莓">🍓 草莓 (Strawberry)</option>
-                            <option value="葡萄">🍇 葡萄 (Grape)</option>
-                            <option value="蘋果">🍎 蘋果 (Apple)</option>
-                            <option value="玫瑰">🌹 玫瑰/景觀花卉</option>
-                            <option value="室內綠植">🪴 室內盆栽/觀葉植物</option>
-                            <option value="未知作物">❓ 自動全品項辨識</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-600 font-bold block mb-1">盆栽專屬標籤 (選填，同種多盆隔離)</label>
-                        <input type="text" id="input-plant-tag" placeholder="如: 陽台1號、客廳盆栽 (未填則為未分類)" value="" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-medium focus:ring-2 focus:ring-brand-500" />
-                    </div>
+                <!-- 作物設定 (對齊手機端 UploadActivity 簡潔設計) -->
+                <div>
+                    <label class="text-xs text-slate-600 font-bold block mb-1">目標植物種類</label>
+                    <select id="input-crop-name" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-medium focus:ring-2 focus:ring-brand-500">
+                        <option value="檸檬">🍋 檸檬 (Lemon)</option>
+                        <option value="柑橘">🍊 柑橘 (Citrus)</option>
+                        <option value="番茄">🍅 番茄 (Tomato)</option>
+                        <option value="草莓">🍓 草莓 (Strawberry)</option>
+                        <option value="葡萄">🍇 葡萄 (Grape)</option>
+                        <option value="蘋果">🍎 蘋果 (Apple)</option>
+                        <option value="玫瑰">🌹 玫瑰/景觀花卉</option>
+                        <option value="室內綠植">🪴 室內盆栽/觀葉植物</option>
+                        <option value="未知作物">❓ 自動全品項辨識</option>
+                    </select>
                 </div>
 
                 <!-- 寵物與室內友善開關 (都市模式) -->
@@ -424,7 +418,6 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="text-xs uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full font-bold" id="res-crop-pill">作物：檸檬</span>
-                            <span class="text-xs uppercase tracking-wider bg-black/20 px-2.5 py-0.5 rounded-full font-bold" id="res-tag-pill">盆栽：陽台1號</span>
                         </div>
                         <h2 class="text-2xl sm:text-3xl font-black mt-1" id="res-status-name">健康狀態</h2>
                     </div>
@@ -824,24 +817,23 @@
                 <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-brand-700 flex items-center justify-center mx-auto mb-3">
                     <i data-lucide="tag" class="w-6 h-6"></i>
                 </div>
-                <h3 class="text-lg font-black text-slate-800">指定此盆栽專屬標籤</h3>
-                <p class="text-xs text-slate-500 mt-1">方便日後獨立追蹤康復歷程，不與其他盆栽混淆</p>
+                <h3 class="text-lg font-black text-slate-800" id="modal-tag-title">指定此盆栽專屬標籤</h3>
+                <p class="text-xs text-slate-500 mt-1">若種植了多盆同品種植物，指定盆栽暱稱可完美隔離時間軸！</p>
             </div>
 
-            <!-- 快捷標籤晶片 -->
+            <!-- 快捷標籤晶片 (依作物名稱動態生成，例如：扁蒲 1號、扁蒲 2號) -->
             <div>
                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">快速選擇標籤</label>
                 <div class="flex flex-wrap gap-2">
-                    <button type="button" onclick="selectQuickTag('陽台1號')" class="tag-quick-chip text-xs bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-3 py-1.5 rounded-xl transition">🌿 陽台1號</button>
-                    <button type="button" onclick="selectQuickTag('客廳2號')" class="tag-quick-chip text-xs bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-3 py-1.5 rounded-xl transition">🪴 客廳2號</button>
-                    <button type="button" onclick="selectQuickTag('頂樓花園')" class="tag-quick-chip text-xs bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-3 py-1.5 rounded-xl transition">🌸 頂樓花園</button>
-                    <button type="button" onclick="selectQuickTag('辦公室3號')" class="tag-quick-chip text-xs bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-3 py-1.5 rounded-xl transition">🏢 辦公室3號</button>
+                    <button type="button" id="chip-tag-opt-1" onclick="selectQuickTag(this.getAttribute('data-tag'))" class="tag-quick-chip text-xs bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-3 py-1.5 rounded-xl transition">🌿 植物 1號</button>
+                    <button type="button" id="chip-tag-opt-2" onclick="selectQuickTag(this.getAttribute('data-tag'))" class="tag-quick-chip text-xs bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-3 py-1.5 rounded-xl transition">🪴 植物 2號</button>
+                    <button type="button" id="chip-tag-opt-3" onclick="selectQuickTag('陽台盆栽')" class="tag-quick-chip text-xs bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-3 py-1.5 rounded-xl transition">🌸 陽台盆栽</button>
                 </div>
             </div>
 
             <div>
-                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">或自訂盆栽編號/名稱</label>
-                <input type="text" id="modal-tag-input" value="陽台1號" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-bold text-brand-900 focus:ring-2 focus:ring-brand-500" />
+                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">或自訂專屬盆栽暱稱</label>
+                <input type="text" id="modal-tag-input" placeholder="如: 陽台1號、客廳2號" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-bold text-brand-900 focus:ring-2 focus:ring-brand-500" />
             </div>
 
             <div class="flex items-center gap-3 pt-2">
@@ -1324,7 +1316,6 @@
             }
 
             document.getElementById('input-crop-name').value = crop;
-            document.getElementById('input-plant-tag').value = tag;
 
             try {
                 const res = await fetch(sampleUrl);
@@ -1361,7 +1352,6 @@
             animateProgressBar();
 
             const crop = document.getElementById('input-crop-name').value;
-            const tag = document.getElementById('input-plant-tag').value.trim() || '未分類';
             const indoorPet = document.getElementById('check-indoor-pet').checked;
 
             try {
@@ -1391,7 +1381,7 @@
                 lastPredictionId = data.prediction_id;
 
                 setTimeout(() => {
-                    renderResultScreen(lastAnalysisResult, tag);
+                    renderResultScreen(lastAnalysisResult);
                 }, 1200);
             } catch (err) {
                 Swal.fire({ icon: 'error', title: '診斷異常', text: err.message }).then(() => {
@@ -1430,7 +1420,7 @@
             }, 1200);
         }
 
-        function renderResultScreen(result, tag) {
+        function renderResultScreen(result) {
             navigateTo('result');
 
             const crop = result.crop_name || '植株';
@@ -1445,7 +1435,6 @@
                 : 'bg-rose-600 px-6 sm:px-8 py-5 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3';
 
             document.getElementById('res-crop-pill').textContent = `作物：${crop}`;
-            document.getElementById('res-tag-pill').textContent = `盆栽：${tag}`;
             document.getElementById('res-status-name').textContent = isHealthy ? '🌿 健康旺盛狀態' : `⚠️ ${status}`;
             document.getElementById('res-confidence-val').textContent = `${conf}%`;
 
@@ -1476,7 +1465,7 @@
             lucide.createIcons();
         }
 
-        // 存檔與標籤彈窗 (對齊 dialog_plant_tag_select.xml)
+        // 存檔與標籤彈窗 (對齊手機端 ResultActivity showPlantTagDialog)
         function promptPlantTagAndSave() {
             const token = localStorage.getItem('plant_token');
             if (!token) {
@@ -1492,8 +1481,23 @@
                 return;
             }
 
-            const currentTag = document.getElementById('input-plant-tag').value.trim() || '陽台1號';
-            document.getElementById('modal-tag-input').value = currentTag;
+            const cropName = (lastAnalysisResult && lastAnalysisResult.crop_name) ? lastAnalysisResult.crop_name : '植物';
+            const defaultTag = `${cropName} 1號`;
+
+            document.getElementById('modal-tag-title').textContent = `🌿 歸檔至【${cropName}】專屬病歷`;
+            
+            const chip1 = document.getElementById('chip-tag-opt-1');
+            const chip2 = document.getElementById('chip-tag-opt-2');
+            if (chip1) {
+                chip1.textContent = `🌿 ${cropName} 1號`;
+                chip1.setAttribute('data-tag', `${cropName} 1號`);
+            }
+            if (chip2) {
+                chip2.textContent = `🪴 ${cropName} 2號`;
+                chip2.setAttribute('data-tag', `${cropName} 2號`);
+            }
+
+            document.getElementById('modal-tag-input').value = defaultTag;
             document.getElementById('modal-plant-tag').classList.remove('hidden');
         }
 
