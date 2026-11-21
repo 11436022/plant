@@ -24,12 +24,12 @@ def validate_image_content(content: bytes, content_type: str | None) -> FrameMet
         "image/png": "PNG",
         "image/webp": "WEBP",
     }
-    allowed_types = set(mime_formats.keys()) | {"image/*"}
+    allowed_types = set(mime_formats.keys()) | {"image/*", "application/octet-stream", "binary/octet-stream"}
     normalized_type = content_type.lower() if content_type else None
     if not content or (normalized_type and normalized_type not in allowed_types):
-        raise HTTPException(status_code=400, detail="A nonempty JPEG, PNG, or WebP image is required.")
+        raise HTTPException(status_code=400, detail="請上傳非空的植物葉片圖片 (JPG / PNG / WebP)。")
     if len(content) > settings.WEBCAM_MAX_IMAGE_BYTES:
-        raise HTTPException(status_code=413, detail="Image exceeds the upload size limit.")
+        raise HTTPException(status_code=413, detail=f"圖片檔案大小超出限制 (最大 {settings.WEBCAM_MAX_IMAGE_BYTES // (1024*1024)}MB)。")
     try:
         with Image.open(io.BytesIO(content)) as image:
             image.verify()
@@ -37,11 +37,9 @@ def validate_image_content(content: bytes, content_type: str | None) -> FrameMet
             width, height = image.size
             image_format = str(image.format or "").upper()
             if image_format not in ("JPEG", "PNG", "WEBP"):
-                raise HTTPException(status_code=400, detail="A nonempty JPEG, PNG, or WebP image is required.")
+                raise HTTPException(status_code=400, detail="請上傳標準 JPG、PNG 或 WebP 格式圖片。")
             if width * height > 20_000_000:
-                raise HTTPException(status_code=400, detail="Image resolution is too large.")
-            if normalized_type in mime_formats and image_format != mime_formats[normalized_type]:
-                raise HTTPException(status_code=400, detail="Image format does not match its content type.")
+                raise HTTPException(status_code=400, detail="圖片解析度過大 (超過 2000 萬像素)，請調整後再試。")
             # 支援手機直拍 (Portrait) 與橫拍 (Landscape)：長邊需達標、短邊不低於 160px
             longer_side = max(width, height)
             shorter_side = min(width, height)
@@ -54,9 +52,11 @@ def validate_image_content(content: bytes, content_type: str | None) -> FrameMet
             grayscale = image.convert("L")
             grayscale.thumbnail((320, 320))
             if float(ImageStat.Stat(grayscale).stddev[0]) < 5.0:
-                raise HTTPException(status_code=422, detail="Image lacks enough visual detail for diagnosis.")
+                raise HTTPException(status_code=422, detail="圖片對比度過低或過於模糊，缺乏足夠視覺細節進行 AI 診斷。")
+    except HTTPException:
+        raise
     except (Image.DecompressionBombError, UnidentifiedImageError, OSError, ValueError) as exc:
-        raise HTTPException(status_code=400, detail="Image data is invalid or damaged.") from exc
+        raise HTTPException(status_code=400, detail="圖片格式無效或檔案損壞，請上傳有效的 JPG、PNG 或 WebP 影像。") from exc
     return FrameMetadata(width, height, image_format)
 
 

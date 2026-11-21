@@ -1987,6 +1987,85 @@
             renderHistoryGrid(filtered);
         }
 
+        function renderHistoryGrid(items) {
+            const grid = document.getElementById('history-grid');
+            const empty = document.getElementById('history-empty');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                if (empty) empty.classList.remove('hidden');
+                return;
+            }
+            if (empty) empty.classList.add('hidden');
+
+            items.forEach(item => {
+                const isHealthy = (item.user_corrected_status || item.status_name || '').includes('健康');
+                const tag = item.plant_tag ? ` [${item.plant_tag}]` : '';
+                const title = `${item.crop_name || '植株'}${tag}`;
+                const status = item.user_corrected_status || item.status_name || '無法判定';
+                const date = (item.created_at || '').split(' ')[0] || '--';
+
+                const card = document.createElement('div');
+                card.onclick = () => openDiaryDetail(item.id);
+                card.className = 'bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer group flex flex-col justify-between';
+
+                card.innerHTML = `
+                    <div>
+                        <!-- 拍立得縮圖與浮動標籤 (對齊 item_history.xml) -->
+                        <div class="h-40 bg-slate-100 relative overflow-hidden">
+                            <img src="${item.image_url || '/uploads/5be47fb03c4a48cea32436669fa48f44.jpg'}" alt="${title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='/uploads/5be47fb03c4a48cea32436669fa48f44.jpg'" />
+                            
+                            <!-- 狀態膠囊 -->
+                            <span class="absolute top-2.5 right-2.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow ${isHealthy ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
+                                ${isHealthy ? '🌿 健康' : '⚠️ ' + status}
+                            </span>
+                            
+                            <!-- 盆栽標籤 -->
+                            ${item.plant_tag ? `<span class="absolute top-2.5 left-2.5 text-[10px] font-bold bg-black/60 backdrop-blur-sm text-white px-2.5 py-0.5 rounded-full shadow">🪴 ${item.plant_tag}</span>` : ''}
+                        </div>
+
+                        <!-- 標題與病害 -->
+                        <div class="p-4 space-y-1">
+                            <h4 class="text-base font-black text-slate-800 group-hover:text-brand-700 transition truncate">${title}</h4>
+                            <p class="text-xs text-slate-500 truncate">診斷結果：<span class="font-bold text-slate-700">${status}</span></p>
+                        </div>
+                    </div>
+
+                    <div class="px-4 pb-3 pt-0 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                        <span>📅 ${date}</span>
+                        <span class="text-brand-700 font-bold group-hover:underline">詳情 &gt;</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function renderDemoHistoryList() {
+            const demoItems = [
+                {
+                    id: 111,
+                    crop_name: '檸檬',
+                    plant_tag: '陽台1號',
+                    status_name: '缺鐵症',
+                    created_at: '2026-11-21 23:46',
+                    image_url: '/uploads/5be47fb03c4a48cea32436669fa48f44.jpg'
+                },
+                {
+                    id: 109,
+                    crop_name: '柑橘',
+                    plant_tag: '客廳2號',
+                    status_name: '健康狀態',
+                    created_at: '2026-10-20 21:52',
+                    image_url: '/uploads/a1fedd2b0db8462e92112d124cc30cb4.jpg'
+                }
+            ];
+            allHistoryItems = demoItems;
+            renderHistoryCropChips();
+            applyCombinedHistoryFilter();
+        }
+
         // ==========================================
         // 病歷詳細與時間軸 (HISTORY DETAIL LOGIC)
         // ==========================================
