@@ -132,6 +132,7 @@ async def login_user(
 
 
 @router.get("/user/me")
+@router.get("/user/profile")
 async def get_user_profile(current_user: User = Depends(get_current_user)):
     """取得目前登入者的基本資料。"""
     return {

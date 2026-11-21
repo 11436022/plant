@@ -18,14 +18,14 @@
                 extend: {
                     colors: {
                         brand: {
-                            50: '#F1F8E9',
-                            100: '#DCEDC8',
-                            200: '#C5E1A5',
-                            500: '#4CAF50',
-                            600: '#388E3C',
-                            700: '#2E7D32',
-                            800: '#1B5E20',
-                            900: '#0D3813'
+                            50: 'var(--brand-50, #F1F8E9)',
+                            100: 'var(--brand-100, #DCEDC8)',
+                            200: 'var(--brand-200, #C5E1A5)',
+                            500: 'var(--brand-500, #4CAF50)',
+                            600: 'var(--brand-600, #388E3C)',
+                            700: 'var(--brand-700, #2E7D32)',
+                            800: 'var(--brand-800, #1B5E20)',
+                            900: 'var(--brand-900, #0D3813)'
                         }
                     }
                 }
@@ -34,12 +34,22 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+        :root {
+            --brand-50: #F1F8E9;
+            --brand-100: #DCEDC8;
+            --brand-200: #C5E1A5;
+            --brand-500: #4CAF50;
+            --brand-600: #388E3C;
+            --brand-700: #2E7D32;
+            --brand-800: #1B5E20;
+            --brand-900: #0D3813;
+        }
         body {
             font-family: 'Inter', 'Noto Sans TC', sans-serif;
             background-color: #F8FAF9;
         }
         .glass-header {
-            background: rgba(27, 94, 32, 0.96);
+            background: var(--brand-800, #1B5E20);
             backdrop-filter: blur(14px);
         }
         .custom-scrollbar::-webkit-scrollbar {
@@ -181,12 +191,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="bg-black/20 rounded-2xl px-4 py-3 border border-white/10 max-w-md text-xs space-y-1">
+                    <div class="bg-black/25 rounded-2xl p-4 border border-white/10 max-w-lg text-xs space-y-2">
                         <div class="flex items-center gap-1.5 font-bold text-amber-300">
-                            <i data-lucide="shield-alert" class="w-4 h-4"></i>
-                            <span>今日溫室病蟲害防範提醒</span>
+                            <i data-lucide="sprout" class="w-4 h-4"></i>
+                            <span>今日農事與病害防範提醒</span>
                         </div>
-                        <p class="text-white/80 leading-relaxed" id="weather-tip">濕度偏高，傍晚請加強溫室對流通風，注意紅蜘蛛與白粉病滋生風險。</p>
+                        <div class="space-y-1.5 text-white/90">
+                            <div class="flex items-start gap-1.5"><span class="font-bold text-amber-200 shrink-0">💧 澆水建議：</span><span id="weather-watering" class="leading-relaxed">天氣晴朗，植物水分蒸散較快，請確保充足澆水</span></div>
+                            <div class="flex items-start gap-1.5"><span class="font-bold text-amber-200 shrink-0">🛡️ 病害預防：</span><span id="weather-disease" class="leading-relaxed">天氣乾燥，請注意紅蜘蛛等蟲害，可適度對葉片噴霧</span></div>
+                            <div class="flex items-start gap-1.5"><span class="font-bold text-amber-200 shrink-0">🌱 一般照護：</span><span id="weather-care" class="leading-relaxed">陽光充足，適合植物生長，適當遮陽避免曬傷</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -474,15 +488,19 @@
                         <p>避開正午高溫陽光直射，避免肥傷灼傷；連續雨天後應加強盆栽基底排水透氣。</p>
                     </div>
 
-                    <!-- 動作按鈕 -->
+                    <!-- 動作按鈕 (對齊 ResultActivity.kt 三大按鈕) -->
                     <div class="pt-3 flex flex-col sm:flex-row items-center gap-3">
                         <button onclick="promptPlantTagAndSave()" class="w-full sm:flex-1 bg-brand-700 hover:bg-brand-800 text-white font-bold py-3.5 px-5 rounded-2xl shadow-md transition flex items-center justify-center gap-2 text-sm">
                             <i data-lucide="bookmark-plus" class="w-4 h-4"></i>
                             <span>儲存至日記並建立專屬時間軸</span>
                         </button>
-                        <button onclick="jumpToRemediesFromDiagnosis()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 px-6 rounded-2xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                        <button id="btn-result-remedies" onclick="jumpToRemediesFromDiagnosis()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 px-6 rounded-2xl shadow-md transition flex items-center justify-center gap-2 text-sm">
                             <i data-lucide="shield-check" class="w-4 h-4"></i>
                             <span>查閱官方對應資材</span>
+                        </button>
+                        <button onclick="openFeedbackModal()" class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 px-5 rounded-2xl transition flex items-center justify-center gap-2 text-sm border border-slate-200">
+                            <i data-lucide="message-square-warning" class="w-4 h-4 text-slate-500"></i>
+                            <span>結果有誤？(反饋)</span>
                         </button>
                     </div>
                 </div>
@@ -517,13 +535,20 @@
                 <!-- 月份快捷晶片 -->
                 <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
                     <button onclick="setHistoryMonthFilter('all')" id="btn-month-all" class="month-chip px-3.5 py-1.5 rounded-full bg-brand-800 text-white shrink-0 shadow-sm transition">
-                        🌱 全部紀錄
+                        🌱 全部月份
                     </button>
                     <button onclick="setHistoryMonthFilter('current')" id="btn-month-current" class="month-chip px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0 transition">
                         🗓️ 本月最新
                     </button>
                     <button onclick="setHistoryMonthFilter('prev')" id="btn-month-prev" class="month-chip px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0 transition">
                         🗓️ 上月歷史
+                    </button>
+                </div>
+
+                <!-- 作物品種過濾晶片 (對齊 HistoryListActivity matchesCrop) -->
+                <div id="history-crop-chips" class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold pt-1 border-t border-slate-100">
+                    <button onclick="setHistoryCropFilter('all')" class="history-crop-chip px-3 py-1 rounded-full bg-brand-700 text-white shrink-0 shadow-sm transition">
+                        全部作物
                     </button>
                 </div>
             </div>
@@ -991,29 +1016,87 @@
         </div>
     </div>
 
-    <!-- 6. API 端點設定 (Railway Config Modal) -->
+    <!-- 6. 系統設定彈窗 (對齊 SettingsActivity.kt: 主題切換、個人檔案、密碼修改、雲端端點) -->
     <div id="modal-api-config" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between">
-                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                    <i data-lucide="server" class="w-5 h-5 text-brand-700"></i> Railway 雲端 API 端點設定
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                    <i data-lucide="settings" class="w-5 h-5 text-brand-700"></i> 系統偏好設定 (Settings)
                 </h3>
                 <button onclick="closeApiConfigModal()" class="text-slate-400 hover:text-slate-600 p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            <p class="text-xs text-slate-500">部署於 Railway 或從本地展示時，可指定雲端後端網址：</p>
+
+            <!-- 1. 主題配色切換 (對齊 ThemeManager.kt 四大主題) -->
             <div>
-                <label class="text-xs font-bold text-slate-700 block mb-1">API Base URL</label>
-                <input type="text" id="config-api-base" placeholder="例如: https://xxx.up.railway.app 或保留空白走相對路徑" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-mono focus:ring-2 focus:ring-brand-500" />
+                <label class="text-xs font-bold text-slate-700 block mb-2">🎨 介面主題配色切換</label>
+                <div class="grid grid-cols-2 gap-2 text-xs font-bold">
+                    <button type="button" onclick="applyTheme(0)" id="theme-btn-0" class="theme-btn flex items-center gap-2 p-2.5 rounded-2xl border-2 border-emerald-600 bg-emerald-50 text-emerald-900 transition">
+                        <span class="w-4 h-4 rounded-full bg-[#2E7D32]"></span>
+                        <span>🌿 經典陽光綠</span>
+                    </button>
+                    <button type="button" onclick="applyTheme(1)" id="theme-btn-1" class="theme-btn flex items-center gap-2 p-2.5 rounded-2xl border-2 border-slate-200 hover:border-blue-500 bg-slate-50 text-slate-700 transition">
+                        <span class="w-4 h-4 rounded-full bg-[#1565C0]"></span>
+                        <span>🌌 清新大海藍</span>
+                    </button>
+                    <button type="button" onclick="applyTheme(2)" id="theme-btn-2" class="theme-btn flex items-center gap-2 p-2.5 rounded-2xl border-2 border-slate-200 hover:border-orange-500 bg-slate-50 text-slate-700 transition">
+                        <span class="w-4 h-4 rounded-full bg-[#D84315]"></span>
+                        <span>🪵 暖陽落日橙</span>
+                    </button>
+                    <button type="button" onclick="applyTheme(3)" id="theme-btn-3" class="theme-btn flex items-center gap-2 p-2.5 rounded-2xl border-2 border-slate-200 hover:border-pink-500 bg-slate-50 text-slate-700 transition">
+                        <span class="w-4 h-4 rounded-full bg-[#AD1457]"></span>
+                        <span>🌸 微醺初戀粉</span>
+                    </button>
+                </div>
             </div>
-            <div class="flex items-center justify-between text-xs text-slate-500">
-                <span>目前延遲 (Ping)：<span id="ping-result" class="font-bold text-slate-700">測量中...</span></span>
-                <button onclick="testApiPing()" class="text-brand-700 hover:underline font-bold">重新測速</button>
+
+            <!-- 2. 個人檔案狀態 (對齊 UserProfileResponse) -->
+            <div id="settings-profile-section" class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-xs space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-500">當前登入帳號：</span>
+                    <span class="font-bold text-slate-800" id="settings-username">未登入</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-500">綁定電子信箱：</span>
+                    <span class="font-medium text-slate-700 font-mono" id="settings-email">--</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-500">信箱驗證狀態：</span>
+                    <span id="settings-verified" class="font-bold text-emerald-600">已通過官方驗證</span>
+                </div>
             </div>
-            <div class="flex items-center justify-end gap-3 pt-2">
-                <button onclick="closeApiConfigModal()" class="text-xs text-slate-600 font-bold px-4 py-2">取消</button>
-                <button onclick="saveApiConfig()" class="text-xs bg-brand-700 hover:bg-brand-800 text-white px-5 py-2 rounded-xl font-bold shadow transition">儲存並套用</button>
+
+            <!-- 3. 線上密碼修改 (對齊 SettingsActivity.kt:379 / change-password) -->
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-700 block">🔒 安全與密碼管理</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input type="password" id="input-new-password" placeholder="輸入新密碼 (至少6碼)" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-brand-500" />
+                    <input type="password" id="input-confirm-password" placeholder="再次確認新密碼" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-brand-500" />
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                    <button type="button" onclick="handleSendResetEmail()" class="text-[11px] text-brand-700 hover:underline font-bold">寄送重設密碼信到信箱</button>
+                    <button type="button" onclick="handleChangePasswordOnline()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl font-bold transition">更新密碼</button>
+                </div>
+            </div>
+
+            <!-- 4. 雲端伺服器端點 (Railway Config) -->
+            <div class="space-y-2 pt-2 border-t border-slate-100">
+                <label class="text-xs font-bold text-slate-700 block">🌐 後端伺服器端點 (Railway 雲端 / 本地)</label>
+                <input type="text" id="config-api-base" placeholder="如: https://xxx.up.railway.app (留空走本地)" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-mono focus:ring-2 focus:ring-brand-500" />
+                <div class="flex items-center justify-between text-xs text-slate-500">
+                    <span>即時連線延遲 (Ping)：<span id="ping-result" class="font-bold text-slate-700">測量中...</span></span>
+                    <button type="button" onclick="testApiPing()" class="text-brand-700 hover:underline font-bold">重新測速</button>
+                </div>
+            </div>
+
+            <!-- 底部按鈕組 -->
+            <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                <button type="button" onclick="openAuthModal()" class="text-xs text-rose-600 hover:underline font-bold">切換/登出帳號</button>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="closeApiConfigModal()" class="text-xs text-slate-600 font-bold px-4 py-2 rounded-xl hover:bg-slate-100">關閉</button>
+                    <button type="button" onclick="saveApiConfig()" class="text-xs bg-brand-700 hover:bg-brand-800 text-white px-5 py-2.5 rounded-xl font-bold shadow transition">儲存端點設定</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1042,8 +1125,49 @@
             return base ? `${base}${ep}` : ep;
         }
 
+        // ==========================================
+        // 主題系統 (對齊 Android ThemeManager.kt 4大主題)
+        // ==========================================
+        const THEMES = [
+            { id: 0, name: '🌿 經典陽光綠', p: '#2E7D32', d: '#1B5E20', bg: '#F1F8E9', light: '#DCEDC8' },
+            { id: 1, name: '🌌 清新大海藍', p: '#1565C0', d: '#0D47A1', bg: '#E3F2FD', light: '#BBDEFB' },
+            { id: 2, name: '🪵 暖陽落日橙', p: '#D84315', d: '#BF360C', bg: '#FBE9E7', light: '#FFCCBC' },
+            { id: 3, name: '🌸 微醺初戀粉', p: '#AD1457', d: '#880E4F', bg: '#FCE4EC', light: '#F8BBD0' }
+        ];
+
+        function applyTheme(themeId) {
+            const t = THEMES[themeId] || THEMES[0];
+            localStorage.setItem('plant_theme_id', t.id);
+
+            const root = document.documentElement;
+            root.style.setProperty('--brand-700', t.p);
+            root.style.setProperty('--brand-800', t.d);
+            root.style.setProperty('--brand-900', t.d);
+            root.style.setProperty('--brand-100', t.light);
+            root.style.setProperty('--brand-50', t.bg);
+
+            // 更新導覽列底色
+            const nav = document.getElementById('main-navbar');
+            if (nav) nav.style.backgroundColor = t.d;
+
+            // 更新主題切換邊框
+            THEMES.forEach((item, idx) => {
+                const btn = document.getElementById(`theme-btn-${idx}`);
+                if (btn) {
+                    if (idx === t.id) {
+                        btn.className = `theme-btn flex items-center gap-2 p-2.5 rounded-2xl border-2 ring-2 ring-offset-1 border-brand-700 bg-white font-bold transition`;
+                    } else {
+                        btn.className = `theme-btn flex items-center gap-2 p-2.5 rounded-2xl border-2 border-slate-200 hover:border-slate-300 bg-slate-50 text-slate-700 font-medium transition`;
+                    }
+                }
+            });
+        }
+
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = parseInt(localStorage.getItem('plant_theme_id') || '0', 10);
+            applyTheme(savedTheme);
+
             lucide.createIcons();
             initApiStatus();
             checkUserSession();
@@ -1077,15 +1201,29 @@
             }
         }
 
-        // 即時天氣加載 (對齊 HomeActivity 天氣)
+        // 即時農事天氣加載 (對齊 HomeActivity: location, temp, watering, disease, care)
         async function loadWeatherWidget() {
             try {
-                const res = await fetch(getFullApiUrl('/api/v1/weather/current?city=臺北市'));
+                const res = await fetch(getFullApiUrl('/api/v1/weather/plant-care-advice?city=臺北市'));
                 if (res.ok) {
                     const data = await res.json();
+                    const cw = data.current_weather || {};
                     document.getElementById('weather-city').textContent = data.location || '臺北市';
-                    document.getElementById('weather-temp').textContent = data.temperature || '24°C';
-                    document.getElementById('weather-desc').textContent = `${data.weather || '晴時多雲'} · 降雨機率 ${data.rain_probability || '10%'}`;
+                    document.getElementById('weather-temp').textContent = cw.temperature || '24°C';
+                    document.getElementById('weather-desc').textContent = `${cw.weather || '晴時多雲'} · 降雨機率 ${cw.rain_probability || '10%'}`;
+                    
+                    if (data.watering_advice) {
+                        const el = document.getElementById('weather-watering');
+                        if (el) el.textContent = data.watering_advice;
+                    }
+                    if (data.disease_prevention_advice) {
+                        const el = document.getElementById('weather-disease');
+                        if (el) el.textContent = data.disease_prevention_advice;
+                    }
+                    if (data.general_care) {
+                        const el = document.getElementById('weather-care');
+                        if (el) el.textContent = data.general_care;
+                    }
                 }
             } catch (e) {
                 console.warn('Weather fetch error', e);
@@ -1110,10 +1248,39 @@
             }
         }
 
-        function openApiConfigModal() {
+        async function openApiConfigModal() {
             document.getElementById('config-api-base').value = API_BASE;
             document.getElementById('modal-api-config').classList.remove('hidden');
             testApiPing();
+
+            // 載入使用者個人資訊 (對齊 SettingsActivity.kt:477 fetchUserProfile)
+            const token = localStorage.getItem('plant_token');
+            const uName = localStorage.getItem('plant_username');
+            const elUser = document.getElementById('settings-username');
+            const elEmail = document.getElementById('settings-email');
+            const elVer = document.getElementById('settings-verified');
+
+            if (token && uName) {
+                elUser.textContent = uName;
+                try {
+                    const res = await fetch(getFullApiUrl('/api/v1/auth/user/me'), {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        const p = data.data || {};
+                        if (p.email) elEmail.textContent = p.email;
+                        elVer.textContent = p.is_email_verified ? '已通過官方驗證 ✓' : '尚未驗證 (請至信箱點擊連結)';
+                        elVer.className = p.is_email_verified ? 'font-bold text-emerald-600' : 'font-bold text-amber-600';
+                    }
+                } catch (e) {
+                    console.warn(e);
+                }
+            } else {
+                elUser.textContent = '未登入 (訪客展示模式)';
+                elEmail.textContent = '無';
+                elVer.textContent = '--';
+            }
         }
 
         function closeApiConfigModal() {
@@ -1142,6 +1309,77 @@
             } catch (e) {
                 pingRes.textContent = '無法連線 (請檢查網址或 CORS)';
                 pingRes.className = 'font-bold text-red-600';
+            }
+        }
+
+        // 線上修改密碼 (對齊 SettingsActivity.kt)
+        async function handleChangePasswordOnline() {
+            const token = localStorage.getItem('plant_token');
+            if (!token) {
+                Swal.fire({ icon: 'warning', title: '請先登入後再修改密碼' });
+                return;
+            }
+            const np = document.getElementById('input-new-password').value.trim();
+            const cp = document.getElementById('input-confirm-password').value.trim();
+
+            if (!np || !cp) {
+                Swal.fire({ icon: 'warning', title: '請填寫新密碼與確認密碼' });
+                return;
+            }
+            if (np !== cp) {
+                Swal.fire({ icon: 'error', title: '兩次輸入的密碼不一致' });
+                return;
+            }
+            if (np.length < 6) {
+                Swal.fire({ icon: 'error', title: '密碼長度至少需 6 碼' });
+                return;
+            }
+
+            try {
+                const res = await fetch(getFullApiUrl('/api/v1/auth/user/change-password'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ new_password: np, confirm_password: cp })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    Swal.fire({ icon: 'success', title: '密碼修改成功！' });
+                    document.getElementById('input-new-password').value = '';
+                    document.getElementById('input-confirm-password').value = '';
+                } else {
+                    throw new Error(data.detail || '密碼更新失敗');
+                }
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: '更新失敗', text: e.message });
+            }
+        }
+
+        // 寄送重設密碼信 (對齊 SettingsActivity.kt sendResetEmail)
+        async function handleSendResetEmail() {
+            const elEmail = document.getElementById('settings-email');
+            const email = (elEmail && elEmail.textContent !== '--' && elEmail.textContent !== '無') 
+                ? elEmail.textContent 
+                : prompt('請輸入要接收重設密碼信的電子郵件：');
+
+            if (!email) return;
+
+            try {
+                const res = await fetch(getFullApiUrl('/api/v1/auth/user/forgot-password'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                if (res.ok) {
+                    Swal.fire({ icon: 'success', title: '重設密碼信已寄出！', text: `已發送重設信至 ${email}，請至信箱查收！` });
+                } else {
+                    const data = await res.json().catch(() => ({}));
+                    throw new Error(data.detail || '寄送失敗');
+                }
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: '發送失敗', text: e.message });
             }
         }
 
@@ -1398,26 +1636,34 @@
             
             fill.style.width = '0%';
             pct.textContent = '0%';
-            stText.textContent = '邊緣 ConvNeXt 模型快速快篩中...';
-            subText.textContent = '超低延遲推論 (<4ms)，擷取葉脈微特徵';
+            stText.textContent = '植物特徵分析中...';
+            subText.textContent = '擷取葉脈微特徵，過濾背景光影雜訊';
 
             setTimeout(() => {
                 fill.style.width = '45%';
                 pct.textContent = '45%';
-                stText.textContent = '進行 OOD 域外作物與 85% 信心門檻仲裁...';
+                stText.textContent = '本地專家模型比對中...';
+                subText.textContent = 'ConvNeXt 邊緣超低延遲推論 (<4ms)，85% 信心門檻仲裁';
             }, 400);
 
             setTimeout(() => {
-                fill.style.width = '85%';
-                pct.textContent = '85%';
-                stText.textContent = '連動台灣農業部防檢署 1,616 筆官方審定資材...';
-                subText.textContent = '依室內寵物條件生成生活化寶特瓶計量處方';
+                fill.style.width = '75%';
+                pct.textContent = '75%';
+                stText.textContent = '雲端 AI 專家深層診斷中...';
+                subText.textContent = 'Gemini 多模態語義特徵審核與域外 OOD 覆核';
             }, 850);
+
+            setTimeout(() => {
+                fill.style.width = '95%';
+                pct.textContent = '95%';
+                stText.textContent = '檢索農業專書處方中...';
+                subText.textContent = '連動農業部 1,616 筆官方審定資材庫生成處方';
+            }, 1150);
 
             setTimeout(() => {
                 fill.style.width = '100%';
                 pct.textContent = '100%';
-            }, 1200);
+            }, 1400);
         }
 
         function renderResultScreen(result) {
@@ -1441,6 +1687,16 @@
             // 處方內容
             document.getElementById('res-symptom-text').textContent = result.suggestion || '病況特徵特寫收斂良好，無擴大跡象。';
             document.getElementById('res-treatment-text').textContent = result.treatment || '維持良好通風，定期巡檢，傍晚時分微量補充水分。';
+
+            // 官方資材跳轉按鈕 (對齊 ResultActivity.kt:146 僅非健康時顯示)
+            const btnRemedies = document.getElementById('btn-result-remedies');
+            if (btnRemedies) {
+                if (isHealthy) {
+                    btnRemedies.classList.add('hidden');
+                } else {
+                    btnRemedies.classList.remove('hidden');
+                }
+            }
 
             // 來源標章
             const badge = document.getElementById('res-engine-badge');
@@ -1616,6 +1872,8 @@
         // ==========================================
         // 歷史日記列表 (HISTORY LIST - 2-Column Grid)
         // ==========================================
+        let historyCropFilter = 'all';
+
         async function fetchHistoryFromServer() {
             const token = localStorage.getItem('plant_token');
             const grid = document.getElementById('history-grid');
@@ -1635,112 +1893,47 @@
                 });
                 const data = await res.json();
                 allHistoryItems = data.data || [];
-                renderHistoryGrid(allHistoryItems);
+                renderHistoryCropChips();
+                applyCombinedHistoryFilter();
             } catch (err) {
                 console.error(err);
                 renderDemoHistoryList();
             }
         }
 
-        function renderHistoryGrid(items) {
-            const grid = document.getElementById('history-grid');
-            const empty = document.getElementById('history-empty');
-            grid.innerHTML = '';
-
-            if (!items || items.length === 0) {
-                empty.classList.remove('hidden');
-                return;
-            }
-            empty.classList.add('hidden');
-
-            items.forEach(item => {
-                const isHealthy = (item.user_corrected_status || item.status_name || '').includes('健康');
-                const tag = item.plant_tag ? ` [${item.plant_tag}]` : '';
-                const title = `${item.crop_name || '植株'}${tag}`;
-                const status = item.user_corrected_status || item.status_name || '無法判定';
-                const date = (item.created_at || '').split(' ')[0] || '--';
-
-                const card = document.createElement('div');
-                card.onclick = () => openDiaryDetail(item.id);
-                card.className = 'bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer group flex flex-col justify-between';
-
-                card.innerHTML = `
-                    <div>
-                        <!-- 135dp 拍立得縮圖與浮動標籤 -->
-                        <div class="h-36 bg-slate-100 relative overflow-hidden">
-                            <img src="${item.image_url || 'https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80'}" alt="${title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80'" />
-                            
-                            <!-- 狀態膠囊 -->
-                            <span class="absolute top-2.5 right-2.5 text-[11px] font-bold px-2 py-0.5 rounded-full shadow ${isHealthy ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
-                                ${isHealthy ? '🌿 健康' : '⚠️ ' + status}
-                            </span>
-                            
-                            <!-- 寵物安全 -->
-                            <span class="absolute top-2.5 left-2.5 text-[10px] font-bold bg-blue-600 text-white px-2 py-0.5 rounded-full shadow">
-                                🐱 寵物安全
-                            </span>
-                        </div>
-
-                        <!-- 標題與日期 -->
-                        <div class="p-4 space-y-1">
-                            <h4 class="text-base font-black text-slate-800 group-hover:text-brand-700 transition truncate">${title}</h4>
-                            <p class="text-xs text-slate-500 truncate">診斷結果：<span class="font-bold text-slate-700">${status}</span></p>
-                        </div>
-                    </div>
-
-                    <div class="px-4 pb-3 pt-0 flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                        <span>📅 ${date}</span>
-                        <span class="text-brand-700 font-bold group-hover:underline">詳情 &gt;</span>
-                    </div>
+        function renderHistoryCropChips() {
+            const container = document.getElementById('history-crop-chips');
+            if (!container) return;
+            const crops = Array.from(new Set(allHistoryItems.map(item => item.crop_name).filter(Boolean)));
+            
+            let html = `
+                <button onclick="setHistoryCropFilter('all')" class="history-crop-chip px-3 py-1 rounded-full text-xs font-bold ${historyCropFilter === 'all' ? 'bg-brand-700 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'} shrink-0 transition">
+                    全部作物
+                </button>
+            `;
+            crops.forEach(c => {
+                const isActive = historyCropFilter === c;
+                html += `
+                    <button onclick="setHistoryCropFilter('${c}')" class="history-crop-chip px-3 py-1 rounded-full text-xs font-bold ${isActive ? 'bg-brand-700 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'} shrink-0 transition">
+                        🌱 ${c}
+                    </button>
                 `;
-                grid.appendChild(card);
             });
-            lucide.createIcons();
+            container.innerHTML = html;
         }
 
-        function renderDemoHistoryList() {
-            const demoItems = [
-                {
-                    id: 111,
-                    crop_name: '檸檬',
-                    plant_tag: '陽台1號',
-                    status_name: '缺鐵症',
-                    created_at: '2026-11-21 23:46',
-                    image_url: 'https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80'
-                },
-                {
-                    id: 109,
-                    crop_name: '柑橘',
-                    plant_tag: '客廳2號',
-                    status_name: '健康狀態',
-                    created_at: '2026-10-20 21:52',
-                    image_url: 'https://images.unsplash.com/photo-1596724895577-6286392d7d8e?auto=format&fit=crop&w=600&q=80'
-                }
-            ];
-            allHistoryItems = demoItems;
-            renderHistoryGrid(demoItems);
+        function setHistoryCropFilter(crop) {
+            historyCropFilter = crop;
+            renderHistoryCropChips();
+            applyCombinedHistoryFilter();
         }
 
         function filterHistoryList() {
-            const q = document.getElementById('history-search-input').value.trim().toLowerCase();
-            const filtered = allHistoryItems.filter(item => {
-                const matchCrop = (item.crop_name || '').toLowerCase().includes(q);
-                const matchTag = (item.plant_tag || '').toLowerCase().includes(q);
-                const matchStatus = (item.user_corrected_status || item.status_name || '').toLowerCase().includes(q);
-                const matchDate = (item.created_at || '').includes(q);
-                return matchCrop || matchTag || matchStatus || matchDate;
-            });
-            renderHistoryGrid(filtered);
+            applyCombinedHistoryFilter();
         }
 
         function filterHistoryByDate() {
-            const d = document.getElementById('history-date-picker').value;
-            if (!d) {
-                renderHistoryGrid(allHistoryItems);
-                return;
-            }
-            const filtered = allHistoryItems.filter(item => (item.created_at || '').includes(d));
-            renderHistoryGrid(filtered);
+            applyCombinedHistoryFilter();
         }
 
         function setHistoryMonthFilter(filter) {
@@ -1750,6 +1943,13 @@
             });
             const activeBtn = document.getElementById(`btn-month-${filter}`);
             if (activeBtn) activeBtn.className = 'month-chip px-3.5 py-1.5 rounded-full bg-brand-800 text-white shrink-0 shadow-sm transition';
+            applyCombinedHistoryFilter();
+        }
+
+        // 核心多維度過濾演算法 (對齊 HistoryListActivity.kt:253 filterList)
+        function applyCombinedHistoryFilter() {
+            const q = (document.getElementById('history-search-input')?.value || '').trim().toLowerCase();
+            const datePicker = document.getElementById('history-date-picker')?.value || '';
 
             const now = new Date();
             const y = now.getFullYear();
@@ -1757,15 +1957,34 @@
             const prevM = String(now.getMonth() === 0 ? 12 : now.getMonth()).padStart(2, '0');
             const prevY = now.getMonth() === 0 ? y - 1 : y;
 
-            if (filter === 'current') {
-                const prefix = `${y}-${m}`;
-                renderHistoryGrid(allHistoryItems.filter(i => (i.created_at || '').includes(prefix)));
-            } else if (filter === 'prev') {
-                const prefix = `${prevY}-${prevM}`;
-                renderHistoryGrid(allHistoryItems.filter(i => (i.created_at || '').includes(prefix)));
-            } else {
-                renderHistoryGrid(allHistoryItems);
-            }
+            const filtered = allHistoryItems.filter(item => {
+                // 1. 關鍵字搜尋 (作物、標籤、病害、覆核名、日期)
+                const matchKeyword = !q || (
+                    (item.crop_name || '').toLowerCase().includes(q) ||
+                    (item.plant_tag || '').toLowerCase().includes(q) ||
+                    (item.status_name || '').toLowerCase().includes(q) ||
+                    (item.user_corrected_status || '').toLowerCase().includes(q) ||
+                    (item.created_at || '').includes(q)
+                );
+
+                // 2. 精準特定日期過濾 (YYYY-MM-DD)
+                const matchDate = !datePicker || (item.created_at || '').includes(datePicker);
+
+                // 3. 月份快捷過濾 (YYYY-MM)
+                let matchMonth = true;
+                if (historyMonthFilter === 'current') {
+                    matchMonth = (item.created_at || '').includes(`${y}-${m}`);
+                } else if (historyMonthFilter === 'prev') {
+                    matchMonth = (item.created_at || '').includes(`${prevY}-${prevM}`);
+                }
+
+                // 4. 植物品類過濾 (Crop Filter)
+                const matchCrop = (historyCropFilter === 'all') || (item.crop_name === historyCropFilter);
+
+                return matchKeyword && matchDate && matchMonth && matchCrop;
+            });
+
+            renderHistoryGrid(filtered);
         }
 
         // ==========================================
