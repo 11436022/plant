@@ -140,6 +140,7 @@ def create_safe_upload_path(original_name: str) -> Path:
     filename = Path(original_name or "upload.bin").name
     suffix = Path(filename).suffix.lower()
     safe_name = f"{uuid.uuid4().hex}{suffix}"
+    settings.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     file_path = (settings.UPLOAD_DIR / safe_name).resolve()
     upload_root = settings.UPLOAD_DIR.resolve()
     if upload_root not in file_path.parents:

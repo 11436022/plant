@@ -142,6 +142,13 @@ def create_app() -> FastAPI:
         except Exception as e:
             print(f"[WARN] 自動開通使用者驗證狀態略過: {e}")
 
+        # 🌟 先行補齊必要欄位 (如: plant_tag, category, reference_source 等)，確保後續種子與寫入不報錯
+        try:
+            ensure_auth_schema()
+            print("[DB] 所有資料表結構與必要欄位 (含 plant_tag) 驗證/補齊成功！")
+        except Exception as e:
+            print(f"[WARN] ensure_auth_schema 略過: {e}")
+
         # 若是全新空資料庫或病歷日記少於 10 筆，自動執行 latest_seed.sql 補齊 56 筆示範病歷與歷史資料
         try:
             from sqlalchemy import text
@@ -184,11 +191,6 @@ def create_app() -> FastAPI:
                     print("[DB] 56 筆示範病歷日記已成功同步並綁定至帳號 123！")
         except Exception as seed_err:
             print(f"[WARN] 檢查/同步資料庫種子略過: {seed_err}")
-
-        try:
-            ensure_auth_schema()
-        except Exception as e:
-            print(f"[WARN] ensure_auth_schema 略過: {e}")
         # 載入 RAG 知識庫
         try:
             rag.load_knowledge_base()

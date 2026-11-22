@@ -476,8 +476,11 @@ async def confirm_and_create_diary(
         }
     except Exception as e:
         db.rollback()
+        print(f"❌ [CONFIRM ERROR] Failed to save diary: {e}")
+        import traceback
+        traceback.print_exc()
         if diary_id is None:
             if formal_path.exists():
                 shutil.move(str(formal_path), temp_path)
             prediction_cache[prediction_id] = cached_data
-        raise HTTPException(status_code=500, detail="Failed to save diary.") from e
+        raise HTTPException(status_code=500, detail=f"Failed to save diary: {e}") from e

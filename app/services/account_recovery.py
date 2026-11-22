@@ -45,6 +45,8 @@ def ensure_auth_schema() -> None:
                     cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_url VARCHAR(2048) NULL DEFAULT NULL")
                 if not _column_exists(cursor, "plant_diary", "reference_record_id"):
                     cursor.execute("ALTER TABLE plant_diary ADD COLUMN reference_record_id VARCHAR(128) NULL DEFAULT NULL")
+                if not _column_exists(cursor, "plant_diary", "plant_tag"):
+                    cursor.execute("ALTER TABLE plant_diary ADD COLUMN plant_tag VARCHAR(50) NULL DEFAULT NULL")
 
             # 2.1 Disease 與 Pests 知識來源欄位 (避免模型查詢未知欄位 1054 錯誤)
             if _table_exists(cursor, "disease"):
