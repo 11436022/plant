@@ -890,37 +890,40 @@
         </div>
     </div>
 
-    <!-- 2. 診斷糾錯反饋彈窗 (對齊反饋提交) -->
+    <!-- 2. 診斷糾錯反饋彈窗 (對齊 dialog_feedback.xml: 只提供勾選項) -->
     <div id="modal-feedback" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-5 text-center">
             <div class="flex items-center justify-between">
-                <h3 class="text-base font-black text-slate-800 flex items-center gap-2">
-                    <i data-lucide="message-square-warning" class="w-5 h-5 text-rose-600"></i> 提交診斷糾錯反饋
-                </h3>
+                <span class="w-6"></span>
+                <h3 class="text-xl font-black text-brand-800">結果有誤？</h3>
                 <button onclick="closeFeedbackModal()" class="text-slate-400 hover:text-slate-600 p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            <p class="text-xs text-slate-500">若 AI 診斷有誤，您的反饋將送交管理者後台審核，持續優化專家知識庫！</p>
             
-            <div class="space-y-3">
-                <div>
-                    <label class="text-xs font-bold text-slate-700 block mb-1">更正之植物名稱</label>
-                    <input type="text" id="fb-crop-name" placeholder="例如: 檸檬" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-brand-500" />
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-700 block mb-1">更正之正確病害名稱</label>
-                    <input type="text" id="fb-disease-name" placeholder="例如: 白粉病" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-brand-500" />
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-700 block mb-1">補充說明/徵狀特徵</label>
-                    <textarea id="fb-comment" rows="2" placeholder="葉片背面有明顯白色粉狀斑塊..." class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-brand-500"></textarea>
-                </div>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                請告訴我們是哪個部分出錯了，<br/>這能幫助我們未來提供更準確的分析！
+            </p>
+            
+            <!-- 勾選項 (對齊 cb_plant_error 與 cb_disease_error) -->
+            <div class="space-y-3 text-left">
+                <label class="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 cursor-pointer transition select-none">
+                    <input type="checkbox" id="cb-plant-error" class="w-5 h-5 rounded text-brand-700 focus:ring-brand-500 border-slate-300 accent-brand-700" />
+                    <span class="text-sm font-bold text-slate-800">🌱 植物種類錯誤</span>
+                </label>
+                <label class="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 cursor-pointer transition select-none">
+                    <input type="checkbox" id="cb-disease-error" class="w-5 h-5 rounded text-brand-700 focus:ring-brand-500 border-slate-300 accent-brand-700" />
+                    <span class="text-sm font-bold text-slate-800">🔬 疾病判斷錯誤</span>
+                </label>
             </div>
 
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeFeedbackModal()" class="text-xs text-slate-500 font-bold px-4 py-2">取消</button>
-                <button onclick="submitDiagnosisFeedback()" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold px-5 py-2 rounded-xl shadow transition">提交反饋</button>
+            <div class="space-y-2 pt-2">
+                <button onclick="submitDiagnosisFeedback()" class="w-full bg-brand-700 hover:bg-brand-800 text-white font-bold py-3 px-4 rounded-xl shadow transition text-sm">
+                    送出回饋
+                </button>
+                <button onclick="closeFeedbackModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 px-4 rounded-xl transition text-sm">
+                    取消
+                </button>
             </div>
         </div>
     </div>
@@ -1862,14 +1865,14 @@
             loadRemediesList(q);
         }
 
-        // 糾錯反饋
+        // 糾錯反饋 (對齊 ResultActivity.kt:481-555 showFeedbackDialog)
         function openFeedbackModal() {
             if (!lastPredictionId) {
                 Swal.fire({ icon: 'info', title: '尚未執行診斷' });
                 return;
             }
-            document.getElementById('fb-crop-name').value = lastAnalysisResult?.crop_name || '';
-            document.getElementById('fb-disease-name').value = lastAnalysisResult?.status_name || '';
+            document.getElementById('cb-plant-error').checked = false;
+            document.getElementById('cb-disease-error').checked = false;
             document.getElementById('modal-feedback').classList.remove('hidden');
         }
 
@@ -1878,11 +1881,15 @@
         }
 
         async function submitDiagnosisFeedback() {
-            const c = document.getElementById('fb-crop-name').value.trim();
-            const d = document.getElementById('fb-disease-name').value.trim();
-            const com = document.getElementById('fb-comment').value.trim();
-            const token = localStorage.getItem('plant_token');
+            const isPlantError = document.getElementById('cb-plant-error').checked;
+            const isDiseaseError = document.getElementById('cb-disease-error').checked;
 
+            if (!isPlantError && !isDiseaseError) {
+                Swal.fire({ icon: 'warning', title: '請至少勾選一項錯誤項目' });
+                return;
+            }
+
+            const token = localStorage.getItem('plant_token');
             if (!token) {
                 Swal.fire({ icon: 'info', title: '請先登入後提交反饋' });
                 return;
@@ -1897,17 +1904,22 @@
                     },
                     body: JSON.stringify({
                         prediction_id: lastPredictionId,
-                        corrected_plant_name: c,
-                        corrected_disease_name: d,
-                        comment: com,
-                        is_plant_error: Boolean(c && c !== lastAnalysisResult?.crop_name),
-                        is_disease_error: Boolean(d && d !== lastAnalysisResult?.status_name)
+                        original_plant_name: lastAnalysisResult?.crop_name,
+                        original_disease_name: lastAnalysisResult?.status_name,
+                        is_plant_error: isPlantError,
+                        is_disease_error: isDiseaseError
                     })
                 });
 
                 if (res.ok) {
                     closeFeedbackModal();
-                    Swal.fire({ icon: 'success', title: '糾錯反饋已提交至管理員後台審核！' });
+                    Swal.fire({
+                        icon: 'success',
+                        title: '感謝您的回饋！',
+                        text: '我們將盡快改進。',
+                        timer: 1600,
+                        showConfirmButton: false
+                    });
                 } else {
                     const err = await res.json().catch(() => ({}));
                     throw new Error(err.detail || '提交失敗');
