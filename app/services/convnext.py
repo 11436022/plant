@@ -85,12 +85,38 @@ def load_class_index(force_reload: bool = False) -> dict[int, str]:
 def get_convnext_model(force_reload: bool = False):
     """
     惰性加載 ConvNeXt-small 分類模型。
+    在低記憶體環境（如 Railway 雲端 512MB RAM）中，自動安全降級至 Gemini 雲端多模態視覺診斷，避免 OOM Killed。
     """
     global _convnext_model, _model_load_attempted
     if not force_reload and _model_load_attempted:
         return _convnext_model
 
     _model_load_attempted = True
+
+    # 1. 檢查環境變數是否顯式停用
+    import os
+    env_enable = os.getenv("ENABLE_LOCAL_CONVNEXT")
+    if env_enable is not None and env_enable.lower() in ("0", "false", "no", "off"):
+        print("[INFO] 本地 ConvNeXt 已停用（ENABLE_LOCAL_CONVNEXT=false），將自動採用 Gemini 雲端多模態視覺診斷。")
+        return None
+
+    # 2. 自動偵測 Linux 容器 CGroup 記憶體限制 (Railway 等雲端環境預設為 512MB)
+    try:
+        cgroup_v2 = Path("/sys/fs/cgroup/memory.max")
+        if cgroup_v2.exists():
+            val = cgroup_v2.read_text().strip()
+            if val != "max" and int(val) <= 750 * 1024 * 1024:
+                print(f"[INFO] 偵測到雲端容器記憶體上限為 {int(val)//(1024*1024)}MB <= 750MB，自動跳過 ConvNeXt 本地模型以防 OOM 崩潰，系統將全自動由 Gemini 雲端多模態提供診斷。")
+                return None
+        cgroup_v1 = Path("/sys/fs/cgroup/memory/memory.limit_in_bytes")
+        if cgroup_v1.exists():
+            val = cgroup_v1.read_text().strip()
+            if int(val) <= 750 * 1024 * 1024:
+                print(f"[INFO] 偵測到雲端容器記憶體上限為 {int(val)//(1024*1024)}MB <= 750MB，自動跳過 ConvNeXt 本地模型以防 OOM 崩潰。")
+                return None
+    except Exception:
+        pass
+
     model_path = Path(settings.CONVNEXT_MODEL_PATH)
     if not model_path.is_absolute():
         model_path = settings.BASE_DIR / model_path
@@ -104,10 +130,14 @@ def get_convnext_model(force_reload: bool = False):
 
         load_class_index(force_reload=force_reload)
         num_classes = len(_idx_to_class) if _idx_to_class else 38
-        state_dict = torch.load(str(model_path), map_location="cpu")
+        state_dict = torch.load(str(model_path), map_location="cpu", weights_only=False)
         ckpt_classes = state_dict["head.fc.weight"].shape[0] if "head.fc.weight" in state_dict else num_classes
         model = timm.create_model("convnext_small", num_classes=ckpt_classes, pretrained=False)
         model.load_state_dict(state_dict, strict=False)
+        del state_dict
+        import gc
+        gc.collect()
+
         if num_classes > ckpt_classes:
             old_fc = model.head.fc
             in_feats = old_fc.in_features
