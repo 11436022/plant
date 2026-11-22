@@ -27,6 +27,7 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_PATH = settings.STATIC_DIR
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 templates.env.auto_reload = True
+templates.env.cache = None
 templates.env.filters['tw_time'] = format_taiwan_time
 
 
@@ -87,7 +88,11 @@ def create_app() -> FastAPI:
     async def get_web_app_page(request: Request):
         """提供跨平台（包含 iPhone / Safari / 電腦展覽大屏）即時拍照快篩、單株時間軸與官方資材圖鑑網頁。"""
         template = templates.get_template("index.html")
-        return HTMLResponse(content=template.render({"request": request}))
+        response = HTMLResponse(content=template.render({"request": request}))
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
 
     @app.get("/dashboard")
     async def redirect_dashboard():

@@ -5,5 +5,5 @@ if __name__ == "__main__":
     print("🌱 智慧植物醫生後端伺服器 啟動中...")
     print("🌐 監聽位址: 0.0.0.0:8000 (支援本機與手機 Wi-Fi 連線)")
     print("==================================================")
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True, reload_includes=["*.html", "*.py", "*.js", "*.css"])
 
