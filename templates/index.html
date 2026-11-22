@@ -426,6 +426,17 @@
                 </div>
             </div>
 
+            <!-- 植物照片卡片 (對齊 ResultActivity.kt / activity_result.xml:49-65 cv_image_container & img_result_plant) -->
+            <div id="res-image-card" class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden relative group">
+                <div class="h-64 sm:h-80 w-full relative overflow-hidden flex items-center justify-center bg-slate-900">
+                    <img id="res-plant-img" src="" alt="診斷葉片" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                    <span class="absolute bottom-3 left-4 text-xs font-bold bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-full shadow flex items-center gap-1.5">
+                        <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                        <span>AI 診斷原始影像</span>
+                    </span>
+                </div>
+            </div>
+
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                 <!-- 狀態大彩條 -->
                 <div id="res-status-banner" class="bg-emerald-600 px-6 sm:px-8 py-5 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -1694,6 +1705,17 @@
 
         function renderResultScreen(result) {
             navigateTo('result');
+
+            // 渲染植物原始葉片照片 (對齊 ResultActivity.kt / activity_result.xml:59 img_result_plant)
+            const resImg = document.getElementById('res-plant-img');
+            const previewImg = document.getElementById('preview-image');
+            if (resImg) {
+                if (previewImg && previewImg.src && !previewImg.src.includes('data:image/svg+xml') && previewImg.src.length > 5) {
+                    resImg.src = previewImg.src;
+                } else if (result.image_url) {
+                    resImg.src = result.image_url;
+                }
+            }
 
             const crop = result.crop_name || '植株';
             const status = result.status_name || '無法判定';

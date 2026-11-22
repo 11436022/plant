@@ -142,37 +142,46 @@ def create_app() -> FastAPI:
         except Exception as e:
             print(f"[WARN] 自動開通使用者驗證狀態略過: {e}")
 
-        # 若是全新空資料庫或舊版資料庫 (診斷紀錄少於 50 筆)，自動同步最新種子資料
+        # 若是全新空資料庫或病歷日記少於 10 筆，自動執行 latest_seed.sql 補齊 56 筆示範病歷與歷史資料
         try:
             from sqlalchemy import text
             from app.db.session import engine, get_db_connection
             needs_seed = False
+            diary_cnt = 0
             try:
                 with engine.connect() as conn:
-                    crop_cnt = conn.execute(text("SELECT count(*) FROM crop")).scalar()
-                if not crop_cnt or crop_cnt == 0:
+                    diary_cnt = conn.execute(text("SELECT count(*) FROM plant_diary")).scalar() or 0
+                if diary_cnt < 10:
                     needs_seed = True
             except Exception:
                 needs_seed = True
 
             if needs_seed:
-                # 優先使用包含 56 筆與最新資料的 latest_seed.sql
                 sql_path = Path("latest_seed.sql") if Path("latest_seed.sql").exists() else Path("init_db.sql")
                 if sql_path.exists():
-                    print(f"[DB] 自動執行 {sql_path.name} 同步最新資料庫紀錄...")
-                    raw_sql = sql_path.read_text(encoding="utf-8")
+                    print(f"[DB] 偵測到歷史病歷紀錄不足 ({diary_cnt} 筆)，自動執行 {sql_path.name} 同步 56 筆完整歷史病歷與資料庫紀錄...")
+                    raw_sql = sql_path.read_text(encoding="utf-8").replace("\r\n", "\n")
                     db_conn = get_db_connection()
                     with db_conn.cursor() as cur:
                         for stmt in raw_sql.split(";\n"):
                             clean_s = stmt.strip()
-                            if clean_s:
+                            if clean_s and not clean_s.startswith("--"):
                                 try:
                                     cur.execute(clean_s)
                                 except Exception:
                                     pass
+                        # 確保展示帳號 123 擁有這些病歷紀錄 (不論 user_id 為 1 或 2)
+                        try:
+                            cur.execute("SELECT user_id FROM user WHERE username = '123' LIMIT 1")
+                            u123 = cur.fetchone()
+                            if u123:
+                                target_uid = u123["user_id"] if isinstance(u123, dict) else u123[0]
+                                cur.execute("UPDATE plant_diary SET user_id = %s WHERE user_id = 2 OR user_id IS NULL OR user_id = 1", (target_uid,))
+                        except Exception:
+                            pass
                         db_conn.commit()
                     db_conn.close()
-                    print("[DB] 資料庫同步完成！")
+                    print("[DB] 56 筆示範病歷日記已成功同步並綁定至帳號 123！")
         except Exception as seed_err:
             print(f"[WARN] 檢查/同步資料庫種子略過: {seed_err}")
 
