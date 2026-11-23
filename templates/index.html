@@ -942,6 +942,14 @@
                 </button>
             </div>
 
+            <!-- 官方審定證件 / 包裝標籤圖片 (對齊 Android img_remedy_license 預覽) -->
+            <div class="relative w-full h-48 bg-[#F1F8E9] rounded-2xl overflow-hidden border border-emerald-100 flex items-center justify-center group cursor-pointer" onclick="openRemedyLightbox()">
+                <img id="modal-remedy-img" src="" alt="官方審定資材圖片" class="w-full h-full object-contain p-2 transition-transform duration-300 group-hover:scale-105" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='/static/images/doctor_check.png';" />
+                <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 opacity-90 group-hover:opacity-100 transition shadow">
+                    <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> 點擊放大審定證件
+                </div>
+            </div>
+
             <!-- 成分與標籤 -->
             <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-2 text-xs">
                 <div class="flex items-center justify-between">
@@ -978,7 +986,17 @@
                 </p>
             </div>
 
-            <button onclick="closeRemedyModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs transition">
+            <!-- 底部動作按鈕 (對齊 Android dialog_btn_license 與 dialog_btn_buy) -->
+            <div class="flex items-center gap-2 pt-2">
+                <button onclick="openRemedyLightbox()" class="flex-1 border-2 border-brand-700 text-brand-700 hover:bg-brand-50 font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+                    <i data-lucide="award" class="w-4 h-4"></i> 查看審定證件
+                </button>
+                <a id="modal-remedy-btn-buy" href="#" target="_blank" rel="noopener noreferrer" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
+                    <i data-lucide="shopping-cart" class="w-4 h-4"></i> 前往採購/比價
+                </a>
+            </div>
+
+            <button onclick="closeRemedyModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition">
                 關閉視窗
             </button>
         </div>
@@ -2402,56 +2420,95 @@
 
                 list.forEach(item => {
                     const card = document.createElement('div');
-                    card.className = 'bg-white rounded-3xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between group';
+                    card.className = 'bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between group';
                     
                     const isPetSafe = item.pet_friendly_status === 'SAFE';
+                    const isPetCaution = item.pet_friendly_status === 'CAUTION';
                     let catBadge = '🌱 活力營養';
+                    let catBadgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
                     if (item.use_disease && item.use_pest) {
                         catBadge = '🛡️🐛 雙效防護';
+                        catBadgeClass = 'bg-teal-100 text-teal-800 border-teal-200';
                     } else if (item.use_disease) {
                         catBadge = '🛡️ 防病剋星';
+                        catBadgeClass = 'bg-blue-100 text-blue-800 border-blue-200';
                     } else if (item.use_pest) {
                         catBadge = '🐛 驅蟲除蟎';
+                        catBadgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
                     } else if (item.category_name) {
                         catBadge = item.category_name;
+                        catBadgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
                     }
 
                     const safeBadge = isPetSafe 
-                        ? '<span class="text-[11px] font-bold bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full">🐱 寵物安全</span>' 
-                        : '<span class="text-[11px] font-bold bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">⚠️ 避開犬貓</span>';
+                        ? '<span class="text-[11px] font-bold bg-white/95 text-emerald-800 px-2.5 py-1 rounded-full shadow-sm backdrop-blur-sm border border-emerald-200">🐾 寵物安全</span>' 
+                        : (isPetCaution
+                            ? '<span class="text-[11px] font-bold bg-white/95 text-amber-800 px-2.5 py-1 rounded-full shadow-sm backdrop-blur-sm border border-amber-200">⚠️ 避開犬貓</span>'
+                            : '<span class="text-[11px] font-bold bg-white/95 text-rose-800 px-2.5 py-1 rounded-full shadow-sm backdrop-blur-sm border border-rose-200">🚫 寵物禁忌</span>');
 
                     const ingredient = item.active_ingredient || item.common_name || item.ingredient || '天然植保成分';
                     const targetStr = item.efficacy_summary || (item.matched_targets && item.matched_targets.slice(0, 3).join('、')) || '白粉病、缺鐵黃化、葉蟎';
                     const vendor = item.company_name || item.vendor_name || '合規原廠';
+                    const imgUrl = item.license_image_url || '/static/images/doctor_check.png';
+                    const purchaseUrl = item.purchase_search_url || `https://shopee.tw/search?keyword=${encodeURIComponent((item.product_name || '') + ' 園藝')}`;
 
                     card.innerHTML = `
                         <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">${catBadge}</span>
-                                ${safeBadge}
-                            </div>
-                            <h4 class="text-base font-black text-slate-800 group-hover:text-brand-700 transition truncate">${item.product_name || '無毒保護資材'}</h4>
-                            <p class="text-xs text-slate-500 font-mono mt-0.5">${item.registration_no || '官方審定編號'}</p>
-                            
-                            <div class="mt-3 bg-slate-50 rounded-2xl p-3 text-xs space-y-1.5 border border-slate-100">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-slate-500">主成分：</span>
-                                    <span class="font-bold text-slate-700">${ingredient}</span>
+                            <!-- 頂部圖片容器 (對齊 Android item_remedy_card.xml: 115dp + 類別/安全徽章疊加) -->
+                            <div class="card-img-container relative w-full h-36 bg-[#F1F8E9] overflow-hidden flex items-center justify-center cursor-pointer border-b border-slate-100 group-hover:bg-[#E8F5E9] transition">
+                                <img src="${imgUrl}" 
+                                     alt="${item.product_name}" 
+                                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                                     loading="lazy" 
+                                     referrerpolicy="no-referrer"
+                                     onerror="this.onerror=null; this.src='/static/images/doctor_check.png'; this.className='w-full h-full object-contain p-4 opacity-80';" />
+                                
+                                <!-- 類別徽章 (左上角) -->
+                                <div class="absolute top-2.5 left-2.5">
+                                    <span class="text-[11px] font-bold ${catBadgeClass} px-2.5 py-1 rounded-full shadow-sm backdrop-blur-md border">
+                                        ${catBadge}
+                                    </span>
                                 </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-slate-500">專克適用：</span>
-                                    <span class="font-bold text-brand-700 truncate max-w-[180px]">${targetStr}</span>
+                                
+                                <!-- 寵物安全徽章 (右上角) -->
+                                <div class="absolute top-2.5 right-2.5">
+                                    ${safeBadge}
+                                </div>
+                            </div>
+
+                            <!-- 卡片文字內容 -->
+                            <div class="p-5">
+                                <h4 class="card-title text-base font-black text-slate-800 group-hover:text-brand-700 transition truncate cursor-pointer">${item.product_name || '無毒保護資材'}</h4>
+                                <p class="text-xs text-slate-500 font-mono mt-0.5">${item.registration_no || '官方審定編號'}</p>
+                                
+                                <div class="mt-3 bg-slate-50 rounded-2xl p-3 text-xs space-y-1.5 border border-slate-100">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-500 shrink-0">主成分：</span>
+                                        <span class="font-bold text-slate-700 truncate max-w-[180px]">${ingredient}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-500 shrink-0">專克適用：</span>
+                                        <span class="font-bold text-brand-700 truncate max-w-[180px]">${targetStr}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs text-slate-400 font-mono truncate max-w-[120px]">${vendor}</span>
-                            <button class="btn-open-remedy text-xs bg-brand-700 hover:bg-brand-800 text-white font-bold px-3 py-1.5 rounded-xl shadow-sm transition">
-                                查看稀釋指南
-                            </button>
+                        <!-- 底部操作列 (對齊 Android 前往採購 + 稀釋指南) -->
+                        <div class="px-5 pb-5 pt-0 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
+                            <span class="text-xs text-slate-400 font-mono truncate max-w-[110px]">${vendor}</span>
+                            <div class="flex items-center gap-1.5">
+                                <a href="${purchaseUrl}" target="_blank" rel="noopener noreferrer" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1.5 rounded-xl shadow-sm transition flex items-center gap-1" title="前往電商採購/比價" onclick="event.stopPropagation()">
+                                    🛒 採購
+                                </a>
+                                <button class="btn-open-remedy text-xs bg-brand-700 hover:bg-brand-800 text-white font-bold px-3 py-1.5 rounded-xl shadow-sm transition">
+                                    查看指南
+                                </button>
+                            </div>
                         </div>
                     `;
+                    card.querySelector('.card-img-container').onclick = () => openRemedyModal(item);
+                    card.querySelector('.card-title').onclick = () => openRemedyModal(item);
                     card.querySelector('.btn-open-remedy').onclick = () => openRemedyModal(item);
                     grid.appendChild(card);
                 });
@@ -2462,12 +2519,20 @@
             }
         }
 
+        let currentRemedyDetail = null;
+
         function openRemedyModal(item) {
+            currentRemedyDetail = item;
             document.getElementById('modal-remedy-title').textContent = item.product_name || '無毒保護資材';
             document.getElementById('modal-remedy-regno').textContent = `官方字號：${item.registration_no || '--'}`;
             document.getElementById('modal-remedy-ingredient').textContent = item.active_ingredient || item.common_name || item.ingredient || '天然植保成分';
             document.getElementById('modal-remedy-targets').textContent = item.efficacy_summary || (item.matched_targets && item.matched_targets.join('、')) || '一般真菌與生理病害';
             document.getElementById('modal-remedy-vendor').textContent = item.company_name || item.vendor_name || '核准廠商';
+
+            const imgEl = document.getElementById('modal-remedy-img');
+            if (imgEl) {
+                imgEl.src = item.license_image_url || '/static/images/doctor_check.png';
+            }
 
             const defaultDilution = (item.active_ingredient && item.active_ingredient.includes('油'))
                 ? '以 600ml 寶特瓶裝水，滴入約 0.6ml~1.2ml（約半瓶蓋以內），劇烈搖晃乳化後均勻噴灑葉片正反面，清晨或傍晚施用效果最佳。'
@@ -2476,7 +2541,19 @@
             document.getElementById('modal-remedy-dilution').textContent = item.dilution_tip || defaultDilution;
             document.getElementById('modal-remedy-notice').textContent = item.pet_friendly_desc || item.indoor_reason || item.precautions || '存放陰涼避光處，避免幼童直接接觸，施用時請保持環境通風。';
 
+            const buyBtn = document.getElementById('modal-remedy-btn-buy');
+            if (buyBtn) {
+                buyBtn.href = item.purchase_search_url || `https://shopee.tw/search?keyword=${encodeURIComponent((item.product_name || '') + ' 園藝')}`;
+            }
+
             document.getElementById('modal-remedy-detail').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function openRemedyLightbox() {
+            if (currentRemedyDetail) {
+                openLightbox(currentRemedyDetail.license_image_url || '/static/images/doctor_check.png');
+            }
         }
 
         function closeRemedyModal() {
