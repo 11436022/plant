@@ -297,7 +297,7 @@ class HistoryDetailActivity : AppCompatActivity() {
     private fun handleCareCheckin(isHealthy: Boolean) {
         val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
         val checkinText = if (isHealthy) {
-            "【💧 照護打卡】$todayStr 已完成日常澆水與生長環境通風巡檢。"
+            "【💧 照護打卡】$todayStr 已完成日常澆水與環境通風觀察。"
         } else {
             "【🌿 照護打卡】$todayStr 已依處方指南完成藥劑噴灑與通風照護。"
         }
