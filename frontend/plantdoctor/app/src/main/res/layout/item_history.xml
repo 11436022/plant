@@ -29,7 +29,7 @@
                 android:src="@android:drawable/ic_menu_gallery"
                 tools:ignore="ContentDescription" />
 
-            <!-- 右上角：動態病害 / 健康狀態浮動膠囊 -->
+            <!-- 右上角：動態病害 / 健康狀態浮動膠囊 (依需求隱藏，照片保持無任何標籤遮蔽) -->
             <TextView
                 android:id="@+id/tv_status_badge"
                 android:layout_width="wrap_content"
@@ -42,7 +42,8 @@
                 android:text="🌿 健康"
                 android:textColor="#2E7D32"
                 android:textSize="11sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
 
             <!-- 依使用者需求隱藏小徽章，保留純淨拍立得植株葉片特寫照片 -->
             <TextView

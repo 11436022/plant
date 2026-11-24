@@ -471,6 +471,8 @@ class HistoryAdapter(
             holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_disease)
             holder.tvStatusBadge.setTextColor(Color.parseColor("#C62828"))
         }
+        // 依需求隱藏照片上所有小徽章與膠囊，保留乾淨純粹的葉片特寫照片
+        holder.tvStatusBadge.visibility = View.GONE
 
         // 2. 歷史照片小徽章隱藏 (保持照片視覺純淨)
         holder.tvSafetyBadge.visibility = View.GONE

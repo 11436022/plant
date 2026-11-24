@@ -73,7 +73,7 @@
         app:cardCornerRadius="30dp"
         app:cardElevation="16dp"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="340dp"
+        app:behavior_peekHeight="460dp"
         app:behavior_fitToContents="false"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
