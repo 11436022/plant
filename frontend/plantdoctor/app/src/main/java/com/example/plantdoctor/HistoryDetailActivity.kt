@@ -490,6 +490,22 @@ class HistoryDetailActivity : AppCompatActivity() {
                     // 判斷此植株當前是否為健康狀態
                     val isHealthyPlant = (data.user_corrected_status ?: data.status_name ?: "").contains("健康")
 
+                    // 🌟 動態更新病徵卡片環境與安全標籤 (豐富卡片資訊，跨端排版一致)
+                    val chipPet = findViewById<TextView?>(R.id.chip_pet_status)
+                    val chipEnv = findViewById<TextView?>(R.id.chip_env_status)
+                    if (isHealthyPlant) {
+                        chipPet?.text = "🐾 環境無風險"
+                        chipEnv?.text = "🌱 正常養護環境"
+                    } else {
+                        val treatStr = data.treatment ?: ""
+                        if (treatStr.contains("避開") || treatStr.contains("CAUTION")) {
+                            chipPet?.text = "⚠️ 避開毛孩舔拭"
+                        } else {
+                            chipPet?.text = "🐾 寵物低風險"
+                        }
+                        chipEnv?.text = "🏠 通風採光處"
+                    }
+
                     // 點擊「官方用藥寶典 ➜」直接攜帶作物與病名快速開啟寶典
                     if (isHealthyPlant) {
                         btnOpenRemedyCatalog.visibility = View.GONE

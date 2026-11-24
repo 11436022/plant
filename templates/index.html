@@ -482,12 +482,12 @@
                             <h4 class="text-xs font-bold text-emerald-950 flex items-center gap-2 uppercase tracking-wide">
                                 <i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-700"></i> 居家生活化免登記處方箋
                             </h4>
-                            <span class="text-[11px] bg-emerald-200/70 text-emerald-900 font-bold px-2 py-0.5 rounded-full">礦泉水寶特瓶計量</span>
+                            <span class="text-[11px] bg-emerald-200/70 text-emerald-900 font-bold px-2 py-0.5 rounded-full">免登記資材雙層驗證</span>
                         </div>
                         <div class="text-sm text-emerald-950 leading-relaxed whitespace-pre-line" id="res-treatment-text">
-                            1. 準備約 600ml 礦泉水寶特瓶裝滿清水。
-                            2. 倒入約 1/2 瓶蓋之天然無毒資材（如柑橘精油或甲殼素）。
-                            3. 均勻搖晃後於傍晚向葉片正反面噴灑。
+                            1. 參照產品外包裝標示之官方倍數加水稀釋調配。
+                            2. 建議初次使用先於單片病葉進行局部試噴，確認 24 小時無藥傷。
+                            3. 均勻搖晃後於傍晚向葉片正反面與生病處均勻噴灑。
                         </div>
                     </div>
 
@@ -712,20 +712,61 @@
                     </button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-5 space-y-2">
-                        <span class="text-xs font-bold text-blue-900 uppercase">病徵特徵深度剖析</span>
-                        <p class="text-xs text-blue-950 leading-relaxed" id="detail-symptom-text">--</p>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+                    <!-- 左側 (佔 5 格)：病徵分析與環境防護指標 -->
+                    <div class="lg:col-span-5 bg-gradient-to-br from-blue-50/90 to-indigo-50/60 border border-blue-200/80 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-xs">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between border-b border-blue-200/60 pb-2">
+                                <span class="text-xs font-black text-blue-900 uppercase flex items-center gap-1.5 tracking-wide">
+                                    <i data-lucide="microscope" class="w-4 h-4 text-blue-700"></i> 病況特徵特寫分析
+                                </span>
+                                <span class="text-[11px] font-bold bg-blue-100/90 text-blue-800 px-2.5 py-0.5 rounded-full border border-blue-200/60">
+                                    AI 雙向特徵吻合
+                                </span>
+                            </div>
+                            <p class="text-xs text-blue-950 leading-relaxed font-normal" id="detail-symptom-text">--</p>
+                        </div>
+
+                        <!-- 底部結構化安全與環境指標卡 (填補留白，跨端對齊) -->
+                        <div class="pt-3 border-t border-blue-200/60 grid grid-cols-2 gap-2 text-[11px]">
+                            <div class="bg-white/85 p-2.5 rounded-xl border border-blue-100/80 space-y-0.5 shadow-2xs">
+                                <span class="text-slate-400 font-medium block">🐾 寵物環境提示</span>
+                                <span class="font-bold text-slate-700 block" id="detail-pet-chip">低接觸風險 (食品級)</span>
+                            </div>
+                            <div class="bg-white/85 p-2.5 rounded-xl border border-blue-100/80 space-y-0.5 shadow-2xs">
+                                <span class="text-slate-400 font-medium block">🛡️ 官方驗證依據</span>
+                                <span class="font-bold text-emerald-700 block" id="detail-evidence-chip">農業部 EIR841</span>
+                            </div>
+                            <div class="bg-white/85 p-2.5 rounded-xl border border-blue-100/80 space-y-0.5 shadow-2xs">
+                                <span class="text-slate-400 font-medium block">🌱 作用機制類型</span>
+                                <span class="font-bold text-indigo-700 block" id="detail-mechanism-chip">天然保護與阻隔</span>
+                            </div>
+                            <div class="bg-white/85 p-2.5 rounded-xl border border-blue-100/80 space-y-0.5 shadow-2xs">
+                                <span class="text-slate-400 font-medium block">⏱️ 建議施用時機</span>
+                                <span class="font-bold text-amber-700 block" id="detail-timing-chip">傍晚通風時施用</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-5 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-emerald-950 uppercase">🌿 居家生活化安全處方箋</span>
-                            <button id="btn-detail-open-remedy-inline" onclick="jumpToRemediesFromDiary()" class="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 hover:text-emerald-950 bg-emerald-200/70 hover:bg-emerald-200 px-3 py-1 rounded-full transition cursor-pointer">
-                                <span>官方用藥寶典 ➜</span>
-                            </button>
+                    <!-- 右側 (佔 7 格)：官方處方箋 (移除重複寶典按鈕) -->
+                    <div class="lg:col-span-7 bg-emerald-50/80 border border-emerald-200 rounded-2xl p-5 flex flex-col justify-between space-y-3 shadow-xs">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between border-b border-emerald-200/80 pb-2">
+                                <span class="text-xs font-black text-emerald-950 uppercase flex items-center gap-1.5 tracking-wide">
+                                    <i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-700"></i> 居家生活化安全處方箋
+                                </span>
+                                <span class="text-[11px] font-bold bg-emerald-200/70 text-emerald-900 px-2.5 py-0.5 rounded-full border border-emerald-300/60">
+                                    免登記資材雙層驗證
+                                </span>
+                            </div>
+                            <p class="text-xs text-emerald-950 leading-relaxed whitespace-pre-line font-medium" id="detail-treatment-text">--</p>
                         </div>
-                        <p class="text-xs text-emerald-950 leading-relaxed whitespace-pre-line" id="detail-treatment-text">--</p>
+                        <div class="pt-2 border-t border-emerald-200/60 flex items-center justify-between text-[11px] text-emerald-800">
+                            <span class="flex items-center gap-1">
+                                <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-emerald-600"></i>
+                                請依產品外包裝標示倍數稀釋，初次使用建議先局部單葉試噴
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2191,15 +2232,24 @@
             document.getElementById('detail-symptom-text').textContent = item.suggestion || '病況特徵特寫良好，定期追蹤維護。';
             document.getElementById('detail-treatment-text').textContent = item.treatment || '保持良好通風與排水，適時補充植物保護資材。';
 
+            // 動態更新左側結構化指標小卡
+            const petChip = document.getElementById('detail-pet-chip');
+            const mechChip = document.getElementById('detail-mechanism-chip');
+            if (petChip) {
+                petChip.textContent = isHealthy ? '環境健康無風險' : (item.pet_friendly_rating === 'CAUTION' || item.pet_risk_level === 'MODERATE_RISK' ? '避開寵物舔拭' : '低接觸風險 (食品級)');
+            }
+            if (mechChip) {
+                const isPest = /蟲|蟎|蝨|蜘蛛|蛾/.test(status);
+                const isFungus = /病|斑|粉|黴|銹|腐|疫/.test(status);
+                mechChip.textContent = isHealthy ? '維持健康抗逆力' : (isPest ? '害蟲物理阻隔' : (isFungus ? '真菌病斑防護' : '天然保護資材'));
+            }
+
             // 官方用藥寶典快捷入口 (對齊 HistoryDetailActivity.kt:490-505)
             const btnRemedy = document.getElementById('btn-detail-open-remedy');
-            const btnRemedyInline = document.getElementById('btn-detail-open-remedy-inline');
             if (isHealthy) {
                 if (btnRemedy) btnRemedy.classList.add('hidden');
-                if (btnRemedyInline) btnRemedyInline.classList.add('hidden');
             } else {
                 if (btnRemedy) btnRemedy.classList.remove('hidden');
-                if (btnRemedyInline) btnRemedyInline.classList.remove('hidden');
             }
             lucide.createIcons();
         }
