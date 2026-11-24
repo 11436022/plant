@@ -617,7 +617,7 @@ class ResultActivity : AppCompatActivity() {
 
         val html = "<b>【病症狀態】</b><br/>" +
                 cleanSug.replace("\n", "<br/>") +
-                "<br/><br/><b>【照護與處方】</b><br/>" +
+                "<br/><br/>" +
                 cleanTreat.replace("\n", "<br/>")
                     .replace("【即時照護】", "<b>【即時照護】</b>")
                     .replace("🌿【官方登錄資材建議】", "<br/><b>🌿【官方登錄資材建議】</b>")

@@ -44,7 +44,7 @@
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
-            <!-- 左下角：室內/寵物安全小徽章 (置於底層角落，徹底避免與頂部病害信心度重疊碰撞) -->
+            <!-- 依使用者需求隱藏小徽章，保留純淨拍立得植株葉片特寫照片 -->
             <TextView
                 android:id="@+id/tv_safety_badge"
                 android:layout_width="wrap_content"
@@ -57,7 +57,8 @@
                 android:text="🐾 寵物安全"
                 android:textColor="#0277BD"
                 android:textSize="10sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
         </FrameLayout>
 
         <!-- 下半部：個人植物手記摘要 -->

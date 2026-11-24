@@ -472,9 +472,8 @@ class HistoryAdapter(
             holder.tvStatusBadge.setTextColor(Color.parseColor("#C62828"))
         }
 
-        // 2. 室內與寵物友善標章
-        holder.tvSafetyBadge.text = "🐾 寵物安全"
-        holder.tvSafetyBadge.setBackgroundResource(R.drawable.bg_badge_safe)
+        // 2. 歷史照片小徽章隱藏 (保持照片視覺純淨)
+        holder.tvSafetyBadge.visibility = View.GONE
 
         // 3. 診斷摘要說明 (拍立得卡片精簡排版)
         holder.tvStatus.text = buildString {
