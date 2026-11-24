@@ -1,7 +1,7 @@
 """
 臺灣官方免登記植物保護資材與園藝安全用藥服務 (Taiwan MOA Official Plant Protection & Remedy Service)
 
-資料來源：農業部動植物防疫檢疫署 (EIR841 開放資料集，全量 1,616 筆產品)
+資料來源：農業部動植物防疫檢疫署 (EIR841 開放資料集)
 整合功能：
 1. 全國合法市售商品索引與檢索 (商品名稱、登錄字號、製造廠商、所在縣市、統編)
 2. 室內環境安全過濾 (Indoor Safety Classification)
@@ -217,7 +217,7 @@ def _enrich_single_item(item: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def load_all_remedies() -> List[Dict[str, Any]]:
-    """載入並快取全台 1,616 筆官方植物保護資材。"""
+    """載入並快取全台官方植物保護資材。"""
     global _REMEDIES_CACHE
     if _REMEDIES_CACHE is not None:
         return _REMEDIES_CACHE

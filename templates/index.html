@@ -117,7 +117,7 @@
                         <i data-lucide="book-open" class="w-4 h-4"></i> 病歷日記
                     </button>
                     <button onclick="navigateTo('remedies')" id="nav-btn-remedies" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-green-100 hover:bg-white/10">
-                        <i data-lucide="shield-check" class="w-4 h-4"></i> 官方資材寶典 <span class="text-[11px] bg-amber-400 text-amber-950 font-bold px-1.5 py-0.2 rounded-full">1,616</span>
+                        <i data-lucide="shield-check" class="w-4 h-4"></i> 官方資材寶典
                     </button>
                     <button onclick="navigateTo('webcam')" id="nav-btn-webcam" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-green-100 hover:bg-white/10">
                         <i data-lucide="video" class="w-4 h-4"></i> 即時監控
@@ -250,7 +250,7 @@
                             <i data-lucide="shield-check" class="w-6 h-6"></i>
                         </div>
                         <h3 class="text-base font-black text-slate-800 group-hover:text-brand-700 transition">官方安全用藥寶典</h3>
-                        <p class="text-xs text-slate-500 mt-1">收錄 1,616 筆防檢署免登記資材、生活化寶特瓶稀釋指南</p>
+                        <p class="text-xs text-slate-500 mt-1">收錄防檢署免登記資材清冊、居家安全防護與施用指南</p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-brand-700">
                         <span>查閱圖鑑</span>
@@ -783,7 +783,7 @@
                             <i data-lucide="shield-check" class="w-6 h-6 text-brand-700"></i>
                             <span>官方安全用藥寶典</span>
                         </h2>
-                        <p class="text-xs text-slate-500 mt-1">介接農業部動植物防檢署審定清冊，共收錄 1,616 筆合法免登記資材</p>
+                        <p class="text-xs text-slate-500 mt-1">介接農業部動植物防檢署審定清冊，收錄全台合法免登記資材</p>
                     </div>
 
                     <div class="relative w-full md:w-80">
@@ -795,7 +795,7 @@
                 <!-- 分類晶片過濾 -->
                 <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
                     <button onclick="setRemedyCategory('all')" id="chip-cat-all" class="remedy-chip px-3.5 py-1.5 rounded-full bg-brand-800 text-white shrink-0 shadow-sm transition">
-                        全部資材 (1,616)
+                        全部資材
                     </button>
                     <button onclick="setRemedyCategory('disease')" id="chip-cat-disease" class="remedy-chip px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0 transition">
                         🛡️ 真菌發黴剋星
@@ -1756,7 +1756,7 @@
                 fill.style.width = '95%';
                 pct.textContent = '95%';
                 stText.textContent = '檢索農業專書處方中...';
-                subText.textContent = '連動農業部 1,616 筆官方審定資材庫生成處方';
+                subText.textContent = '連動農業部官方審定資材庫雙層驗證生成處方';
             }, 1150);
 
             setTimeout(() => {

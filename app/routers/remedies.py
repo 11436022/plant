@@ -1,6 +1,6 @@
 """
 臺灣官方免登記植物保護資材與園藝藥劑型錄 API
-提供前端 Android 瀏覽全台 1,616 筆合法資材、包裝圖片、適應症與安全等級
+提供前端 Android 瀏覽全台合法免登記資材、包裝圖片、適應症與安全等級
 """
 
 from typing import Any, Dict, List, Optional
@@ -39,7 +39,7 @@ def get_remedies(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
 ) -> Dict[str, Any]:
-    """檢索與分頁瀏覽臺灣官方 1,616 筆免登記植物保護資材圖鑑。"""
+    """檢索與分頁瀏覽臺灣官方免登記植物保護資材圖鑑。"""
     all_items = load_all_remedies()
     filtered = all_items
 

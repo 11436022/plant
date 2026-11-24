@@ -87,7 +87,7 @@ async def predict_plant_status(
 ):
     """
     接收圖片，執行 AI 分析，並將結果暫存。
-    支援室內安全、寵物友善與全台官方 1,616 筆資材自動匹配推薦。
+    支援室內安全、寵物友善與全台官方免登記資材自動匹配推薦。
     """
     start_time = time.time()
     temp_file_path = None

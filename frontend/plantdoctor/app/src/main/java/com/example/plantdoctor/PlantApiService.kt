@@ -229,7 +229,7 @@ data class DiagnosisFeedbackResponse(
     val message: String
 )
 
-// --- 🌿 臺灣官方免登記植物保護資材 (1,616 筆產品型錄) ---
+// --- 🌿 臺灣官方免登記植物保護資材 (產品型錄) ---
 data class RemedyItem(
     @SerializedName("registration_no") val registrationNo: String,
     @SerializedName("product_name") val productName: String,

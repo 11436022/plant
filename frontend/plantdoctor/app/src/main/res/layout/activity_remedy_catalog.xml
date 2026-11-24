@@ -128,7 +128,7 @@
                 android:focusable="true"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="5dp"
-                android:text="全量圖鑑 (1,616)"
+                android:text="全量圖鑑"
                 android:textColor="#FFFFFF"
                 android:textSize="11.5sp"
                 android:textStyle="bold" />
