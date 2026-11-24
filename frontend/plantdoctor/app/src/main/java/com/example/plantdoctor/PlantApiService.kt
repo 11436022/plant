@@ -470,8 +470,8 @@ interface PlantApiService {
         const val CLOUD_HOST = "plant-production-462b.up.railway.app"
         const val CLOUD_BASE_URL = "https://plant-production-462b.up.railway.app/api/v1/"
 
-        // 🌟 連線模式開關：false = 本機後端測試 (電腦 run.py)；true = Railway 雲端伺服器
-        const val FORCE_CLOUD_MODE = false
+        // 🌟 連線模式開關：false = 本機後端測試 (電腦 run.py)；true = Railway 雲端伺服器 (正式發布/實機安裝請務必設為 true)
+        const val FORCE_CLOUD_MODE = true
 
         // 🌟 全域變數，用來即時同步目前能通的 IP 門牌
         var currentRunningIp: String = if (FORCE_CLOUD_MODE) CLOUD_HOST else (if (!WIFI_HOST.isNullOrBlank()) WIFI_HOST else "127.0.0.1")
@@ -509,8 +509,8 @@ interface PlantApiService {
                 if (isUsbConnected) {
                     currentRunningIp = "127.0.0.1" // 🔌 有線插線
                     "http://127.0.0.1:8000/api/v1/"
-                } else if (!WIFI_HOST.isNullOrBlank()) {
-                    currentRunningIp = WIFI_HOST // 📶 區域網路
+                } else if (!WIFI_HOST.isNullOrBlank() && WIFI_HOST != "10.0.2.2" && WIFI_HOST != "127.0.0.1") {
+                    currentRunningIp = WIFI_HOST // 📶 區域網路 (非模擬器/回環地址)
                     "http://$WIFI_HOST:8000/api/v1/"
                 } else {
                     currentRunningIp = CLOUD_HOST // ☁️ 無線走雲端
