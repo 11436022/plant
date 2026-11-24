@@ -104,7 +104,9 @@ async def predict_plant_status(
         temp_file_path.write_bytes(content)
 
         img_sha256 = hashlib.sha256(content).hexdigest()
-        cache_key = (img_sha256, (crop_name or "").strip())
+        raw_crop = (crop_name or "").strip()
+        effective_crop = None if raw_crop in ["", "未知", "未知作物", "自動辨識", "自動全品項辨識", "null", "undefined"] else raw_crop
+        cache_key = (img_sha256, effective_crop or "")
         now = time.monotonic()
 
         from datetime import datetime
@@ -132,8 +134,8 @@ async def predict_plant_status(
 
             # 2. 呼叫 AI 進行診斷 (三層瀑布流階層式架構)
             crops, diseases, pests = get_reference_lists(db)
-            if crop_name:
-                crops = [crop_name]
+            if effective_crop:
+                crops = [effective_crop]
             raw_ai_result = diagnostic_plant(str(temp_file_path), crops, diseases, pests)
             if raw_ai_result and raw_ai_result.get("category") != "unknown":
                 image_diagnosis_cache[cache_key] = {

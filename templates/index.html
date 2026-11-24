@@ -328,19 +328,41 @@
                     <p class="text-xs text-slate-500 mt-1">上傳清晰葉片特寫照片，AI 將自動辨識病徵並產出對應生活化安全處方</p>
                 </div>
 
-                <!-- 作物設定 (對齊手機端 UploadActivity 簡潔設計) -->
+                <!-- 作物設定 (對齊手機端 UploadActivity 完整品項與動態同步) -->
                 <div>
-                    <label class="text-xs text-slate-600 font-bold block mb-1">目標植物種類</label>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="text-xs text-slate-600 font-bold block">目標植物種類</label>
+                        <span class="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                            <i data-lucide="sparkles" class="w-3 h-3"></i> 支援動態全品項與自學庫
+                        </span>
+                    </div>
                     <select id="input-crop-name" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-medium focus:ring-2 focus:ring-brand-500">
+                        <option value="未知" selected>❓ 未知 (AI 自動全品項辨識 - 預設)</option>
+                        <option value="室內盆栽/觀葉植物">🪴 室內盆栽/觀葉植物</option>
+                        <option value="玫瑰/景觀花卉">🌹 玫瑰/景觀花卉</option>
                         <option value="檸檬">🍋 檸檬 (Lemon)</option>
                         <option value="柑橘">🍊 柑橘 (Citrus)</option>
                         <option value="番茄">🍅 番茄 (Tomato)</option>
                         <option value="草莓">🍓 草莓 (Strawberry)</option>
                         <option value="葡萄">🍇 葡萄 (Grape)</option>
                         <option value="蘋果">🍎 蘋果 (Apple)</option>
-                        <option value="玫瑰">🌹 玫瑰/景觀花卉</option>
-                        <option value="室內綠植">🪴 室內盆栽/觀葉植物</option>
-                        <option value="未知作物">❓ 自動全品項辨識</option>
+                        <option value="水稻">🌾 水稻 (Rice)</option>
+                        <option value="玉米">🌽 玉米 (Corn)</option>
+                        <option value="胡瓜">🥒 胡瓜/小黃瓜 (Cucumber)</option>
+                        <option value="蓮霧">🍎 蓮霧 (Wax Apple)</option>
+                        <option value="芒果">🥭 芒果 (Mango)</option>
+                        <option value="木瓜">🍈 木瓜 (Papaya)</option>
+                        <option value="西瓜">🍉 西瓜 (Watermelon)</option>
+                        <option value="茄子">🍆 茄子 (Eggplant)</option>
+                        <option value="甜椒">🫑 甜椒/青椒 (Pepper)</option>
+                        <option value="茶">🍵 茶 (Tea)</option>
+                        <option value="香蕉">🍌 香蕉 (Banana)</option>
+                        <option value="馬鈴薯">🥔 馬鈴薯 (Potato)</option>
+                        <option value="甘藍">🥬 甘藍/高麗菜 (Cabbage)</option>
+                        <option value="青花菜">🥦 青花菜/花椰菜 (Broccoli)</option>
+                        <option value="洋蔥">🧅 洋蔥 (Onion)</option>
+                        <option value="梨">🍐 梨 (Pear)</option>
+                        <option value="桃">🍑 桃 (Peach)</option>
                     </select>
                 </div>
 
@@ -1281,6 +1303,7 @@
             checkUserSession();
             loadWeatherWidget();
             loadRemediesList();
+            loadCropsList();
 
             // 鍵盤快捷鍵支援 (Alt+R 或非輸入框時按 R 快速前往官方用藥寶典)
             window.addEventListener('keydown', (e) => {
@@ -1730,7 +1753,9 @@
             try {
                 const formData = new FormData();
                 formData.append('file', currentSelectedFile);
-                if (crop && crop !== '未知作物') formData.append('crop_name', crop);
+                if (crop && crop !== '未知' && crop !== '未知作物' && crop !== '自動全品項辨識') {
+                    formData.append('crop_name', crop);
+                }
                 formData.append('is_indoor', indoorPet ? 'true' : 'false');
                 formData.append('has_pet', indoorPet ? 'true' : 'false');
 
@@ -2714,6 +2739,113 @@
 
         function closeRemedyModal() {
             document.getElementById('modal-remedy-detail').classList.add('hidden');
+        }
+
+        // 🌟 動態同步後端與自學特徵庫所有作物清單 (1:1 對齊手機端 UploadActivity 邏輯)
+        async function loadCropsList() {
+            const selectEl = document.getElementById('input-crop-name');
+            if (!selectEl) return;
+
+            const cropMeta = {
+                '檸檬': { icon: '🍋', en: 'Lemon' },
+                '柑橘': { icon: '🍊', en: 'Citrus' },
+                '番茄': { icon: '🍅', en: 'Tomato' },
+                '草莓': { icon: '🍓', en: 'Strawberry' },
+                '葡萄': { icon: '🍇', en: 'Grape' },
+                '蘋果': { icon: '🍎', en: 'Apple' },
+                '胡瓜': { icon: '🥒', en: 'Cucumber' },
+                '水稻': { icon: '🌾', en: 'Rice' },
+                '玉米': { icon: '🌽', en: 'Corn' },
+                '蓮霧': { icon: '🍎', en: 'Wax Apple' },
+                '芒果': { icon: '🥭', en: 'Mango' },
+                '木瓜': { icon: '🍈', en: 'Papaya' },
+                '西瓜': { icon: '🍉', en: 'Watermelon' },
+                '茄子': { icon: '🍆', en: 'Eggplant' },
+                '甜椒': { icon: '🫑', en: 'Pepper' },
+                '茶': { icon: '🍵', en: 'Tea' },
+                '香蕉': { icon: '🍌', en: 'Banana' },
+                '馬鈴薯': { icon: '🥔', en: 'Potato' },
+                '甘藍': { icon: '🥬', en: 'Cabbage' },
+                '青花菜': { icon: '🥦', en: 'Broccoli' },
+                '洋蔥': { icon: '🧅', en: 'Onion' },
+                '梨': { icon: '🍐', en: 'Pear' },
+                '桃': { icon: '🍑', en: 'Peach' },
+                '室內盆栽/觀葉植物': { icon: '🪴', en: 'Foliage / Houseplants' },
+                '玫瑰/景觀花卉': { icon: '🌹', en: 'Rose / Flowers' }
+            };
+
+            try {
+                const token = localStorage.getItem('plant_token');
+                const headers = {};
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                let res = await fetch(getFullApiUrl('/api/v1/knowledge/crops'), { headers }).catch(() => null);
+                if (!res || !res.ok) {
+                    res = await fetch(getFullApiUrl('/api/v1/crops'), { headers }).catch(() => null);
+                }
+                if (!res || !res.ok) return;
+
+                const result = await res.json();
+                const rawCrops = result.data || [];
+                if (!Array.isArray(rawCrops) || rawCrops.length === 0) return;
+
+                const currentVal = selectEl.value;
+                const cropSet = new Set();
+                rawCrops.forEach(c => {
+                    const clean = (c || '').trim();
+                    if (clean && clean !== '未知' && clean !== '未知作物') {
+                        cropSet.add(clean);
+                    }
+                });
+
+                // 納入手機端 24 種作物預設列表
+                const mobileDefaults = [
+                    "室內盆栽/觀葉植物", "玫瑰/景觀花卉", "檸檬", "草莓", "番茄", "水稻", 
+                    "玉米", "胡瓜", "柑橘", "葡萄", "蓮霧", "芒果", "木瓜", "西瓜", 
+                    "茄子", "甜椒", "茶", "香蕉", "馬鈴薯", "甘藍", "青花菜", "洋蔥", 
+                    "蘋果", "梨", "桃"
+                ];
+                mobileDefaults.forEach(c => cropSet.add(c));
+
+                // 重新渲染 select 選項
+                selectEl.innerHTML = '';
+
+                // 首項固定為未知 (預設 AI 自動全品項辨識)
+                const optUnknown = document.createElement('option');
+                optUnknown.value = '未知';
+                optUnknown.textContent = '❓ 未知 (AI 自動全品項辨識 - 預設)';
+                selectEl.appendChild(optUnknown);
+
+                const sortedCrops = Array.from(cropSet).sort((a, b) => {
+                    const priority = ['室內盆栽/觀葉植物', '玫瑰/景觀花卉', '檸檬', '柑橘', '番茄', '草莓', '葡萄', '蘋果'];
+                    const idxA = priority.indexOf(a);
+                    const idxB = priority.indexOf(b);
+                    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                    if (idxA !== -1) return -1;
+                    if (idxB !== -1) return 1;
+                    return a.localeCompare(b, 'zh-Hant');
+                });
+
+                sortedCrops.forEach(cropName => {
+                    const opt = document.createElement('option');
+                    opt.value = cropName;
+                    const meta = cropMeta[cropName];
+                    if (meta) {
+                        opt.textContent = `${meta.icon} ${cropName}${meta.en ? ` (${meta.en})` : ''}`;
+                    } else {
+                        opt.textContent = `🌱 ${cropName}`;
+                    }
+                    selectEl.appendChild(opt);
+                });
+
+                if (currentVal && Array.from(selectEl.options).some(o => o.value === currentVal)) {
+                    selectEl.value = currentVal;
+                } else {
+                    selectEl.value = '未知';
+                }
+            } catch (err) {
+                console.warn('動態同步作物清單失敗，保留完整靜態預設清單:', err);
+            }
         }
 
         // 大圖燈箱

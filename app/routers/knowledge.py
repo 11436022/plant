@@ -46,6 +46,7 @@ async def get_all_diagnoses(db: Session = Depends(get_db)):
 
 
 @router.get("/crops", status_code=200)
+@router.get("/crops/", include_in_schema=False)
 async def get_all_crops(db: Session = Depends(get_db)):
     """
     獲取資料庫中所有作物的完整參考列表，供使用者拍照前或 Webcam 執行前下拉選取。
