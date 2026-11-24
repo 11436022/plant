@@ -588,15 +588,29 @@ def generate_precise_prescription(
                 f"- 【傳播與風險提醒】：請密切檢視鄰近葉片、葉背與植株基部是否出現擴散跡象，高溫多濕或通風不良時病程可能快速加劇。"
             )
             convnext_treat = (
-                f"1. 【病部隔離與清除】：立即剪除發病枝葉或受害組織並帶離田間集中銷毀，修剪工具須徹底消毒，阻斷病菌孢子或媒介昆蟲擴散。\n"
+                f"1. 【病部隔離與清除】：立即剪除發病枝葉或受害組織並集中包裝丟棄，修剪工具須徹底消毒，阻斷病菌孢子擴散。\n"
                 f"2. 【標準防治與用藥處置】：{base_treat_db}\n"
-                f"3. 【環境防護管理】：適當拉開植株間距降低微氣候濕度，澆水改採滴灌或盆土注水避免噴濕葉面，發病期暫停施用高氮肥料並保持排水良好。"
+                f"3. 【環境防護管理】：適當拉開植株間距降低濕度，澆水改採盆土注水避免噴濕葉面，發病期暫停施肥並保持良好通風。"
             )
             print(f"[ConvNeXt]  本地 ConvNeXt 命中：採用 MySQL 專家資料庫權威處方 -> {crop_name} - {status_name}")
             return convnext_sugg, convnext_treat, "convnext_local_graded_prescription"
         else:
             print(f"[MySQL]  命中 MySQL 專家資料庫標準指引 -> {crop_name} - {status_name}")
             return base_desc, base_treat_db, "mysql_fallback_database"
+
+    # --- 步驟 1.5：若首輪 Gemini 看圖診斷已產生專屬病徵與處置，直接採納並串接官方資材，免去二次重複呼叫省時 2~3 秒 ---
+    if fallback_suggestion and fallback_treatment and not _is_invalid_text(fallback_suggestion) and not _is_invalid_text(fallback_treatment):
+        print(f"[FAST]  直接採納首輪 Gemini 看圖動態處置，免除二次網路請求加速推論：{crop_name} - {status_name}")
+        treat_out = apply_indoor_safety_filter(fallback_treatment, is_indoor=is_indoor)
+        try:
+            from app.services.remedies import search_official_remedies
+            rems = search_official_remedies(status_name, is_indoor=is_indoor, has_pet=has_pet, limit=2)
+            if rems:
+                treat_out = format_remedies_into_treatment(treat_out, rems, is_indoor=is_indoor, has_pet=has_pet)
+        except Exception as rem_err:
+            print(f"[WARN] 串接官方資材處方失敗: {rem_err}")
+        sugg_out = f"{active_learning_banner}\n{fallback_suggestion}" if active_learning_banner else fallback_suggestion
+        return sugg_out, treat_out, "gemini_multimodal_dynamic_prescription"
 
     # --- 步驟 2：MySQL 資料庫無該病害處方 -> 檢索 FAISS 農業部官方專書、官方資材庫並結合 Gemini 動態生成處方 ---
     rag_snippet = ""

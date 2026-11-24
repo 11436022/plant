@@ -110,7 +110,7 @@
                     <button onclick="navigateTo('home')" id="nav-btn-home" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 bg-white/20 text-white shadow-sm">
                         <i data-lucide="home" class="w-4 h-4"></i> 首頁
                     </button>
-                    <button onclick="navigateTo('upload')" id="nav-btn-upload" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-green-100 hover:bg-white/10">
+                    <button onclick="handleNavDiagnosisClick()" id="nav-btn-upload" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-green-100 hover:bg-white/10">
                         <i data-lucide="camera" class="w-4 h-4"></i> 拍照診斷
                     </button>
                     <button onclick="navigateTo('history')" id="nav-btn-history" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-green-100 hover:bg-white/10">
@@ -149,7 +149,7 @@
             <button onclick="navigateTo('home')" class="flex flex-col items-center gap-1 text-white font-medium">
                 <i data-lucide="home" class="w-4 h-4"></i> 首頁
             </button>
-            <button onclick="navigateTo('upload')" class="flex flex-col items-center gap-1 text-green-200 hover:text-white">
+            <button onclick="handleNavDiagnosisClick()" class="flex flex-col items-center gap-1 text-green-200 hover:text-white">
                 <i data-lucide="camera" class="w-4 h-4"></i> 診斷
             </button>
             <button onclick="navigateTo('history')" class="flex flex-col items-center gap-1 text-green-200 hover:text-white">
@@ -295,6 +295,18 @@
         <!-- 2. 拍照與診斷視圖 (VIEW: UPLOAD) 對齊 UploadActivity -->
         <!-- ========================================== -->
         <section id="view-upload" class="app-view hidden space-y-6">
+            <!-- 快速返回最近診斷結果橫條 (若已有診斷結果，方便隨時切換) -->
+            <div id="upload-recent-result-bar" class="hidden flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-2xl p-4 shadow-xs">
+                <div class="flex items-center gap-2.5 text-xs text-emerald-950 font-medium">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-emerald-600 shrink-0"></i>
+                    <span>您剛才已有診斷結果：<b id="recent-result-title" class="text-brand-800 font-bold">--</b></span>
+                </div>
+                <button onclick="navigateTo('result')" class="text-xs font-bold text-white bg-brand-700 hover:bg-brand-800 px-3.5 py-1.5 rounded-xl transition shadow-xs flex items-center gap-1 cursor-pointer">
+                    <span>返回診斷結果</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+
             <div class="flex items-center justify-between">
                 <button onclick="navigateTo('home')" class="text-xs font-bold text-slate-600 hover:text-brand-700 flex items-center gap-1">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回主頁
@@ -416,7 +428,7 @@
         <!-- ========================================== -->
         <section id="view-result" class="app-view hidden space-y-6">
             <div class="flex items-center justify-between">
-                <button onclick="navigateTo('upload')" class="text-xs font-bold text-slate-600 hover:text-brand-700 flex items-center gap-1">
+                <button onclick="resetAndDiagnoseAgain()" class="text-xs font-bold text-slate-600 hover:text-brand-700 flex items-center gap-1 cursor-pointer">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i> 重新診斷
                 </button>
                 <div class="flex items-center gap-2">
@@ -776,6 +788,18 @@
         <!-- 7. 官方資材寶典視圖 (VIEW: REMEDIES) 對齊 RemedyCatalogActivity -->
         <!-- ========================================== -->
         <section id="view-remedies" class="app-view hidden space-y-6">
+            <!-- 從診斷/病歷跳轉過來的快速返回橫條 -->
+            <div id="remedies-back-bar" class="hidden flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-3.5 shadow-xs">
+                <div class="flex items-center gap-2.5 text-xs font-bold text-emerald-950">
+                    <i data-lucide="arrow-left-circle" class="w-5 h-5 text-emerald-700"></i>
+                    <span id="remedies-back-text">您目前正在查閱診斷對應資材</span>
+                </div>
+                <button onclick="returnFromRemedies()" class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-700 hover:bg-brand-800 px-4 py-2 rounded-xl transition shadow-sm cursor-pointer">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span id="remedies-back-btn-label">返回診斷結果頁</span>
+                </button>
+            </div>
+
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 space-y-4">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
@@ -1289,7 +1313,19 @@
             if (targetNavBtn) {
                 targetNavBtn.classList.add('bg-white/20', 'text-white', 'shadow-sm');
                 targetNavBtn.classList.remove('text-green-100');
+            } else if (viewName === 'result') {
+                const uploadBtn = document.getElementById('nav-btn-upload');
+                if (uploadBtn) {
+                    uploadBtn.classList.add('bg-white/20', 'text-white', 'shadow-sm');
+                    uploadBtn.classList.remove('text-green-100');
+                }
             }
+
+            if (viewName !== 'remedies') {
+                const backBar = document.getElementById('remedies-back-bar');
+                if (backBar) backBar.classList.add('hidden');
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
             lucide.createIcons();
 
@@ -1709,6 +1745,7 @@
                 });
 
                 if (!res.ok) {
+                    if (progressTimer) clearInterval(progressTimer);
                     const err = await res.json().catch(() => ({}));
                     throw new Error(err.detail || `診斷失敗 (${res.status})`);
                 }
@@ -1717,15 +1754,16 @@
                 lastAnalysisResult = data.analysis_result || {};
                 lastPredictionId = data.prediction_id;
 
-                setTimeout(() => {
-                    renderResultScreen(lastAnalysisResult);
-                }, 1200);
+                finishProgressBarAndRender(lastAnalysisResult);
             } catch (err) {
+                if (progressTimer) clearInterval(progressTimer);
                 Swal.fire({ icon: 'error', title: '診斷異常', text: err.message }).then(() => {
                     navigateTo('upload');
                 });
             }
         }
+
+        let progressTimer = null;
 
         function animateProgressBar() {
             const fill = document.getElementById('progress-bar-fill');
@@ -1733,36 +1771,52 @@
             const stText = document.getElementById('progress-status-text');
             const subText = document.getElementById('progress-sub-text');
             
-            fill.style.width = '0%';
-            pct.textContent = '0%';
+            if (progressTimer) clearInterval(progressTimer);
+
+            let currentPct = 15;
+            fill.style.width = '15%';
+            pct.textContent = '15%';
             stText.textContent = '植物特徵分析中...';
-            subText.textContent = '擷取葉脈微特徵，過濾背景光影雜訊';
+            subText.textContent = '擷取葉脈微觀特徵，過濾環境光影雜訊';
+
+            progressTimer = setInterval(() => {
+                if (currentPct < 45) {
+                    currentPct += 12;
+                    fill.style.width = `${currentPct}%`;
+                    pct.textContent = `${currentPct}%`;
+                    stText.textContent = '植株特徵微觀快篩中...';
+                    subText.textContent = '邊緣超低延遲特徵提取與品質校驗';
+                } else if (currentPct < 75) {
+                    currentPct += 8;
+                    fill.style.width = `${currentPct}%`;
+                    pct.textContent = `${currentPct}%`;
+                    stText.textContent = '雲端多模態專家深層會診中...';
+                    subText.textContent = 'Gemini 視覺特徵比對與居家安全環境審核';
+                } else if (currentPct < 92) {
+                    currentPct += 3;
+                    fill.style.width = `${currentPct}%`;
+                    pct.textContent = `${currentPct}%`;
+                    stText.textContent = '匹配居家綠植安全處方中...';
+                    subText.textContent = '連動官方無毒保護資材庫與寵物友善防護規範';
+                }
+            }, 260);
+        }
+
+        function finishProgressBarAndRender(result) {
+            if (progressTimer) clearInterval(progressTimer);
+            const fill = document.getElementById('progress-bar-fill');
+            const pct = document.getElementById('progress-pct');
+            const stText = document.getElementById('progress-status-text');
+            const subText = document.getElementById('progress-sub-text');
+
+            fill.style.width = '100%';
+            pct.textContent = '100%';
+            stText.textContent = '診斷完成！';
+            subText.textContent = '即將呈現專屬居家綠植健康處方箋...';
 
             setTimeout(() => {
-                fill.style.width = '45%';
-                pct.textContent = '45%';
-                stText.textContent = '本地專家模型比對中...';
-                subText.textContent = 'ConvNeXt 邊緣超低延遲推論 (<4ms)，85% 信心門檻仲裁';
-            }, 400);
-
-            setTimeout(() => {
-                fill.style.width = '75%';
-                pct.textContent = '75%';
-                stText.textContent = '雲端 AI 專家深層診斷中...';
-                subText.textContent = 'Gemini 多模態語義特徵審核與域外 OOD 覆核';
-            }, 850);
-
-            setTimeout(() => {
-                fill.style.width = '95%';
-                pct.textContent = '95%';
-                stText.textContent = '檢索農業專書處方中...';
-                subText.textContent = '連動農業部官方審定資材庫雙層驗證生成處方';
-            }, 1150);
-
-            setTimeout(() => {
-                fill.style.width = '100%';
-                pct.textContent = '100%';
-            }, 1400);
+                renderResultScreen(result);
+            }, 250);
         }
 
         function renderResultScreen(result) {
@@ -1783,6 +1837,14 @@
             const status = result.status_name || '無法判定';
             const conf = ((result.confidence || 0.95) * 100).toFixed(1);
             const isHealthy = status.includes('健康');
+
+            // 更新拍照診斷頁頂部的「返回剛才診斷」橫條
+            const recentBar = document.getElementById('upload-recent-result-bar');
+            const recentTitle = document.getElementById('recent-result-title');
+            if (recentBar && recentTitle) {
+                recentTitle.textContent = `${crop} - ${status}`;
+                recentBar.classList.remove('hidden');
+            }
 
             // 頂部大彩條
             const banner = document.getElementById('res-status-banner');
@@ -1916,12 +1978,54 @@
             }
         }
 
+        let previousViewBeforeRemedies = null;
+
         function jumpToRemediesFromDiagnosis() {
+            previousViewBeforeRemedies = 'result';
             const st = (lastAnalysisResult && lastAnalysisResult.status_name) || '';
             const q = st.replace(/健康|正常/g, '').trim();
             navigateTo('remedies');
-            document.getElementById('remedies-search-input').value = q;
+            showRemediesBackBar(`您正在查閱【${lastAnalysisResult?.crop_name || '植株'} - ${st}】官方對應保護資材`, '返回剛才的診斷結果');
+            const searchInput = document.getElementById('remedies-search-input');
+            if (searchInput) searchInput.value = q;
             loadRemediesList(q);
+        }
+
+        function showRemediesBackBar(text, btnLabel) {
+            const bar = document.getElementById('remedies-back-bar');
+            if (bar) {
+                const tEl = document.getElementById('remedies-back-text');
+                const bEl = document.getElementById('remedies-back-btn-label');
+                if (tEl) tEl.textContent = text;
+                if (bEl) bEl.textContent = btnLabel;
+                bar.classList.remove('hidden');
+                lucide.createIcons();
+            }
+        }
+
+        function returnFromRemedies() {
+            if (previousViewBeforeRemedies === 'result' && lastAnalysisResult) {
+                navigateTo('result');
+            } else if (previousViewBeforeRemedies === 'history-detail') {
+                navigateTo('history-detail');
+            } else {
+                navigateTo('upload');
+            }
+        }
+
+        function handleNavDiagnosisClick() {
+            // 如果剛完成診斷，且目前正在查閱資材、看病歷或首頁，點「拍照診斷」直接回到剛才的診斷結果頁，不需重新上傳或診斷！
+            if (lastAnalysisResult && currentView !== 'result' && currentView !== 'upload') {
+                navigateTo('result');
+            } else {
+                navigateTo('upload');
+            }
+        }
+
+        function resetAndDiagnoseAgain() {
+            // 使用者主動點擊「重新診斷」時，導向拍照上傳頁，可選新圖片
+            clearSelectedImage();
+            navigateTo('upload');
         }
 
         // 糾錯反饋 (對齊 ResultActivity.kt:481-555 showFeedbackDialog)
@@ -2256,9 +2360,11 @@
 
         // 點擊「官方用藥寶典 ➜」直接攜帶病名快速開啟寶典 (對齊 HistoryDetailActivity.kt:502)
         function jumpToRemediesFromDiary() {
+            previousViewBeforeRemedies = 'history-detail';
             const rawStatus = currentDetailItem?.user_corrected_status || currentDetailItem?.status_name || '';
             const q = rawStatus.replace(/健康|正常/g, '').trim();
             navigateTo('remedies');
+            showRemediesBackBar(`您正在查閱病歷【${currentDetailItem?.crop_name || ''} - ${rawStatus}】官方對應保護資材`, '返回病歷詳情');
             const searchInput = document.getElementById('remedies-search-input');
             if (searchInput) searchInput.value = q;
             loadRemediesList(q);
