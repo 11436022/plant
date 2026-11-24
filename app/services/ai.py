@@ -424,12 +424,15 @@ def format_remedies_into_treatment(
     is_indoor: bool = True,
     has_pet: bool = False,
 ) -> str:
-    """將官方審定之免登記安全資材與用藥推薦轉換為居家直覺、極簡超低閱讀負擔、日常容器（寶特瓶/瓶蓋）換算之生活化處方"""
+    """
+    將經雙層驗證之農業部免登記安全資材推薦整合至處方中。
+    嚴格遵循安全標準：消除未驗證之寶特瓶調配幻覺，強制提示遵循外包裝標示與局部試噴指引。
+    """
     if not treatment_text and not remedies_list:
         return "1. 請將盆栽置於通風採光良好處。\n2. 避免過度澆水積水。"
 
     # 避免重複附加
-    if "居家安心推薦用藥" in treatment_text or "怎麼調配" in treatment_text:
+    if "居家安心推薦用藥" in treatment_text or "官方登錄資材建議" in treatment_text:
         return treatment_text
 
     # 1. 簡化一般急救步驟，剔除果園冷藏/倉儲等非居家盆栽指引
@@ -458,25 +461,32 @@ def format_remedies_into_treatment(
         icon = icons[i] if i < len(icons) else "• "
         output += f"{icon}{step}\n"
 
-    # 2. 官方審定資材推薦（精選 1 款首選 + 最多 1 款備選，超直覺生活化調配說明）
+    # 2. 官方審定資材推薦（精選 1 款首選 + 最多 1 款備選，安全合規標示指引）
     if remedies_list:
-        output += "\n🌿【居家安心推薦用藥】（🐾 寵物友善／室內安全）：\n"
+        pet_title_badge = "🐾 寵物環境低風險提示" if not has_pet else "🐾 家有寵物接觸風險提示"
+        output += f"\n🌿【官方登錄資材建議】（🛡️ 雙層病理驗證／{pet_title_badge}）：\n"
         primary = remedies_list[0]
         p_name = primary.get("product_name", "")
+        reg_no = primary.get("registration_no", "")
         ingr = primary.get("active_ingredient", "")
+        evidence_lvl = primary.get("official_evidence_level", "MEDIUM")
+        evidence_note = primary.get("official_evidence_note", "符合農業部公告登記")
+
         # 精簡主成分顯示
         ingr_short = "、".join([x for x in ingr.split("、") if x][:2]) or ingr
-        pet_badge = "🐾 犬貓安全" if primary.get("pet_friendly_status") == "SAFE" else "⚠️ 噴灑時避開寵物"
+        pet_badge = primary.get("pet_risk_notice") or ("🐾 環境接觸風險低" if primary.get("pet_friendly_status") == "SAFE" else "⚠️ 噴灑時避開毛孩")
 
-        output += f"👉 首選推薦：【{p_name}】\n"
-        output += f"   • 成分特性：{ingr_short}配方（{pet_badge}）\n"
-        output += f"   • 怎麼調配：拿 1 瓶 600ml 寶特瓶裝水，倒入「半瓶蓋」藥劑搖勻（生活化比例，免用量杯）\n"
-        output += f"   • 怎麼噴灑：每週傍晚均勻噴在葉背與生病處 1 次\n"
+        output += f"👉 首選推薦：【{p_name}】（登錄字號：{reg_no}）\n"
+        output += f"   • 成分機制：{ingr_short}配方（官方依據：{evidence_lvl} - {evidence_note}）\n"
+        output += f"   • 安全注意：{pet_badge}\n"
+        output += f"   • 稀釋調配：免登記資材各家商品濃度不同，請嚴格參照產品外包裝標示之倍數稀釋（切勿過量）\n"
+        output += f"   • 施用指引：建議初次使用先於單片病葉局部試噴，確認 24 小時無藥傷再於傍晚均勻噴灑\n"
 
         if len(remedies_list) > 1:
             alt = remedies_list[1]
             alt_name = alt.get("product_name", "")
-            output += f"\n💡 替代備選：【{alt_name}】（亦為農業部審定居家安全資材）\n"
+            alt_reg = alt.get("registration_no", "")
+            output += f"\n💡 替代備選：【{alt_name}】（登錄字號：{alt_reg}，使用請嚴格依產品外包裝標示）\n"
 
     return output.strip()
 
@@ -613,7 +623,7 @@ def generate_precise_prescription(
                 f"{rem_ref}"
                 "請根據照片中植株實際病徵嚴重度、室內與寵物安全規範及上述官方審定資材，以繁體中文回傳單層 JSON：\n"
                 '{"suggestion": "2點具體病徵與風險分析（每點以 - 開頭並以 \\n 換行，每點精簡在 25 至 40 字以內）", '
-                '"treatment": "2點行動導向居家盆栽急救步驟（以 1. 2. 開頭並以 \\n 換行）。注意：專門針對居家與辦公室盆栽，第一點修剪隔離受害組織，第二點通風控水，嚴禁給予大田耕作或採收後冷藏指引！每點控制在 25 至 40 字以內。"}'
+                '"treatment": "2點行動導向居家盆栽急救步驟（以 1. 2. 開頭並以 \\n 換行）。注意：專門針對居家與辦公室盆栽，第一點修剪隔離受害組織，第二點通風控水，嚴禁給予大田耕作或採收後冷藏指引！嚴禁自行虛構特定藥劑稀釋毫升數或自創濃度，使用方法一律指引參照產品外包裝標示。每點控制在 25 至 40 字以內。"}'
             )
             resp = call_gemini_with_fallback(contents=[rx_prompt, img])
             clean_rx = (resp.text or "").replace("```json", "").replace("```", "").strip()
@@ -1245,9 +1255,9 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
     )
 
     from app.services.remedies import search_official_remedies
-    remedies_list = search_official_remedies(status_name, is_indoor=True, has_pet=False, limit=3)
+    remedies_list = search_official_remedies(status_name, is_indoor=True, has_pet=False, limit=3, verified_only=True)
     pet_status = "SAFE"
-    if remedies_list and any(r.get("pet_friendly_status") == "CAUTION" for r in remedies_list):
+    if remedies_list and any(r.get("pet_friendly_status") == "CAUTION" or r.get("pet_risk_level") == "MODERATE_RISK" for r in remedies_list):
         pet_status = "CAUTION"
 
     if record:
@@ -1280,7 +1290,8 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
             "commercial_remedies": remedies_list,
             "indoor_safe": True,
             "pet_friendly_rating": pet_status,
-            "safety_protocol": "臺灣農業部 (EIR841 全量登錄資材雙向驗證防護)",
+            "safety_protocol": "臺灣農業部 (EIR841 登錄資材雙層病理與依據驗證)",
+            "disclaimer": "本系統資材推薦與環境/寵物注意事項係依成分學術特性提供之風險提示，非農業部官方安全認證；使用倍數與範圍請以產品包裝正式標示為準。",
         }
     else:
         print(f"[OK]  新增資料庫紀錄: {crop_name} - {status_name}")
@@ -1318,7 +1329,8 @@ def process_and_update_diagnosis(raw_ai_data: dict, db: Session) -> dict:
             "commercial_remedies": remedies_list,
             "indoor_safe": True,
             "pet_friendly_rating": pet_status,
-            "safety_protocol": "臺灣農業部 (EIR841 全量登錄資材雙向驗證防護)",
+            "safety_protocol": "臺灣農業部 (EIR841 登錄資材雙層病理與依據驗證)",
+            "disclaimer": "本系統資材推薦與環境/寵物注意事項係依成分學術特性提供之風險提示，非農業部官方安全認證；使用倍數與範圍請以產品包裝正式標示為準。",
         }
 
 

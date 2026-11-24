@@ -57,33 +57,75 @@ INGREDIENT_EFFICACY_MAP = {
     "斜紋夜蛾": ["蘇力菌", "苦楝油"],
 }
 
-# 寵物友善等級判定依據
-# SAFE: 犬貓無害，可於室內放心使用
-# CAUTION: 稀釋噴灑乾燥後無害，但避免寵物在未乾時直接舔拭或密閉直吸
-# TOXIC: 對特定寵物（尤其貓）具有潛在神經/代謝毒性
-def evaluate_pet_safety(declare_items: str) -> tuple[str, str]:
+# 寵物友善等級判定依據（系統基於學術文獻成分特性之風險分類，非農業部官方安全認證）
+# SAFE -> LOW_RISK: 犬貓環境接觸風險低
+# CAUTION -> MODERATE_RISK: 植物精油/皂素，稀釋乾燥後安全；噴灑時避開寵物與避免舔拭
+# TOXIC -> HIGH_RISK: 對特定寵物（尤其貓）具潛在神經/代謝刺激性
+def evaluate_pet_safety(declare_items: str) -> tuple[str, str, str, str]:
     text = declare_items or ""
+    disclaimer_suffix = "（系統環境風險提示，非官方認證）"
     if any(k in text for k in ["除蟲菊", "百滅寧", "賽滅寧", "茶樹精油", "酚類"]):
-        return "TOXIC", "對貓犬具神經或代謝毒性，居家有寵物嚴禁使用"
+        return (
+            "TOXIC",
+            f"對貓犬具神經或代謝刺激風險，居家有寵物嚴禁使用{disclaimer_suffix}",
+            "HIGH_RISK",
+            f"【寵物環境警示】成分對特定貓犬具神經或代謝刺激風險，居家有寵物請避免接觸{disclaimer_suffix}",
+        )
     if any(k in text for k in ["柑桔精油", "肉桂精油", "薄荷精油", "尤加利"]):
-        return "CAUTION", "植物精油成分，稀釋噴灑乾燥後安全；噴灑時請將貓犬暫時移開，避免直接舔拭葉片"
+        return (
+            "CAUTION",
+            f"植物精油成分，稀釋噴灑乾燥後風險低；噴灑時請將貓犬暫移，避免直接舔拭葉片{disclaimer_suffix}",
+            "MODERATE_RISK",
+            f"【寵物接觸提示】精油成分稀釋乾燥後接觸風險低，噴灑時請將寵物暫時移開，避免直接舔拭{disclaimer_suffix}",
+        )
     if any(k in text for k in ["苦茶粕"]):
-        return "CAUTION", "含天然皂素，對水生生物與犬隻腸胃有刺激性，避免誤食"
+        return (
+            "CAUTION",
+            f"含天然皂素，對水生生物與犬隻腸胃有刺激性，避免誤食{disclaimer_suffix}",
+            "MODERATE_RISK",
+            f"【寵物接觸提示】含天然皂素對寵物腸胃具刺激性，盆栽施用請避免毛孩誤食{disclaimer_suffix}",
+        )
     if any(k in text for k in ["碳酸氫鈉", "食品原料", "大型褐藻萃取物", "甲殼素", "幾丁聚醣", "矽藻土", "碳酸鈣", "中性化亞磷酸", "醋"]):
-        return "SAFE", "食品級或天然礦物成分，犬貓寵物友善，室內可安全使用"
+        return (
+            "SAFE",
+            f"食品級或天然礦物成分，接觸風險低，室內施用請保持通風{disclaimer_suffix}",
+            "LOW_RISK",
+            f"【寵物接觸提示】食品級或天然礦物成分，接觸風險低{disclaimer_suffix}",
+        )
     if any(k in text for k in ["苦楝油", "脂肪酸鹽類", "矽酸鉀"]):
-        return "SAFE", "天然植物油脂或皂素，正常稀釋使用對哺乳動物安全"
-    return "SAFE", "經農業部審定之天然無毒植物保護資材"
+        return (
+            "SAFE",
+            f"天然植物油脂或皂素，正常稀釋使用接觸風險低{disclaimer_suffix}",
+            "LOW_RISK",
+            f"【寵物接觸提示】天然油脂或皂素成分，正常稀釋使用接觸風險低{disclaimer_suffix}",
+        )
+    return (
+        "SAFE",
+        f"農業部登錄天然植物保護資材，接觸風險低{disclaimer_suffix}",
+        "LOW_RISK",
+        f"【寵物接觸提示】農業部登錄之天然資材，接觸風險低{disclaimer_suffix}",
+    )
 
 
-def evaluate_indoor_safety(declare_items: str) -> tuple[bool, str]:
+def evaluate_indoor_safety(declare_items: str) -> tuple[bool, str, str]:
     text = declare_items or ""
-    # 室內不建議有刺激性強酸強揮發氣味（如未稀釋高濃度壬酸、苦茶粕粉塵）
     if any(k in text for k in ["除蟲菊", "有機磷", "三唑", "百滅寧"]):
-        return False, "化學合成農藥，嚴禁於密閉室內使用"
+        return (
+            False,
+            "化學合成農藥或強揮發成分，嚴禁於密閉室內使用（系統風險評估）",
+            "【室內使用警示】具刺激性或化學成分，嚴禁於密閉室內環境使用",
+        )
     if any(k in text for k in ["苦茶粕"]):
-        return True, "室內盆栽可表土薄撒，但避免揚塵吸入"
-    return True, "純天然/物理機制資材，極適合居家與辦公室密閉環境使用"
+        return (
+            True,
+            "室內盆栽可表土薄撒，但避免揚塵吸入（系統風險評估）",
+            "【室內使用提示】微量表土覆蓋，避免揚塵吸入，保持環境通風",
+        )
+    return (
+        True,
+        "純天然/物理機制資材，施用後保持通風即可（系統風險評估）",
+        "【室內使用提示】天然物理資材，施用後請置於通風採光處保持通氣",
+    )
 
 
 def _enrich_single_item(item: Dict[str, Any]) -> Dict[str, Any]:
@@ -93,8 +135,8 @@ def _enrich_single_item(item: Dict[str, Any]) -> Dict[str, Any]:
     reg_num = item.get("RegNoNum", "").strip()
     full_reg_no = f"{reg_type}字第{reg_num}號" if (reg_type and reg_num) else "農業部官方核准登記"
     
-    pet_status, pet_reason = evaluate_pet_safety(declare_items)
-    indoor_safe, indoor_reason = evaluate_indoor_safety(declare_items)
+    pet_status, pet_reason, pet_risk_lvl, pet_risk_note = evaluate_pet_safety(declare_items)
+    indoor_safe, indoor_reason, indoor_risk_note = evaluate_indoor_safety(declare_items)
 
     # 決定適應對象標籤
     matched_diseases = []
@@ -162,8 +204,12 @@ def _enrich_single_item(item: Dict[str, Any]) -> Dict[str, Any]:
         "efficacy_summary": efficacy_summary,
         "indoor_safe": indoor_safe,
         "indoor_reason": indoor_reason,
+        "indoor_risk_notice": indoor_risk_note,
         "pet_friendly_status": pet_status,  # SAFE, CAUTION, TOXIC
         "pet_friendly_desc": pet_reason,
+        "pet_risk_level": pet_risk_lvl,
+        "pet_risk_notice": pet_risk_note,
+        "disclaimer": "本系統之環境與寵物注意事項係依成分學術特性提供之輔助風險提示，非農業部官方安全認證；使用倍數與範圍請以產品包裝正式標示為準。",
         "license_image_url": item.get("LicenseImageUrl", ""),
         "matched_targets": matched_diseases,
         "purchase_search_url": purchase_url,
@@ -266,16 +312,118 @@ def resolve_ingredients_by_pathology(disease_or_pest_name: str) -> List[str]:
     return combined
 
 
+def verify_remedy_suitability(
+    item: Dict[str, Any],
+    disease_or_pest_name: str,
+    target_ingredients: List[str],
+) -> Dict[str, Any]:
+    """
+    第二層：官方資料依據與安全驗證模組 (Official Evidence & Safety Verification)
+    
+    評估項目拆分：
+    1. pathology_score (病理機制相關分): 推導成分與產品成分/名稱的關聯度
+    2. official_evidence_level (官方登記依據等級: HIGH, MEDIUM, LOW):
+       - HIGH: 官方資料 UseDisease/UsePest 登記用途符合，且品名/成分明確命中適應機制
+       - MEDIUM: 官方資料具備防除登記，成分符合病理機制
+       - LOW: 僅為一般生長營養 (UseGrowth) 或無對應防除登記，不得宣稱病害防除特效
+    3. verified: 是否通過官方依據門檻
+    4. rejection_reason: 若被攔截或降級，說明原因（用於口試實驗二：不符合條件之資材攔截率）
+    """
+    query = (disease_or_pest_name or "").strip()
+    is_disease_query = any(w in query for w in ["病", "菌", "斑", "枯", "爛", "黴", "粉", "銹", "腐", "疫"])
+    is_pest_query = any(w in query for w in ["蟲", "蟎", "蝨", "蛾", "蝶", "蝸", "蜘蛛", "薊馬"])
+
+    use_disease = item.get("use_disease", False)
+    use_pest = item.get("use_pest", False)
+    use_growth = item.get("use_growth", False)
+    ingredient = item.get("active_ingredient", "")
+    pname = item.get("product_name", "")
+
+    # 1. 計算病理相關分 (Pathology Score)
+    pathology_score = 0
+    matched_ingr = [ti for ti in target_ingredients if ti in ingredient or ti in pname]
+    if matched_ingr:
+        pathology_score += len(matched_ingr) * 3
+
+    if any(target in query for target in item.get("matched_targets", [])):
+        pathology_score += 4
+
+    # 2. 官方資料登錄依據查核 (Official Evidence Check)
+    evidence_level = "LOW"
+    evidence_notes = []
+    rejection_reason = None
+    is_verified = False
+
+    if is_disease_query:
+        if use_disease:
+            if pathology_score >= 3:
+                evidence_level = "HIGH"
+                evidence_notes.append("符合農業部公告之病害防除登錄類別，且有效成分具明確病理機制支持")
+                is_verified = True
+            else:
+                evidence_level = "MEDIUM"
+                evidence_notes.append("符合農業部公告之病害防除登錄類別，成分具廣譜保護特性")
+                is_verified = True
+        elif use_growth and not use_disease:
+            evidence_level = "LOW"
+            rejection_reason = "官方登記用途為促進生長/活力營養，非病害防除資材，依據不足進行攔截降級"
+            evidence_notes.append("注意：此產品官方登記為生長營養類，非直接病害防除資材")
+        else:
+            evidence_level = "LOW"
+            rejection_reason = "官方登記未包含病害防除用途 (UseDisease!=Y)"
+            evidence_notes.append("官方登錄資訊未包含病害防治依據")
+
+    elif is_pest_query:
+        if use_pest:
+            if pathology_score >= 3:
+                evidence_level = "HIGH"
+                evidence_notes.append("符合農業部公告之害蟲防除登錄類別，且成分具明確驅蟲除蟎機制")
+                is_verified = True
+            else:
+                evidence_level = "MEDIUM"
+                evidence_notes.append("符合農業部公告之害蟲防除登錄類別")
+                is_verified = True
+        elif use_growth and not use_pest:
+            evidence_level = "LOW"
+            rejection_reason = "官方登記用途為促進生長，非蟲害防除資材，進行攔截降級"
+            evidence_notes.append("注意：此產品官方登記為生長營養類，非蟲害防除資材")
+        else:
+            evidence_level = "LOW"
+            rejection_reason = "官方登記未包含害蟲防除用途 (UsePest!=Y)"
+            evidence_notes.append("官方登錄資訊未包含害蟲防治依據")
+
+    else:
+        # 一般性保護或未知分類
+        if use_disease or use_pest:
+            evidence_level = "MEDIUM"
+            evidence_notes.append("具官方病蟲害防除登錄，請依產品標示之適應範圍施用")
+            is_verified = True
+        else:
+            evidence_level = "LOW"
+            evidence_notes.append("一般植物保護或營養資材")
+
+    return {
+        "verified": is_verified,
+        "pathology_score": pathology_score,
+        "official_evidence_level": evidence_level,
+        "official_evidence_note": "；".join(evidence_notes),
+        "rejection_reason": rejection_reason,
+        "matched_mechanism_ingredients": matched_ingr,
+    }
+
+
 def search_official_remedies(
     disease_or_pest_name: str,
     is_indoor: bool = True,
     has_pet: bool = False,
     city_filter: Optional[str] = None,
     limit: int = 5,
+    verified_only: bool = True,
 ) -> List[Dict[str, Any]]:
     """
-    根據病蟲害名稱、室內設定與寵物狀況，精準檢索全台官方市售安全資材。
-    採用病理機制自動推導引擎，不需手動維護單一疾病字典。
+    雙層驗證資材檢索服務：
+    第一層：植物病理機制成分映射與初篩
+    第二層：農業部官方登錄依據驗證 (UseDisease/UsePest)、寵物接觸風險與室內安全條件過濾
     """
     all_remedies = load_all_remedies()
     if not all_remedies:
@@ -284,48 +432,47 @@ def search_official_remedies(
     query = disease_or_pest_name.strip()
     candidates = []
 
-    # 取得此病害常見的有效資材成分 (病理機制自動推導)
+    # 第一層：取得此病害常見的有效資材成分 (病理機制自動推導)
     target_ingredients = resolve_ingredients_by_pathology(query)
 
-    for item in all_remedies:
-        # 1. 室內安全性過濾
-        if is_indoor and not item["indoor_safe"]:
+    for base_item in all_remedies:
+        # 環境條件過濾
+        if is_indoor and not base_item["indoor_safe"]:
+            continue
+        if has_pet and base_item["pet_friendly_status"] == "TOXIC":
+            continue
+        if city_filter and city_filter not in base_item["city"]:
             continue
 
-        # 2. 寵物安全性過濾
-        if has_pet and item["pet_friendly_status"] == "TOXIC":
+        # 第二層：官方依據與適用性驗證
+        verification = verify_remedy_suitability(base_item, query, target_ingredients)
+        pathology_score = verification["pathology_score"]
+
+        # 若要求僅推薦有官方依據驗證通過者，且該產品未通過驗證 (例如純營養品被拿來當病害藥)，進行攔截
+        if verified_only and not verification["verified"]:
             continue
 
-        # 3. 縣市過濾 (若有指定)
-        if city_filter and city_filter not in item["city"]:
+        if pathology_score <= 0 and not any(term in query for term in ["病", "菌", "斑", "蟲", "蟎"]):
             continue
 
-        # 4. 適應症評分
-        score = 0
-        ingredient = item["active_ingredient"]
-        pname = item["product_name"]
+        # 計算綜合排序權重：官方依據等級權重 + 病理機制吻合分
+        evidence_weight = 10 if verification["official_evidence_level"] == "HIGH" else (5 if verification["official_evidence_level"] == "MEDIUM" else 0)
+        total_score = evidence_weight + pathology_score
 
-        # 直接成分命中
-        for ti in target_ingredients:
-            if ti in ingredient:
-                score += 3
-            if ti in pname:
-                score += 2
+        # 封裝包含驗證資訊的資材字典
+        enriched_item = dict(base_item)
+        enriched_item.update({
+            "verified": verification["verified"],
+            "official_evidence_level": verification["official_evidence_level"],
+            "official_evidence_note": verification["official_evidence_note"],
+            "pathology_score": pathology_score,
+            "total_score": total_score,
+            "rejection_reason": verification["rejection_reason"],
+        })
 
-        # 病蟲害類別符合
-        if any(term in query for term in ["病", "菌", "斑", "枯", "爛"]) and item["use_disease"]:
-            score += 1
-        if any(term in query for term in ["蟲", "蟎", "蝨", "蛾", "蝶", "蝸"]) and item["use_pest"]:
-            score += 1
+        candidates.append((total_score, enriched_item))
 
-        # 若有指定目標直接命中
-        if any(target in query for target in item["matched_targets"]):
-            score += 4
-
-        if score > 0:
-            candidates.append((score, item))
-
-    # 按相關度排序
+    # 按綜合分數排序 (官方依據高 + 機制高度吻合者居前)
     candidates.sort(key=lambda x: x[0], reverse=True)
     results = [item for _, item in candidates[:limit]]
     return results
@@ -345,26 +492,30 @@ def build_remedy_bidirectional_context(
         is_indoor=is_indoor,
         has_pet=has_pet,
         limit=3,
+        verified_only=True,
     )
     if not remedies:
         return ""
 
     lines = [
-        "【臺灣農業部審定官方市售資材適應症（供反向交叉比對與商業處方推薦）】：",
-        f"目前環境條件：{'室內/辦公室環境 (嚴格排除化學農藥)' if is_indoor else '戶外/農田環境'}；"
-        f"寵物安全要求：{'有犬貓同住 (必須 100% 寵物無毒)' if has_pet else '無特殊要求'}。",
+        "【臺灣農業部登錄官方市售資材（經系統雙層病理與依據驗證）】：",
+        f"環境條件需求：{'室內/辦公室盆栽環境' if is_indoor else '戶外/農田環境'}；"
+        f"寵物接觸考量：{'有犬貓同住 (需低風險資材)' if has_pet else '無特殊要求'}。",
     ]
 
     for idx, r in enumerate(remedies, 1):
         lines.append(
-            f"{idx}. 商品名稱：【{r['product_name']}】(登記字號：{r['registration_no']})\n"
+            f"{idx}. 商品名稱：【{r['product_name']}】(登錄字號：{r['registration_no']})\n"
             f"   - 有效成分：{r['active_ingredient']}（製造商：{r['company_name']}，{r['city']}）\n"
-            f"   - 寵物友善評級：{r['pet_friendly_status']}（{r['pet_friendly_desc']}）\n"
+            f"   - 官方依據等級：{r.get('official_evidence_level', 'MEDIUM')}（{r.get('official_evidence_note', '')}）\n"
+            f"   - 寵物接觸風險提示：{r.get('pet_risk_notice', r.get('pet_friendly_desc', ''))}\n"
             f"   - 適用範圍：{'防除病菌 ' if r['use_disease'] else ''}{'防除害蟲' if r['use_pest'] else ''}"
         )
 
     lines.append(
-        "【重要反向驗證指引】：請比對照片實際病斑是否符合上述官方資材所針對之作用機制。"
-        "若吻合，請在防治步驟中具體推薦上述官方資材、安全稀釋倍數與噴灑部位，杜絕虛構不實處方！"
+        "【重要安全防護與規範指引】：\n"
+        "1. 請比對照片病斑特徵是否符合上述官方資材之作用機制。\n"
+        "2. 嚴禁自行虛構特定稀釋倍數或未經驗證的寶特瓶調配公式！\n"
+        "3. 處方指引中請明確提示使用者『嚴格參照產品外包裝標示之官方稀釋倍數施用』，並先局部試噴以杜絕藥傷。"
     )
     return "\n".join(lines)
