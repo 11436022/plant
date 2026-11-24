@@ -461,32 +461,32 @@ def format_remedies_into_treatment(
         icon = icons[i] if i < len(icons) else "• "
         output += f"{icon}{step}\n"
 
-    # 2. 官方審定資材推薦（精選 1 款首選 + 最多 1 款備選，安全合規標示指引）
+    # 2. 官方審定資材推薦（精簡要領條列，避免手機小螢幕產生排版擁擠與文字牆負擔）
     if remedies_list:
-        pet_title_badge = "🐾 寵物環境低風險提示" if not has_pet else "🐾 家有寵物接觸風險提示"
-        output += f"\n🌿【官方登錄資材建議】（🛡️ 雙層病理驗證／{pet_title_badge}）：\n"
         primary = remedies_list[0]
         p_name = primary.get("product_name", "")
         reg_no = primary.get("registration_no", "")
         ingr = primary.get("active_ingredient", "")
-        evidence_lvl = primary.get("official_evidence_level", "MEDIUM")
-        evidence_note = primary.get("official_evidence_note", "符合農業部公告登記")
 
         # 精簡主成分顯示
         ingr_short = "、".join([x for x in ingr.split("、") if x][:2]) or ingr
-        pet_badge = primary.get("pet_risk_notice") or ("🐾 環境接觸風險低" if primary.get("pet_friendly_status") == "SAFE" else "⚠️ 噴灑時避開毛孩")
+        pet_badge = primary.get("pet_risk_notice") or ("🐾 環境接觸低風險" if primary.get("pet_friendly_status") == "SAFE" else "⚠️ 噴灑時避開毛孩")
+        pet_badge_clean = pet_badge.replace("(系統環境風險提示，非官方認證)", "").replace("（系統環境風險提示，非官方認證）", "").strip()
 
-        output += f"👉 首選推薦：【{p_name}】（登錄字號：{reg_no}）\n"
-        output += f"   • 成分機制：{ingr_short}配方（官方依據：{evidence_lvl} - {evidence_note}）\n"
-        output += f"   • 安全注意：{pet_badge}\n"
-        output += f"   • 稀釋調配：免登記資材各家商品濃度不同，請嚴格參照產品外包裝標示之倍數稀釋（切勿過量）\n"
-        output += f"   • 施用指引：建議初次使用先於單片病葉局部試噴，確認 24 小時無藥傷再於傍晚均勻噴灑\n"
+        output += f"\n🌿【官方登錄資材建議】\n"
+        output += f"👉 首選推薦：【{p_name}】\n"
+        if reg_no:
+            output += f"   • 登錄字號：{reg_no}\n"
+        output += f"   • 核心成分：{ingr_short}配方\n"
+        output += f"   • 毛孩安全：{pet_badge_clean}\n"
+        output += f"   • 施用要領：依包裝倍數稀釋；先單葉試噴，傍晚施用最佳\n"
 
         if len(remedies_list) > 1:
             alt = remedies_list[1]
             alt_name = alt.get("product_name", "")
             alt_reg = alt.get("registration_no", "")
-            output += f"\n💡 替代備選：【{alt_name}】（登錄字號：{alt_reg}，使用請嚴格依產品外包裝標示）\n"
+            alt_reg_str = f"（{alt_reg}）" if alt_reg else ""
+            output += f"💡 替代備選：【{alt_name}】{alt_reg_str}\n"
 
     return output.strip()
 

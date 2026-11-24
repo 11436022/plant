@@ -44,12 +44,12 @@
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
-            <!-- 寵物安全徽章 (右上角) -->
+            <!-- 寵物安全徽章 (左下角，避免與右上/左上徽章水平擠壓重疊) -->
             <TextView
                 android:id="@+id/tv_remedy_pet_badge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
+                android:layout_gravity="bottom|start"
                 android:layout_margin="5dp"
                 android:background="@drawable/bg_badge_safe"
                 android:paddingHorizontal="6dp"

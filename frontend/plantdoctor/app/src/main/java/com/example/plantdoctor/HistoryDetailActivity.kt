@@ -483,9 +483,9 @@ class HistoryDetailActivity : AppCompatActivity() {
                     }.toString()
                     tvAdvice.text = fullAdvice
 
-                    // 🌟 核心升級：將處方箋優雅拆解為獨立的卡片區塊
+                    // 🌟 核心升級：將處方箋優雅拆解為獨立的卡片區塊，並以排版美化避免文字擁擠
                     tvDetailSymptom.text = data.suggestion ?: "目前植株狀態穩定，無異常嚴重病徵。"
-                    tvDetailTreatment.text = data.treatment ?: "請維持良好光照與通風，適度澆水即可。"
+                    tvDetailTreatment.text = formatTreatmentText(data.treatment)
 
                     // 判斷此植株當前是否為健康狀態
                     val isHealthyPlant = (data.user_corrected_status ?: data.status_name ?: "").contains("健康")
@@ -736,6 +736,33 @@ class HistoryDetailActivity : AppCompatActivity() {
 
         android.util.Log.d("FixImageUrl", "🖼️ 圖片網址最終修復為: $url")
         return url
+    }
+
+    private fun formatTreatmentText(raw: String?): CharSequence {
+        if (raw.isNullOrBlank()) return "請維持良好光照與通風，適度澆水即可。"
+
+        // 去除歷史舊資料中冗長括號免責字樣與過長文字，並以 HTML 粗體呈現段落
+        var text = raw
+            .replace("(系統環境風險提示，非官方認證)", "")
+            .replace("（系統環境風險提示，非官方認證）", "")
+            .replace("（🛡️ 雙層病理驗證／🐾 寵物環境低風險提示）：", "")
+            .replace("（🛡️ 雙層病理驗證／🐾 家有寵物接觸風險提示）：", "")
+            .replace("免登記資材各家商品濃度不同，請嚴格參照產品外包裝標示之倍數稀釋（切勿過量）", "請嚴格依包裝標示倍數稀釋")
+            .replace("免登記資材各家商品濃度不同，請嚴格參照產品外包裝標示之倍數稀釋 (切勿過量)", "請嚴格依包裝標示倍數稀釋")
+
+        val html = text
+            .replace("\n", "<br/>")
+            .replace("【即時照護】", "<b>【即時照護】</b>")
+            .replace("🌿【官方登錄資材建議】", "<br/><b>🌿【官方登錄資材建議】</b>")
+            .replace("👉 首選推薦：", "<b>👉 首選推薦：</b>")
+            .replace("💡 替代備選：", "<br/><b>💡 替代備選：</b>")
+
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            android.text.Html.fromHtml(html, android.text.Html.FROM_HTML_MODE_COMPACT)
+        } else {
+            @Suppress("DEPRECATION")
+            android.text.Html.fromHtml(html)
+        }
     }
 
     private fun executeDelete() {

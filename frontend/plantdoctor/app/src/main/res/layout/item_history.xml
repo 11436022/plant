@@ -44,12 +44,12 @@
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
-            <!-- 左上角：室內/寵物安全小徽章 -->
+            <!-- 左下角：室內/寵物安全小徽章 (置於底層角落，徹底避免與頂部病害信心度重疊碰撞) -->
             <TextView
                 android:id="@+id/tv_safety_badge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="top|start"
+                android:layout_gravity="bottom|start"
                 android:layout_margin="8dp"
                 android:background="@drawable/bg_badge_safe"
                 android:paddingHorizontal="6dp"

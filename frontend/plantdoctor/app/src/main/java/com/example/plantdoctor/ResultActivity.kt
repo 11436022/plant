@@ -113,11 +113,7 @@ class ResultActivity : AppCompatActivity() {
             binding.tvPlantName.text = "植物：${plantName ?: "無法辨識"}"
             binding.tvDiseaseName.text = "診斷：${diseaseName ?: "未知"}"
 
-            val fullAdvice = StringBuilder().apply {
-                append("【病症狀態】\n${data.suggestion ?: "尚無建議"}\n\n")
-                append("【治療方法】\n${data.treatment ?: "請諮詢專業人員"}")
-            }.toString()
-            binding.tvAdvice.text = fullAdvice
+            binding.tvAdvice.text = formatResultAdvice(data.suggestion, data.treatment)
             binding.tvAdvice.setTextIsSelectable(true)
 
             val unknownCrops = listOf("未知作物", "未知", "無法判定", "無法辨識", "非植物", "無植物特徵")
@@ -607,6 +603,33 @@ class ResultActivity : AppCompatActivity() {
                 goToHome()
             }
         })
+    }
+
+    private fun formatResultAdvice(suggestion: String?, treatment: String?): CharSequence {
+        val cleanSug = suggestion ?: "目前植株生長良好，無明顯異常症狀。"
+        var cleanTreat = (treatment ?: "請維持良好光照與通風，適度澆水即可。")
+            .replace("(系統環境風險提示，非官方認證)", "")
+            .replace("（系統環境風險提示，非官方認證）", "")
+            .replace("（🛡️ 雙層病理驗證／🐾 寵物環境低風險提示）：", "")
+            .replace("（🛡️ 雙層病理驗證／🐾 家有寵物接觸風險提示）：", "")
+            .replace("免登記資材各家商品濃度不同，請嚴格參照產品外包裝標示之倍數稀釋（切勿過量）", "請依產品外包裝標示倍數稀釋")
+            .replace("免登記資材各家商品濃度不同，請嚴格參照產品外包裝標示之倍數稀釋 (切勿過量)", "請依產品外包裝標示倍數稀釋")
+
+        val html = "<b>【病症狀態】</b><br/>" +
+                cleanSug.replace("\n", "<br/>") +
+                "<br/><br/><b>【照護與處方】</b><br/>" +
+                cleanTreat.replace("\n", "<br/>")
+                    .replace("【即時照護】", "<b>【即時照護】</b>")
+                    .replace("🌿【官方登錄資材建議】", "<br/><b>🌿【官方登錄資材建議】</b>")
+                    .replace("👉 首選推薦：", "<b>👉 首選推薦：</b>")
+                    .replace("💡 替代備選：", "<br/><b>💡 替代備選：</b>")
+
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            android.text.Html.fromHtml(html, android.text.Html.FROM_HTML_MODE_COMPACT)
+        } else {
+            @Suppress("DEPRECATION")
+            android.text.Html.fromHtml(html)
+        }
     }
 }
 
